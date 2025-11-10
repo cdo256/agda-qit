@@ -1,0 +1,4 @@
+name: agda-qit
+depend: 
+include: .
+flags: --with-K --prop --rewriting --backtracking-instance-search --allow-unsolved-metas
