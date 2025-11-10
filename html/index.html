@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>index</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="Agda"><a id="1" class="Keyword">module</a> <a id="8" href="index.html" class="Module">index</a> <a id="14" class="Keyword">where</a>
+<a id="20" class="Comment">{-
+  Agda code to accompany the paper:
+
+  Marcelo P. Fiore, Andrew M. Pitts and S. C. Steenkamp,
+  &quot;Quotients, Inductive Types and Quotient Inductive Types&quot;
+  https://arxiv.org/abs/2101.02994
+
+  Agda code at https://doi.org/10.17863/CAM.77483
+
+  The code has been checked with Agda version 2.6.2
+
+  The files use a common set of options given in the file flags.agda-lib:
+
+  --with-K
+    (we make use of Streicher&#39;s Axiom K, or equivalently the
+    Uniqueness of Identity Proofs (UIP), via the more liberal, dafault
+    version of Agda&#39;s dependent patern matching)
+
+  --prop
+    (we make use of Agda’s built-in predicative universes of
+    definitionally proof-irrelevant propositions)
+
+  --rewriting
+    (we use Agda&#39;s facility for user-defined extensions of its
+    evaluation relation with new computation rules, in order to make
+    the computation rules for postulated quotient types be
+    definitional equalities)
+
+  We begin with a small library of common definitions:
+-}</a>
+<a id="999" class="Keyword">open</a> <a id="1004" class="Keyword">import</a> <a id="1011" href="Prelude.html" class="Module">Prelude</a>
+<a id="1019" class="Comment">{-
+  Next we give some postulates for propositional extensionaliy,
+  Hofmann-style quotient types and the axiom of unique choice, as
+  described in section 2 (Type Theory) of the paper:
+-}</a>
+<a id="1208" class="Keyword">open</a> <a id="1213" class="Keyword">import</a> <a id="1220" href="TypeTheory.html" class="Module">TypeTheory</a>
+<a id="1231" class="Comment">{-
+  We also rely on some standard facts about well-founded induction and
+  recursion (deriving the latter from the former via a use of Unique
+  Choice -- see Proposition 5.3 in the paper):
+-}</a>
+<a id="1424" class="Keyword">open</a> <a id="1429" class="Keyword">import</a> <a id="1436" href="WellFoundedRelations.html" class="Module">WellFoundedRelations</a>
+<a id="1457" class="Comment">{-
+  We make use of (an indexed version of) the Weakly Initial Set of
+  Covers (WISC) Axiom, as discussed in section 4 of the paper:
+-}</a>
+<a id="1593" class="Keyword">open</a> <a id="1598" class="Keyword">import</a> <a id="1605" href="WeaklyInitialSetsOfCovers.html" class="Module">WeaklyInitialSetsOfCovers</a>
+<a id="1631" class="Comment">{-
+  Now there are two branches: QW and QWI
+
+    The QW branch treats the construction of QW-types, as described in
+    the paper.
+-}</a>
+<a id="1765" class="Keyword">open</a> <a id="1770" class="Keyword">import</a> <a id="1777" href="QW.html" class="Module">QW</a>
+<a id="1780" class="Comment">{-
+    The QWI branch generalises the construction to the case of the
+    indexed version of QW-types, the QWI-types described in section 3.3
+    of the paper.
+-}</a>
+<a id="1943" class="Keyword">open</a> <a id="1948" class="Keyword">import</a> <a id="1955" href="QWI.html" class="Module">QWI</a>
+</pre></body></html>

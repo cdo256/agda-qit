@@ -1,0 +1,4 @@
+name: flags
+depend: 
+include: .
+flags: --with-K --prop --rewriting 
