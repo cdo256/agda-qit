@@ -9,6 +9,7 @@
           #ps.standard-library
           #ps.cubical
         ]);
+        just-agda = inputs.just-agda.packages.${system}.just-agda.overrideAttrs (_: { });
       };
     };
 }

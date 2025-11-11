@@ -9,6 +9,12 @@
       repo = "nixpkgs";
       ref = "21.11";
     };
+    just-agda = {
+      type = "github";
+      owner = "cdo256";
+      repo = "just-agda";
+      ref = "main";
+    };
     #agda-cubical = {
     #  type = "github";
     #  owner = "agda";
