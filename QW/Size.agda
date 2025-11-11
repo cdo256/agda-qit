@@ -114,8 +114,8 @@ funᵇ-ext :
   {i : Size}
   {m : Level}
   {B : (j : Size){{_ : j <ᵇ i}} → Set m}
-  {f f' : ∏ᵇ i B}
-  (_ : ∀ᵇ j < i , (f j == f' j))
+  {f f' : (j : Size){{j<i : j <ᵇ i}} → B j {{j<i}}}
+  (_ : (j : Size){{j<i : j <ᵇ i}} → (f j {{j<i}} == f' j {{j<i}}))
   → ------------------------------------
   f == f'
 funᵇ-ext e =
