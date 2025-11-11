@@ -9,7 +9,10 @@
           #ps.standard-library
           #ps.cubical
         ]);
-        just-agda = inputs.just-agda.packages.${system}.just-agda.overrideAttrs (_: { });
+        agda2-mode = pkgs.emacsPackages.agda2-mode;
+        just-agda = inputs.just-agda.packages.${system}.just-agda.override ({
+          agda2-mode = pkgs.emacsPackages.agda2-mode;
+        });
       };
     };
 }
