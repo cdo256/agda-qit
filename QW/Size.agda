@@ -39,14 +39,13 @@ module _ {l : Level}{Size : Set l}{{_ : SizeStructure Size}} where
     field <prf : i < j
   open _<ᵇ_ public
 
-  instance
-    <ᵇ<ᵇ :
-      {i j k : Size}
-      {{q : j <ᵇ k}}
-      {{p : i <ᵇ j}}
-      → ------------------------
-      i <ᵇ k
-    <ᵇ<ᵇ {{q}} {{p}} = <inst (<< (<prf q) (<prf p))
+  <ᵇ<ᵇ :
+    {i j k : Size}
+    {q : j <ᵇ k}
+    {p : i <ᵇ j}
+    → ------------------------
+    i <ᵇ k
+  <ᵇ<ᵇ {q = q} {p = p} = <inst (<< (<prf q) (<prf p))
 
   <ᵇ∨ˢl : {i : Size}(j : Size) → i <ᵇ i ∨ˢ j
   <ᵇ∨ˢl j = <inst (<∨ˢl j)
@@ -64,10 +63,10 @@ module _ {l : Level}{Size : Set l}{{_ : SizeStructure Size}} where
   {{_ : SizeStructure Size}}
   (i : Size)
   {m : Level}
-  (B : (j : Size){{_ : j <ᵇ i}} → Set m)
+  (B : (j : Size){_ : j <ᵇ i} → Set m)
   → ------------------------------------
   Set (l ⊔ m)
-∏ᵇ {l} {Size} i B = (j : Size){{_ : j <ᵇ i}} → B j
+∏ᵇ {l} {Size} i B = (j : Size){j<i : j <ᵇ i} → B j {j<i}
 
 infix 2 ∏ᵇsyntax
 
@@ -77,7 +76,7 @@ infix 2 ∏ᵇsyntax
   {{_ : SizeStructure Size}}
   (i : Size)
   {m : Level}
-  (B : (j : Size){{_ : j <ᵇ i}} → Set m)
+  (B : (j : Size){_ : j <ᵇ i} → Set m)
   → ------------------------------------
   Set (l ⊔ m)
 ∏ᵇsyntax = ∏ᵇ
@@ -90,10 +89,10 @@ syntax ∏ᵇsyntax i (λ j → B) = ∏ᵇ j < i , B
   {{_ : SizeStructure Size}}
   (i : Size)
   {m : Level}
-  (P : (j : Size){{_ : j <ᵇ i}} → Prop m)
+  (P : (j : Size){_ : j <ᵇ i} → Prop m)
   → -------------------------------------
   Prop (l ⊔ m)
-∀ᵇ i P =  ∀ j  → {{_ : j <ᵇ i}} → P j
+∀ᵇ i P =  ∀ j  → {j<i : j <ᵇ i} → P j {j<i}
 
 ∀ᵇsyntax :
   {l : Level}
@@ -101,7 +100,7 @@ syntax ∏ᵇsyntax i (λ j → B) = ∏ᵇ j < i , B
   {{_ : SizeStructure Size}}
   (i : Size)
   {m : Level}
-  (P : (j : Size){{_ : j <ᵇ i}} → Prop m)
+  (P : (j : Size){_ : j <ᵇ i} → Prop m)
   → -------------------------------------
   Prop (l ⊔ m)
 ∀ᵇsyntax = ∀ᵇ
@@ -113,14 +112,14 @@ funᵇ-ext :
   {{_ : SizeStructure Size}}
   {i : Size}
   {m : Level}
-  {B : (j : Size){{_ : j <ᵇ i}} → Set m}
-  {f f' : (j : Size){{j<i : j <ᵇ i}} → B j {{j<i}}}
-  (_ : (j : Size){{j<i : j <ᵇ i}} → (f j {{j<i}} == f' j {{j<i}}))
+  {B : (j : Size){_ : j <ᵇ i} → Set m}
+  {f f' : (j : Size){j<i : j <ᵇ i} → B j {j<i}}
+  (_ : (j : Size){j<i : j <ᵇ i} → (f j {j<i} == f' j {j<i}))
   → ------------------------------------
   f == f'
 funᵇ-ext e =
   funext λ j →
-  instance-funexp λ p → e j {{p}}
+  {!instance-funexp λ p → e j {p}!}
 
 -- Bounded dependent product
 record ∑ᵇ
@@ -129,15 +128,15 @@ record ∑ᵇ
   {{_ : SizeStructure Size}}
   (i : Size)
   {m : Level}
-  (B : (j : Size){{_ : j <ᵇ i}} → Set m)
+  (B : (j : Size){_ : j <ᵇ i} → Set m)
   : ------------------------------------
   Set (l ⊔ m)
   where
   constructor pairᵇ
   field
     fst      : Size
-    {{fst<}} : fst <ᵇ i
-    snd      : B fst
+    {fst<} : fst <ᵇ i
+    snd      : B fst {fst<}
 open ∑ᵇ public
 
 infix 2 Σᵇsyntax
@@ -148,7 +147,7 @@ infix 2 Σᵇsyntax
   {{_ : SizeStructure Size}}
   (i : Size)
   {m : Level}
-  (B : (j : Size){{_ : j <ᵇ i}} → Set m)
+  (B : (j : Size){_ : j <ᵇ i} → Set m)
   → ------------------------------------
   Set (l ⊔ m)
 Σᵇsyntax = ∑ᵇ
@@ -161,11 +160,11 @@ data ∃ᵇ
   {{_ : SizeStructure Size}}
   (i : Size)
   {m : Level}
-  (P : (j : Size){{_ : j <ᵇ i}} → Prop m)
+  (P : (j : Size){_ : j <ᵇ i} → Prop m)
   : -------------------------------------
   Prop (l ⊔ m)
   where
-    ∃ᵇi : (j : Size){{_ : j <ᵇ i}} → P j → ∃ᵇ i P
+    ∃ᵇi : (j : Size){j<i : j <ᵇ i} → P j {j<i} → ∃ᵇ i P
 
 infix 2 ∃ᵇsyntax
 
@@ -175,7 +174,7 @@ infix 2 ∃ᵇsyntax
   {{_ : SizeStructure Size}}
   (i : Size)
   {m : Level}
-  (P : (j : Size){{_ : j <ᵇ i}} → Prop m)
+  (P : (j : Size){_ : j <ᵇ i} → Prop m)
   → -------------------------------------
   Prop (l ⊔ m)
 ∃ᵇsyntax = ∃ᵇ
@@ -215,7 +214,7 @@ syntax subsetᵇ i (λ j → P) = subsetᵇ j < i , P
   → --------------------------------
   ∀ i → P i
 <ind P p = wf.ind _<_ <iswf P
-  (λ i h → p i (λ j {{j<ᵇi}} → h j (<prf j<ᵇi)))
+  (λ i h → p i (λ j {j<i} → h j (<prf j<i)))
 
 <rec :
   {l : Level}
@@ -227,7 +226,7 @@ syntax subsetᵇ i (λ j → P) = subsetᵇ j < i , P
   → --------------------------------
   ∀ i → B i
 <rec B b = wf.rec _<_ <iswf B
-  (λ i h → b i (λ j {{j<ᵇi}} → h j (<prf j<ᵇi)))
+  (λ i h → b i (λ j {j<i} → h j (<prf j<i)))
 
 ----------------------------------------------------------------------
 -- Plump order (Example 5.4)
