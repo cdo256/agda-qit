@@ -114,12 +114,11 @@ funᵇ-ext :
   {m : Level}
   {B : (j : Size){_ : j <ᵇ i} → Set m}
   {f f' : (j : Size){j<i : j <ᵇ i} → B j {j<i}}
-  (_ : (j : Size){j<i : j <ᵇ i} → (f j {j<i} == f' j {j<i}))
+  (eq : (j : Size){j<i : j <ᵇ i} → (f j {j<i} == f' j {j<i}))
   → ------------------------------------
   f == f'
-funᵇ-ext e =
-  funext λ j →
-  {!instance-funexp λ p → e j {p}!}
+funᵇ-ext {Size = Size} {i = i} {B = B} {f = f} {f' = f'} eq =
+  funext (λ j → implicit-funexp λ x → eq j)
 
 -- Bounded dependent product
 record ∑ᵇ

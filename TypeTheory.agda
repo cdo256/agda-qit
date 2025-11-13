@@ -312,6 +312,21 @@ implicit-funext {A = A} {B} {f} {g} e =
   impl : ((x : A) → B x) → {x : A} → B x
   impl f {x} = f x
 
+--  Function extensionality with implicit arguments (Prop)
+implicit-funexp :
+  {l m : Level}
+  {A : Prop l}
+  {B : A → Set m}
+  {f g : {x : A} → B x}
+  (_ : ∀ x → f {x} == g {x})
+  → ------------------------------
+  (λ{x} → f {x}) == (λ{x} → g {x})
+implicit-funexp {A = A} {B} {f} {g} e =
+  ap impl (funexp {f = λ x → f{x}} {g = λ x → g{x}} e)
+  where
+  impl : ((x : A) → B x) → {x : A} → B x
+  impl f {x} = f x
+
 --  Function extensionality with implicit arguments
 instance-funext :
   {l m : Level}
