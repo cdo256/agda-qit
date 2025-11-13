@@ -58,9 +58,9 @@ module SizeIdxStruct
 
   -- (6.2)
   data Rᵇ {i : Size}(A : IdxStructᵇ i) : Wᵇ A → Wᵇ A → Prop l where
-    τεᵇ : ∀ᵇ j < i ,
+    τεᵇ : ∀ j → (j<i : j <ᵇ i) →
       ((e : Op Γ)
-        (ρ : Ar Γ e → Dᵇ A j)
+        (ρ : Ar Γ e → Dᵇ A j {{j<i}})
         → ----------------------------------------------------
         Rᵇ A (pairᵇ j (T' ρ (lhs e))) (pairᵇ j (T' ρ (rhs e))))
     τηᵇ : ∀ᵇ j < i , ∀ᵇ k < j ,

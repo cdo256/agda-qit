@@ -1,4 +1,4 @@
 name: flags
 depend: 
 include: .
-flags: --with-K --prop --rewriting 
+flags: --with-K --prop --rewriting --backtracking-instance-search
