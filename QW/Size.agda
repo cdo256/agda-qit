@@ -66,21 +66,7 @@ module _ {l : Level}{Size : Set l}{{_ : SizeStructure Size}} where
   (B : (j : Size){_ : j <ᵇ i} → Set m)
   → ------------------------------------
   Set (l ⊔ m)
-∏ᵇ {l} {Size} i B = (j : Size){j<i : j <ᵇ i} → B j {j<i}
-
-infix 2 ∏ᵇsyntax
-
-∏ᵇsyntax :
-  {l : Level}
-  {Size : Set l}
-  {{_ : SizeStructure Size}}
-  (i : Size)
-  {m : Level}
-  (B : (j : Size){_ : j <ᵇ i} → Set m)
-  → ------------------------------------
-  Set (l ⊔ m)
-∏ᵇsyntax = ∏ᵇ
-syntax ∏ᵇsyntax i (λ j j<i → B) = ∏ᵇ[ j<i ] j < i , B
+∏ᵇ {l} {Size} i B = ∀ j {j<i : j <ᵇ i} → B j {j<i}
 
 -- Bounded universal quantification
 ∀ᵇ :
@@ -89,22 +75,10 @@ syntax ∏ᵇsyntax i (λ j j<i → B) = ∏ᵇ[ j<i ] j < i , B
   {{_ : SizeStructure Size}}
   (i : Size)
   {m : Level}
-  (P : (j : Size)(_ : j <ᵇ i) → Prop m)
+  (P : (j : Size){_ : j <ᵇ i} → Prop m)
   → -------------------------------------
   Prop (l ⊔ m)
-∀ᵇ i P =  ∀ j  → (j<i : j <ᵇ i) → P j j<i
-
-∀ᵇsyntax :
-  {l : Level}
-  {Size : Set l}
-  {{_ : SizeStructure Size}}
-  (i : Size)
-  {m : Level}
-  (P : (j : Size)(_ : j <ᵇ i) → Prop m)
-  → -------------------------------------
-  Prop (l ⊔ m)
-∀ᵇsyntax = ∀ᵇ
-syntax ∀ᵇsyntax i (λ j j<i → P) = ∀ᵇ[ j<i ] j < i , P
+∀ᵇ i P = ∀ j {j<i : j <ᵇ i} → P j {j<i}
 
 funᵇ-ext :
   {l : Level}
@@ -138,20 +112,6 @@ record ∑ᵇ
     snd      : B fst {fst<}
 open ∑ᵇ public
 
-infix 2 Σᵇsyntax
-
-Σᵇsyntax :
-  {l : Level}
-  {Size : Set l}
-  {{_ : SizeStructure Size}}
-  (i : Size)
-  {m : Level}
-  (B : (j : Size){_ : j <ᵇ i} → Set m)
-  → ------------------------------------
-  Set (l ⊔ m)
-Σᵇsyntax = ∑ᵇ
-syntax Σᵇsyntax i (λ j → B) = ∑ᵇ j < i , B
-
 -- Bounded existential quantification
 data ∃ᵇ
   {l : Level}
@@ -164,20 +124,6 @@ data ∃ᵇ
   Prop (l ⊔ m)
   where
     ∃ᵇi : (j : Size){j<i : j <ᵇ i} → P j {j<i} → ∃ᵇ i P
-
-infix 2 ∃ᵇsyntax
-
-∃ᵇsyntax :
-  {l : Level}
-  {Size : Set l}
-  {{_ : SizeStructure Size}}
-  (i : Size)
-  {m : Level}
-  (P : (j : Size){_ : j <ᵇ i} → Prop m)
-  → -------------------------------------
-  Prop (l ⊔ m)
-∃ᵇsyntax = ∃ᵇ
-syntax ∃ᵇsyntax i (λ j → P) = ∃ᵇ j < i , P
 
 -- Bounded comprehension
 infixl 4 _∣ᵇ_
@@ -194,11 +140,9 @@ record subsetᵇ
   constructor _∣ᵇ_
   field
     ins      : Size
-    {{ins<}} : ins <ᵇ i
+    {ins<} : ins <ᵇ i
     prf      : P ins
 open subsetᵇ public
-
-syntax subsetᵇ i (λ j → P) = subsetᵇ j < i , P
 
 ----------------------------------------------------------------------
 -- Bounded well-founded induction and recursion (Proposition 5.3)
@@ -209,11 +153,11 @@ syntax subsetᵇ i (λ j → P) = subsetᵇ j < i , P
   {{_ : SizeStructure Size}}
   {n : Level}
   (P : Size → Prop n)
-  (p : ∀ i → (∀ᵇ[ j<i ] j < i , P j) → P i)
+  (p : ∀ i → (∀ j {j<i : j <ᵇ i} → P j) → P i)
   → --------------------------------
   ∀ i → P i
 <ind P p = wf.ind _<_ <iswf P
-  (λ i h → p i (λ j j<i → h j (<prf j<i)))
+  (λ i h → p i (λ j {j<i} → h j (<prf j<i)))
 
 <rec :
   {l : Level}
