@@ -59,14 +59,14 @@ module _
       DA=Q : ∀{i} → ∣D A ∣ i == Q i
       DA=Q {i} = ∧e₁ (δ i)
 
-      τ=[pairᵇ]/R  : ∀{i} → ∀ᵇ j < i ,
+      τ=[pairᵇ]/R  : ∀{i} → ∀ᵇ i λ j {j<i} →
         (∀ t → τ A i j t === [ pairᵇ j t ]/ R i)
       τ=[pairᵇ]/R {i} j = ∧e₂ (δ i) j
 
-      W′ : ∀ i → ∏ᵇ j < i , (W j → W i)
+      W′ : ∀ i → ∏ᵇ i λ j {j<i} → (W j → W i)
       W′ i j (pairᵇ k t) = pairᵇ k t
 
-      Q′ : ∀ i → ∏ᵇ j < i , (Q j → Q i)
+      Q′ : ∀ i → ∏ᵇ i λ j {j<i} → (Q j → Q i)
       Q′ i j = quot.lift {R = R j}
         (λ z → [ W′ i j z ]/ R i)
         λ{ (τεᵇ k e ρ)   → quot.eq (R i) (τεᵇ k e ρ)
@@ -74,14 +74,14 @@ module _
         ; (τσᵇ k l a f) → quot.eq (R i) (τσᵇ k l a f)
         }
 
-      D′ : ∀ i → ∏ᵇ j < i , (∣D A ∣ j → ∣D A ∣ i)
+      D′ : ∀ i → ∏ᵇ i λ j {j<i} → (∣D A ∣ j → ∣D A ∣ i)
       D′ i j = τ A i j ∘ η
 
       τ-surj :
         (i : Size)
         (x : ∣D A ∣ i)
         → ----------------------------------------------
-        ∃ᵇ j < i , (∃ t ∶ T (∣D A ∣ j) , τ A i j t == x)
+        ∃ᵇ i λ j {j<i} → (∃ t ∶ T (∣D A ∣ j) , τ A i j t == x)
       τ-surj i x =
         match (quot.surjectionmk (R i) (coe DA=Q x))
         λ{(∃i (pairᵇ j t) p) → ∃ᵇi j (∃i t
@@ -95,7 +95,7 @@ module _
             x
           qed))}
 
-      D′=Q′ : ∀ i → ∀ᵇ j < i , (∀ x →
+      D′=Q′ : ∀ i → ∀ᵇ i λ j {j<i} → (∀ x →
         coe DA=Q (D′ i j x) == Q′ i j (coe DA=Q x))
       D′=Q′ i j x = match (τ-surj j x) (λ {
         (∃ᵇi k (∃i t refl)) →
@@ -113,7 +113,7 @@ module _
           qed
         })
 
-      Dact : ∀ i → ∀ᵇ j < i , ∀ᵇ k < j , (∀ z →
+      Dact : ∀ i → ∀ᵇ i λ j {j<i} → ∀ᵇ j λ k {k<j} → (∀ z →
         D′ i k z == D′ i j (D′ j k z))
       Dact i j k z =
         proof
@@ -126,7 +126,7 @@ module _
           τ A i j (η (τ A j k (η z)))
         qed
 
-      τε : ∀ i → ∀ᵇ j < i ,
+      τε : ∀ i → ∀ᵇ i λ j {j<i} →
         ((e : Op Γ)
         (ρ : Ar Γ e → ∣D A ∣ j)
         → ------------------------------------------------
@@ -142,13 +142,13 @@ module _
           τ A i j (T' ρ (rhs e))
         qed
 
-      τη : ∀ i → ∀ᵇ j < i ,
+      τη : ∀ i → ∀ᵇ i λ j {j<i} →
         ((z : ∣D A ∣ j)
         → --------------------------
         τ A i j (η z) == D′ i j z)
       τη _ _ _ = refl
 
-      τσ : ∀ i → ∀ᵇ j < i , ∀ᵇ k < j ,
+      τσ : ∀ i → ∀ᵇ i λ j {j<i} → ∀ᵇ j λ k {k<j} →
         ((a : Op Σ)
         (f : Ar Σ a → T (∣D A ∣ k))
         → -----------------------------------------
@@ -165,7 +165,7 @@ module _
           τ A i j (σ (a , λ b → η (τ A j k (f b))))
         qed
 
-      D′τ :  ∀ i → ∀ᵇ j < i , ∀ᵇ k < j , (∀ t →
+      D′τ :  ∀ i → ∀ᵇ i λ j {j<i} → ∀ᵇ j λ k {k<j} → (∀ t →
         D′ i j (τ A j k t) == τ A i k t)
       D′τ i j k t =
         proof
@@ -337,7 +337,7 @@ module _
             qed
 
       -- QW satisfies the equational system
-      ⟦⟧ν : ∀ i → ∀ᵇ j < i ,
+      ⟦⟧ν : ∀ i → ∀ᵇ i λ j {j<i} →
         ((t : T{l}{Σ} (∣D A ∣ j))
         → --------------------------------
         ⟦ t ⟧ (ν D j) == ν D i (τ A i j t))
@@ -405,7 +405,7 @@ module _
           record Fun (i : Size) : Set l where
             field
               fun   : W i / R i → C
-              funτ : ∀ᵇ j < i ,
+              funτ : ∀ᵇ i λ j {j<i} →
                 ((t : T (∣D A ∣ j))
                 → ---------------------------------
                 fun ([ pairᵇ j t ]/ R i) ==
@@ -414,7 +414,7 @@ module _
 
           fun∘Q′ :
             (i : Size)
-            (hi : ∏ᵇ j < i , Fun j)
+            (hi : ∏ᵇ i λ j {j<i} → Fun j)
             (k j : Size)
             {{_ : j <ᵇ i}}
             {{_ : k <ᵇ j}}
@@ -431,7 +431,7 @@ module _
               → -------------------------------
               fun (hi k) == fun (hi j) ∘ Q′ j k
 
-            hyp : ∀ k → (∀ᵇ l < k , P l) → P k
+            hyp : ∀ k → (∀ᵇ k λ l {l<k} → P l) → P k
             hyp k hk j = funext (quot.ind (R k)
               (λ z → fun (hi k) z == fun (hi j) (Q′ j k z))
               (λ{(pairᵇ l t) →
@@ -457,7 +457,7 @@ module _
           rec' : ∀ i → Fun i
           rec' = <rec Fun hyp
             where
-            hyp : ∀ i → (∏ᵇ j < i , Fun j) → Fun i
+            hyp : ∀ i → (∏ᵇ i λ j {j<i} → Fun j) → Fun i
             hyp i hi = record { fun = funhyp ; funτ = funτhyp }
               where
               funhyp : W i / R i → C
@@ -505,7 +505,7 @@ module _
                   qed)
                 })
 
-              funτhyp : ∀ᵇ j < i ,
+              funτhyp : ∀ᵇ i λ j {j<i} →
                 ((t : T (∣D A ∣ j))
                 → ------------------------------------
                 funhyp ([ pairᵇ j t ]/ R i) ==
@@ -533,7 +533,7 @@ module _
                   funhyp (coe DA=Q (τ A i j (η (τ A j k t))))
                 qed}))
 
-        recτ : ∀ i → ∀ᵇ j < i ,
+        recτ : ∀ i → ∀ᵇ i λ j {j<i} →
           ((t : T (∣D A ∣ j))
           → ------------------------------------------
           rec i (τ A i j t) == ⟦ t ⟧ (rec i ∘ D′ i j))
@@ -620,7 +620,7 @@ module _
           P : Size → Prop l
           P i = rec i == h ∘ ν D i
 
-          hyp : ∀ i → (∀ᵇ j < i , P j) → P i
+          hyp : ∀ i → (∀ᵇ i λ j {j<i} → P j) → P i
           hyp i hi =
             funext λ x →
             match (τ-surj i x) (λ{(∃ᵇi j (∃i t refl)) →

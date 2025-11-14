@@ -29,8 +29,8 @@ module Main
     IdxStructᵇ-ext :
       {i : Size}
       {A A' : IdxStructᵇ i}
-      (_ : ∀ᵇ j < i , (domᵇ A j == domᵇ A' j))
-      (_ : ∀ᵇ j < i , ∀ᵇ k < j ,
+      (_ : ∀ᵇ i λ j {j<i} → (domᵇ A j == domᵇ A' j))
+      (_ : ∀ᵇ i λ j {j<i} → ∀ᵇ j λ k {k<j} →
       ({t : T (domᵇ A k)}
         {t' : T (domᵇ A' k)}
         (_  : t === t')
@@ -52,7 +52,7 @@ module Main
     FixSizeStructᵇ↓ᵇ :
       {i : Size}
       → --------------------------------------------
-      FixSizeStructᵇ i → ∏ᵇ j < i , FixSizeStructᵇ j
+      FixSizeStructᵇ i → ∏ᵇ i λ j {j<i} → FixSizeStructᵇ j
     FixSizeStructᵇ↓ᵇ (D ∣ δ) j = D ↓ᵇ j ∣ (λ k → δ k)
 
     --------------------------------------------------------------------
@@ -68,14 +68,14 @@ module Main
         P : Size → Prop (lsuc l)
         P i = (I I' : FixSizeStructᵇ i) → I == I'
 
-        hyp : ∀ i → (∀ᵇ j < i , P j) → P i
+        hyp : ∀ i → (∀ᵇ i λ j {j<i} → P j) → P i
         hyp i hi I@(D ∣ δ) I'@(D' ∣ δ')  =
           setext (IdxStructᵇ-ext domD=domD' ΤD=τD')
           where
-          D↓ᵇ=D'↓ᵇ : ∀ᵇ j < i , (D ↓ᵇ j == D' ↓ᵇ j)
+          D↓ᵇ=D'↓ᵇ : ∀ᵇ i λ j {j<i} → (D ↓ᵇ j == D' ↓ᵇ j)
           D↓ᵇ=D'↓ᵇ j = ap el (hi j (FixSizeStructᵇ↓ᵇ I j) (FixSizeStructᵇ↓ᵇ I' j))
 
-          domD=domD' : ∀ᵇ j < i , (domᵇ D j == domᵇ D' j)
+          domD=domD' : ∀ᵇ i λ j {j<i} → (domᵇ D j == domᵇ D' j)
           domD=domD' j =
             proof
               domᵇ D j
@@ -87,7 +87,7 @@ module Main
               domᵇ D' j
             qed
 
-          ΤD=τD' :  ∀ᵇ j < i , ∀ᵇ k < j , (∀ {t} {t'} →
+          ΤD=τD' :  ∀ᵇ i λ j {j<i} → ∀ᵇ j λ k {k<j} → (∀ {t} {t'} →
             t === t' → τᵇ D j k t === τᵇ D' j k t')
           ΤD=τD' j k {t}{t'} t=t' =
             proof
@@ -106,13 +106,13 @@ module Main
     initᵇ : ∀ i → FixSizeStructᵇ i
     initᵇ = <rec FixSizeStructᵇ hyp
       where
-      hyp : ∀ i → (∏ᵇ j < i , FixSizeStructᵇ j) → FixSizeStructᵇ i
+      hyp : ∀ i → (∏ᵇ i λ j {j<i} → FixSizeStructᵇ j) → FixSizeStructᵇ i
       hyp i hi = Di ∣ δ
         where
-        domi : ∏ᵇ j < i , Set l
+        domi : ∏ᵇ i λ j {j<i} → Set l
         domi j = Wᵇ (el (hi j)) / Rᵇ (el (hi j))
 
-        domi< : ∀ᵇ j < i , ∀ᵇ k < j , (domi k == domᵇ (el (hi j)) k)
+        domi< : ∀ᵇ i λ j {j<i} → ∀ᵇ j λ k {k<j} → (domi k == domᵇ (el (hi j)) k)
         domi< j k =
           proof
             ◇ (el (hi k))
@@ -122,11 +122,11 @@ module Main
             domᵇ (el (hi j)) k
           qed
 
-        τi :  ∏ᵇ j < i , ∏ᵇ k < j , (T{l}{Σ}(domi k) → domi j)
+        τi :  ∏ᵇ i λ j {j<i} → ∏ᵇ j λ k {k<j} → (T{l}{Σ}(domi k) → domi j)
         τi j k t =  [ pairᵇ k (T' (coe (domi< j k)) t) ]/ Rᵇ (el (hi j))
 
         τi< :
-          ∀ᵇ j < i , ∀ᵇ k < j , ∀ᵇ l < k ,
+          ∀ᵇ i λ j {j<i} → ∀ᵇ j λ k {k<j} → ∀ᵇ k λ l {l<k} →
           ({t : T{Σ = Σ}(domi l)}
           {t' : T (domᵇ (el (hi j)) l)}
           (_ : t === t')
@@ -168,10 +168,10 @@ module Main
         Di : IdxStructᵇ i
         Di = mkIdxStructᵇ domi τi
 
-        Di↓ᵇ : ∀ᵇ j < i , (Di ↓ᵇ j == el (hi j))
+        Di↓ᵇ : ∀ᵇ i λ j {j<i} → (Di ↓ᵇ j == el (hi j))
         Di↓ᵇ j = IdxStructᵇ-ext (domi< j) (τi< j)
 
-        domi↓ᵇ : ∀ᵇ j < i , (domi j == ◇ (Di ↓ᵇ j))
+        domi↓ᵇ : ∀ᵇ i λ j {j<i} → (domi j == ◇ (Di ↓ᵇ j))
         domi↓ᵇ j = ap ◇ (symm (Di↓ᵇ j))
 
         δ : isFixSizeStructᵇ i Di
@@ -198,7 +198,7 @@ module Main
               u
             qed
 
-    FixSizeStructᵇ↓ᵇ-uniq : ∀ i → ∀ᵇ j < i ,
+    FixSizeStructᵇ↓ᵇ-uniq : ∀ i → ∀ᵇ i λ j {j<i} →
       (initᵇ j == FixSizeStructᵇ↓ᵇ (initᵇ i) j)
     FixSizeStructᵇ↓ᵇ-uniq i j =
       FixSizeStructᵇ-uniq j (initᵇ j) (FixSizeStructᵇ↓ᵇ (initᵇ i) j)
@@ -212,7 +212,7 @@ module Main
       Q : Size → Set l
       Q i = ◇ (el (initᵇ i))
 
-      Q< : ∀ i → ∀ᵇ j < i , (Q j == domᵇ (el (initᵇ i)) j)
+      Q< : ∀ i → ∀ᵇ i λ j {j<i} → (Q j == domᵇ (el (initᵇ i)) j)
       Q< i j =
         proof
           ◇ (el (initᵇ j))
