@@ -34,10 +34,8 @@ open SizeStructure{{...}} public
 -- Use instance search for transitivity proofs about <
 module _ {l : Level}{Size : Set l}{{_ : SizeStructure Size}} where
   infix 4 _<ᵇ_
-  record _<ᵇ_  (i j : Size) : Prop l where
-    constructor <inst
-    field <prf : i < j
-  open _<ᵇ_ public
+  _<ᵇ_ : Size → Size → Prop l
+  _<ᵇ_ = _<_
 
   <ᵇ<ᵇ :
     {i j k : Size}
@@ -45,16 +43,16 @@ module _ {l : Level}{Size : Set l}{{_ : SizeStructure Size}} where
     (p : i <ᵇ j)
     → ------------------------
     i <ᵇ k
-  <ᵇ<ᵇ q p = <inst (<< (<prf q) (<prf p))
+  <ᵇ<ᵇ q p = << q p
 
   <ᵇ∨ˢl : {i : Size}(j : Size) → i <ᵇ i ∨ˢ j
-  <ᵇ∨ˢl j = <inst (<∨ˢl j)
+  <ᵇ∨ˢl j = <∨ˢl j
 
   <ᵇ∨ˢr : (i : Size){j : Size} → j <ᵇ i ∨ˢ j
-  <ᵇ∨ˢr i = <inst (<∨ˢr i)
+  <ᵇ∨ˢr i = <∨ˢr i
 
   <ᵇ↑ˢ : {i : Size} → i <ᵇ ↑ˢ i
-  <ᵇ↑ˢ = <inst (<↑ˢ)
+  <ᵇ↑ˢ = <↑ˢ
 
 -- Bounded dependent function
 ∏ᵇ :
@@ -157,7 +155,7 @@ open subsetᵇ public
   → --------------------------------
   ∀ i → P i
 <ind P p = wf.ind _<_ <iswf P
-  (λ i h → p i (λ j {j<i} → h j (<prf j<i)))
+  (λ i h → p i (λ j {j<i} → h j j<i))
 
 <rec :
   {l : Level}
@@ -169,7 +167,7 @@ open subsetᵇ public
   → --------------------------------
   ∀ i → B i
 <rec B b = wf.rec _<_ <iswf B
-  (λ i h → b i (λ j {j<i} → h j (<prf j<i)))
+  (λ i h → b i (λ j {j<i} → h j j<i))
 
 ----------------------------------------------------------------------
 -- Plump order (Example 5.4)
@@ -286,7 +284,7 @@ record UpperBounds
       (f : Ar Σ a → Sz Ξ)
       (x : Ar Σ a)
       → -------------------
-      f x <ᵇ ⋁ˢ a f
+      _<ᵇ_ {l = l} (f x) (⋁ˢ a f)
     -- ↑ˢ< : {i j : Sz Ξ} → i < j → ↑ˢ i < ↑ˢ j
     -- ↑ˢ<ᵇ : {i j : Sz Ξ} →  i <ᵇ j → ↑ˢ i <ᵇ ↑ˢ j
 open UpperBounds{{...}} public
@@ -299,4 +297,4 @@ module _ {l : Level}{Σ : Sig{l}} where
     UpperBoundsSize : UpperBounds {l} Σ Σ
     ⋁ˢ   {{UpperBoundsSize}} a f       = sup (ι₂ (ι₂ a) , f)
     <⋁ˢ  {{UpperBoundsSize}} f x       = ≺sup x (≤refl (f x))
-    <ᵇ⋁ˢ {{UpperBoundsSize}} f x       = <inst (<⋁ˢ f x)
+    <ᵇ⋁ˢ {{UpperBoundsSize}} f x       = <⋁ˢ f x

@@ -44,7 +44,7 @@ module _
 
     getQWType : SizeIdxStruct.FixSizeStruct {l} Σ ε Size {{ssz}} → QWtype Σ ε
     getQWType (A ∣ δ) =
-      mkQWtype QW {{AlgQW}} satQW recQW homrecQW uniqQW
+      {!mkQWtype QW {{AlgQW}} satQW recQW homrecQW uniqQW!}
       where
 
       W : Size → Set l
@@ -61,27 +61,27 @@ module _
 
       τ=[pairᵇ]/R  : ∀{i} → ∀ᵇ i λ j {j<i} →
         (∀ t → τ A i j t === [ pairᵇ j t ]/ R i)
-      τ=[pairᵇ]/R {i} j = ∧e₂ (δ i) j
+      τ=[pairᵇ]/R {i} j {j<i} = ∧e₂ (δ i) j {j<i}
 
       W′ : ∀ i → ∏ᵇ i λ j {j<i} → (W j → W i)
-      W′ i j (pairᵇ k t) = pairᵇ k t
+      W′ i j {j<i} (pairᵇ k {k<j} t) = pairᵇ k {<ᵇ<ᵇ j<i k<j} t
 
       Q′ : ∀ i → ∏ᵇ i λ j {j<i} → (Q j → Q i)
-      Q′ i j = quot.lift {R = R j}
-        (λ z → [ W′ i j z ]/ R i)
+      Q′ i j {j<i} = quot.lift {R = R j}
+        (λ z → [ W′ i j {j<i} z ]/ R i)
         λ{ (τεᵇ k e ρ)   → quot.eq (R i) (τεᵇ k e ρ)
         ; (τηᵇ k l t)   → quot.eq (R i) (τηᵇ k l t)
         ; (τσᵇ k l a f) → quot.eq (R i) (τσᵇ k l a f)
         }
 
       D′ : ∀ i → ∏ᵇ i λ j {j<i} → (∣D A ∣ j → ∣D A ∣ i)
-      D′ i j = τ A i j ∘ η
+      D′ i j {j<i} = τ A i j {j<i} ∘ η
 
       τ-surj :
         (i : Size)
         (x : ∣D A ∣ i)
         → ----------------------------------------------
-        ∃ᵇ i λ j {j<i} → (∃ t ∶ T (∣D A ∣ j) , τ A i j t == x)
+        ∃ᵇ i λ j {j<i} → (∃ t ∶ T (∣D A ∣ j) , τ A i j {j<i} t == x)
       τ-surj i x =
         match (quot.surjectionmk (R i) (coe DA=Q x))
         λ{(∃i (pairᵇ j t) p) → ∃ᵇi j (∃i t
@@ -96,8 +96,8 @@ module _
           qed))}
 
       D′=Q′ : ∀ i → ∀ᵇ i λ j {j<i} → (∀ x →
-        coe DA=Q (D′ i j x) == Q′ i j (coe DA=Q x))
-      D′=Q′ i j x = match (τ-surj j x) (λ {
+        coe DA=Q (D′ i j {j<i} x) == Q′ i j {j<i} (coe DA=Q x))
+      D′=Q′ i j {j<i} x = match (τ-surj j x) (λ {
         (∃ᵇi k (∃i t refl)) →
           proof
             coe DA=Q (τ A i j (η (τ A j k t)))
@@ -107,15 +107,15 @@ module _
             [ pairᵇ j (η (τ A j k t)) ]/ R i
           =[ quot.eq (R i) (τηᵇ j k t) ]
             [ pairᵇ k t ]/ R i
-          =[ ap (Q′ i j)
+          =[ ap (Q′ i j {j<i})
             (symm (trans (τ=[pairᵇ]/R k t) (coe=== DA=Q _))) ]
-            Q′ i j (coe DA=Q (τ A j k t))
+            Q′ i j {j<i} (coe DA=Q (τ A j k t))
           qed
         })
 
       Dact : ∀ i → ∀ᵇ i λ j {j<i} → ∀ᵇ j λ k {k<j} → (∀ z →
-        D′ i k z == D′ i j (D′ j k z))
-      Dact i j k z =
+        D′ i k {<ᵇ<ᵇ j<i k<j} z == D′ i j {j<i} (D′ j k {k<j} z))
+      Dact i j {j<i} k {k<j} z =
         proof
           τ A i k (η z)
         =[ τ=[pairᵇ]/R k _ ]
@@ -130,8 +130,8 @@ module _
         ((e : Op Γ)
         (ρ : Ar Γ e → ∣D A ∣ j)
         → ------------------------------------------------
-        τ A i j (T' ρ (lhs e)) == τ A i j (T' ρ (rhs e)))
-      τε i j e ρ =
+        τ A i j {j<i} (T' ρ (lhs e)) == τ A i j {j<i} (T' ρ (rhs e)))
+      τε i j {j<i} e ρ =
         proof
           τ A i j (T' ρ (lhs e))
         =[ τ=[pairᵇ]/R  j _ ]
@@ -145,8 +145,8 @@ module _
       τη : ∀ i → ∀ᵇ i λ j {j<i} →
         ((z : ∣D A ∣ j)
         → --------------------------
-        τ A i j (η z) == D′ i j z)
-      τη _ _ _ = refl
+        τ A i j {j<i} (η z) == D′ i j {j<i} z)
+      τη _ _ {_} _ = refl
 
       τσ : ∀ i → ∀ᵇ i λ j {j<i} → ∀ᵇ j λ k {k<j} →
         ((a : Op Σ)
@@ -154,25 +154,25 @@ module _
         → -----------------------------------------
         τ A i k (σ (a , f)) ==
         τ A i j (σ (a , λ b → η (τ A j k (f b)))))
-      τσ i j k a f =
+      τσ i j {j<i} k {k<j} a f =
         proof
           τ A i k (σ (a , f))
         =[ τ=[pairᵇ]/R k _ ]
           [ pairᵇ k (σ (a , f)) ]/ R i
-        =[ quot.eq (R i) (τσᵇ j k a f) ]
+        =[ quot.eq (R i) (τσᵇ j {j<i} k {k<j} a f) ]
           [ pairᵇ j (σ (a , λ b → η (τ A j k (f b)))) ]/ R i
         =[ symm (τ=[pairᵇ]/R j _) ]
           τ A i j (σ (a , λ b → η (τ A j k (f b))))
         qed
 
       D′τ :  ∀ i → ∀ᵇ i λ j {j<i} → ∀ᵇ j λ k {k<j} → (∀ t →
-        D′ i j (τ A j k t) == τ A i k t)
-      D′τ i j k t =
+        D′ i j {j<i} (τ A j k t) == τ A i k t)
+      D′τ i j {j<i} k {k<j} t =
         proof
           τ A i j (η (τ A j k t))
         =[ τ=[pairᵇ]/R j _  ]
-          [ pairᵇ j (η (τ A j k t)) ]/ R i
-        =[ quot.eq (R i) (τηᵇ j k t) ]
+          [ pairᵇ j (η (τ A j k {k<j} t)) ]/ R i
+        =[ quot.eq (R i) (τηᵇ j k {k<j} t) ]
           [ pairᵇ k t ]/ R i
         =[ symm (τ=[pairᵇ]/R k _ ) ]
           τ A i k t
@@ -180,50 +180,47 @@ module _
 
       τD′ :
         (i  j : Size)
-        {p : j <ᵇ i}
+        {j<i : j <ᵇ i}
         (t : T (∣D A ∣ j))
         → --------------------------------
-        set k ∶ Size , (⋀ q ∶ i <ᵇ k ,
-          τ A k j {<ᵇ<ᵇ q p} t ==
-          τ A k i {q}  (T' (D′ i j) t))
-      τD′ i j {p} (η x) =
+        set k ∶ Size , (⋀ i<k ∶ i <ᵇ k ,
+          τ A k j {<ᵇ<ᵇ i<k j<i} t ==
+          τ A k i {i<k} (T' (D′ i j {j<i}) t))
+      τD′ i j {j<i} (η x) =
         let
           k : Size
           k = ↑ˢ i
-          instance
-            _ : j <ᵇ i
-            _ = p
-            q : i <ᵇ k
-            q = <ᵇ↑ˢ
-            _ : j <ᵇ k
-            _ = <ᵇ<ᵇ ? ?
-        in k ∣ ⋀i q
+          i<k : i <ᵇ k
+          i<k = <ᵇ↑ˢ
+          j<k : j <ᵇ k
+          j<k = <ᵇ<ᵇ i<k j<i
+        in k ∣ ⋀i i<k
         (proof
           τ A k j (η x)
         =[ τη k j _ ]
           D′ k j x
         =[ Dact k i j x ]
-          D′ k i (D′ i j x)
+          D′ k i (D′ i j {j<i}x)
         =[ symm (τη k i _) ]
-          τ A k i (η (D′ i j x))
+          τ A k i (η (D′ i j {j<i} x))
         qed)
-      τD′ i j {p} (σ (a , f)) =
+      τD′ i j {j<i} (σ (a , f)) =
         let
           g : Ar Σ a → Size
           g b = el (τD′ i j (f b))
 
-          i<ᵇg : ∀ b → i <ᵇ g b
-          i<ᵇg b = ⋀e₁ (pf (τD′ i j (f b)))
+          i<g : ∀ b → i <ᵇ g b
+          i<g b = ⋀e₁ (pf (τD′ i j (f b)))
 
-          j<ᵇg : ∀ b → j <ᵇ g b
-          j<ᵇg b = <ᵇ<ᵇ (i<ᵇg b) ?
+          j<g : ∀ b → j <ᵇ g b
+          j<g b = <ᵇ<ᵇ (i<g b) j<i
 
           e :
             (b : Ar Σ a)
             → ------------------------------------------
-            τ A (g b) j {j<ᵇg b} (f b) ==
-            τ A (g b) i {i<ᵇg b} (T' (D′ i j) (f b))
-          e b = ⋀e₂ (pf (τD′ i j (f b)))
+            τ A (g b) j {j<g b} (f b) ==
+            τ A (g b) i {i<g b} (T' (D′ i j {j<i}) (f b))
+          e b = ⋀e₂ (pf (τD′ i j {j<i} (f b)))
 
           k : Size
           k = i ∨ˢ ⋁ˢ (ι₁ a) g
@@ -237,30 +234,31 @@ module _
           l : Size
           l = ↑ˢ k
 
-          instance
-            _ : i <ᵇ k
-            _ = <ᵇ∨ˢl _
-            _ : k <ᵇ l
-            _ = <ᵇ↑ˢ
-            q : i <ᵇ l
-            q = <ᵇ<ᵇ ? ?
-        in l ∣ (⋀i q
+          i<k : i <ᵇ k
+          i<k = <ᵇ∨ˢl _
+          k<l : k <ᵇ l
+          k<l = <ᵇ↑ˢ
+          i<l : i <ᵇ l
+          i<l = <ᵇ<ᵇ k<l i<k
+          j<k : j <ᵇ k
+          j<k = <ᵇ<ᵇ i<k j<i
+        in l ∣ (⋀i i<l
           (proof
             τ A l j (σ (a , f))
-          =[  τσ l k j _ _  ]
+          =[  τσ l k {k<l} j {j<k} _ _  ]
             τ A l k (σ (a , λ b → η (τ A k j (f b))))
-          =[ ap (λ f' → τ A l k (σ (a , f'))) (funext λ b →
-              ap η (symm (D′τ k (g b) {g<ᵇk b} j {j<ᵇg b} _))) ]
+          =[ ap (λ f' → τ A l k {k<l} (σ (a , f'))) (funext λ b →
+              ap η (symm (D′τ k (g b) {g<ᵇk b} j {j<g b} _))) ]
               τ A l k (σ (a , λ b → η (D′ k (g b) {g<ᵇk b}
-              (τ A (g b) j {j<ᵇg b} (f b)))))
-          =[ ap (λ h → τ A l k (σ (a , h))) (funext λ b →
+              (τ A (g b) j {j<g b} (f b)))))
+          =[ ap (λ h → τ A l k {k<l} (σ (a , h))) (funext λ b →
               ap (η {ℓ} {Σ} ∘ D′ k (g b) {g<ᵇk b}) (e b)) ]
               τ A l k (σ (a , λ b → η (D′ k (g b) {g<ᵇk b}
-              (τ A (g b) i {i<ᵇg b} (T' (D′ i j) (f b))))))
-          =[ ap (λ h → τ A l k (σ (a , h))) (funext λ b →
-              ap (η {ℓ} {Σ}) (D′τ k (g b) {g<ᵇk b} i {i<ᵇg b} _ )) ]
+              (τ A (g b) i {i<g b} (T' (D′ i j) (f b))))))
+          =[ ap (λ h → τ A l k {k<l} (σ (a , h))) (funext λ b →
+              ap (η {ℓ} {Σ}) (D′τ k (g b) {g<ᵇk b} i {i<g b} _ )) ]
               τ A l k (σ (a , λ b → η (τ A k i (T' (D′ i j) (f b)))))
-          =[ symm (τσ l k i _ _) ]
+          =[ symm (τσ l k {k<l} i {i<k} _ _) ]
             τ A l i (σ (a , λ b → T' (D′ i j) (f b)))
           qed)
           )
@@ -286,53 +284,52 @@ module _
           φ i s = ν D (↑ˢ i) (τ A (↑ˢ i) i {<ᵇ↑ˢ} (ι s))
 
           Coconeφ : Cocone (S∘ D) φ
-          Coconeφ i j s =
+          Coconeφ i j {j<i} s =
             let
               k : Size
-              k = el (τD′ i j (ι s))
+              k = el (τD′ i j {j<i} (ι s))
               k' : Size
               k' = ↑ˢ i ∨ˢ ↑ˢ j ∨ˢ k
-              instance
-                i<ᵇk : i <ᵇ k
-                i<ᵇk = ⋀e₁ (pf (τD′ i j (ι s)))
+              i<k : i <ᵇ k
+              i<k = ⋀e₁ (pf (τD′ i j {j<i} (ι s)))
 
-                j<ᵇk : j <ᵇ k
-                j<ᵇk = <ᵇ<ᵇ ? ?
+              j<k : j <ᵇ k
+              j<k = <ᵇ<ᵇ i<k j<i
 
-                ↑ˢj<ᵇk' : ↑ˢ j <ᵇ k'
-                ↑ˢj<ᵇk' = <ᵇ<ᵇ (<ᵇ∨ˢr _) (<ᵇ∨ˢl _)
+              ↑ˢj<k' : ↑ˢ j <ᵇ k'
+              ↑ˢj<k' = <ᵇ<ᵇ (<ᵇ∨ˢr _) (<ᵇ∨ˢl _)
 
-                i<ᵇk' : i <ᵇ k'
-                i<ᵇk' = <ᵇ<ᵇ (<ᵇ∨ˢl _) (<ᵇ↑ˢ)
+              i<k' : i <ᵇ k'
+              i<k' = <ᵇ<ᵇ (<ᵇ∨ˢl _) (<ᵇ↑ˢ)
 
-                j<ᵇk' : j <ᵇ k'
-                j<ᵇk' = <ᵇ<ᵇ (↑ˢj<ᵇk') (<ᵇ↑ˢ)
+              j<k' : j <ᵇ k'
+              j<k' = <ᵇ<ᵇ (↑ˢj<k') (<ᵇ↑ˢ)
 
-                k<ᵇk' : k <ᵇ k'
-                k<ᵇk' = <ᵇ<ᵇ (<ᵇ∨ˢr _) (<ᵇ∨ˢr _)
+              k<k' : k <ᵇ k'
+              k<k' = <ᵇ<ᵇ (<ᵇ∨ˢr _) (<ᵇ∨ˢr _)
 
-                ↑ˢi<ᵇk' : ↑ˢ i <ᵇ k'
-                ↑ˢi<ᵇk' = <ᵇ∨ˢl _
+              ↑ˢi<k' : ↑ˢ i <ᵇ k'
+              ↑ˢi<k' = <ᵇ∨ˢl _
 
               e : τ A k j (ι s) == τ A k i (T' (D′ i j) (ι s))
               e = ⋀e₂ (pf (τD′ i j (ι s)))
             in
             proof
               ν D (↑ˢ j) (τ A (↑ˢ j) j {<ᵇ↑ˢ} (ι s))
-            =[ Coconeν D k' (↑ˢ j) _ ]
+            =[ Coconeν D k' (↑ˢ j) {↑ˢj<k'} _ ]
               ν D k' (D′ k' (↑ˢ j) ((τ A (↑ˢ j) j {<ᵇ↑ˢ} (ι s))))
             =[ ap (ν D k') (D′τ k' (↑ˢ j) j {<ᵇ↑ˢ} _) ]
               ν D k' (τ A k' j (ι s))
-            =[ ap (ν D k') (symm (D′τ k' k j _)) ]
+            =[ ap (ν D k') (symm (D′τ k' k {k<k'} j _)) ]
               ν D k' (D′ k' k (τ A k j (ι s)))
             =[ ap (ν D k' ∘ D′ k' k) e ]
               ν D k' (D′ k' k (τ A k i (T' (D′ i j) (ι s))))
             =[ ap (ν D k') (D′τ k' k i _) ]
               ν D k' (τ A k' i (T' (D′ i j) (ι s)))
-            =[ ap (ν D k') (symm (D′τ k' (↑ˢ i) {↑ˢi<ᵇk'} i {<ᵇ↑ˢ} _)) ]
-              ν D k' (D′ k' (↑ˢ i) {↑ˢi<ᵇk'}
+            =[ ap (ν D k') (symm (D′τ k' (↑ˢ i) {↑ˢi<k'} i {<ᵇ↑ˢ} _)) ]
+              ν D k' (D′ k' (↑ˢ i) {↑ˢi<k'}
               (τ A (↑ˢ i) i {<ᵇ↑ˢ} (T' (D′ i j) (ι s))))
-            =[ symm (Coconeν D k' (↑ˢ i) {↑ˢi<ᵇk'} _ ) ]
+            =[ symm (Coconeν D k' (↑ˢ i) {↑ˢi<k'} _ ) ]
               ν D (↑ˢ i) (τ A (↑ˢ i) i {<ᵇ↑ˢ} (T' (D′ i j) (ι s)))
             qed
 
@@ -340,21 +337,21 @@ module _
       ⟦⟧ν : ∀ i → ∀ᵇ i λ j {j<i} →
         ((t : T{l}{Σ} (∣D A ∣ j))
         → --------------------------------
-        ⟦ t ⟧ (ν D j) == ν D i (τ A i j t))
-      ⟦⟧ν i j (η x) =
+        ⟦ t ⟧ (ν D j) == ν D i (τ A i j {j<i} t))
+      ⟦⟧ν i j {j<i} (η x) =
         proof
           ν D j x
-        =[ Coconeν D i j x ]
+        =[ Coconeν D i j {j<i} x ]
           ν D i (D′ i j x)
         =[ ap (ν D i) (symm (τη _ _ _)) ]
-          ν D i (τ A i j (η x))
+          ν D i (τ A i j {j<i} (η x))
         qed
-      ⟦⟧ν i j (σ (a , f)) =
+      ⟦⟧ν i j {j<i} (σ (a , f)) =
           proof
             ∫ (S∘ D) φ Coconeφ (((canS D)⁻¹)
               (a , λ b → ⟦ f b ⟧ (ν D j)))
-          =[ ap (λ g → ∫ (S∘ D) φ Coconeφ (((canS D)⁻¹) (a , g)))
-            (funext λ b → ⟦⟧ν i j (f b))
+            =[ ap (λ g → ∫ (S∘ D) φ Coconeφ (((canS D)⁻¹) (a , g)))
+              (funext λ b → ⟦⟧ν i j {j<i} (f b))
           ]
             ∫ (S∘ {Σ} D) {QW} φ Coconeφ (((canS D)⁻¹) (S' (ν D i) (a , λ b → τ A i j (f b))))
           =[ ap (∫ (S∘ D) φ Coconeφ) canS⁻¹Sν ]
@@ -362,7 +359,7 @@ module _
           =[ refl ]
             ν D (↑ˢ i) (τ A (↑ˢ i) i {<ᵇ↑ˢ} (T' (τ A i j) (σ (a , η ∘ f))))
           =[ ap (ν D (↑ˢ i)) (symm (τσ (↑ˢ i) i {<ᵇ↑ˢ} j _ _)) ]
-            ν D (↑ˢ i) (τ A (↑ˢ i) j {<ᵇ<ᵇ (<ᵇ↑ˢ) ?} (σ (a , f)))
+            ν D (↑ˢ i) (τ A (↑ˢ i) j {<ᵇ<ᵇ (<ᵇ↑ˢ) j<i} (σ (a , f)))
           =[ ap (ν D (↑ˢ i)) (symm (D′τ (↑ˢ i) i {<ᵇ↑ˢ} j _)) ]
             ν D (↑ˢ i) (D′ (↑ˢ i) i {<ᵇ↑ˢ} (τ A i j (σ (a , f))))
           =[ symm (Coconeν D (↑ˢ i) i {<ᵇ↑ˢ} _) ]
@@ -371,13 +368,13 @@ module _
         where
         open CocontinuityOfPolynomialEndofunctors Ξ
         canS⁻¹Sν :
-            ((canS D)⁻¹) (S' (ν D i) (a , λ b → τ A i j (f b)))
+            ((canS D)⁻¹) (S' (ν D i) (a , λ b → τ A i j {j<i} (f b)))
           ===
-            ν (S∘ {Σ} D) i ((a , λ b → τ A i j (f b)))
+            ν (S∘ {Σ} D) i ((a , λ b → τ A i j {j<i} (f b)))
         canS⁻¹Sν = linv (canS D) _
 
       satQW : Sat {l} {Σ} {ε} QW
-      satQW e ρ with CocontinuityOfTakingPowers.surjcan Ξ C F w C' F' w' (ι₂ e) D ρ
+      satQW e ρ with CocontinuityOfTakingPowers.surjcan {l} Ξ C F w C' F' w' (ι₂ e) D ρ
       ... | ∃i i (∃i ρi refl) =
         proof
           ⟦ lhs e ⟧ (ν D i ∘ ρi)
@@ -403,55 +400,56 @@ module _
         rec = λ i → fun (rec' i) ∘ coe DA=Q
           module _ where
           record Fun (i : Size) : Set l where
+            inductive
             field
               fun   : W i / R i → C
               funτ : ∀ᵇ i λ j {j<i} →
                 ((t : T (∣D A ∣ j))
                 → ---------------------------------
-                fun ([ pairᵇ j t ]/ R i) ==
-                ⟦ t ⟧ (fun ∘ coe DA=Q ∘ D′ i j))
+                fun ([ pairᵇ j {j<i} t ]/ R i) ==
+                ⟦ t ⟧ (fun ∘ coe DA=Q ∘ D′ i j {j<i}))
           open Fun public
 
           fun∘Q′ :
             (i : Size)
             (hi : ∏ᵇ i λ j {j<i} → Fun j)
             (k j : Size)
-            {_ : j <ᵇ i}
-            {_ : k <ᵇ j}
+            {j<i : j <ᵇ i}
+            {k<j : k <ᵇ j}
             → -------------------------------
             fun (hi k) == fun (hi j) ∘ Q′ j k
           fun∘Q′ i hi = wf.ind _<_ <iswf P
-            λ k hk → hyp k (λ l {l<ᵇk} → hk l (<prf l<ᵇk))
+            λ k hk → λ j {j<i} {k<j} → hyp k (λ l {l<k} → hk l (<prf l<k)) j {j<i} {k<j}
             where
             P : Size → Prop l
             P k =
               (j : Size)
-              {_ : j <ᵇ i}
-              {_ : k <ᵇ j}
+              {j<i : j <ᵇ i}
+              {k<j : k <ᵇ j}
               → -------------------------------
-              fun (hi k) == fun (hi j) ∘ Q′ j k
+              fun (hi k) == fun (hi j) ∘ Q′ j k {k<j}
 
             hyp : ∀ k → (∀ᵇ k λ l {l<k} → P l) → P k
-            hyp k hk j = funext (quot.ind (R k)
-              (λ z → fun (hi k) z == fun (hi j) (Q′ j k z))
-              (λ{(pairᵇ l t) →
+            hyp k hk j {j<i} {k<j} = funext (quot.ind (R k)
+              (λ z → fun (hi k) z == fun (hi j) (Q′ j k {k<j} z))
+              (λ{(pairᵇ l {l<k} t) →
                 proof
-                  fun (hi k) ([ pairᵇ l t ]/ R k)
-                =[ funτ (hi k) l t ]
-                  ⟦ t ⟧ (fun (hi k) ∘ coe DA=Q ∘ D′ k l)
+                  fun (hi k) ([ pairᵇ l {l<k} t ]/ R k)
+                =[ funτ (hi k) l {l<k} t ]
+                  ⟦ t ⟧ (fun (hi k) ∘ coe DA=Q ∘ D′ k l {l<k})
                 =[ ap (λ f → ⟦ t ⟧ (fun (hi k) ∘ f))
-                  (funext (D′=Q′ k l)) ]
-                  ⟦ t ⟧ (fun (hi k) ∘ Q′ k l ∘ coe DA=Q)
+                  (funext (D′=Q′ k l {l<k})) ]
+                  ⟦ t ⟧ (fun (hi k) ∘ Q′ k l {l<k} ∘ coe DA=Q)
                 =[ ap (λ f → ⟦ t ⟧ (f ∘ coe DA=Q))
-                  (symm (hk l k)) ]
+                  (symm (hk l {l<k} k)) ]
                   ⟦ t ⟧ (fun (hi l) ∘ coe DA=Q)
-                =[ ap (λ f → ⟦ t ⟧ (f ∘ coe DA=Q)) (hk l j {?}) ]
-                  ⟦ t ⟧ (fun (hi j) ∘ Q′ j l ∘ coe DA=Q)
+                =[ ap (λ f → ⟦ t ⟧ (f ∘ coe DA=Q)) (hk l (<prf l<k) j {j<i} {<ᵇ<ᵇ (<prf l<k) k<j}) ]
+                  ⟦ t ⟧ (fun (hi j) ∘ Q′ j l {<ᵇ<ᵇ (<prf l<k) k<j} ∘ coe DA=Q)
                 =[ ap (λ f → ⟦ t ⟧ (fun (hi j) ∘ f))
-                  (symm (funext (D′=Q′ j l))) ]
-                  ⟦ t ⟧ (fun (hi j) ∘ coe DA=Q ∘ D′ j l)
-                =[ symm (funτ (hi j) l t) ]
-                  fun (hi j) ([ pairᵇ l t ]/ R j)
+                  (symm (funext (D′=Q′ j l {<ᵇ<ᵇ (<prf l<k) k<j}))) ]
+                  ⟦ t ⟧ (fun (hi j) ∘ coe DA=Q ∘ D′ j l {<ᵇ<ᵇ (<prf l<k) k<j})
+                =[ symm (funτ (hi j) l {<ᵇ<ᵇ (<prf l<k) k<j} t) ]
+                  fun (hi j) ([ pairᵇ l {<ᵇ<ᵇ (<prf l<k) k<j} t ]/ R j)
                 qed}))
 
           rec' : ∀ i → Fun i
@@ -462,7 +460,7 @@ module _
               where
               funhyp : W i / R i → C
               funhyp = quot.lift {R = R i}
-                (λ{(pairᵇ j t) → ⟦ t ⟧ (fun (hi j) ∘ coe DA=Q)})
+                (λ{(pairᵇ j {j<i} t) → ⟦ t ⟧ (fun (hi j) ∘ coe DA=Q)})
                 (λ{(τεᵇ j e ρ) →
                   proof
                     ⟦ T' ρ (lhs e) ⟧ (fun (hi j) ∘ coe DA=Q)
@@ -470,7 +468,7 @@ module _
                     ⟦ lhs e ⟧ (fun (hi j) ∘ coe DA=Q ∘ ρ)
                   =[ satC e (fun (hi j) ∘ coe DA=Q ∘ ρ) ]
                     ⟦ rhs e ⟧ (fun (hi j) ∘ coe DA=Q ∘ ρ)
-                  =[ symm ( ⟦T⟧ (rhs e)) ]
+                  =[ symm (⟦T⟧ (rhs e)) ]
                     ⟦ T' ρ (rhs e) ⟧ (fun (hi j) ∘ coe DA=Q)
                   qed
                 ;(τηᵇ j k t) →
@@ -510,7 +508,7 @@ module _
                 → ------------------------------------
                 funhyp ([ pairᵇ j t ]/ R i) ==
                 ⟦ t ⟧ (funhyp ∘ coe DA=Q ∘ D′ i j))
-              funτhyp j t = ap ⟦ t ⟧ (funext λ x →
+              funτhyp j {j<i} t = ap ⟦ t ⟧ (funext λ x →
                 match (τ-surj j x) (λ{(∃ᵇi k (∃i t refl)) →
                 proof
                   fun (hi j) (coe DA=Q (τ A j k t))
@@ -537,7 +535,7 @@ module _
           ((t : T (∣D A ∣ j))
           → ------------------------------------------
           rec i (τ A i j t) == ⟦ t ⟧ (rec i ∘ D′ i j))
-        recτ i j t =
+        recτ i j {j<i} t =
           proof
             fun (rec' i) (coe DA=Q (τ A i j t))
           =[ ap (fun (rec' i)) (trans (τ=[pairᵇ]/R j _) (coe=== DA=Q _)) ]
@@ -646,3 +644,4 @@ module _
           recQW == h
         uniqQW h isHomh =
           colimext D λ x → ap (case x) (uniq< h isHomh _)
+-- -}

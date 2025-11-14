@@ -73,10 +73,10 @@ module Main
           setext (IdxStructᵇ-ext domD=domD' ΤD=τD')
           where
           D↓ᵇ=D'↓ᵇ : ∀ᵇ i λ j {j<i} → (D ↓ᵇ j == D' ↓ᵇ j)
-          D↓ᵇ=D'↓ᵇ j = ap el (hi j (FixSizeStructᵇ↓ᵇ I j) (FixSizeStructᵇ↓ᵇ I' j))
+          D↓ᵇ=D'↓ᵇ j {j<i} = ap el (hi j {j<i} (FixSizeStructᵇ↓ᵇ I j) (FixSizeStructᵇ↓ᵇ I' j))
 
           domD=domD' : ∀ᵇ i λ j {j<i} → (domᵇ D j == domᵇ D' j)
-          domD=domD' j =
+          domD=domD' j {j<i} =
             proof
               domᵇ D j
             =[ ∧e₁ (δ j) ]
@@ -89,7 +89,7 @@ module Main
 
           ΤD=τD' :  ∀ᵇ i λ j {j<i} → ∀ᵇ j λ k {k<j} → (∀ {t} {t'} →
             t === t' → τᵇ D j k t === τᵇ D' j k t')
-          ΤD=τD' j k {t}{t'} t=t' =
+          ΤD=τD' j {j<i} k {k<j} {t}{t'} t=t' =
             proof
               τᵇ D j k t
             =[ ∧e₂ (δ j) k t ]
@@ -113,7 +113,7 @@ module Main
         domi j = Wᵇ (el (hi j)) / Rᵇ (el (hi j))
 
         domi< : ∀ᵇ i λ j {j<i} → ∀ᵇ j λ k {k<j} → (domi k == domᵇ (el (hi j)) k)
-        domi< j k =
+        domi< j {j<i} k {k<j} =
           proof
             ◇ (el (hi k))
           =[ ap (◇ ∘ el) (FixSizeStructᵇ-uniq k (hi k) (FixSizeStructᵇ↓ᵇ (hi j) k)) ]
@@ -169,10 +169,10 @@ module Main
         Di = mkIdxStructᵇ domi τi
 
         Di↓ᵇ : ∀ᵇ i λ j {j<i} → (Di ↓ᵇ j == el (hi j))
-        Di↓ᵇ j = IdxStructᵇ-ext (domi< j) (τi< j)
+        Di↓ᵇ j {j<i} = IdxStructᵇ-ext (domi< j) (τi< j)
 
         domi↓ᵇ : ∀ᵇ i λ j {j<i} → (domi j == ◇ (Di ↓ᵇ j))
-        domi↓ᵇ j = ap ◇ (symm (Di↓ᵇ j))
+        domi↓ᵇ j {j<i} = ap ◇ (symm (Di↓ᵇ j))
 
         δ : isFixSizeStructᵇ i Di
         δ j = ∧i (domi↓ᵇ j) λ k t →
@@ -200,7 +200,7 @@ module Main
 
     FixSizeStructᵇ↓ᵇ-uniq : ∀ i → ∀ᵇ i λ j {j<i} →
       (initᵇ j == FixSizeStructᵇ↓ᵇ (initᵇ i) j)
-    FixSizeStructᵇ↓ᵇ-uniq i j =
+    FixSizeStructᵇ↓ᵇ-uniq i j {j<i} =
       FixSizeStructᵇ-uniq j (initᵇ j) (FixSizeStructᵇ↓ᵇ (initᵇ i) j)
 
     ----------------------------------------------------------------------
@@ -213,7 +213,7 @@ module Main
       Q i = ◇ (el (initᵇ i))
 
       Q< : ∀ i → ∀ᵇ i λ j {j<i} → (Q j == domᵇ (el (initᵇ i)) j)
-      Q< i j =
+      Q< i j {j<i} =
         proof
           ◇ (el (initᵇ j))
         =[ ap (◇ ∘ el) (FixSizeStructᵇ↓ᵇ-uniq i j) ]
