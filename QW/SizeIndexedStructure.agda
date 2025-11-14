@@ -28,7 +28,7 @@ module SizeIdxStruct
     constructor mkIdxStruct
     field
       D : Size → Set l -- D aka dom
-      τ : ∀ i → ∏ᵇ j < i , (T{l}{Σ}(D j) → D i)
+      τ : ∀ i → ∏ᵇ i λ j {j<i} → (T{l}{Σ}(D j) → D i)
   open IdxStruct public
 
   -- (↓ i)-indexed structure (i : Size),
@@ -36,43 +36,48 @@ module SizeIdxStruct
   record IdxStructᵇ (i : Size) : Set (lsuc l) where
     constructor mkIdxStructᵇ
     field
-      Dᵇ : ∏ᵇ j < i , Set l
-      τᵇ : ∏ᵇ j < i , ∏ᵇ k < j , (T{l}{Σ}(Dᵇ k) → Dᵇ j)
+      Dᵇ : ∏ᵇ i λ j {j<i} → Set l
+      τᵇ : ∏ᵇ i λ j {j<i} → ∏ᵇ j λ k {k<j}
+         → (T{l}{Σ}(Dᵇ k {<ᵇ<ᵇ j<i k<j}) → Dᵇ j {j<i})
   open IdxStructᵇ public
 
   infixl 6 _↓_
   -- restriction of a (any) Size-indexed alg to a (↓ i)-indexed alg
   _↓_ : IdxStruct → ∀ i → IdxStructᵇ i
-  Dᵇ (A ↓ i) j   = D A j
-  τᵇ (A ↓ i) j k = τ A j k
+  Dᵇ (A ↓ i) j = D A j
+  τᵇ (A ↓ i) j k {k<j} = τ A j k {k<j}
 
   infixl 6 _↓ᵇ_
   -- restriction of a (↓ i)-indexed alg to a (↓ j)-indexed alg,
   -- when j < i
-  _↓ᵇ_ : {i : Size} → IdxStructᵇ i → ∏ᵇ j < i , IdxStructᵇ j
-  Dᵇ (A ↓ᵇ _) j  = Dᵇ A j
-  τᵇ (A ↓ᵇ _) j k = τᵇ A j k
+  _↓ᵇ_ : {i : Size} → IdxStructᵇ i → ∀ j {j<i : j <ᵇ i} → IdxStructᵇ j
+  Dᵇ ((A ↓ᵇ _) {j<i}) k = Dᵇ A k
+  τᵇ ((A ↓ᵇ _) {j<i}) k {k<j} l {l<k} m = τᵇ A k {<ᵇ<ᵇ j<i k<j} l {l<k} m 
 
   Wᵇ : ∀{i} → IdxStructᵇ i → Set l
-  Wᵇ {i} A = ∑ᵇ j < i , T{l}{Σ} (Dᵇ A j)
+  Wᵇ {i} A = ∑ᵇ i λ j {j<i} → T{l}{Σ} (Dᵇ A j {j<i})
 
   -- (6.2)
   data Rᵇ {i : Size}(A : IdxStructᵇ i) : Wᵇ A → Wᵇ A → Prop l where
-    τεᵇ : ∀ j → (j<i : j <ᵇ i) →
+    τεᵇ : ∀ᵇ i λ j {j<i} →
       ((e : Op Γ)
-        (ρ : Ar Γ e → Dᵇ A j {{j<i}})
+        (ρ : Ar Γ e → Dᵇ A j {j<i})
         → ----------------------------------------------------
         Rᵇ A (pairᵇ j (T' ρ (lhs e))) (pairᵇ j (T' ρ (rhs e))))
-    τηᵇ : ∀ᵇ j < i , ∀ᵇ k < j ,
+    τηᵇ : ∀ᵇ i λ j {j<i} → ∀ᵇ j λ k {k<j} → 
       ((t : T{l}{Σ}(Dᵇ A k))
         → ------------------------------------------
-        Rᵇ A (pairᵇ j (η (τᵇ A j k t))) (pairᵇ k t))
-    τσᵇ : ∀ᵇ j < i , ∀ᵇ k < j ,
+        Rᵇ A (pairᵇ j {j<i} (η (τᵇ A j {j<i} k {k<j} t))) (pairᵇ k t))
+    τσᵇ : ∀ᵇ i λ j {j<i} → ∀ᵇ j λ k {k<j} →
       ((a : Op Σ)
         (f : Ar Σ a → T (Dᵇ A k))
         → ------------------------------------------------
-        Rᵇ A (pairᵇ k (σ (a , f)))
-            (pairᵇ j (σ (a , λ b → η (τᵇ A j k (f b))))))
+        let open SizeStructure ssz renaming (<< to <<')
+            k<i : k <ᵇ i
+            k<i = <inst (<<' (j<i .<prf) (k<j .<prf))
+        in
+        Rᵇ A (pairᵇ k {k<i} (σ (a , f)))
+            (pairᵇ j {j<i} (σ (a , λ b → η (τᵇ A j {j<i} k {k<j} (f b))))))
 
   -- (6.1)
   ◇ : ∀{i} → IdxStructᵇ i → Set l
@@ -82,7 +87,7 @@ module SizeIdxStruct
   ◇fix : IdxStruct → Prop (lsuc l)
   ◇fix alg =
     ∀ i → D alg i == ◇ (alg ↓ i) ∧
-    ∀ᵇ j < i , (∀ t → τ alg i j t === [ pairᵇ j t ]/ Rᵇ (alg ↓ i))
+    ∀ᵇ i λ j {j<i} → (∀ t → τ alg i j {j<i} t === [ pairᵇ j {j<i} t ]/ Rᵇ (alg ↓ i))
 
   -- We will show (Proposition 6.4) that any element of the folowing
   -- type yields an initial algebra for the equational systen (Σ,ε)
@@ -98,9 +103,9 @@ module SizeIdxStruct
     module _ where
     isFixSizeStructᵇ : IdxStructᵇ i → Prop (lsuc l)
     isFixSizeStructᵇ alg =
-      ∀ᵇ j < i , (Dᵇ alg j == ◇ (alg ↓ᵇ j)
-        ∧ ∀ᵇ k < j ,
+      ∀ᵇ i λ j {j<i} → (Dᵇ alg j {j<i} == ◇ ((alg ↓ᵇ j) {j<i})
+        ∧ ∀ᵇ j λ k {k<j} → 
           ((t : T{l}{Σ}(Dᵇ (mkIdxStructᵇ (Dᵇ alg) (τᵇ alg)) k))
-            → τᵇ alg j k t === [ pairᵇ k t ]/ Rᵇ (alg ↓ᵇ j)
+            → τᵇ alg j {j<i} k {k<j} t === [ pairᵇ k {k<j} t ]/ Rᵇ ((alg ↓ᵇ j) {j<i})
           )
       )
