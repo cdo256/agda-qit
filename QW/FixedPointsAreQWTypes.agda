@@ -44,7 +44,7 @@ module _
 
     getQWType : SizeIdxStruct.FixSizeStruct {l} Σ ε Size {{ssz}} → QWtype Σ ε
     getQWType (A ∣ δ) =
-      {!mkQWtype QW {{AlgQW}} satQW recQW homrecQW uniqQW!}
+      mkQWtype QW {{AlgQW}} satQW recQW homrecQW uniqQW
       where
 
       W : Size → Set l
@@ -417,9 +417,9 @@ module _
             {j<i : j <ᵇ i}
             {k<j : k <ᵇ j}
             → -------------------------------
-            fun (hi k) == fun (hi j) ∘ Q′ j k
+            fun (hi k {<ᵇ<ᵇ j<i k<j}) == fun (hi j {j<i}) ∘ Q′ j k {k<j}
           fun∘Q′ i hi = wf.ind _<_ <iswf P
-            λ k hk → λ j {j<i} {k<j} → hyp k (λ l {l<k} → hk l (<prf l<k)) j {j<i} {k<j}
+            λ k hk → λ j {j<i} {k<j} → hyp k (λ l {l<k} → hk l l<k) j {j<i} {k<j}
             where
             P : Size → Prop l
             P k =
@@ -437,19 +437,20 @@ module _
                   fun (hi k) ([ pairᵇ l {l<k} t ]/ R k)
                 =[ funτ (hi k) l {l<k} t ]
                   ⟦ t ⟧ (fun (hi k) ∘ coe DA=Q ∘ D′ k l {l<k})
-                =[ ap (λ f → ⟦ t ⟧ (fun (hi k) ∘ f))
+                =[ ap (λ f → ⟦ t ⟧ (fun (hi k {<ᵇ<ᵇ j<i k<j}) ∘ f))
                   (funext (D′=Q′ k l {l<k})) ]
                   ⟦ t ⟧ (fun (hi k) ∘ Q′ k l {l<k} ∘ coe DA=Q)
                 =[ ap (λ f → ⟦ t ⟧ (f ∘ coe DA=Q))
-                  (symm (hk l {l<k} k)) ]
+                  {x = fun (hi k {<ᵇ<ᵇ j<i k<j}) ∘ Q′ k l {l<k}}
+                  (symm (hk l {l<k} k {<ᵇ<ᵇ j<i k<j} {l<k})) ]
                   ⟦ t ⟧ (fun (hi l) ∘ coe DA=Q)
-                =[ ap (λ f → ⟦ t ⟧ (f ∘ coe DA=Q)) (hk l (<prf l<k) j {j<i} {<ᵇ<ᵇ (<prf l<k) k<j}) ]
-                  ⟦ t ⟧ (fun (hi j) ∘ Q′ j l {<ᵇ<ᵇ (<prf l<k) k<j} ∘ coe DA=Q)
-                =[ ap (λ f → ⟦ t ⟧ (fun (hi j) ∘ f))
-                  (symm (funext (D′=Q′ j l {<ᵇ<ᵇ (<prf l<k) k<j}))) ]
-                  ⟦ t ⟧ (fun (hi j) ∘ coe DA=Q ∘ D′ j l {<ᵇ<ᵇ (<prf l<k) k<j})
-                =[ symm (funτ (hi j) l {<ᵇ<ᵇ (<prf l<k) k<j} t) ]
-                  fun (hi j) ([ pairᵇ l {<ᵇ<ᵇ (<prf l<k) k<j} t ]/ R j)
+                =[ ap (λ f → ⟦ t ⟧ (f ∘ coe DA=Q)) (hk l {l<k} j {j<i} {<ᵇ<ᵇ k<j l<k}) ]
+                  ⟦ t ⟧ (fun (hi j) ∘ Q′ j l {<ᵇ<ᵇ k<j l<k} ∘ coe DA=Q)
+                =[ ap (λ f → ⟦ t ⟧ (fun (hi j {j<i}) ∘ f))
+                  (symm (funext (D′=Q′ j l {<ᵇ<ᵇ k<j l<k}))) ]
+                  ⟦ t ⟧ (fun (hi j) ∘ coe DA=Q ∘ D′ j l {<ᵇ<ᵇ k<j l<k})
+                =[ symm (funτ (hi j) l {<ᵇ<ᵇ k<j l<k} t) ]
+                  fun (hi j) ([ pairᵇ l t ]/ R j)
                 qed}))
 
           rec' : ∀ i → Fun i
@@ -460,7 +461,7 @@ module _
               where
               funhyp : W i / R i → C
               funhyp = quot.lift {R = R i}
-                (λ{(pairᵇ j {j<i} t) → ⟦ t ⟧ (fun (hi j) ∘ coe DA=Q)})
+                (λ{(pairᵇ j {j<i} t) → ⟦ t ⟧ (fun (hi j {j<i}) ∘ coe DA=Q)})
                 (λ{(τεᵇ j e ρ) →
                   proof
                     ⟦ T' ρ (lhs e) ⟧ (fun (hi j) ∘ coe DA=Q)
@@ -471,7 +472,7 @@ module _
                   =[ symm (⟦T⟧ (rhs e)) ]
                     ⟦ T' ρ (rhs e) ⟧ (fun (hi j) ∘ coe DA=Q)
                   qed
-                ;(τηᵇ j k t) →
+                ;(τηᵇ j {j<i} k {k<j} t) →
                   proof
                     fun (hi j) (coe DA=Q (τ A j k t))
                   =[ ap (fun (hi j))
@@ -479,20 +480,21 @@ module _
                     fun (hi j) ([ pairᵇ k t ]/ R j)
                   =[ funτ (hi j) k t ]
                     ⟦ t ⟧ (fun (hi j) ∘ coe DA=Q ∘ D′ j k)
-                  =[ ap (λ f → ⟦ t ⟧ (fun (hi j) ∘ f))
+                  =[ ap (λ f → ⟦ t ⟧ (fun (hi j {j<i}) ∘ f))
                       (funext (D′=Q′ j k)) ]
-                    ⟦ t ⟧ (fun (hi j) ∘ Q′ j k ∘ coe DA=Q)
+                    ⟦ t ⟧ (fun (hi j) ∘ Q′ j k {k<j} ∘ coe DA=Q)
                   =[ ap (λ f → ⟦ t ⟧ (f ∘ coe DA=Q))
-                    (symm (fun∘Q′ i hi k j)) ]
+                    {x = fun (hi j) ∘ Q′ j k {k<j}}
+                    (symm (fun∘Q′ i hi k j {j<i} {k<j})) ]
                     ⟦ t ⟧ (fun (hi k) ∘ coe DA=Q)
                   qed
-                ;(τσᵇ j k a f) → ap (λ f → sup (a , f)) (funext λ b →
+                ;(τσᵇ j {j<i} k {k<j} a f) → ap (λ f → sup (a , f)) (funext λ b →
                   proof
                     ⟦ f b ⟧ (fun (hi k) ∘ coe DA=Q)
                   =[ ap (λ g → ⟦ f b ⟧ (g ∘ coe DA=Q))
-                      (fun∘Q′ i hi k j)  ]
-                    ⟦ f b ⟧ (fun (hi j) ∘ Q′ j k ∘ coe DA=Q)
-                  =[ ap (λ g → ⟦ f b ⟧ (fun (hi j) ∘ g))
+                      (fun∘Q′ i hi k j {j<i} {k<j})  ]
+                    ⟦ f b ⟧ (fun (hi j) ∘ Q′ j k {k<j} ∘ coe DA=Q)
+                  =[ ap (λ g → ⟦ f b ⟧ (fun (hi j {j<i}) ∘ g))
                       (symm (funext (D′=Q′ j k))) ]
                     ⟦ f b ⟧ (fun (hi j) ∘ coe DA=Q ∘ D′ j k)
                   =[ symm (funτ (hi j) k _) ]
@@ -509,7 +511,7 @@ module _
                 funhyp ([ pairᵇ j t ]/ R i) ==
                 ⟦ t ⟧ (funhyp ∘ coe DA=Q ∘ D′ i j))
               funτhyp j {j<i} t = ap ⟦ t ⟧ (funext λ x →
-                match (τ-surj j x) (λ{(∃ᵇi k (∃i t refl)) →
+                match (τ-surj j x) (λ{(∃ᵇi k {k<j} (∃i t refl)) →
                 proof
                   fun (hi j) (coe DA=Q (τ A j k t))
                 =[ ap (fun (hi j))
@@ -517,11 +519,12 @@ module _
                   fun (hi j) ([ pairᵇ k t ]/ R j)
                 =[ funτ (hi j) k t ]
                   ⟦ t ⟧ (fun (hi j) ∘ coe DA=Q ∘ D′ j k)
-                =[ ap (λ f → ⟦ t ⟧ (fun (hi j) ∘ f))
+                =[ ap (λ f → ⟦ t ⟧ (fun (hi j {j<i}) ∘ f))
                   (funext (D′=Q′ j k)) ]
-                  ⟦ t ⟧ (fun (hi j) ∘ Q′ j k ∘ coe DA=Q)
+                  ⟦ t ⟧ (fun (hi j) ∘ Q′ j k {k<j} ∘ coe DA=Q)
                 =[ ap (λ f → ⟦ t ⟧ (f ∘ coe DA=Q))
-                  (symm (fun∘Q′ i hi k j)) ]
+                  {x = fun (hi j) ∘ Q′ j k {k<j}}
+                  (symm (fun∘Q′ i hi k j {j<i} {k<j})) ]
                   ⟦ t ⟧ (fun (hi k) ∘ coe DA=Q)
                 =[ refl ]
                   funhyp ([ pairᵇ k t ]/ R i)
@@ -534,7 +537,7 @@ module _
         recτ : ∀ i → ∀ᵇ i λ j {j<i} →
           ((t : T (∣D A ∣ j))
           → ------------------------------------------
-          rec i (τ A i j t) == ⟦ t ⟧ (rec i ∘ D′ i j))
+          rec i (τ A i j t) == ⟦ t ⟧ (rec i ∘ D′ i j {j<i}))
         recτ i j {j<i} t =
           proof
             fun (rec' i) (coe DA=Q (τ A i j t))
@@ -545,28 +548,28 @@ module _
           qed
 
         Coconerec : Cocone D rec
-        Coconerec = λ i j → wf.ind _<_ <iswf P hyp j i
+        Coconerec = λ i j {j<i} → wf.ind _<_ <iswf P hyp j i
           where
           P : Size → Prop l
           P j =
             (i : Size)
-            {_ : j <ᵇ i}
+            {j<i : j <ᵇ i}
             (x : ∣D A ∣ j)
             → --------------------------
-            rec j x == rec i (D′ i j x)
+            rec j x == rec i (D′ i j {j<i} x)
 
           hyp : ∀ j → (∀ k → (k < j) → P k) → P j
-          hyp j h i {j<ᵇi} x = match (τ-surj j x)
-            (λ {(∃ᵇi k {k<ᵇj} (∃i t refl)) →
+          hyp j h i {j<i} x = match (τ-surj j x)
+            (λ {(∃ᵇi k {k<j} (∃i t refl)) →
             proof
               rec j (τ A j k t)
-            =[ recτ j k t ]
+            =[ recτ j k {k<j} t ]
               ⟦ t ⟧ (rec j ∘ D′ j k)
-            =[ ap ⟦ t ⟧ (symm (funext (h k (<prf k<ᵇj) j))) ]
+            =[ ap ⟦ t ⟧ (symm (funext (h k k<j j {k<j}))) ]
               ⟦ t ⟧ (rec k)
-            =[ ap ⟦ t ⟧ (funext (h k (<prf k<ᵇj) i)) ]
+            =[ ap ⟦ t ⟧ (funext (h k k<j i {<ᵇ<ᵇ j<i k<j})) ]
               ⟦ t ⟧ (rec i ∘ D′ i k)
-            =[ symm (recτ i k t) ]
+            =[ symm (recτ i k {<ᵇ<ᵇ j<i k<j} t) ]
               rec i (τ A i k t)
             =[ ap (rec i) (symm (D′τ i j k t)) ]
               rec i (D′ i j (τ A j k t))
@@ -621,14 +624,14 @@ module _
           hyp : ∀ i → (∀ᵇ i λ j {j<i} → P j) → P i
           hyp i hi =
             funext λ x →
-            match (τ-surj i x) (λ{(∃ᵇi j (∃i t refl)) →
+            match (τ-surj i x) (λ{(∃ᵇi j {j<i} (∃i t refl)) →
             proof
               rec i (τ A i j t)
-            =[ recτ i j t ]
+            =[ recτ i j {j<i} t ]
               ⟦ t ⟧ (rec i ∘ D′ i j)
             =[ ap ⟦ t ⟧ (funext λ z → symm (Coconerec i j z)) ]
               ⟦ t ⟧ (rec j)
-            =[ ap ⟦ t ⟧ (hi j) ]
+            =[ ap ⟦ t ⟧ (hi j {j<i}) ]
               ⟦ t ⟧ (h ∘ ν D j)
             =[ symm (⟦⟧∘ (ν D j) h isHomh t) ]
               h (⟦ t ⟧ (ν D j))

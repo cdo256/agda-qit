@@ -263,7 +263,7 @@ module CocontinuityOfTakingPowers
       upperbounds : UpperBounds Σ Ψ
       ⋁ˢ   {{upperbounds}} a f       = sup (ι₂ (ι₂ (in₃ a)) , f)
       <⋁ˢ  {{upperbounds}} f x       = ≺sup x (≤refl (f x))
-      <ᵇ⋁ˢ {{upperbounds}} f x       = <inst (<⋁ˢ f x)
+      <ᵇ⋁ˢ {{upperbounds}} f x       = <⋁ˢ f x
 
     open Colim Size
 
@@ -398,8 +398,8 @@ module CocontinuityOfTakingPowers
         P : B' → Size → Prop l
         P ((x , y) ∣ _) j =
           ⋀ i<j ∶ (i < j),
-            edg D j i {<inst i<j} (fi x) ==
-            edg D j i {<inst i<j} (fi y)
+            edg D j i {i<j} (fi x) ==
+            edg D j i {i<j} (fi y)
 
         Ptotal : ∀ z → ∃ j ∶ Size , P z j
         Ptotal ((x , y) ∣ px=py) = h (quot-eff.prop (≈ D)
@@ -424,9 +424,9 @@ module CocontinuityOfTakingPowers
             ≈ D (i , fi x) (i , fi y)
             → ----------------------------------
             ∃ j ∶ Size , ⋀ i<j ∶ (i < j),
-              edg D j i {<inst i<j} (fi x) ==
-              edg D j i {<inst i<j} (fi y)
-          h (mk≈ k {p} e) = ∃i k (⋀i (<prf p) e)
+              edg D j i {i<j} (fi x) ==
+              edg D j i {i<j} (fi y)
+          h (mk≈ k {p} e) = ∃i k (⋀i p e)
 
         lemma :
           (∃ c' ∶ C' ,
@@ -477,13 +477,13 @@ module CocontinuityOfTakingPowers
           ... | ⋀i i<q'z' v =
             proof
               edg D j i {i<ᵇj} (fi (p₁ z'))
-            =[ act D j (q' z') {q'<ᵇj z'} i {<inst i<q'z'} _ ]
+            =[ act D j (q' z') {q'<ᵇj z'} i {i<q'z'} _ ]
               edg D j (q' z') {q'<ᵇj z'}
-                (edg D (q' z') i {<inst i<q'z'} (fi (p₁ z')))
+                (edg D (q' z') i {i<q'z'} (fi (p₁ z')))
             =[ ap (edg D j (q' z') {q'<ᵇj z'}) v ]
               edg D j (q' z') {q'<ᵇj z'}
-                (edg D (q' z') i {<inst i<q'z'} (fi (p₂ z')))
-            =[ symm (act D j (q' z') {q'<ᵇj z'} i {<inst i<q'z'} _) ]
+                (edg D (q' z') i {i<q'z'} (fi (p₂ z')))
+            =[ symm (act D j (q' z') {q'<ᵇj z'} i {i<q'z'} _) ]
               edg D j i {i<ᵇj} (fi (p₂ z'))
             qed
 
@@ -549,6 +549,9 @@ module CocontinuityOfPolynomialEndofunctors
       Coconeφ : ∀ a → Cocone (Ar Σ a ⟶ D) (φ a)
       Coconeφ a i j {j<ᵇi} f =
         let
+          instance
+            _ : SizeStructure Size
+            _ = ssz
           k : Size
           k = ↑ˢ i
         in
