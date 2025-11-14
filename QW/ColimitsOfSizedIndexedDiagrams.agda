@@ -15,9 +15,10 @@ module Colim
     constructor mkDiag
     field
       vtx : Size → Set l
-      edg : (i : Size) → ∏ᵇ j < i , (vtx j → vtx i)
-      act : ∀ i → ∀ᵇ j < i , ∀ᵇ k < j , (∀ x →
-        edg i k x == edg i j (edg j k x))
+      edg : ∀ i j {j<i : j <ᵇ i} → (vtx j → vtx i)
+      act : ∀ i j {j<i : j <ᵇ i} → ∀ k {k<j : k <ᵇ j}
+          → (∀ x → edg i k {<ᵇ<ᵇ j<i k<j} x
+                == edg i j {j<i} (edg j k {k<j} x))
   open Diag public
 
   -- Cocones under the diagram
@@ -28,7 +29,7 @@ module Colim
     → ----------------------
     Prop l
   Cocone D f =
-    ∀ i → ∀ᵇ j < i , (∀ x → f j x == f i (edg D i j x))
+    ∀ i j {j<i : j <ᵇ i} → (∀ x → f j x == f i (edg D i j {j<i} x))
 
   -- Colimits
   colim : Diag → Set l
@@ -42,9 +43,9 @@ module Colim
         {x : vtx D i}
         {y : vtx D j}
         (k : Size)
-        {_ : i <ᵇ k}
-        {_ : j <ᵇ k}
-        (_ : edg D k i x == edg D k j y)
+        {i<k : i <ᵇ k}
+        {j<k : j <ᵇ k}
+        (_ : edg D k i {i<k} x == edg D k j {j<k} y)
         → ------------------------------
         ≈ (i , x) (j , y)
 
@@ -67,20 +68,22 @@ module Colim
       (_ : ≈ (i , x) (j , y))
       → ----------------------------------------------
       ≈ (i , x) (k , z)
-    ≈trans {i , x} {j , y} {k , z} (mk≈ m e') (mk≈ l e) =
+    ≈trans {i , x} {j , y} {k , z}
+           (mk≈ m {i<m} {j<m} e')
+           (mk≈ l {i<l} {j<l} e) =
       let
         n : Size
         n = l ∨ˢ m
         i<n : i <ᵇ n
-        i<n = <ᵇ<ᵇ {q = <ᵇ∨ˢl _}
+        i<n = <ᵇ<ᵇ (<ᵇ∨ˢl m) i<l
         j<n : j <ᵇ n
-        j<n = <ᵇ<ᵇ {q = <ᵇ∨ˢl _}
+        j<n = <ᵇ<ᵇ (<ᵇ∨ˢl _) j<l
         k<n : k <ᵇ n
-        k<n = <ᵇ<ᵇ {q = <ᵇ∨ˢr _}
+        k<n = <ᵇ<ᵇ (<ᵇ∨ˢr _) j<m
       in
       mk≈ n
         (proof
-          edg D n i x
+          edg D n i {i<n} x
         =[ act D n l {<ᵇ∨ˢl _} i x ]
           edg D n l {<ᵇ∨ˢl _} (edg D l i x)
         =[ ap (edg D n l {<ᵇ∨ˢl _}) e ]
@@ -104,9 +107,9 @@ module Colim
   ν D i x = [ (i , x) ]/ ≈ D
 
   Coconeν : (D : Diag) → Cocone D (ν D)
-  Coconeν D i j x =
+  Coconeν D i j {j<i} x =
     quot.eq (≈ D)
-      (mk≈ (↑ˢ i) {<ᵇ<ᵇ {q = <ᵇ↑ˢ}} {<ᵇ↑ˢ}
+      (mk≈ (↑ˢ i) {<ᵇ<ᵇ <ᵇ↑ˢ j<i} {<ᵇ↑ˢ}
         (act D (↑ˢ i) i {<ᵇ↑ˢ} j x))
 
   -- Universal property of the colimit
@@ -158,8 +161,9 @@ module Colim
   infix 4 _⟶_
   _⟶_ : Set l → Diag → Diag -- Power diagrams (5.17)
   vtx (X ⟶ D) i       = X → vtx D i
-  edg (X ⟶ D) i j f x = edg D i j (f x)
-  act (X ⟶ D) i j k f = funext λ x → act D i j k (f x)
+  edg (X ⟶ D) i j {j<i} f x = edg D i j {_} (f x)
+  act (X ⟶ D) i j {j<i} k {k<j} f =
+    funext λ x → act D i j {j<i} k {k<j} (f x)
 
   can : -- The associated canonical function (5.18)
     (X : Set l)
@@ -171,7 +175,7 @@ module Colim
     λ{ {i , f} {j , g} (mk≈ k e) → funext λ x →
       proof
         ν D i (f x)
-      =[ Coconeν D  k i (f x) ]
+      =[ Coconeν D k i (f x) ]
         ν D k (edg D k i (f x))
       =[ ap (λ h → ν D k (h x)) e ]
         ν D k (edg D k j (g x))
@@ -187,14 +191,14 @@ module Colim
     V : Size → Set l
     V i = S{l}{Σ} (vtx D i)
 
-    E : (i : Size) → ∏ᵇ j < i , (V j → V i)
-    E i j (a , f) = (a , λ b → edg D i j (f b))
+    E : ∀ i j → {j<i : j <ᵇ i} → (V j → V i)
+    E i j {j<i} (a , f) = (a , λ b → edg D i j {j<i} (f b))
 
-    A : ∀ i → ∀ᵇ j < i , ∀ᵇ k < j , (∀ x →
-        E i k x == E i j (E j k x))
-    A i j k (a , f) =
+    A : ∀ i j {j<i : j <ᵇ i} → ∀ k {k<j : k <ᵇ j} → (∀ x →
+        E i k {<ᵇ<ᵇ j<i k<j} x == E i j {j<i} (E j k {k<j} x))
+    A i j {j<i} k {k<i} (a , f) =
       ap {B = λ _ → S{l}{Σ} (vtx D i)} (a ,_)
-      (funext λ b → act D i j k (f b))
+      (funext λ b → act D i j {j<i} k {k<i} (f b))
 
   canS : -- the associated canonical function (5.27)
     {Σ : Sig{l}}
@@ -336,13 +340,11 @@ module CocontinuityOfTakingPowers
           u = <ᵇ∨ˢl _
 
           v : j <ᵇ k
-          v = <ᵇ<ᵇ {q = <ᵇ∨ˢr _} {<ᵇ∨ˢl _}
+          v = <ᵇ<ᵇ (<ᵇ∨ˢr _) (<ᵇ∨ˢl _)
 
           sx'<ᵇk : ∀ x' → s x' <ᵇ k
           sx'<ᵇk x' =
-            <ᵇ<ᵇ {q =
-            <ᵇ<ᵇ {q =
-              <ᵇ∨ˢr _} {<ᵇ∨ˢr _}} {<ᵇ⋁ˢ s x'}
+            <ᵇ<ᵇ (<ᵇ<ᵇ (<ᵇ∨ˢr _) (<ᵇ∨ˢr _)) (<ᵇ⋁ˢ s x')
 
       ----------------------------------------------------------------
       -- Proof of part (2): injectivity of the canonical function
@@ -455,7 +457,7 @@ module CocontinuityOfTakingPowers
           i<ᵇj = <ᵇ∨ˢl _
 
           q'<ᵇj : ∀ z' → q' z' <ᵇ j
-          q'<ᵇj z' = <ᵇ<ᵇ {q = <ᵇ∨ˢr _}{<ᵇ⋁ˢ q' z'}
+          q'<ᵇj z' = <ᵇ<ᵇ (<ᵇ∨ˢr _) (<ᵇ⋁ˢ q' z')
 
           fj : F c → vtx D j
           fj z = edg D j i {i<ᵇj} (fi z)
@@ -517,6 +519,7 @@ module CocontinuityOfTakingPowers
         bijectionIsIso (can (Ar Σ a) D)
           (∧i injectioncan surjectioncan)
 
+
 ----------------------------------------------------------------------
 -- Cocontinuity of polynomial endofunctors (Corollary 5.10)
 ----------------------------------------------------------------------
@@ -548,14 +551,9 @@ module CocontinuityOfPolynomialEndofunctors
         let
           k : Size
           k = ↑ˢ i
-          instance
-            j<ᵇk : j <ᵇ k
-            j<ᵇk = <ᵇ<ᵇ {q = <ᵇ↑ˢ} {j<ᵇi}
-            i<ᵇk : i <ᵇ k
-            i<ᵇk = <ᵇ↑ˢ
         in
         quot.eq (≈ (S∘ D))
-        (mk≈ k (ap {B = λ b → S{l}{Σ} (vtx D k)} (a ,_)
+        (mk≈ k {<ᵇ<ᵇ <ᵇ↑ˢ j<ᵇi} {<ᵇ↑ˢ} (ap {B = λ b → S{l}{Σ} (vtx D k)} (a ,_)
         (funext λ b → act D k i j (f b))))
 
       c : (a : Op Σ) → colim (Ar Σ a ⟶ D) → colim (S∘ D)

@@ -41,11 +41,11 @@ module _ {l : Level}{Size : Set l}{{_ : SizeStructure Size}} where
 
   <ᵇ<ᵇ :
     {i j k : Size}
-    {q : j <ᵇ k}
-    {p : i <ᵇ j}
+    (q : j <ᵇ k)
+    (p : i <ᵇ j)
     → ------------------------
     i <ᵇ k
-  <ᵇ<ᵇ {q = q} {p = p} = <inst (<< (<prf q) (<prf p))
+  <ᵇ<ᵇ q p = <inst (<< (<prf q) (<prf p))
 
   <ᵇ∨ˢl : {i : Size}(j : Size) → i <ᵇ i ∨ˢ j
   <ᵇ∨ˢl j = <inst (<∨ˢl j)
@@ -80,7 +80,7 @@ infix 2 ∏ᵇsyntax
   → ------------------------------------
   Set (l ⊔ m)
 ∏ᵇsyntax = ∏ᵇ
-syntax ∏ᵇsyntax i (λ j → B) = ∏ᵇ j < i , B
+syntax ∏ᵇsyntax i (λ j j<i → B) = ∏ᵇ[ j<i ] j < i , B
 
 -- Bounded universal quantification
 ∀ᵇ :
@@ -89,10 +89,10 @@ syntax ∏ᵇsyntax i (λ j → B) = ∏ᵇ j < i , B
   {{_ : SizeStructure Size}}
   (i : Size)
   {m : Level}
-  (P : (j : Size){_ : j <ᵇ i} → Prop m)
+  (P : (j : Size)(_ : j <ᵇ i) → Prop m)
   → -------------------------------------
   Prop (l ⊔ m)
-∀ᵇ i P =  ∀ j  → {j<i : j <ᵇ i} → P j {j<i}
+∀ᵇ i P =  ∀ j  → (j<i : j <ᵇ i) → P j j<i
 
 ∀ᵇsyntax :
   {l : Level}
@@ -100,11 +100,11 @@ syntax ∏ᵇsyntax i (λ j → B) = ∏ᵇ j < i , B
   {{_ : SizeStructure Size}}
   (i : Size)
   {m : Level}
-  (P : (j : Size){_ : j <ᵇ i} → Prop m)
+  (P : (j : Size)(_ : j <ᵇ i) → Prop m)
   → -------------------------------------
   Prop (l ⊔ m)
 ∀ᵇsyntax = ∀ᵇ
-syntax ∀ᵇsyntax i (λ j → P) = ∀ᵇ j < i , P
+syntax ∀ᵇsyntax i (λ j j<i → P) = ∀ᵇ[ j<i ] j < i , P
 
 funᵇ-ext :
   {l : Level}
@@ -209,11 +209,11 @@ syntax subsetᵇ i (λ j → P) = subsetᵇ j < i , P
   {{_ : SizeStructure Size}}
   {n : Level}
   (P : Size → Prop n)
-  (p : ∀ i → (∀ᵇ j < i , P j) → P i)
+  (p : ∀ i → (∀ᵇ[ j<i ] j < i , P j) → P i)
   → --------------------------------
   ∀ i → P i
 <ind P p = wf.ind _<_ <iswf P
-  (λ i h → p i (λ j {j<i} → h j (<prf j<i)))
+  (λ i h → p i (λ j j<i → h j (<prf j<i)))
 
 <rec :
   {l : Level}
@@ -221,7 +221,7 @@ syntax subsetᵇ i (λ j → P) = subsetᵇ j < i , P
   {{_ : SizeStructure Size}}
   {n : Level}
   (B : Size → Set n)
-  (b : ∀ i → (∏ᵇ j < i , B j) → B i)
+  (b : ∀ i → (∀ j → {_ : j <ᵇ i} → B j) → B i)
   → --------------------------------
   ∀ i → B i
 <rec B b = wf.rec _<_ <iswf B
