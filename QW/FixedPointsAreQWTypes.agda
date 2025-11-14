@@ -180,13 +180,13 @@ module _
 
       τD′ :
         (i  j : Size)
-        {{p : j <ᵇ i}}
+        {p : j <ᵇ i}
         (t : T (∣D A ∣ j))
         → --------------------------------
         set k ∶ Size , (⋀ q ∶ i <ᵇ k ,
-          τ A k j {{<ᵇ<ᵇ{{q = q}}}} t ==
-          τ A k i {{q}}  (T' (D′ i j) t))
-      τD′ i j {{p}} (η x) =
+          τ A k j {<ᵇ<ᵇ q p} t ==
+          τ A k i {q}  (T' (D′ i j) t))
+      τD′ i j {p} (η x) =
         let
           k : Size
           k = ↑ˢ i
@@ -196,7 +196,7 @@ module _
             q : i <ᵇ k
             q = <ᵇ↑ˢ
             _ : j <ᵇ k
-            _ = <ᵇ<ᵇ
+            _ = <ᵇ<ᵇ ? ?
         in k ∣ ⋀i q
         (proof
           τ A k j (η x)
@@ -207,7 +207,7 @@ module _
         =[ symm (τη k i _) ]
           τ A k i (η (D′ i j x))
         qed)
-      τD′ i j {{p}} (σ (a , f)) =
+      τD′ i j {p} (σ (a , f)) =
         let
           g : Ar Σ a → Size
           g b = el (τD′ i j (f b))
@@ -216,20 +216,20 @@ module _
           i<ᵇg b = ⋀e₁ (pf (τD′ i j (f b)))
 
           j<ᵇg : ∀ b → j <ᵇ g b
-          j<ᵇg b = <ᵇ<ᵇ {{q = i<ᵇg b}}
+          j<ᵇg b = <ᵇ<ᵇ (i<ᵇg b) ?
 
           e :
             (b : Ar Σ a)
             → ------------------------------------------
-            τ A (g b) j {{j<ᵇg b}} (f b) ==
-            τ A (g b) i {{i<ᵇg b}} (T' (D′ i j) (f b))
+            τ A (g b) j {j<ᵇg b} (f b) ==
+            τ A (g b) i {i<ᵇg b} (T' (D′ i j) (f b))
           e b = ⋀e₂ (pf (τD′ i j (f b)))
 
           k : Size
           k = i ∨ˢ ⋁ˢ (ι₁ a) g
 
           g<ᵇk : ∀ b → g b <ᵇ k
-          g<ᵇk b = <ᵇ<ᵇ {{q = <ᵇ∨ˢr _}} {{<ᵇ⋁ˢ g b}}
+          g<ᵇk b = <ᵇ<ᵇ (<ᵇ∨ˢr _) (<ᵇ⋁ˢ g b)
 
           ℓ : Level
           ℓ = l
@@ -243,22 +243,22 @@ module _
             _ : k <ᵇ l
             _ = <ᵇ↑ˢ
             q : i <ᵇ l
-            q = <ᵇ<ᵇ
+            q = <ᵇ<ᵇ ? ?
         in l ∣ (⋀i q
           (proof
             τ A l j (σ (a , f))
           =[  τσ l k j _ _  ]
             τ A l k (σ (a , λ b → η (τ A k j (f b))))
           =[ ap (λ f' → τ A l k (σ (a , f'))) (funext λ b →
-              ap η (symm (D′τ k (g b) {{g<ᵇk b}} j {{j<ᵇg b}} _))) ]
-              τ A l k (σ (a , λ b → η (D′ k (g b) {{g<ᵇk b}}
-              (τ A (g b) j {{j<ᵇg b}} (f b)))))
+              ap η (symm (D′τ k (g b) {g<ᵇk b} j {j<ᵇg b} _))) ]
+              τ A l k (σ (a , λ b → η (D′ k (g b) {g<ᵇk b}
+              (τ A (g b) j {j<ᵇg b} (f b)))))
           =[ ap (λ h → τ A l k (σ (a , h))) (funext λ b →
-              ap (η {ℓ} {Σ} ∘ D′ k (g b) {{g<ᵇk b}}) (e b)) ]
-              τ A l k (σ (a , λ b → η (D′ k (g b) {{g<ᵇk b}}
-              (τ A (g b) i {{i<ᵇg b}} (T' (D′ i j) (f b))))))
+              ap (η {ℓ} {Σ} ∘ D′ k (g b) {g<ᵇk b}) (e b)) ]
+              τ A l k (σ (a , λ b → η (D′ k (g b) {g<ᵇk b}
+              (τ A (g b) i {i<ᵇg b} (T' (D′ i j) (f b))))))
           =[ ap (λ h → τ A l k (σ (a , h))) (funext λ b →
-              ap (η {ℓ} {Σ}) (D′τ k (g b) {{g<ᵇk b}} i {{i<ᵇg b}} _ )) ]
+              ap (η {ℓ} {Σ}) (D′τ k (g b) {g<ᵇk b} i {i<ᵇg b} _ )) ]
               τ A l k (σ (a , λ b → η (τ A k i (T' (D′ i j) (f b)))))
           =[ symm (τσ l k i _ _) ]
             τ A l i (σ (a , λ b → T' (D′ i j) (f b)))
@@ -283,7 +283,7 @@ module _
         sup {{AlgQW}} = (∫ (S∘ D) φ Coconeφ) ∘ (canS {Σ} D)⁻¹
           module _ where
           φ : (i : Size) → S{l}{Σ}(∣D A ∣ i) → QW
-          φ i s = ν D (↑ˢ i) (τ A (↑ˢ i) i {{<ᵇ↑ˢ}} (ι s))
+          φ i s = ν D (↑ˢ i) (τ A (↑ˢ i) i {<ᵇ↑ˢ} (ι s))
 
           Coconeφ : Cocone (S∘ D) φ
           Coconeφ i j s =
@@ -297,19 +297,19 @@ module _
                 i<ᵇk = ⋀e₁ (pf (τD′ i j (ι s)))
 
                 j<ᵇk : j <ᵇ k
-                j<ᵇk = <ᵇ<ᵇ
+                j<ᵇk = <ᵇ<ᵇ ? ?
 
                 ↑ˢj<ᵇk' : ↑ˢ j <ᵇ k'
-                ↑ˢj<ᵇk' = <ᵇ<ᵇ {{q = <ᵇ∨ˢr _}} {{<ᵇ∨ˢl _}}
+                ↑ˢj<ᵇk' = <ᵇ<ᵇ (<ᵇ∨ˢr _) (<ᵇ∨ˢl _)
 
                 i<ᵇk' : i <ᵇ k'
-                i<ᵇk' = <ᵇ<ᵇ {{q = <ᵇ∨ˢl _}} {{<ᵇ↑ˢ}}
+                i<ᵇk' = <ᵇ<ᵇ (<ᵇ∨ˢl _) (<ᵇ↑ˢ)
 
                 j<ᵇk' : j <ᵇ k'
-                j<ᵇk' = <ᵇ<ᵇ {{q = ↑ˢj<ᵇk'}}{{<ᵇ↑ˢ}}
+                j<ᵇk' = <ᵇ<ᵇ (↑ˢj<ᵇk') (<ᵇ↑ˢ)
 
                 k<ᵇk' : k <ᵇ k'
-                k<ᵇk' = <ᵇ<ᵇ {{q = <ᵇ∨ˢr _}} {{<ᵇ∨ˢr _}}
+                k<ᵇk' = <ᵇ<ᵇ (<ᵇ∨ˢr _) (<ᵇ∨ˢr _)
 
                 ↑ˢi<ᵇk' : ↑ˢ i <ᵇ k'
                 ↑ˢi<ᵇk' = <ᵇ∨ˢl _
@@ -318,10 +318,10 @@ module _
               e = ⋀e₂ (pf (τD′ i j (ι s)))
             in
             proof
-              ν D (↑ˢ j) (τ A (↑ˢ j) j {{<ᵇ↑ˢ}} (ι s))
+              ν D (↑ˢ j) (τ A (↑ˢ j) j {<ᵇ↑ˢ} (ι s))
             =[ Coconeν D k' (↑ˢ j) _ ]
-              ν D k' (D′ k' (↑ˢ j) ((τ A (↑ˢ j) j {{<ᵇ↑ˢ}} (ι s))))
-            =[ ap (ν D k') (D′τ k' (↑ˢ j) j {{<ᵇ↑ˢ}} _) ]
+              ν D k' (D′ k' (↑ˢ j) ((τ A (↑ˢ j) j {<ᵇ↑ˢ} (ι s))))
+            =[ ap (ν D k') (D′τ k' (↑ˢ j) j {<ᵇ↑ˢ} _) ]
               ν D k' (τ A k' j (ι s))
             =[ ap (ν D k') (symm (D′τ k' k j _)) ]
               ν D k' (D′ k' k (τ A k j (ι s)))
@@ -329,11 +329,11 @@ module _
               ν D k' (D′ k' k (τ A k i (T' (D′ i j) (ι s))))
             =[ ap (ν D k') (D′τ k' k i _) ]
               ν D k' (τ A k' i (T' (D′ i j) (ι s)))
-            =[ ap (ν D k') (symm (D′τ k' (↑ˢ i) {{↑ˢi<ᵇk'}} i {{<ᵇ↑ˢ}} _)) ]
-              ν D k' (D′ k' (↑ˢ i) {{↑ˢi<ᵇk'}}
-              (τ A (↑ˢ i) i {{<ᵇ↑ˢ}} (T' (D′ i j) (ι s))))
-            =[ symm (Coconeν D k' (↑ˢ i) {{↑ˢi<ᵇk'}} _ ) ]
-              ν D (↑ˢ i) (τ A (↑ˢ i) i {{<ᵇ↑ˢ}} (T' (D′ i j) (ι s)))
+            =[ ap (ν D k') (symm (D′τ k' (↑ˢ i) {↑ˢi<ᵇk'} i {<ᵇ↑ˢ} _)) ]
+              ν D k' (D′ k' (↑ˢ i) {↑ˢi<ᵇk'}
+              (τ A (↑ˢ i) i {<ᵇ↑ˢ} (T' (D′ i j) (ι s))))
+            =[ symm (Coconeν D k' (↑ˢ i) {↑ˢi<ᵇk'} _ ) ]
+              ν D (↑ˢ i) (τ A (↑ˢ i) i {<ᵇ↑ˢ} (T' (D′ i j) (ι s)))
             qed
 
       -- QW satisfies the equational system
@@ -360,12 +360,12 @@ module _
           =[ ap (∫ (S∘ D) φ Coconeφ) canS⁻¹Sν ]
             ∫ (S∘ {Σ} D) {QW} φ Coconeφ (ν (S∘ {Σ} D) i ((a , λ b → τ A i j (f b))))
           =[ refl ]
-            ν D (↑ˢ i) (τ A (↑ˢ i) i {{<ᵇ↑ˢ}} (T' (τ A i j) (σ (a , η ∘ f))))
-          =[ ap (ν D (↑ˢ i)) (symm (τσ (↑ˢ i) i {{<ᵇ↑ˢ}} j _ _)) ]
-            ν D (↑ˢ i) (τ A (↑ˢ i) j {{<ᵇ<ᵇ {{q = <ᵇ↑ˢ}}}} (σ (a , f)))
-          =[ ap (ν D (↑ˢ i)) (symm (D′τ (↑ˢ i) i {{<ᵇ↑ˢ}} j _)) ]
-            ν D (↑ˢ i) (D′ (↑ˢ i) i {{<ᵇ↑ˢ}} (τ A i j (σ (a , f))))
-          =[ symm (Coconeν D (↑ˢ i) i {{<ᵇ↑ˢ}} _) ]
+            ν D (↑ˢ i) (τ A (↑ˢ i) i {<ᵇ↑ˢ} (T' (τ A i j) (σ (a , η ∘ f))))
+          =[ ap (ν D (↑ˢ i)) (symm (τσ (↑ˢ i) i {<ᵇ↑ˢ} j _ _)) ]
+            ν D (↑ˢ i) (τ A (↑ˢ i) j {<ᵇ<ᵇ (<ᵇ↑ˢ) ?} (σ (a , f)))
+          =[ ap (ν D (↑ˢ i)) (symm (D′τ (↑ˢ i) i {<ᵇ↑ˢ} j _)) ]
+            ν D (↑ˢ i) (D′ (↑ˢ i) i {<ᵇ↑ˢ} (τ A i j (σ (a , f))))
+          =[ symm (Coconeν D (↑ˢ i) i {<ᵇ↑ˢ} _) ]
             ν D i (τ A i j (σ (a , f)))
           qed
         where
@@ -383,11 +383,11 @@ module _
           ⟦ lhs e ⟧ (ν D i ∘ ρi)
         =[ symm (⟦T⟧ (lhs e))  ]
           ⟦ T' ρi (lhs e) ⟧ (ν D i)
-        =[ ⟦⟧ν  (↑ˢ i) i {{<ᵇ↑ˢ}} _ ]
-          ν D (↑ˢ i) (τ A (↑ˢ i) i {{<ᵇ↑ˢ}} (T' ρi (lhs e)))
-        =[ ap (ν D (↑ˢ i)) (τε (↑ˢ i) i {{<ᵇ↑ˢ}} _ _) ]
-          ν D (↑ˢ i) (τ A (↑ˢ i) i {{<ᵇ↑ˢ}} (T' ρi (rhs e)))
-        =[ symm (⟦⟧ν  (↑ˢ i) i {{<ᵇ↑ˢ}} _ ) ]
+        =[ ⟦⟧ν  (↑ˢ i) i {<ᵇ↑ˢ} _ ]
+          ν D (↑ˢ i) (τ A (↑ˢ i) i {<ᵇ↑ˢ} (T' ρi (lhs e)))
+        =[ ap (ν D (↑ˢ i)) (τε (↑ˢ i) i {<ᵇ↑ˢ} _ _) ]
+          ν D (↑ˢ i) (τ A (↑ˢ i) i {<ᵇ↑ˢ} (T' ρi (rhs e)))
+        =[ symm (⟦⟧ν  (↑ˢ i) i {<ᵇ↑ˢ} _ ) ]
           ⟦ T' ρi (rhs e) ⟧ (ν D i)
         =[ ⟦T⟧ (rhs e) ]
           ⟦ rhs e ⟧ (ν D i ∘ ρi)
@@ -416,18 +416,18 @@ module _
             (i : Size)
             (hi : ∏ᵇ i λ j {j<i} → Fun j)
             (k j : Size)
-            {{_ : j <ᵇ i}}
-            {{_ : k <ᵇ j}}
+            {_ : j <ᵇ i}
+            {_ : k <ᵇ j}
             → -------------------------------
             fun (hi k) == fun (hi j) ∘ Q′ j k
           fun∘Q′ i hi = wf.ind _<_ <iswf P
-            λ k hk → hyp k (λ l {{l<ᵇk}} → hk l (<prf l<ᵇk))
+            λ k hk → hyp k (λ l {l<ᵇk} → hk l (<prf l<ᵇk))
             where
             P : Size → Prop l
             P k =
               (j : Size)
-              {{_ : j <ᵇ i}}
-              {{_ : k <ᵇ j}}
+              {_ : j <ᵇ i}
+              {_ : k <ᵇ j}
               → -------------------------------
               fun (hi k) == fun (hi j) ∘ Q′ j k
 
@@ -445,7 +445,7 @@ module _
                 =[ ap (λ f → ⟦ t ⟧ (f ∘ coe DA=Q))
                   (symm (hk l k)) ]
                   ⟦ t ⟧ (fun (hi l) ∘ coe DA=Q)
-                =[ ap (λ f → ⟦ t ⟧ (f ∘ coe DA=Q)) (hk l j) ]
+                =[ ap (λ f → ⟦ t ⟧ (f ∘ coe DA=Q)) (hk l j {?}) ]
                   ⟦ t ⟧ (fun (hi j) ∘ Q′ j l ∘ coe DA=Q)
                 =[ ap (λ f → ⟦ t ⟧ (fun (hi j) ∘ f))
                   (symm (funext (D′=Q′ j l))) ]
@@ -552,14 +552,14 @@ module _
           P : Size → Prop l
           P j =
             (i : Size)
-            {{_ : j <ᵇ i}}
+            {_ : j <ᵇ i}
             (x : ∣D A ∣ j)
             → --------------------------
             rec j x == rec i (D′ i j x)
 
           hyp : ∀ j → (∀ k → (k < j) → P k) → P j
-          hyp j h i {{j<ᵇi}} x = match (τ-surj j x)
-            (λ {(∃ᵇi k {{k<ᵇj}} (∃i t refl)) →
+          hyp j h i {j<ᵇi} x = match (τ-surj j x)
+            (λ {(∃ᵇi k {k<ᵇj} (∃i t refl)) →
             proof
               rec j (τ A j k t)
             =[ recτ j k t ]
@@ -598,14 +598,14 @@ module _
             {i : Size}
             (s : S{l}{Σ} (∣D A ∣ i))
             → --------------------------------------------------------------------
-            rec (↑ˢ i) (τ A (↑ˢ i) i {{<ᵇ↑ˢ}} (ι s)) == sup (S' (recQW ∘ ν D i) s)
+            rec (↑ˢ i) (τ A (↑ˢ i) i {<ᵇ↑ˢ} (ι s)) == sup (S' (recQW ∘ ν D i) s)
           lemma {i} (a , f) =
             proof
-              rec (↑ˢ i) (τ A (↑ˢ i) i {{<ᵇ↑ˢ}} (σ (a , η ∘ f)))
-            =[ recτ (↑ˢ i) i {{<ᵇ↑ˢ}} _ ]
-              sup (a , rec (↑ˢ i) ∘ D′ (↑ˢ i) i {{<ᵇ↑ˢ}} ∘ f)
+              rec (↑ˢ i) (τ A (↑ˢ i) i {<ᵇ↑ˢ} (σ (a , η ∘ f)))
+            =[ recτ (↑ˢ i) i {<ᵇ↑ˢ} _ ]
+              sup (a , rec (↑ˢ i) ∘ D′ (↑ˢ i) i {<ᵇ↑ˢ} ∘ f)
             =[ ap (λ g → sup (a , g ∘ f)) (funext λ z →
-              symm (Coconerec (↑ˢ i) i {{<ᵇ↑ˢ}} z)) ]
+              symm (Coconerec (↑ˢ i) i {<ᵇ↑ˢ} z)) ]
               sup (a , rec i ∘ f)
             qed
 
