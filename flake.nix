@@ -8,7 +8,8 @@
       owner = "nixos";
       repo = "nixpkgs";
       #ref = "21.11"; # Agda 2.6.2
-      ref = "25.05"; # Agda 2.7.0.1
+      #ref = "25.05"; # Agda 2.7.0.1
+      ref = "nixos-unstable"; # Latest
     };
     just-agda = {
       type = "github";
