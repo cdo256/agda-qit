@@ -33,12 +33,20 @@ module SizeIdxStruct
 
   -- (↓ i)-indexed structure (i : Size),
   -- i.e. indexed for all j : Size and j < i
+  Dᵇ-type : (i : Size) → Set (lsuc ℓ) 
+  Dᵇ-type i =
+      ∏ᵇ i λ j {j<i}
+    → Set ℓ
+  τᵇ-type : (i : Size) → (Dᵇ : Dᵇ-type i) → Set ℓ
+  τᵇ-type i Dᵇ =
+      ∏ᵇ i λ j {j<i}
+    → ∏ᵇ j λ k {k<j}
+    → (T{ℓ}{Σ}(Dᵇ k {<ᵇ<ᵇ j<i k<j}) → Dᵇ j {j<i})
   record IdxStructᵇ (i : Size) : Set (lsuc ℓ) where
     constructor mkIdxStructᵇ
     field
-      Dᵇ : ∏ᵇ i λ j {j<i} → Set ℓ
-      τᵇ : ∏ᵇ i λ j {j<i} → ∏ᵇ j λ k {k<j}
-         → (T{ℓ}{Σ}(Dᵇ k {<ᵇ<ᵇ j<i k<j}) → Dᵇ j {j<i})
+      Dᵇ : Dᵇ-type i
+      τᵇ : τᵇ-type i Dᵇ
   open IdxStructᵇ public
 
   infixl 6 _↓_

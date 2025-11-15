@@ -26,25 +26,47 @@ module Main
     --------------------------------------------------------------------
     -- Extensionality principles for IdxStructᵇ
     --------------------------------------------------------------------
+    IdxStructᵇ-ext₀ :
+      {i : Size}
+      {Dᵇ  Dᵇ' : Dᵇ-type i}
+      (dom-eq : ∀ᵇ i λ j {j<i} → Dᵇ j {j<i} == Dᵇ' j {j<i})
+      {τᵇ  : τᵇ-type i Dᵇ}
+      {τᵇ' : τᵇ-type i Dᵇ'}
+      (τ-eq : ∀ᵇ i λ j {j<i} → ∀ᵇ j λ k {k<j} →
+              {t  : T (Dᵇ k {<ᵇ<ᵇ j<i k<j})} {t' : T (Dᵇ' k {<ᵇ<ᵇ j<i k<j})} →
+              t === t' →
+              τᵇ j {j<i} k {k<j} t  === τᵇ' j {j<i} k {k<j} t')
+      → mkIdxStructᵇ Dᵇ τᵇ == mkIdxStructᵇ Dᵇ' τᵇ'
+    IdxStructᵇ-ext₀ {i = i} {Dᵇ = Dᵇ} {Dᵇ' = Dᵇ'} dom-eq {τᵇ = τᵇ} {τᵇ' = τᵇ'} τ-eq =
+      match (funᵇ-ext dom-eq) q
+      where
+      q : (p : Dᵇ === Dᵇ') →
+           mkIdxStructᵇ Dᵇ τᵇ == mkIdxStructᵇ Dᵇ' τᵇ'
+      q refl =
+        let
+          τ-eq' : τᵇ == τᵇ'
+          τ-eq' =
+            funᵇ-ext (λ j {j<i} →
+            funᵇ-ext (λ k {k<j} →
+            funext (λ t →
+            τ-eq j {j<i} k {k<j} {t} {t} refl)))
+        in match τ-eq' λ{refl → refl}
+ 
     IdxStructᵇ-ext :
       {i : Size}
       {A A' : IdxStructᵇ i}
-      (_ : ∀ᵇ i λ j {j<i} → (domᵇ A j == domᵇ A' j))
-      (_ : ∀ᵇ i λ j {j<i} → ∀ᵇ j λ k {k<j} →
-      ({t : T (domᵇ A k)}
-        {t' : T (domᵇ A' k)}
+      (dom-eq : ∀ᵇ i λ j {j<i} → (domᵇ A j {j<i} == domᵇ A' j {j<i}))
+      (τ-eq : ∀ᵇ i λ j {j<i} → ∀ᵇ j λ k {k<j} →
+        {t : T (domᵇ A k)} {t' : T (domᵇ A' k)}
         (_  : t === t')
-        → ---------------------------
-        τᵇ A j k t === τᵇ A' j k t'))
+        → τᵇ A j {j<i} k {k<j} t === τᵇ A' j {j<i} k {k<j} t')
       → -------------------------------------
       A == A'
-    IdxStructᵇ-ext e e' =
-      match (funᵇ-ext e) λ{refl →
-      match
-        (funᵇ-ext λ j →
-        funᵇ-ext λ k →
-        heq-funext refl λ p → e' j k p)
-      λ{refl → refl}}
+    IdxStructᵇ-ext
+      {i = i}
+      {A = A}
+      {A' = A'}
+      dom-eq τ-eq = IdxStructᵇ-ext₀ dom-eq τ-eq
 
     --------------------------------------------------------------------
     -- Restricting elements of FixSizeStructᵇ to lower sizes
@@ -53,7 +75,7 @@ module Main
       {i : Size}
       → --------------------------------------------
       FixSizeStructᵇ i → ∏ᵇ i λ j {j<i} → FixSizeStructᵇ j
-    FixSizeStructᵇ↓ᵇ (D ∣ δ) j = D ↓ᵇ j ∣ (λ k → δ k)
+    FixSizeStructᵇ↓ᵇ (D ∣ δ) j {j<i} = _↓ᵇ_ D j {j<i} ∣ (λ k → δ k)
 
     --------------------------------------------------------------------
     -- Elements of FixSizeStructᵇ are unique if they exist
@@ -134,13 +156,13 @@ module Main
           τi k l t === τᵇ (el (hi j)) k l t')
         τi< j k l {t} {t'} t=t' =
           proof
-            [ pairᵇ l (T' (coe (domi< k l)) t) ]/ Rᵇ (el (hi k))
-          =[ ap₂ (λ X x → [ pairᵇ l x ]/ Rᵇ (el X))
+            [ pairᵇ l {{!!}} {!T' (coe (domi< k l)) t!} ]/ Rᵇ (el (hi k))
+          =[ ap₂ (λ X x → [ pairᵇ l {{!!}} x ]/ Rᵇ (el X))
             (FixSizeStructᵇ-uniq k (hi k) (FixSizeStructᵇ↓ᵇ (hi j) k))
             (lemma e (domi< k l) t=t') ]
-            [ pairᵇ l t' ]/ Rᵇ ((el (hi j)) ↓ᵇ k)
-          =[ symm (∧e₂ (pf (hi j) k) l t') ]
-            τᵇ (el (hi j)) k l t'
+            [ pairᵇ l {{!!}} {!t'!} ]/ Rᵇ ((el (hi j)) ↓ᵇ k)
+          =[ symm (∧e₂ (pf (hi j) k) l {!t'!}) ]
+            τᵇ (el (hi j)) k l {!t'!}
           qed
           where
           e : domᵇ (el (FixSizeStructᵇ↓ᵇ (hi j) k)) l == domᵇ (el (hi k)) l
@@ -227,35 +249,35 @@ module Main
       τ  D i j t = [ pairᵇ j ( T'(coe (Q< i j)) t) ]/ Rᵇ(el (initᵇ i))
 
       D↓ : ∀ i → D ↓ i == el (initᵇ i)
-      D↓ i = IdxStructᵇ-ext (Q< i) λ j k {t}{t'} t=t' →
-        proof
-          [ pairᵇ k (T'(coe (Q< j k)) t) ]/ Rᵇ (el (initᵇ j))
-        =[ ap₂ (λ X x → [ pairᵇ k x ]/ Rᵇ (el X))
-          (FixSizeStructᵇ↓ᵇ-uniq i j)
-          (lemma (ap (λ X → domᵇ (el X) k)
-            (symm (FixSizeStructᵇ↓ᵇ-uniq i j))) (Q< j k) t=t') ]
-          [ pairᵇ k t' ]/ Rᵇ (el (initᵇ i) ↓ᵇ j)
-        =[ symm (∧e₂ (pf (initᵇ i) j) k t') ]
-          τᵇ (el (initᵇ i)) j k t'
-        qed
-        where
-        lemma :
-          {X X' X'' : Set _}
-          (_ : X' == X'')
-          (e : X == X'')
-          {u : T{Σ = Σ} X}
-          {u' : T{Σ = Σ} X'}
-          (_ : u === u')
-          → -----------------
-          T' (coe e) u === u'
-        lemma refl refl {u} refl =
-          proof
-            T' (coe refl) u
-          =[ ap (λ f → T' f u) (funext coerefl) ]
-            T' id u
-          =[ symm (T'id _) ]
-            u
-          qed
+      -- D↓ i = IdxStructᵇ-ext (Q< i) λ j k {t}{t'} t=t' →
+      --   proof
+      --     [ pairᵇ k (T'(coe (Q< j k)) t) ]/ Rᵇ (el (initᵇ j))
+      --   =[ ap₂ (λ X x → [ pairᵇ k x ]/ Rᵇ (el X))
+      --     (FixSizeStructᵇ↓ᵇ-uniq i j)
+      --     (lemma (ap (λ X → domᵇ (el X) k)
+      --       (symm (FixSizeStructᵇ↓ᵇ-uniq i j))) (Q< j k) t=t') ]
+      --     [ pairᵇ k t' ]/ Rᵇ (el (initᵇ i) ↓ᵇ j)
+      --   =[ symm (∧e₂ (pf (initᵇ i) j) k t') ]
+      --     τᵇ (el (initᵇ i)) j k t'
+      --   qed
+      --   where
+      --   lemma :
+      --     {X X' X'' : Set _}
+      --     (_ : X' == X'')
+      --     (e : X == X'')
+      --     {u : T{Σ = Σ} X}
+      --     {u' : T{Σ = Σ} X'}
+      --     (_ : u === u')
+      --     → -----------------
+      --     T' (coe e) u === u'
+      --   lemma refl refl {u} refl =
+      --     proof
+      --       T' (coe refl) u
+      --     =[ ap (λ f → T' f u) (funext coerefl) ]
+      --       T' id u
+      --     =[ symm (T'id _) ]
+      --       u
+      --     qed
 
       δ : ◇fix D
       δ i = ∧i (Q=Qᵇ↓ i) λ j t →
