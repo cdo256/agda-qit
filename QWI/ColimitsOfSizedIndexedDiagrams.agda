@@ -8,16 +8,17 @@ open import QWI.Size public
 module Colim
   {l : Level}
   (Size : Set l)
-  {{_ : SizeStructure Size}}
+  {{ssz : SizeStructure Size}}
   where
   -- Diagrams in Set
   record Diag : Set (lsuc l) where
     constructor mkDiag
     field
       vtx : Size → Set l
-      edg : (i : Size) → ∏ᵇ j < i , (vtx j → vtx i)
-      act : ∀ i → ∀ᵇ j < i , ∀ᵇ k < j , (∀ x →
-        edg i k x == edg i j (edg j k x))
+      edg : ∀ i j {j<i : _<ᵇ_ j i} → (vtx j → vtx i)
+      act : ∀ i j {j<i : j <ᵇ i} → ∀ k {k<j : k <ᵇ j}
+          → (∀ x → edg i k {<ᵇ<ᵇ j<i k<j} x
+                == edg i j {j<i} (edg j k {k<j} x))
   open Diag public
 
   -- Cocones under the diagram
@@ -28,7 +29,7 @@ module Colim
     → ----------------------
     Prop l
   Cocone D f =
-    ∀ i → ∀ᵇ j < i , (∀ x → f j x == f i (edg D i j x))
+    ∀ i j {j<i : j <ᵇ i} → (∀ x → f j x == f i (edg D i j {j<i} x))
 
   -- Colimits
   colim : Diag → Set l
@@ -42,9 +43,9 @@ module Colim
         {x : vtx D i}
         {y : vtx D j}
         (k : Size)
-        {{_ : i <ᵇ k}}
-        {{_ : j <ᵇ k}}
-        (_ : edg D k i x == edg D k j y)
+        {i<k : i <ᵇ k}
+        {j<k : j <ᵇ k}
+        (_ : edg D k i {i<k} x == edg D k j {j<k} y)
         → ------------------------------
         ≈ (i , x) (j , y)
 
@@ -53,7 +54,7 @@ module Colim
       (_ : z == z')
       → ---------------------------
       ≈ z z'
-    ≈refl {i , _} refl = mk≈ (↑ˢ i) {{<ᵇ↑ˢ}} {{<ᵇ↑ˢ}} refl
+    ≈refl {i , _} refl = mk≈ (↑ˢ i) {<ᵇ↑ˢ} {<ᵇ↑ˢ} refl
 
     ≈symm :
       {(i , x) (j , y) : ∑ i ∶ Size , vtx D i}
@@ -67,32 +68,33 @@ module Colim
       (_ : ≈ (i , x) (j , y))
       → ----------------------------------------------
       ≈ (i , x) (k , z)
-    ≈trans {i , x} {j , y} {k , z} (mk≈ m e') (mk≈ l e) =
+    ≈trans {i , x} {j , y} {k , z}
+           (mk≈ m {i<m} {j<m} e')
+           (mk≈ l {i<l} {j<l} e) =
       let
         n : Size
         n = l ∨ˢ m
-        instance
-          _ : i <ᵇ n
-          _ = <ᵇ<ᵇ {{q = <ᵇ∨ˢl _}}
-          _ : j <ᵇ n
-          _ = <ᵇ<ᵇ {{q = <ᵇ∨ˢl _}}
-          _ : k <ᵇ n
-          _ = <ᵇ<ᵇ {{q = <ᵇ∨ˢr _}}
+        i<n : i <ᵇ n
+        i<n = <ᵇ<ᵇ (<ᵇ∨ˢl m) i<l
+        j<n : j <ᵇ n
+        j<n = <ᵇ<ᵇ (<ᵇ∨ˢl _) j<l
+        k<n : k <ᵇ n
+        k<n = <ᵇ<ᵇ (<ᵇ∨ˢr _) j<m
       in
       mk≈ n
         (proof
-          edg D n i x
-        =[ act D n l {{<ᵇ∨ˢl _}} i x ]
-          edg D n l {{<ᵇ∨ˢl _}} (edg D l i x)
-        =[ ap (edg D n l {{<ᵇ∨ˢl _}}) e ]
-          edg D n l {{<ᵇ∨ˢl _}} (edg D l j y)
-        =[ symm (act D n l {{<ᵇ∨ˢl _}} j y) ]
+          edg D n i {i<n} x
+        =[ act D n l {<ᵇ∨ˢl _} i x ]
+          edg D n l {<ᵇ∨ˢl _} (edg D l i x)
+        =[ ap (edg D n l {<ᵇ∨ˢl _}) e ]
+          edg D n l {<ᵇ∨ˢl _} (edg D l j y)
+        =[ symm (act D n l {<ᵇ∨ˢl _} j y) ]
           edg D n j y
-        =[ act D n m {{<ᵇ∨ˢr _}} j y ]
-          edg D n m {{<ᵇ∨ˢr _}} (edg D m j y)
-        =[ ap (edg D n m {{<ᵇ∨ˢr _}}) e' ]
-          edg D n m {{<ᵇ∨ˢr _}} (edg D m k z)
-        =[ symm (act D n m {{<ᵇ∨ˢr _}} k z) ]
+        =[ act D n m {<ᵇ∨ˢr _} j y ]
+          edg D n m {<ᵇ∨ˢr _} (edg D m j y)
+        =[ ap (edg D n m {<ᵇ∨ˢr _}) e' ]
+          edg D n m {<ᵇ∨ˢr _} (edg D m k z)
+        =[ symm (act D n m {<ᵇ∨ˢr _} k z) ]
           edg D n k z
         qed)
 
@@ -105,10 +107,10 @@ module Colim
   ν D i x = [ (i , x) ]/ ≈ D
 
   Coconeν : (D : Diag) → Cocone D (ν D)
-  Coconeν D i j x =
+  Coconeν D i j {j<i} x =
     quot.eq (≈ D)
-      (mk≈ (↑ˢ i) {{<ᵇ<ᵇ {{q = <ᵇ↑ˢ}}}} {{<ᵇ↑ˢ}}
-        (act D (↑ˢ i) i {{<ᵇ↑ˢ}} j x))
+      (mk≈ (↑ˢ i) {<ᵇ<ᵇ <ᵇ↑ˢ j<i} {<ᵇ↑ˢ}
+        (act D (↑ˢ i) i {<ᵇ↑ˢ} j x))
 
   -- Universal property of the colimit
   ∫ :
@@ -150,10 +152,10 @@ module Colim
     (_ : ν D i x === ν D' i' x')
     → ---------------------------------------------
     ∃ j ∶ Size , ⋀ p ∶ i <ᵇ j , ⋀ p' ∶ i' <ᵇ j ,
-      (edg D j i {{p}} x === edg D' j i' {{p'}} x')
+      (edg D j i {p} x === edg D' j i' {p'} x')
   νkernel {D} refl e =
     match (quot-eff.prop (≈ D) (≈refl D) (≈symm D) (≈trans D) e)
-    λ{(mk≈ j {{p}} {{p'}} e) → ∃i j (⋀i p (⋀i p' e))}
+    λ{(mk≈ j {p} {p'} e) → ∃i j (⋀i p (⋀i p' e))}
 
   -- Preservation of colimits by polynomial endofunctors (Definition 5.9)
   module _
@@ -165,8 +167,17 @@ module Colim
     _⟶ᴵ_ : Setᴵ l → (I → Diag) → Diag -- Power diagrams (5.17)
     vtx (X ⟶ᴵ D) i         = ∀ n → X n → vtx (D n) i
     edg (X ⟶ᴵ D) i j f n x = edg (D n) i j (f n x)
-    act (X ⟶ᴵ D) i j k f   =
-      funext λ n → funext λ x → act (D n) i j k (f n x)
+    act (X ⟶ᴵ D) i j k {k<j} f   =
+      funext λ n → funext λ x → act (D n) i j k {k<j} (f n x)
+
+    -- E : ∀ i j → {j<i : j <ᵇ i} → (V j → V i)
+    -- E i j {j<i} (a , f) = (a , λ b → edg D i j {j<i} (f b))
+
+    -- A : ∀ i j {j<i : j <ᵇ i} → ∀ k {k<j : k <ᵇ j} → (∀ x →
+    --     E i k {<ᵇ<ᵇ j<i k<j} x == E i j {j<i} (E j k {k<j} x))
+    -- A i j {j<i} k {k<i} (a , f) =
+    --   ap {B = λ _ → S{l}{Σ} (vtx D i)} (a ,_)
+    --   (funext λ b → act D i j {j<i} k {k<i} (f b))
 
     can : -- The associated canonical function (5.18)
       (X : Setᴵ l)
@@ -195,11 +206,11 @@ module Colim
         V : Size → Set l
         V i = S{Σ} (λ n → vtx (D n) i) m
 
-        E : (i : Size) → ∏ᵇ j < i , (V j → V i)
-        E i j (a , f) = (a , λ n b → edg (D n) i j (f n b))
+        E : (i : Size) → ∏ᵇ i λ j {j<i} → (V j → V i)
+        E i j {j<i} (a , f) = (a , λ n b → edg (D n) i j {j<i} (f n b))
 
-        A : ∀ i → ∀ᵇ j < i , ∀ᵇ k < j , (∀ x →
-            E i k x == E i j (E j k x))
+        A : ∀ i → ∀ᵇ i λ j {j<i} → ∀ᵇ j λ k {k<j} → (∀ x →
+            E i k {<ᵇ<ᵇ j<i k<j} x == E i j {j<i} (E j k {k<j} x))
         A i j k (a , f) =
           proof
             (a , (λ n b → edg (D n) i k (f n b)))
@@ -289,18 +300,15 @@ module CocontinuityOfTakingPowers
       upperbounds : UpperBounds {Σ = Ψ} Σ
       ⋁ˢ   {{upperbounds}} a f = Unindexed.sup (ι₂ (ι₂ (in₃ a)) , f)
       <⋁ˢ  {{upperbounds}} f x = ≺sup x (≤refl (f x))
-      <ᵇ⋁ˢ {{upperbounds}} f x = <inst (<⋁ˢ f x)
+      <ᵇ⋁ˢ {{upperbounds}} f x = <⋁ˢ f x
 
     open Colim Size
-
-    module _ (a : A)(D : I → Diag) where
+    module _ (a : A)(D : I → Diag {{ssz}}) where
       qD : (∑ n ∶ I , ∑ Size (vtx (D n))) → ∑ I (colim ∘ D)
       qD (n , i , x) = (n , quot.mk (≈ (D n)) (i , x))
-
       surjectionqD : surjection qD
       surjectionqD (n , z) with quot.surjectionmk (≈ (D n)) z
       ... | ∃i i refl = ∃i (n , i) refl
-
       ----------------------------------------------------------------
       -- Property (5.19)
       ----------------------------------------------------------------
@@ -311,10 +319,10 @@ module CocontinuityOfTakingPowers
         (e : (λ n x → ν (D n) i (f n x)) ==
           (λ n x → ν (D n) j (g n x))      )
         → ----------------------------------------
-        ∃ k ∶ Size , ⋀ p ∶ i <ᵇ k , ⋀ q ∶ j <ᵇ k ,
+        ∃ k ∶ Size , ⋀ p ∶ (_<ᵇ_ i k) , ⋀ q ∶ j <ᵇ k ,
           (∀ n x →
-            edg (D n) k i {{p}} (f n x) ==
-            edg (D n) k j {{q}} (g n x))
+            edg (D n) k i {p} (f n x) ==
+            edg (D n) k j {q} (g n x))
       injcan {i} {j} f g e =
         lemma (wAC (mkFam C F) (w a) (λ _ → Size) P Ptotal)
         where
@@ -322,8 +330,8 @@ module CocontinuityOfTakingPowers
         P (n , x) k =
           ⋀ p ∶ i <ᵇ k ,
           ⋀ q ∶ j <ᵇ k ,
-            (edg (D n) k i {{p}} (f n x) ==
-             edg (D n) k j {{q}} (g n x))
+            (edg (D n) k i {p} (f n x) ==
+             edg (D n) k j {q} (g n x))
 
         Ptotal : (nx : ∑ I (B a)) → ∃ k ∶ Size , P nx k
         Ptotal (n , x) = νkernel refl (ap (λ e' → e' n x) e)
@@ -336,8 +344,8 @@ module CocontinuityOfTakingPowers
           → ------------------------------------------
           ∃ k ∶ Size , ⋀ u ∶ i <ᵇ k , ⋀ v ∶ j <ᵇ k ,
             (∀ n x →
-             edg (D n) k i {{u}} (f n x) ==
-             edg (D n) k j {{v}} (g n x))
+             edg (D n) k i {u} (f n x) ==
+             edg (D n) k j {v} (g n x))
         lemma (∃i c (∃i p (∃i s (∧i surjectionh sp-eq)))) =
           ∃i k (⋀i u (⋀i v λ n x →
             match (surjectionh (n , x)) \ where
@@ -345,15 +353,15 @@ module CocontinuityOfTakingPowers
                 match (sp-eq x') \ where
                   (⋀i i<ᵇsx' (⋀i j<ᵇsx' e')) →
                     proof
-                      edg (D n) k i {{u}} (f n (snd (p x')))
-                    =[ act (D n) k (s x') {{_}} i {{_}} _ ]
-                      edg (D n) k  (s x') {{sx'<ᵇk x'}}
-                     (edg (D n) (s x') i {{i<ᵇsx'}} (f n (snd (p x'))))
-                    =[ ap (edg (D n) k (s x') {{sx'<ᵇk x'}}) e' ]
-                      edg (D n) k  (s x') {{sx'<ᵇk x'}}
-                      (edg (D n) (s x') j {{j<ᵇsx'}} (g n (snd (p x'))))
-                    =[ symm (act (D n) k (s x') {{_}} j {{_}} _) ]
-                      edg (D n) k j {{v}} (g n (snd (p x')))
+                      edg (D n) k i {u} (f n (snd (p x')))
+                    =[ act (D n) k (s x') {_} i {_} _ ]
+                      edg (D n) k  (s x') {sx'<ᵇk x'}
+                     (edg (D n) (s x') i {i<ᵇsx'} (f n (snd (p x'))))
+                    =[ ap (edg (D n) k (s x') {sx'<ᵇk x'}) e' ]
+                      edg (D n) k  (s x') {sx'<ᵇk x'}
+                      (edg (D n) (s x') j {j<ᵇsx'} (g n (snd (p x'))))
+                    =[ symm (act (D n) k (s x') {_} j {_} _) ]
+                      edg (D n) k j {v} (g n (snd (p x')))
                     qed))
           where
           k : Size
@@ -363,13 +371,11 @@ module CocontinuityOfTakingPowers
           u = <ᵇ∨ˢl _
 
           v : j <ᵇ k
-          v = <ᵇ<ᵇ {{q = <ᵇ∨ˢr _}} {{<ᵇ∨ˢl _}}
+          v = <ᵇ<ᵇ (<ᵇ∨ˢr _) (<ᵇ∨ˢl _)
 
           sx'<ᵇk : ∀ x' → s x' <ᵇ k
           sx'<ᵇk x' =
-            <ᵇ<ᵇ {{q =
-            <ᵇ<ᵇ {{q =
-              <ᵇ∨ˢr _}} {{<ᵇ∨ˢr _}}}} {{<ᵇ⋁ˢ s x'}}
+            <ᵇ<ᵇ (<ᵇ<ᵇ (<ᵇ∨ˢr _) (<ᵇ∨ˢr _)) (<ᵇ⋁ˢ s x')
 
       ----------------------------------------------------------------
       -- Proof of part (2): injectivity of the canonical function
@@ -381,7 +387,7 @@ module CocontinuityOfTakingPowers
           (λ z z' → can (B a) D z == can (B a) D z' → z == z')
           (λ{(i , f) (j , g) e → match (injcan f g e) \ where
             (∃i k (⋀i p (⋀i q e'))) →
-              quot.eq (≈ (B a ⟶ᴵ D)) (mk≈ k {{p}} {{q}}
+              quot.eq (≈ (B a ⟶ᴵ D)) (mk≈ k {p} {q}
               (funext λ n → funext (e' n)))})
           z
           z'
@@ -435,13 +441,13 @@ module CocontinuityOfTakingPowers
           s<ᵇj z = <ᵇ⋁ˢ s z
 
           fj : ∀ z → vtx (D (p₁ z)) j
-          fj z = edg (D (p₁ z)) j (s z) {{s<ᵇj z}} (g z)
+          fj z = edg (D (p₁ z)) j (s z) {s<ᵇj z} (g z)
 
           νfj=fp : ∀ z → ν (D (p₁ z)) j (fj z) == f (p₁ z) (p₂ z)
           νfj=fp z =
             proof
               ν (D (p₁ z)) j (fj z)
-            =[ symm (Coconeν (D (p₁ z)) j (s z) {{s<ᵇj z}} (g z)) ]
+            =[ symm (Coconeν (D (p₁ z)) j (s z) {s<ᵇj z} (g z)) ]
               ν (D (p₁ z)) (s z) (g z)
             =[ u z ]
               f (p₁ z) (p₂ z)
@@ -449,8 +455,8 @@ module CocontinuityOfTakingPowers
 
           P' : ker p → Size → Prop l
           P' ((z , z') ∣ _) k = ⋀ j<ᵇk ∶ j <ᵇ k ,
-            edg (D (p₁ z )) k j {{j<ᵇk}} (fj z ) ===
-            edg (D (p₁ z')) k j {{j<ᵇk}} (fj z')
+            edg (D (p₁ z )) k j {j<ᵇk} (fj z ) ===
+            edg (D (p₁ z')) k j {j<ᵇk} (fj z')
 
           P'total : ∀ zz' → ∃ k ∶ Size , P' zz' k
           P'total ((z , z') ∣ pz=pz') =
@@ -492,10 +498,10 @@ module CocontinuityOfTakingPowers
             j<ᵇi = <ᵇ∨ˢl _
 
             s'<ᵇi : ∀ z' → s' z' <ᵇ i
-            s'<ᵇi z' = <ᵇ<ᵇ {{q = <ᵇ∨ˢr _}}{{<ᵇ⋁ˢ s' z'}}
+            s'<ᵇi z' = <ᵇ<ᵇ (<ᵇ∨ˢr _) (<ᵇ⋁ˢ s' z')
 
             fi : (z : F c) → vtx (D (p₁ z)) i
-            fi z = edg (D (p₁ z)) i j {{j<ᵇi}} (fj z)
+            fi z = edg (D (p₁ z)) i j {j<ᵇi} (fj z)
 
             νfi=fp :
               (z : F c)
@@ -504,7 +510,7 @@ module CocontinuityOfTakingPowers
             νfi=fp z =
               proof
                 ν (D (p₁ z)) i (fi z)
-              =[ symm (Coconeν (D (p₁ z)) i j {{j<ᵇi}} (fj z)) ]
+              =[ symm (Coconeν (D (p₁ z)) i j {j<ᵇi} (fj z)) ]
                 ν (D (p₁ z)) j (fj z)
               =[ νfj=fp z ]
                 f (p₁ z) (p₂ z)
@@ -531,18 +537,18 @@ module CocontinuityOfTakingPowers
                         proof
                           fi z₂
                         =[ ap (fi ∘ snd ∘ el) (symm p'z'=z₁z₂) ]
-                          edg (D (p₁ (p₂' z'))) i j {{j<ᵇi}} (fj (p₂' z'))
-                        =[ act (D (p₁ (p₂' z'))) i (s' z') {{s'<ᵇi z'}}
-                          j {{j<ᵇs'z'}} _ ]
-                          edg (D (p₁ (p₂' z'))) i (s' z') {{s'<ᵇi z'}}
-                          (edg (D (p₁ (p₂' z'))) (s' z') j {{j<ᵇs'z'}} (fj (p₂' z')))
-                        =[ symm (ap₂ (λ 𝕛 d → edg (D 𝕛) i (s' z') {{s'<ᵇi z'}} d)
+                          edg (D (p₁ (p₂' z'))) i j {j<ᵇi} (fj (p₂' z'))
+                        =[ act (D (p₁ (p₂' z'))) i (s' z') {s'<ᵇi z'}
+                          j {j<ᵇs'z'} _ ]
+                          edg (D (p₁ (p₂' z'))) i (s' z') {s'<ᵇi z'}
+                          (edg (D (p₁ (p₂' z'))) (s' z') j {j<ᵇs'z'} (fj (p₂' z')))
+                        =[ symm (ap₂ (λ 𝕛 d → edg (D 𝕛) i (s' z') {s'<ᵇi z'} d)
                           (ap fst (pf (p' z'))) e') ]
-                          edg (D (p₁ (p₁' z'))) i (s' z') {{s'<ᵇi z'}}
-                          (edg (D (p₁ (p₁' z'))) (s' z') j {{j<ᵇs'z'}} (fj (p₁' z')))
-                        =[ symm (act (D (p₁ (p₁' z'))) i (s' z') {{s'<ᵇi z'}}
-                          j {{j<ᵇs'z'}} _) ]
-                          edg (D (p₁ (p₁' z'))) i j {{j<ᵇi}} (fj (p₁' z'))
+                          edg (D (p₁ (p₁' z'))) i (s' z') {s'<ᵇi z'}
+                          (edg (D (p₁ (p₁' z'))) (s' z') j {j<ᵇs'z'} (fj (p₁' z')))
+                        =[ symm (act (D (p₁ (p₁' z'))) i (s' z') {s'<ᵇi z'}
+                          j {j<ᵇs'z'} _) ]
+                          edg (D (p₁ (p₁' z'))) i j {j<ᵇi} (fj (p₁' z'))
                         =[ ap (fi ∘ fst ∘ el) p'z'=z₁z₂ ]
                           fi z₁
                         =[ fiz₁=d ]
@@ -577,6 +583,7 @@ module CocontinuityOfTakingPowers
       isIsocan =
         bijectionIsIso (can (B a) D)
         (∧i injectioncan surjectioncan)
+
 
 ----------------------------------------------------------------------
 -- Cocontinuity of polynomial endofunctors (Corollary 5.10) in a form
@@ -618,19 +625,19 @@ module CocontinuityOfPolynomialEndofunctors
       φ a i f = ν (S∘{Σ = Σ} D n) i (a , f)
 
       Coconeφ : (a : Op Σ n) → Cocone (Ar Σ n a ⟶ᴵ D) (φ a)
-      Coconeφ a i j {{j<ᵇi}} f =
+      Coconeφ a i j {j<i} f =
         let
+          instance
+            _ : SizeStructure Size
+            _ = ssz
           k : Size
           k = ↑ˢ i
-          instance
-            j<ᵇk : j <ᵇ k
-            j<ᵇk = <ᵇ<ᵇ {{q = <ᵇ↑ˢ}} {{j<ᵇi}}
-            i<ᵇk : i <ᵇ k
-            i<ᵇk = <ᵇ↑ˢ
+          j<k : j <ᵇ k
+          j<k = <ᵇ<ᵇ (<∨ˢl i) j<i
         in
-        quot.eq (≈ (S∘{Σ = Σ} D n)) (mk≈ k
+        quot.eq (≈ (S∘{Σ = Σ} D n)) (mk≈ k {j<k} {<∨ˢl i}
           (proof
-             edg (S∘{Σ = Σ} D n) k j (a , f)
+             edg (S∘{Σ = Σ} D n) k j {j<k} (a , f)
            =[ refl ]
             (a , λ m x → edg (D m) k j (f m x))
            =[ ap {B =  λ _ → S{Σ} (λ m → vtx (D m) k) n}
@@ -640,7 +647,7 @@ module CocontinuityOfPolynomialEndofunctors
            =[ refl ]
              (a , λ m x → edg (D m) k i (edg (Ar Σ n a ⟶ᴵ D) i j f m x))
            =[ refl ]
-             edg (S∘{Σ = Σ} D n) k i (a , edg (Ar Σ n a ⟶ᴵ D) i j f)
+             edg (S∘{Σ = Σ} D n) k i {<∨ˢl i} (a , edg (Ar Σ n a ⟶ᴵ D) i j f)
            qed))
 
       c : (a : Op Σ n) → colim (Ar Σ n a ⟶ᴵ D) → colim (S∘{Σ = Σ} D n)

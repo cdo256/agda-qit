@@ -36,28 +36,25 @@ open SizeStructure{{...}} public
 -- Use instance search for transitivity proofs about <
 module _ {l : Level}{Size : Set l}{{_ : SizeStructure Size}} where
   infix 4 _<ᵇ_
-  record _<ᵇ_  (i j : Size) : Prop l where
-    constructor <inst
-    field <prf : i < j
-  open _<ᵇ_ public
+  _<ᵇ_ : Size → Size → Prop l
+  _<ᵇ_ = _<_
 
-  instance
-    <ᵇ<ᵇ :
-      {i j k : Size}
-      {{q : j <ᵇ k}}
-      {{p : i <ᵇ j}}
-      → ------------------------
-      i <ᵇ k
-    <ᵇ<ᵇ {{q}} {{p}} = <inst (<< (<prf q) (<prf p))
+  <ᵇ<ᵇ :
+    {i j k : Size}
+    (q : j <ᵇ k)
+    (p : i <ᵇ j)
+    → ------------------------
+    i <ᵇ k
+  <ᵇ<ᵇ q p = << q p
 
   <ᵇ∨ˢl : {i : Size}(j : Size) → i <ᵇ i ∨ˢ j
-  <ᵇ∨ˢl j = <inst (<∨ˢl j)
+  <ᵇ∨ˢl j = <∨ˢl j
 
   <ᵇ∨ˢr : (i : Size){j : Size} → j <ᵇ i ∨ˢ j
-  <ᵇ∨ˢr i = <inst (<∨ˢr i)
+  <ᵇ∨ˢr i = <∨ˢr i
 
   <ᵇ↑ˢ : {i : Size} → i <ᵇ ↑ˢ i
-  <ᵇ↑ˢ = <inst (<↑ˢ)
+  <ᵇ↑ˢ = <↑ˢ
 
 -- Bounded dependent function
 ∏ᵇ :
@@ -66,24 +63,10 @@ module _ {l : Level}{Size : Set l}{{_ : SizeStructure Size}} where
   {{_ : SizeStructure Size}}
   (i : Size)
   {m : Level}
-  (B : (j : Size){{_ : j <ᵇ i}} → Set m)
+  (B : (j : Size){_ : j <ᵇ i} → Set m)
   → ------------------------------------
   Set (l ⊔ m)
-∏ᵇ {l} {Size} i B = (j : Size){{_ : j <ᵇ i}} → B j
-
-infix 2 ∏ᵇsyntax
-
-∏ᵇsyntax :
-  {l : Level}
-  {Size : Set l}
-  {{_ : SizeStructure Size}}
-  (i : Size)
-  {m : Level}
-  (B : (j : Size){{_ : j <ᵇ i}} → Set m)
-  → ------------------------------------
-  Set (l ⊔ m)
-∏ᵇsyntax = ∏ᵇ
-syntax ∏ᵇsyntax i (λ j → B) = ∏ᵇ j < i , B
+∏ᵇ {l} {Size} i B = ∀ j {j<i : j <ᵇ i} → B j {j<i}
 
 -- Bounded universal quantification
 ∀ᵇ :
@@ -92,22 +75,10 @@ syntax ∏ᵇsyntax i (λ j → B) = ∏ᵇ j < i , B
   {{_ : SizeStructure Size}}
   (i : Size)
   {m : Level}
-  (P : (j : Size){{_ : j <ᵇ i}} → Prop m)
+  (P : (j : Size){_ : j <ᵇ i} → Prop m)
   → -------------------------------------
   Prop (l ⊔ m)
-∀ᵇ i P =  ∀ j  → {{_ : j <ᵇ i}} → P j
-
-∀ᵇsyntax :
-  {l : Level}
-  {Size : Set l}
-  {{_ : SizeStructure Size}}
-  (i : Size)
-  {m : Level}
-  (P : (j : Size){{_ : j <ᵇ i}} → Prop m)
-  → -------------------------------------
-  Prop (l ⊔ m)
-∀ᵇsyntax = ∀ᵇ
-syntax ∀ᵇsyntax i (λ j → P) = ∀ᵇ j < i , P
+∀ᵇ i P = ∀ j {j<i : j <ᵇ i} → P j {j<i}
 
 funᵇ-ext :
   {l : Level}
@@ -115,14 +86,13 @@ funᵇ-ext :
   {{_ : SizeStructure Size}}
   {i : Size}
   {m : Level}
-  {B : (j : Size){{_ : j <ᵇ i}} → Set m}
-  {f f' : ∏ᵇ i B}
-  (_ : ∀ᵇ j < i , (f j == f' j))
+  {B : (j : Size){_ : j <ᵇ i} → Set m}
+  {f f' : (j : Size){j<i : j <ᵇ i} → B j {j<i}}
+  (eq : (j : Size){j<i : j <ᵇ i} → (f j {j<i} == f' j {j<i}))
   → ------------------------------------
   f == f'
-funᵇ-ext e =
-  funext λ j →
-  instance-funexp λ p → e j {{p}}
+funᵇ-ext {Size = Size} {i = i} {B = B} {f = f} {f' = f'} eq =
+  funext (λ j → implicit-funexp λ x → eq j)
 
 -- Bounded dependent product
 record ∑ᵇ
@@ -131,30 +101,16 @@ record ∑ᵇ
   {{_ : SizeStructure Size}}
   (i : Size)
   {m : Level}
-  (B : (j : Size){{_ : j <ᵇ i}} → Set m)
+  (B : (j : Size){_ : j <ᵇ i} → Set m)
   : ------------------------------------
   Set (l ⊔ m)
   where
   constructor pairᵇ
   field
     fst      : Size
-    {{fst<}} : fst <ᵇ i
-    snd      : B fst
+    {fst<} : fst <ᵇ i
+    snd      : B fst {fst<}
 open ∑ᵇ public
-
-infix 2 Σᵇsyntax
-
-Σᵇsyntax :
-  {l : Level}
-  {Size : Set l}
-  {{_ : SizeStructure Size}}
-  (i : Size)
-  {m : Level}
-  (B : (j : Size){{_ : j <ᵇ i}} → Set m)
-  → ------------------------------------
-  Set (l ⊔ m)
-Σᵇsyntax = ∑ᵇ
-syntax Σᵇsyntax i (λ j → B) = ∑ᵇ j < i , B
 
 -- Bounded existential quantification
 data ∃ᵇ
@@ -163,25 +119,11 @@ data ∃ᵇ
   {{_ : SizeStructure Size}}
   (i : Size)
   {m : Level}
-  (P : (j : Size){{_ : j <ᵇ i}} → Prop m)
+  (P : (j : Size){_ : j <ᵇ i} → Prop m)
   : -------------------------------------
   Prop (l ⊔ m)
   where
-    ∃ᵇi : (j : Size){{_ : j <ᵇ i}} → P j → ∃ᵇ i P
-
-infix 2 ∃ᵇsyntax
-
-∃ᵇsyntax :
-  {l : Level}
-  {Size : Set l}
-  {{_ : SizeStructure Size}}
-  (i : Size)
-  {m : Level}
-  (P : (j : Size){{_ : j <ᵇ i}} → Prop m)
-  → -------------------------------------
-  Prop (l ⊔ m)
-∃ᵇsyntax = ∃ᵇ
-syntax ∃ᵇsyntax i (λ j → P) = ∃ᵇ j < i , P
+    ∃ᵇi : (j : Size){j<i : j <ᵇ i} → P j {j<i} → ∃ᵇ i P
 
 -- Bounded comprehension
 infixl 4 _∣ᵇ_
@@ -198,11 +140,9 @@ record subsetᵇ
   constructor _∣ᵇ_
   field
     ins      : Size
-    {{ins<}} : ins <ᵇ i
+    {ins<} : ins <ᵇ i
     prf      : P ins
 open subsetᵇ public
-
-syntax subsetᵇ i (λ j → P) = subsetᵇ j < i , P
 
 ----------------------------------------------------------------------
 -- Bounded well-founded induction and recursion (Proposition 5.3)
@@ -213,11 +153,11 @@ syntax subsetᵇ i (λ j → P) = subsetᵇ j < i , P
   {{_ : SizeStructure Size}}
   {n : Level}
   (P : Size → Prop n)
-  (p : ∀ i → (∀ᵇ j < i , P j) → P i)
+  (p : ∀ i → (∀ j {j<i : j <ᵇ i} → P j) → P i)
   → --------------------------------
   ∀ i → P i
 <ind P p = wf.ind _<_ <iswf P
-  (λ i h → p i (λ j {{j<ᵇi}} → h j (<prf j<ᵇi)))
+  (λ i h → p i (λ j {j<i} → h j j<i))
 
 <rec :
   {l : Level}
@@ -225,11 +165,11 @@ syntax subsetᵇ i (λ j → P) = subsetᵇ j < i , P
   {{_ : SizeStructure Size}}
   {n : Level}
   (B : Size → Set n)
-  (b : ∀ i → (∏ᵇ j < i , B j) → B i)
+  (b : ∀ i → (∀ j → {_ : j <ᵇ i} → B j) → B i)
   → --------------------------------
   ∀ i → B i
 <rec B b = wf.rec _<_ <iswf B
-  (λ i h → b i (λ j {{j<ᵇi}} → h j (<prf j<ᵇi)))
+  (λ i h → b i (λ j {j<i} → h j j<i))
 
 ----------------------------------------------------------------------
 -- Plump order (Example 5.4)
@@ -361,4 +301,4 @@ module _ {l : Level}{Σ : Unindexed.Sig{l}} where
       UpperBoundsSize : UpperBounds Σ
       ⋁ˢ   {{UpperBoundsSize}} a f       = Unindexed.sup ((ι₂ (ι₂ a)) , f)
       <⋁ˢ  {{UpperBoundsSize}} f x       = ≺sup x (≤refl (f x))
-      <ᵇ⋁ˢ {{UpperBoundsSize}} f x       = <inst (<⋁ˢ f x)
+      <ᵇ⋁ˢ {{UpperBoundsSize}} f x       = <⋁ˢ f x

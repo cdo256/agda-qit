@@ -29,28 +29,49 @@ module Main
     --------------------------------------------------------------------
     -- Extensionality principles for IdxStructᵇ
     --------------------------------------------------------------------
+    IdxStructᵇ-ext₀ :
+      {i : Size}
+      {Dᵇ  Dᵇ' : Dᵇ-type i}
+      (dom-eq : ∀ᵇ i λ j {j<i} → Dᵇ j {j<i} == Dᵇ' j {j<i})
+      {τᵇ  : τᵇ-type i Dᵇ}
+      {τᵇ' : τᵇ-type i Dᵇ'}
+      (τ-eq : ∀ᵇ i λ j {j<i} → ∀ᵇ j λ k {k<j} → (m : I) →
+              {t : T (Dᵇ k {<ᵇ<ᵇ j<i k<j}) m}
+              {t' : T (Dᵇ' k {<ᵇ<ᵇ j<i k<j}) m} →
+              t === t' →
+              τᵇ j {j<i} k {k<j} m t  === τᵇ' j {j<i} k {k<j} m t')
+      → mkIdxStructᵇ Dᵇ τᵇ == mkIdxStructᵇ Dᵇ' τᵇ'
+    IdxStructᵇ-ext₀ {i = i} {Dᵇ = Dᵇ} {Dᵇ' = Dᵇ'} dom-eq {τᵇ = τᵇ} {τᵇ' = τᵇ'} τ-eq =
+      match (funᵇ-ext dom-eq) q
+      where
+      q : (p : Dᵇ === Dᵇ') →
+           mkIdxStructᵇ Dᵇ τᵇ == mkIdxStructᵇ Dᵇ' τᵇ'
+      q refl =
+        let
+          τ-eq' : τᵇ == τᵇ'
+          τ-eq' =
+            funᵇ-ext (λ j {j<i} →
+            funᵇ-ext (λ k {k<j} →
+            funext (λ m →
+            funext (λ t →
+            τ-eq j {j<i} k {k<j} m {t} {t} refl))))
+        in match τ-eq' λ{refl → refl}
+ 
     IdxStructᵇ-ext :
       {i : Size}
       {A A' : IdxStructᵇ i}
-      (_ : ∀ᵇ j < i , (domᵇ A j == domᵇ A' j))
-      (_ : ∀ᵇ j < i , ∀ᵇ k < j , (
+      (dom-eq : ∀ᵇ i λ j {j<i} → (domᵇ A j == domᵇ A' j))
+      (τ-eq : ∀ᵇ i λ j {j<i} → ∀ᵇ j λ k {k<j} → (
         (m : I)
         {t : T (domᵇ A k) m}
         {t' : T (domᵇ A' k) m}
         (_  : t === t')
         → ---------------------------
-        τᵇ A j k m t === τᵇ A' j k m t')
+        τᵇ A j k {k<j} m t === τᵇ A' j k {k<j} m t')
       )
       → -------------------------------------
       A == A'
-    IdxStructᵇ-ext e e' =
-      match (funᵇ-ext e) λ{refl →
-      match
-        (funᵇ-ext λ j →
-        funᵇ-ext λ k →
-        funext λ m → heq-funext refl λ p → e' j k m p
-        )
-      λ{refl → refl}}
+    IdxStructᵇ-ext dom-eq τ-eq = IdxStructᵇ-ext₀ dom-eq τ-eq
 
     --------------------------------------------------------------------
     -- Restricting elements of FixSizeStructᵇ to lower sizes
@@ -58,8 +79,8 @@ module Main
     FixSizeStructᵇ↓ᵇ :
       {i : Size}
       → --------------------------------------------
-      FixSizeStructᵇ i → ∏ᵇ j < i , FixSizeStructᵇ j
-    FixSizeStructᵇ↓ᵇ (D ∣ δ) j = D ↓ᵇ j ∣ (λ k → δ k)
+      FixSizeStructᵇ i → ∏ᵇ i λ j {j<i} → FixSizeStructᵇ j
+    FixSizeStructᵇ↓ᵇ (D ∣ δ) j {j<i} = _↓ᵇ_ D j {j<i} ∣ (λ k → δ k)
 
     --------------------------------------------------------------------
     -- Elements of FixSizeStructᵇ are unique if they exist
@@ -74,40 +95,64 @@ module Main
         P : Size → Prop (lsuc l)
         P i = (I I' : FixSizeStructᵇ i) → I == I'
 
-        hyp : ∀ i → (∀ᵇ j < i , P j) → P i
+        hyp : ∀ i → (∀ᵇ i λ j {j<i} → P j) → P i
         hyp i hi I@(D ∣ δ) I'@(D' ∣ δ')  =
           setext (IdxStructᵇ-ext domD=domD' ΤD=τD')
           where
-          D↓ᵇ=D'↓ᵇ : ∀ᵇ j < i , (D ↓ᵇ j == D' ↓ᵇ j)
-          D↓ᵇ=D'↓ᵇ j = ap el (hi j (FixSizeStructᵇ↓ᵇ I j) (FixSizeStructᵇ↓ᵇ I' j))
+          D↓ᵇ=D'↓ᵇ : ∀ᵇ i λ j {j<i} → ((D ↓ᵇ j) {j<i} == (D' ↓ᵇ j) {j<i})
+          D↓ᵇ=D'↓ᵇ j {j<i} =
+            ap el (hi j {j<i} (FixSizeStructᵇ↓ᵇ I j {j<i})
+                              (FixSizeStructᵇ↓ᵇ I' j {j<i}))
 
-          domD=domD' : ∀ᵇ j < i , (domᵇ D j == domᵇ D' j)
-          domD=domD' j =
+          domD=domD' : ∀ᵇ i λ j {j<i} → (domᵇ D j == domᵇ D' j)
+          domD=domD' j {j<i} =
             proof
               domᵇ D j
+-- <<<<<<< HEAD
+--             =[ ∧e₁ (δ j) ]
+--               ◇ ((D ↓ᵇ j) {j<i})
+--             =[ ap ◇ ((D↓ᵇ=D'↓ᵇ j) {j<i}) ]
+--               ◇ ((D' ↓ᵇ j) {j<i})
+--             =[ symm (∧e₁ (δ' j)) ]
+--               domᵇ D' j
+--             qed
+
+--           ΤD=τD' :  ∀ᵇ i λ j {j<i} → ∀ᵇ j λ k {k<j} → (∀ {t} {t'} →
+--             t === t' → τᵇ D j k t === τᵇ D' j k t')
+--           ΤD=τD' j {j<i} k {k<j} {t}{t'} t=t' =
+--             proof
+--               τᵇ D j k t
+--             =[ ∧e₂ (δ j) k t ]
+--               [ pairᵇ k t ]/ Rᵇ ((D ↓ᵇ j) {j<i})
+--             =[ ap₂ (λ X x → [ pairᵇ k {k<j} x ]/ Rᵇ X) (D↓ᵇ=D'↓ᵇ j {j<i}) t=t' ]
+--               [ pairᵇ k t' ]/ Rᵇ ((D' ↓ᵇ j) {j<i})
+--             =[ symm (∧e₂ (δ' j) k t') ]
+--               τᵇ D' j k t'
+-- =======
             =[ funext (∧e₁ (δ j)) ]
-              ◇ (D ↓ᵇ j)
-            =[ ap ◇ (D↓ᵇ=D'↓ᵇ j) ]
-              ◇ (D' ↓ᵇ j)
+              ◇ ((D ↓ᵇ j) {j<i})
+            =[ ap ◇ ((D↓ᵇ=D'↓ᵇ j) {j<i}) ]
+              ◇ ((D' ↓ᵇ j) {j<i})
             =[ symm (funext (∧e₁ (δ' j))) ]
               domᵇ D' j
             qed
 
-          ΤD=τD' :  ∀ᵇ j < i , ∀ᵇ k < j , (
+          ΤD=τD' : ∀ᵇ i λ j {j<i} → ∀ᵇ j λ k {k<j} → (
             (m : _)
             {t : T (SizeIdxStruct.Dᵇ D k) m}
             {t' : T (SizeIdxStruct.Dᵇ D' k) m}
             → --------------------------------------------------------------------
             t === t' → SizeIdxStruct.τᵇ D j k m t === SizeIdxStruct.τᵇ D' j k m t')
-          ΤD=τD' j k m {t}{t'} t=t' =
+          ΤD=τD' j {j<i} k {k<j} m {t}{t'} t=t' =
             proof
               τᵇ D j k m t
             =[ ∧e₂ (δ j) k m t ]
-              [ pairᵇ k t ]/ Rᵇ (D ↓ᵇ j) m
-            =[ ap₂ (λ X x → [ pairᵇ k x ]/ Rᵇ X m) (D↓ᵇ=D'↓ᵇ j) t=t' ]
-              [ pairᵇ k t' ]/ Rᵇ (D' ↓ᵇ j) m
+              [ pairᵇ k t ]/ Rᵇ ((D ↓ᵇ j) {j<i}) m
+            =[ ap₂ (λ X x → [ pairᵇ k {k<j} x ]/ Rᵇ X m) (D↓ᵇ=D'↓ᵇ j {j<i}) t=t' ]
+              [ pairᵇ k t' ]/ Rᵇ ((D' ↓ᵇ j) {j<i}) m
             =[ symm (∧e₂ (δ' j) k m t') ]
               τᵇ D' j k m t'
+-- >>>>>>> qwi2
             qed
 
     --------------------------------------------------------------------
@@ -116,48 +161,82 @@ module Main
     initᵇ : ∀ i → FixSizeStructᵇ i
     initᵇ = <rec FixSizeStructᵇ hyp
       where
-      hyp : ∀ i → (∏ᵇ j < i , FixSizeStructᵇ j) → FixSizeStructᵇ i
+      hyp : ∀ i → (∏ᵇ i λ j {j<i} → FixSizeStructᵇ j) → FixSizeStructᵇ i
       hyp i hi = Di ∣ δ
         where
-        domi : ∏ᵇ j < i , Setᴵ l
-        domi j m = Wᵇ (el (hi j)) m / Rᵇ (el (hi j)) m
+-- <<<<<<< HEAD
+--         domi : ∏ᵇ i λ j {j<i} → Set l
+--         domi j = Wᵇ (el (hi j {_})) / Rᵇ (el (hi j))
 
-        domi< : ∀ᵇ j < i , ∀ᵇ k < j , ((m : I) → domi k m == domᵇ (el (hi j)) k m)
-        domi< j k m =
+--         domi< : ∀ᵇ i λ j {j<i} → ∀ᵇ j λ k {k<j} → (domi k {<ᵇ<ᵇ j<i k<j} == domᵇ (el (hi j {j<i})) k)
+--         domi< j {j<i} k {k<j} =
+--           proof
+--             ◇ (el (hi k {<ᵇ<ᵇ j<i k<j}))
+--           =[ ap (◇ ∘ el) (FixSizeStructᵇ-uniq k (hi k) (FixSizeStructᵇ↓ᵇ (hi j {j<i}) k {k<j})) ]
+--             ◇ ((el (hi j {j<i}) ↓ᵇ k) {k<j})
+--           =[ symm (∧e₁ (pf (hi j) k)) ]
+--             domᵇ (el (hi j)) k
+--           qed
+
+--         τi :  ∏ᵇ i λ j {j<i} → ∏ᵇ j λ k {k<j} → (T{l}{Σ}(domi k {<ᵇ<ᵇ j<i k<j}) → domi j {j<i})
+--         τi j {j<i} k t =  [ pairᵇ k (T' {l} (coe (domi< j {j<i} k)) t) ]/ Rᵇ (el (hi j))
+
+--         τi< :
+--           ∀ᵇ i λ j {j<i} → ∀ᵇ j λ k {k<j} → ∀ᵇ k λ l {l<k} →
+--           ({t : T{Σ = Σ}(domi l {<ᵇ<ᵇ j<i (<ᵇ<ᵇ k<j l<k)})}
+--           {t' : T (domᵇ (el (hi j {j<i})) l)}
+--           (_ : t === t')
+--           → -----------------------------------
+--           τi k {<ᵇ<ᵇ j<i k<j} l {l<k} t === τᵇ (el (hi j)) k l t')
+--         τi< j k {k<j} l {l<k} {t} {t'} t=t' =
+--           proof
+--             [ pairᵇ l {l<k} (T' (coe (domi< k l {l<k})) t) ]/ Rᵇ (el (hi k))
+--           =[ ap₂ (λ X x → [ pairᵇ l {l<k} x ]/ Rᵇ (el X))
+--             (FixSizeStructᵇ-uniq k (hi k) (FixSizeStructᵇ↓ᵇ (hi j {_}) k {k<j}))
+--             (lemma e (domi< k l {l<k}) t=t') ]
+--             [ pairᵇ l {l<k} t'  ]/ Rᵇ (((el (hi j {_})) ↓ᵇ k) {k<j})
+--           =[ symm (∧e₂ (pf (hi j {_}) k {_}) l t') ]
+--             τᵇ (el (hi j {_})) k {_} l t'
+-- =======
+        domi : ∏ᵇ i λ j {j<i} → Setᴵ l
+        domi j {j<i} m = Wᵇ (el (hi j {j<i})) m / Rᵇ (el (hi j {j<i})) m
+
+        domi< : ∀ᵇ i λ j {j<i} → ∀ᵇ j λ k {k<j} → ((m : I) → domi k {<ᵇ<ᵇ j<i k<j} m == domᵇ (el (hi j {j<i})) k m)
+        domi< j {j<i} k {k<j} m =
           proof
-            ◇ (el (hi k)) m
-          =[ ap (λ f → (◇ ∘ el) f m) (FixSizeStructᵇ-uniq k (hi k) (FixSizeStructᵇ↓ᵇ (hi j) k)) ]
-            ◇ (el (hi j) ↓ᵇ k) m
-          =[ symm (∧e₁ (pf (hi j) k) m) ]
+            ◇ (el (hi k {<ᵇ<ᵇ j<i k<j})) m
+          =[ ap (λ f → (◇ ∘ el) f m) (FixSizeStructᵇ-uniq k (hi k) (FixSizeStructᵇ↓ᵇ (hi j {j<i}) k {k<j})) ]
+            ◇ ((el (hi j {j<i}) ↓ᵇ k) {k<j}) m
+          =[ symm (∧e₁ (pf (hi j {j<i}) k {k<j}) m) ]
             domᵇ (el (hi j)) k m
           qed
 
-        τi :  ∏ᵇ j < i , ∏ᵇ k < j , (T{Σ}(domi k) ⇁ domi j)
-        τi j k m t =  [ pairᵇ k (T' (λ n → coe (domi< j k n)) m t) ]/ Rᵇ (el (hi j)) m
+        τi :  ∏ᵇ i λ j {j<i} → ∏ᵇ j λ k {k<j} → (T{Σ}(domi k {<ᵇ<ᵇ j<i k<j}) ⇁ domi j {j<i})
+        τi j {j<i} k {k<j} m t =  [ pairᵇ k (T' (λ n → coe (domi< j k n)) m t) ]/ Rᵇ (el (hi j {j<i})) m
 
         τi< :
-          ∀ᵇ j < i , ∀ᵇ k < j , ∀ᵇ l < k ,
+          ∀ᵇ i λ j {j<i} → ∀ᵇ j λ k {k<j} → ∀ᵇ k λ l {l<k} →
           ((m : I)
           {t : T{Σ = Σ}(domi l) m}
-          {t' : T (domᵇ (el (hi j)) l) m}
+          {t' : T (domᵇ (el (hi j {j<i})) l) m}
           (_ : t === t')
           → -------------------------------------
-          τi k l m t === τᵇ (el (hi j)) k l m t')
-        τi< j k l m {t} {t'} t=t' =
+          τi k {<ᵇ<ᵇ j<i k<j} l {l<k} m t === τᵇ (el (hi j)) k l m t')
+        τi< j {j<i} k {k<j} l {l<k} m {t} {t'} t=t' =
           proof
             [ pairᵇ l (T' (λ n → coe (domi< k l n)) m t) ]/ Rᵇ (el (hi k)) m
           =[ ap₂ (λ X x → [ pairᵇ l x ]/ Rᵇ (el X) m)
-            (FixSizeStructᵇ-uniq k (hi k) (FixSizeStructᵇ↓ᵇ (hi j) k))
+            (FixSizeStructᵇ-uniq k (hi k) (FixSizeStructᵇ↓ᵇ (hi j {j<i}) k {k<j}))
             (lemma e (funext λ n → domi< k l n) m t=t')
           ]
-            [ pairᵇ l t' ]/ Rᵇ ((el (hi j)) ↓ᵇ k) m
+            [ pairᵇ l t' ]/ Rᵇ (((el (hi j {j<i})) ↓ᵇ k) {k<j}) m
           =[ symm (∧e₂ (pf (hi j) k) l m t') ]
             τᵇ (el (hi j)) k l m t'
           qed
           where
-          e : domᵇ (el (FixSizeStructᵇ↓ᵇ (hi j) k)) l == domᵇ (el (hi k)) l
-          e = ap (λ X → domᵇ (el X) l)
-              (symm (FixSizeStructᵇ-uniq k (hi k) (FixSizeStructᵇ↓ᵇ (hi j) k)))
+          e : domᵇ (el (FixSizeStructᵇ↓ᵇ (hi j {_}) k {k<j})) l {l<k} == domᵇ (el (hi k {_})) l {l<k}
+          e = ap (λ X → domᵇ (el X) l {l<k})
+              (symm (FixSizeStructᵇ-uniq k (hi k {_}) (FixSizeStructᵇ↓ᵇ (hi j {_}) k {k<j})))
 
           lemma :
             {X X' X'' : Setᴵ _}
@@ -181,27 +260,42 @@ module Main
         Di : IdxStructᵇ i
         Di = mkIdxStructᵇ domi τi
 
-        Di↓ᵇ : ∀ᵇ j < i , (Di ↓ᵇ j == el (hi j))
-        Di↓ᵇ j = IdxStructᵇ-ext
-          (λ i → funext λ m → domi< j i m)
-          (τi< j)
+-- <<<<<<< HEAD
+--         Di↓ᵇ : ∀ᵇ i λ j {j<i} → ((Di ↓ᵇ j) {j<i} == el (hi j {j<i}))
+--         Di↓ᵇ j {j<i} = IdxStructᵇ-ext (domi< j {j<i}) (τi< j {j<i})
+-- =======
+        Di↓ᵇ : ∀ᵇ i λ j {j<i} → ((Di ↓ᵇ j) {j<i} == el (hi j {j<i}))
+        Di↓ᵇ j {j<i} = IdxStructᵇ-ext
+          (λ i {i<j} → funext λ m → domi< j i {i<j} m)
+          (τi< j {j<i})
+-- >>>>>>> qwi2
 
-        domi↓ᵇ : ∀ᵇ j < i , (domi j == ◇ (Di ↓ᵇ j))
-        domi↓ᵇ j = ap ◇ (symm (Di↓ᵇ j))
+        domi↓ᵇ : ∀ᵇ i λ j {j<i} → (domi j {j<i}== ◇ ((Di ↓ᵇ j) {j<i}))
+        domi↓ᵇ j {j<i} = ap ◇ (symm (Di↓ᵇ j {j<i}))
 
         δ : isFixSizeStructᵇ i Di
-        δ j = ∧i
-          (λ n → ap (λ f → f n) (domi↓ᵇ j))
-          (λ k m t →
+-- <<<<<<< HEAD
+--         δ j {j<i} = ∧i ((domi↓ᵇ j) {j<i}) λ k {k<j} t →
+--           proof
+--             [ pairᵇ k {_} (T' (coe (domi< j {j<i} k)) t) ]/ Rᵇ (el (hi j))
+--           =[ ap₂ (λ X x → [ pairᵇ k {k<j} x ]/ Rᵇ X) (symm (Di↓ᵇ j {j<i}))
+--             (lemma (domi< j {j<i} k)) ]
+--             [ pairᵇ k t ]/ Rᵇ ((Di ↓ᵇ j) {j<i})
+--           qed
+-- =======
+        δ j {j<i} = ∧i
+          (λ n → ap (λ f → f n) (domi↓ᵇ j {j<i}))
+          (λ k {k<j} m t →
             (proof
-              [ pairᵇ k (T' (λ n → coe (domi< j k n)) m t) ]/ Rᵇ (el (hi j)) m
-            =[ ap₂ (λ X x → [ pairᵇ k x ]/ Rᵇ X m)
-              (symm (Di↓ᵇ j))
+              [ pairᵇ k (T' (λ n → coe (domi< j k {k<j} n)) m t) ]/ Rᵇ (el (hi j)) m
+            =[ ap₂ (λ X x → [ pairᵇ k {k<j} x ]/ Rᵇ X m)
+              (symm (Di↓ᵇ j {j<i}))
               (lemma (funext λ n → domi< j k n) m)
             ]
-              [ pairᵇ k t ]/ Rᵇ (Di ↓ᵇ j) m
+              [ pairᵇ k t ]/ Rᵇ ((Di ↓ᵇ j) {j<i}) m
             qed)
           )
+-- >>>>>>> qwi2
           where
           lemma :
             {X X' : Setᴵ _}
@@ -221,10 +315,10 @@ module Main
               u
             qed
 
-    FixSizeStructᵇ↓ᵇ-uniq : ∀ i → ∀ᵇ j < i ,
-      (initᵇ j == FixSizeStructᵇ↓ᵇ (initᵇ i) j)
-    FixSizeStructᵇ↓ᵇ-uniq i j =
-      FixSizeStructᵇ-uniq j (initᵇ j) (FixSizeStructᵇ↓ᵇ (initᵇ i) j)
+    FixSizeStructᵇ↓ᵇ-uniq : ∀ i → ∀ᵇ i λ j {j<i} →
+      (initᵇ j == FixSizeStructᵇ↓ᵇ (initᵇ i) j {j<i})
+    FixSizeStructᵇ↓ᵇ-uniq i j {j<i} =
+      FixSizeStructᵇ-uniq j (initᵇ j) (FixSizeStructᵇ↓ᵇ (initᵇ i) j {j<i})
 
     ----------------------------------------------------------------------
     -- Construction of an element of FixSizeStruct
@@ -235,14 +329,21 @@ module Main
       Q : Size → Setᴵ l
       Q i = ◇ (el (initᵇ i))
 
-      Q< : ∀ i → ∀ᵇ j < i , (Q j == domᵇ (el (initᵇ i)) j)
-      Q< i j =
+      Q< : ∀ i → ∀ᵇ i λ j {j<i} → (Q j == domᵇ (el (initᵇ i)) j)
+      Q< i j {j<i} =
         proof
           ◇ (el (initᵇ j))
-        =[ ap (◇ ∘ el) (FixSizeStructᵇ↓ᵇ-uniq i j) ]
-          ◇ (el (initᵇ i) ↓ᵇ j)
+-- <<<<<<< HEAD
+--         =[ ap (◇ ∘ el) (FixSizeStructᵇ↓ᵇ-uniq i j {j<i}) ]
+--           ◇ ((el (initᵇ i) ↓ᵇ j) {j<i})
+--         =[ symm(∧e₁ (pf (initᵇ i) j {j<i})) ]
+--           domᵇ (el (initᵇ i)) j {j<i}
+-- =======
+        =[ ap (◇ ∘ el) (FixSizeStructᵇ↓ᵇ-uniq i j {j<i}) ]
+          ◇ ((el (initᵇ i) ↓ᵇ j) {j<i})
         =[ symm (funext λ n → ∧e₁ (pf (initᵇ i) j) n) ]
           domᵇ (el (initᵇ i)) j
+-- >>>>>>> qwi2
         qed
 
       D : IdxStruct
@@ -252,20 +353,33 @@ module Main
           (Q< i j))) m t) ]/ Rᵇ(el (initᵇ i)) m
 
       D↓ : ∀ i → D ↓ i == el (initᵇ i)
-      D↓ i = IdxStructᵇ-ext (Q< i) λ j k m {t}{t'} t=t' →
+-- <<<<<<< HEAD
+--       D↓ i = IdxStructᵇ-ext (Q< i) λ j {j<i} k {k<j} {t} {t'} t=t' →
+--         proof
+--           [ pairᵇ k (T'(coe (Q< j k)) t) ]/ Rᵇ (el (initᵇ j))
+--         =[ ap₂ (λ X x → [ pairᵇ k x ]/ Rᵇ (el X))
+--           (FixSizeStructᵇ↓ᵇ-uniq i j {j<i})
+--           (lemma (ap (λ X → domᵇ (el X) k {k<j})
+--             (symm (FixSizeStructᵇ↓ᵇ-uniq i j {j<i}))) (Q< j k) t=t') ]
+--           [ pairᵇ k t' ]/ Rᵇ ((el (initᵇ i) ↓ᵇ j) {j<i})
+--         =[ symm (∧e₂ (pf (initᵇ i) j) k t') ]
+--           τᵇ (el (initᵇ i)) j k t'
+-- =======
+      D↓ i = IdxStructᵇ-ext (Q< i) λ j {j<i} k {k<j} m {t}{t'} t=t' →
         proof
           [ pairᵇ k (T' (λ n → coe (ap (λ f → f n)
-             (Q< j k))) m t) ]/ Rᵇ (el (initᵇ j)) m
+             (Q< j k {k<j}))) m t) ]/ Rᵇ (el (initᵇ j)) m
         =[ ap₂ (λ X x → [ pairᵇ k x ]/ Rᵇ (el X) m)
-          (FixSizeStructᵇ↓ᵇ-uniq i j)
+          (FixSizeStructᵇ↓ᵇ-uniq i j {j<i})
           (lemma
-            (ap (λ X → domᵇ (el X) k) (symm (FixSizeStructᵇ↓ᵇ-uniq i j)))
-            (Q< j k) m t=t'
+            (ap (λ X → domᵇ (el X) k {k<j}) (symm (FixSizeStructᵇ↓ᵇ-uniq i j {j<i})))
+            (Q< j k {k<j}) m t=t'
           )
         ]
-          [ pairᵇ k t' ]/ Rᵇ (el (initᵇ i) ↓ᵇ j) m
+          [ pairᵇ k t' ]/ Rᵇ ((el (initᵇ i) ↓ᵇ j) {j<i}) m
         =[ symm (∧e₂ (pf (initᵇ i) j) k m t') ]
           τᵇ (el (initᵇ i)) j k m t'
+-- >>>>>>> qwi2
         qed
         where
         lemma :
@@ -288,18 +402,28 @@ module Main
           qed
 
       δ : ◇fix D
+-- <<<<<<< HEAD
+--       δ i = ∧i (Q=Qᵇ↓ i) λ j {j<i} t →
+--         proof
+--           [ pairᵇ j (T' (coe (Q< i j)) t) ]/ Rᵇ (el (initᵇ i))
+--         =[ ap₂ (λ X x → [ pairᵇ j {j<i} x ]/ Rᵇ X)
+--           (symm (D↓ i)) (lemma (Q< i j)) ]
+--           [ pairᵇ j t ]/ Rᵇ (D ↓ i)
+--         qed
+-- =======
       δ i = ∧i
         (λ n → ap (λ f → f n) (Q=Qᵇ↓ i))
-        (λ j n t →
+        (λ j {j<i} n t →
           proof
             [ pairᵇ j (T' (λ n → coe (ap (λ f → f n) (Q< i j))) n t) ]/ Rᵇ (el (initᵇ i)) n
-          =[ ap₂ (λ X x → [ pairᵇ j x ]/ Rᵇ X n)
+          =[ ap₂ (λ X x → [ pairᵇ j {j<i} x ]/ Rᵇ X n)
             (symm (D↓ i))
             (lemma (Q< i j) n)
           ]
             [ pairᵇ j t ]/ Rᵇ (D ↓ i) n
           qed
         )
+-- >>>>>>> qwi2
         where
         Q=Qᵇ↓ : ∀ i → Q i == ◇ (D ↓ i)
         Q=Qᵇ↓ i = ap ◇ (symm (D↓ i))
