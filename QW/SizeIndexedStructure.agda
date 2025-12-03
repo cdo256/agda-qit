@@ -88,7 +88,7 @@ module SizeIdxStruct
   ◇ A = Wᵇ A / Rᵇ A
 
   -- Definition 6.3
-  ◇fix : IdxStruct → Prop (lsuc ℓ)
+     ◇fix : IdxStruct → Prop (lsuc ℓ)
   ◇fix alg =
     ∀ i → D alg i == ◇ (alg ↓ i) ∧
     ∀ᵇ i λ j {j<i} → (∀ t → τ alg i j {j<i} t === [ pairᵇ j {j<i} t ]/ Rᵇ (alg ↓ i))

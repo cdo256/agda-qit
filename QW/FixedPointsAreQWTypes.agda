@@ -32,12 +32,12 @@ module _
       (inhab getQWType)
     )
     module _ where
-    Size = ConstructiveCocontinuity.Size Ξ C F w C' F' w'
+    Size = ConstructiveCocontinuity.Size Ξ (mkWISC-Cover C F w) (mkWISC-Cover C' F' w')
 
     instance
-      ssz = ConstructiveCocontinuity.ssz Ξ C F w C' F' w'
+      ssz = ConstructiveCocontinuity.ssz Ξ (mkWISC-Cover C F w) ((mkWISC-Cover C' F' w'))
       upperbounds : UpperBounds {l} _ _
-      upperbounds = ConstructiveCocontinuity.upperbounds Ξ C F w C' F' w'
+      upperbounds = ConstructiveCocontinuity.upperbounds Ξ (mkWISC-Cover C F w) ((mkWISC-Cover C' F' w'))
 
     open SizeIdxStruct Σ ε Size {{ssz}} renaming (D to ∣D_∣)
     open Colim Size
@@ -276,7 +276,7 @@ module _
       instance
         canSΣDiso : isIso (canS {Σ} D)
         canSΣDiso = CocontinuityOfPolynomialEndofunctors.Scont Σ Γ Size ssz
-          (CocontinuityOfTakingPowers.isIsocan Ξ C F w C' F' w') D
+          (ConstructiveCocontinuity.isIsocan Ξ (mkWISC-Cover C F w) ((mkWISC-Cover C' F' w'))) D
         AlgQW : Alg {l} {Σ} (QW)
         sup {{AlgQW}} = (∫ (S∘ D) φ Coconeφ) ∘ (canS {Σ} D)⁻¹
           module _ where
@@ -374,21 +374,21 @@ module _
         canS⁻¹Sν = linv (canS D) _
 
       satQW : Sat {l} {Σ} {ε} QW
-      satQW e ρ with CocontinuityOfTakingPowers.surjcan {l} Ξ C F w C' F' w' (ι₂ e) D ρ
-      ... | ∃i i (∃i ρi refl) =
-        proof
-          ⟦ lhs e ⟧ (ν D i ∘ ρi)
-        =[ symm (⟦T⟧ (lhs e))  ]
-          ⟦ T' ρi (lhs e) ⟧ (ν D i)
-        =[ ⟦⟧ν  (↑ˢ i) i {<ᵇ↑ˢ} _ ]
-          ν D (↑ˢ i) (τ A (↑ˢ i) i {<ᵇ↑ˢ} (T' ρi (lhs e)))
-        =[ ap (ν D (↑ˢ i)) (τε (↑ˢ i) i {<ᵇ↑ˢ} _ _) ]
-          ν D (↑ˢ i) (τ A (↑ˢ i) i {<ᵇ↑ˢ} (T' ρi (rhs e)))
-        =[ symm (⟦⟧ν  (↑ˢ i) i {<ᵇ↑ˢ} _ ) ]
-          ⟦ T' ρi (rhs e) ⟧ (ν D i)
-        =[ ⟦T⟧ (rhs e) ]
-          ⟦ rhs e ⟧ (ν D i ∘ ρi)
-        qed
+      -- satQW e ρ with {!ConstructiveCocontinuity.surjcan {l} Ξ C F w C' F' w' (ι₂ e) D ρ!}
+      -- ... | ∃i i (∃i ρi refl) =
+      --   proof
+      --     ⟦ lhs e ⟧ (ν D i ∘ ρi)
+      --   =[ symm (⟦T⟧ (lhs e))  ]
+      --     ⟦ T' ρi (lhs e) ⟧ (ν D i)
+      --   =[ ⟦⟧ν  (↑ˢ i) i {<ᵇ↑ˢ} _ ]
+      --     ν D (↑ˢ i) (τ A (↑ˢ i) i {<ᵇ↑ˢ} (T' ρi (lhs e)))
+      --   =[ ap (ν D (↑ˢ i)) (τε (↑ˢ i) i {<ᵇ↑ˢ} _ _) ]
+      --     ν D (↑ˢ i) (τ A (↑ˢ i) i {<ᵇ↑ˢ} (T' ρi (rhs e)))
+      --   =[ symm (⟦⟧ν  (↑ˢ i) i {<ᵇ↑ˢ} _ ) ]
+      --     ⟦ T' ρi (rhs e) ⟧ (ν D i)
+      --   =[ ⟦T⟧ (rhs e) ]
+      --     ⟦ rhs e ⟧ (ν D i ∘ ρi)
+      --   qed
 
       -- Universal property of QW
       module _

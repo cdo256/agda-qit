@@ -214,30 +214,44 @@ module Colim
     CoconecanSf i j s =
       ap (λ f → S' f s) (funext (Coconeν D i j))
 
-  
-Sig→Fam : {l : Level} → Sig {l} → Fam l
-Sig→Fam (mkSig op ar) = mkFam op ar
+module _ {l : Level} where
+  Sig→Fam : Sig {l} → Fam l
+  Sig→Fam (mkSig op ar) = mkFam op ar
+
+  CoverSubTypeFam : (Σ : Sig {l}) → WISC-Cover (Sig→Fam Σ) → Fam l
+  CoverSubTypeFam Σ U = mkFam (∑ (c , a) ∶ C × (Op Σ) , (F c → Ar Σ a)) λ{(_ , f) → ker f}
+    where open WISC-Cover U
+
+  record WISC-CoveringRecord (Σ : Sig {l}) : Prop (lsuc l) where
+    field
+      U : WISC-Cover (Sig→Fam Σ) 
+      V : WISC-Cover (CoverSubTypeFam Σ U)
+
+  -- Strictly not definable without propositional truncation on the
+  -- codomain, since output must be invariant to the possible covers
+  -- IWISC could generate.
+  IWISC→WISC-CoveringRecord : ∀ Σ → WISC-CoveringRecord Σ
+  IWISC→WISC-CoveringRecord Σ
+    with IWISC (mkFam (Op Σ) (Ar Σ))
+  ... | ∃i (mkFam C F) w
+    with IWISC (mkFam (∑ (c , a) ∶ C × (Op Σ) , (F c → Ar Σ a)) λ{(_ , f) → ker f})
+  ... | ∃i (mkFam C' F') w' = ?
 
 module ConstructiveCocontinuity
   {l : Level}
   (Σ : Sig {l})
   where
-
-  CoverSubTypeFam : (WISC-Cover (Sig→Fam Σ)) → Fam l
-  CoverSubTypeFam U = mkFam (∑ (c , a) ∶ C × (Op Σ) , (F c → Ar Σ a)) λ{(_ , f) → ker f}
-    where open WISC-Cover U
-
   theorem :
-    (U : WISC-Cover (Sig→Fam Σ))
-    (V : WISC-Cover (CoverSubTypeFam U))
+    (Û : WISC-CoveringRecord Σ) 
     → ------------------------
     ∃ Size ∶ Set l ,
     ∃ ssz ∶ SizeStructure Size ,
       (let open Colim Size {{ssz}} in
         ((a : Op Σ)(D : Diag) → isIso (can (Ar Σ a) D)))
-  theorem U V = 
+  theorem Û = 
     ∃i Size (∃i ssz isIsocan)
     module _ where
+    open WISC-CoveringRecord Û
     open WISC-Cover U
     open WISC-Cover V renaming (C to C'; F to F'; w to w')
     ------------------------------------------------------------------
@@ -541,10 +555,76 @@ module CocontinuityOfTakingPowers
     ∃ ssz ∶ SizeStructure Size ,
       (let open Colim Size {{ssz}} in
         ((a : Op Σ)(D : Diag) → isIso (can (Ar Σ a) D)))
-  theorem
-    with IWISC (mkFam (Op Σ) (Ar Σ))
-  ... | ∃i (mkFam C F) w
-    with IWISC (mkFam (∑ (c , a) ∶ C × (Op Σ) , (F c → Ar Σ a)) λ{(_ , f) → ker f})
-  ... | ∃i (mkFam C' F') w' = ConstructiveCocontinuity.theorem
-    Σ (mkWISC-Cover C F w) (mkWISC-Cover C' F' w')
-    
+  theorem = ConstructiveCocontinuity.theorem
+    Σ (IWISC→WISC-CoveringRecord Σ)
+
+
+----------------------------------------------------------------------
+-- Cocontinuity of polynomial endofunctors (Corollary 5.10)
+----------------------------------------------------------------------
+module CocontinuityOfPolynomialEndofunctors
+  {l : Level}
+  (Σ : Sig{l})
+  (Γ : Sig{l})
+  where
+  open ConstructiveCocontinuity hiding (theorem)
+  theorem :
+    ∃ Sz ∶ Set l ,
+    ∃ sz ∶ SizeStructure Sz , (let open Colim Sz {{sz}} in
+      ((D : Diag) → isIso (canS{Σ} D)))
+  theorem with CocontinuityOfTakingPowers.theorem (Σ ⊕ Γ)
+  ... | ∃i Size (∃i ssz p) = {!∃i Size (∃i ssz Scont)!}
+  -- ... | ∃i Size (∃i ssz p) = {!∃i Size (∃i ssz Scont)!}
+    -- module _ where
+    -- open Colim Size
+    -- instance
+    --   _ : SizeStructure Size
+    --   _ = ssz
+
+    -- Scont : (D : Diag) → isIso (canS{Σ} D)
+    -- Scont D = ∃i inv' (∧i linv' rinv')
+    --   where
+    --   φ : (a : Op Σ)(i : Size) → (Ar Σ a → vtx D i) → colim (S∘{Σ} D)
+    --   φ a i f = ν (S∘ D) i (a , f)
+
+    --   Coconeφ : ∀ a → Cocone (Ar Σ a ⟶ D) (φ a)
+    --   Coconeφ a i j {j<ᵇi} f =
+    --     let
+    --       instance
+    --         _ : SizeStructure Size
+    --         _ = ssz
+    --       k : Size
+    --       k = ↑ˢ i
+    --     in
+    --     quot.eq (≈ (S∘ D))
+    --     (mk≈ k {<ᵇ<ᵇ <ᵇ↑ˢ j<ᵇi} {<ᵇ↑ˢ} (ap {B = λ b → S{l}{Σ} (vtx D k)} (a ,_)
+    --     (funext λ b → act D k i j (f b))))
+
+    --   c : (a : Op Σ) → colim (Ar Σ a ⟶ D) → colim (S∘ D)
+    --   c a = ∫ (Ar Σ a ⟶ D) (φ a) (Coconeφ a)
+
+    --   lemma : {a : Op Σ} → canS D ∘ c a == (a ,_) ∘ can (Ar Σ a) D
+    --   lemma {a} = colimext (Ar Σ a ⟶ D) λ _ → refl
+
+    --   inv' : S{l}{Σ}(colim D) → colim (S∘{Σ} D)
+    --   -- inv' (a , f) = c a (((can (Ar Σ a) D)⁻¹) f)
+    --   --   where
+    --   --   instance
+    --   --     _ : isIso (can (Ar Σ a) D)
+    --   --     _ = p (ι₁ a) D
+
+    --   linv' : ∀ z → inv' (canS D z) == z
+    --   -- linv' = quot.ind (≈ (S∘ D)) _ λ{(i , a , f) →
+    --   --   let instance _ = p (ι₁ a) D in
+    --   --   ap (c a) (linv _ (ν (Ar Σ a ⟶ D) i f))}
+
+    --   rinv' : ∀ s → canS D (inv' s) == s
+    --   -- rinv' (a , f) =
+    --   --   let instance _ = p (ι₁ a) D
+    --   --   in proof
+    --   --        canS D (c a (((can _ D)⁻¹) f))
+    --   --      =[ ap (case ((can _ D ⁻¹) f)) lemma ]
+    --   --        (a , can _ D (((can _ D)⁻¹) f))
+    --   --      =[ ap (a ,_) (rinv _ f) ]
+    --   --        (a , f)
+    --   --      qed
