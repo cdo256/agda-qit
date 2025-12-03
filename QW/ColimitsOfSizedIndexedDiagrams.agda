@@ -228,15 +228,12 @@ module _ {l : Level} where
       → (V : WISC-Cover (CoverSubTypeFam Σ U))
       → WISC-CoveringRecord Σ
 
-  -- Strictly not definable without propositional truncation on the
-  -- codomain, since output must be invariant to the possible covers
-  -- IWISC could generate.
   IWISC→WISC-CoveringRecord : ∀ Σ → WISC-CoveringRecord Σ
   IWISC→WISC-CoveringRecord Σ
     with IWISC (mkFam (Op Σ) (Ar Σ))
   ... | ∃i (mkFam C F) w
     with IWISC (mkFam (∑ (c , a) ∶ C × (Op Σ) , (F c → Ar Σ a)) λ{(_ , f) → ker f})
-  ... | ∃i (mkFam C' F') w' = ?
+  ... | ∃i (mkFam C' F') w' = mkWISC-CoveringRecord (mkWISC-Cover C F w) (mkWISC-Cover C' F' w')
 
 module ConstructiveCocontinuity
   {l : Level}
@@ -249,10 +246,9 @@ module ConstructiveCocontinuity
     ∃ ssz ∶ SizeStructure Size ,
       (let open Colim Size {{ssz}} in
         ((a : Op Σ)(D : Diag) → isIso (can (Ar Σ a) D)))
-  theorem Û = 
+  theorem (mkWISC-CoveringRecord U V) = 
     ∃i Size (∃i ssz isIsocan)
     module _ where
-    open WISC-CoveringRecord Û
     open WISC-Cover U
     open WISC-Cover V renaming (C to C'; F to F'; w to w')
     ------------------------------------------------------------------
@@ -573,8 +569,14 @@ module CocontinuityOfPolynomialEndofunctors
     ∃ Sz ∶ Set l ,
     ∃ sz ∶ SizeStructure Sz , (let open Colim Sz {{sz}} in
       ((D : Diag) → isIso (canS{Σ} D)))
-  theorem with CocontinuityOfTakingPowers.theorem (Σ ⊕ Γ)
-  ... | ∃i Size (∃i ssz p) = {!∃i Size (∃i ssz Scont)!}
+  theorem =
+    let
+      G : ∃ Size ∶ Set l , ∃ szz ∶ SizeStructure Size , let open Colim Size {{szz}} in
+        (a : Op (Σ ⊕ Γ))(D : Diag) → isIso (can (Ar (Σ ⊕ Γ) a) D)
+      G = CocontinuityOfTakingPowers.theorem (Σ ⊕ Γ)
+    in casep {!G!} {!!}
+ -- with CocontinuityOfTakingPowers.theorem {!Σ ⊕ Γ!}
+ --  ... | ∃i Size (∃i ssz p) = ?
   -- ... | ∃i Size (∃i ssz p) = {!∃i Size (∃i ssz Scont)!}
     -- module _ where
     -- open Colim Size
