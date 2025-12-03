@@ -29,6 +29,21 @@ module Bag (X : Set) where
 See QWI.EncodingQITsAsQWITypes
 -}
 
+module SimpleTree where
+  Σ : Sig
+  Op Σ       = 𝔹
+  Ar Σ false = 𝟘
+  Ar Σ true  = 𝔹
+
+  ε : Syseq Σ
+  ε = mkSig 𝟘 (λ ()) , (λ ()) , λ ()
+
+  open import QW.FixedPointsAreQWTypes 
+
+  claim = FxSzAlg→QWType Σ ε
+  claim
+
+
 ----------------------------------------------------------------------
 -- Unordered countably-branching trees (Example 7.7)
 ----------------------------------------------------------------------
@@ -44,6 +59,26 @@ module ωTree (X : Set) where
     (λ _ → ℕ)
     , (λ { (x , _ , _) → σ (ι₂ x , η)})
     , (λ { (x , b , _) → σ (ι₂ x , η ∘ b)})
+
+  open import QW.FixedPointsAreQWTypes 
+
+  claim : {!!}
+  claim = FxSzAlg→QWType Σ ε
+
+module 2^ωTree (X : Set) where
+  Σ : Sig
+  Op Σ        = 𝟙 + X
+  Ar Σ (ι₁ _) = 𝟘
+  Ar Σ (ι₂ _) = ℕ → 𝔹
+
+
+  ε : Syseq Σ
+  ε = mkSig
+    (X × ∑ ((ℕ → 𝔹) → (ℕ → 𝔹)) (LiftProp ∘ isIso))
+    (λ _ → (ℕ → 𝔹))
+    , (λ { (x , u , v) → σ (ι₂ x , η)})
+    , (λ { (x , u , v) → σ (ι₂ x , η ∘ u)})
+
 
 ----------------------------------------------------------------------
 -- W-suspensions
