@@ -535,6 +535,7 @@ module CocontinuityOfTakingPowers
   {l : Level}
   (Σ : Sig {l})
   where
+  open ConstructiveCocontinuity hiding (theorem)
   theorem :
     ∃ Size ∶ Set l ,
     ∃ ssz ∶ SizeStructure Size ,

@@ -32,12 +32,12 @@ module _
       (inhab getQWType)
     )
     module _ where
-    Size = CocontinuityOfTakingPowers.Size Ξ C F w C' F' w'
+    Size = ConstructiveCocontinuity.Size Ξ C F w C' F' w'
 
     instance
-      ssz = CocontinuityOfTakingPowers.ssz Ξ C F w C' F' w'
+      ssz = ConstructiveCocontinuity.ssz Ξ C F w C' F' w'
       upperbounds : UpperBounds {l} _ _
-      upperbounds = CocontinuityOfTakingPowers.upperbounds Ξ C F w C' F' w'
+      upperbounds = ConstructiveCocontinuity.upperbounds Ξ C F w C' F' w'
 
     open SizeIdxStruct Σ ε Size {{ssz}} renaming (D to ∣D_∣)
     open Colim Size
