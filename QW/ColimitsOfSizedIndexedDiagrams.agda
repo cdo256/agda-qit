@@ -214,25 +214,32 @@ module Colim
     CoconecanSf i j s =
       ap (λ f → S' f s) (funext (Coconeν D i j))
 
-----------------------------------------------------------------------
--- Cocontinuity of taking powers (Theorem 5.7)
-----------------------------------------------------------------------
-module CocontinuityOfTakingPowers
+  
+Sig→Fam : {l : Level} → Sig {l} → Fam l
+Sig→Fam (mkSig op ar) = mkFam op ar
+
+module ConstructiveCocontinuity
   {l : Level}
   (Σ : Sig {l})
   where
+
+  CoverSubTypeFam : (WISC-Cover (Sig→Fam Σ)) → Fam l
+  CoverSubTypeFam U = mkFam (∑ (c , a) ∶ C × (Op Σ) , (F c → Ar Σ a)) λ{(_ , f) → ker f}
+    where open WISC-Cover U
+
   theorem :
+    (U : WISC-Cover (Sig→Fam Σ))
+    (V : WISC-Cover (CoverSubTypeFam U))
+    → ------------------------
     ∃ Size ∶ Set l ,
     ∃ ssz ∶ SizeStructure Size ,
       (let open Colim Size {{ssz}} in
         ((a : Op Σ)(D : Diag) → isIso (can (Ar Σ a) D)))
-  theorem
-    with IWISC (mkFam (Op Σ) (Ar Σ))
-  ... | ∃i (mkFam C F) w
-    with IWISC (mkFam (∑ (c , a) ∶ C × (Op Σ) , (F c → Ar Σ a)) λ{(_ , f) → ker f})
-  ... | ∃i (mkFam C' F') w' =
+  theorem U V = 
     ∃i Size (∃i ssz isIsocan)
     module _ where
+    open WISC-Cover U
+    open WISC-Cover V renaming (C to C'; F to F'; w to w')
     ------------------------------------------------------------------
     -- Proof of part (1) : to prove the theorem we use the size
     -- associated (as in Lemma 5.5) with the following signature
@@ -520,70 +527,23 @@ module CocontinuityOfTakingPowers
           (∧i injectioncan surjectioncan)
 
 
+
 ----------------------------------------------------------------------
--- Cocontinuity of polynomial endofunctors (Corollary 5.10)
+-- Cocontinuity of taking powers (Theorem 5.7)
 ----------------------------------------------------------------------
-module CocontinuityOfPolynomialEndofunctors
+module CocontinuityOfTakingPowers
   {l : Level}
-  (Σ : Sig{l})
-  (Γ : Sig{l})
+  (Σ : Sig {l})
   where
   theorem :
-    ∃ Sz ∶ Set l ,
-    ∃ sz ∶ SizeStructure Sz , (let open Colim Sz {{sz}} in
-      ((D : Diag) → isIso (canS{Σ} D)))
-  theorem with CocontinuityOfTakingPowers.theorem (Σ ⊕ Γ)
-  ... | ∃i Size (∃i ssz p) = ∃i Size (∃i ssz Scont)
-    module _ where
-    open Colim Size
-    instance
-      _ : SizeStructure Size
-      _ = ssz
-
-    Scont : (D : Diag) → isIso (canS{Σ} D)
-    Scont D = ∃i inv' (∧i linv' rinv')
-      where
-      φ : (a : Op Σ)(i : Size) → (Ar Σ a → vtx D i) → colim (S∘{Σ} D)
-      φ a i f = ν (S∘ D) i (a , f)
-
-      Coconeφ : ∀ a → Cocone (Ar Σ a ⟶ D) (φ a)
-      Coconeφ a i j {j<ᵇi} f =
-        let
-          instance
-            _ : SizeStructure Size
-            _ = ssz
-          k : Size
-          k = ↑ˢ i
-        in
-        quot.eq (≈ (S∘ D))
-        (mk≈ k {<ᵇ<ᵇ <ᵇ↑ˢ j<ᵇi} {<ᵇ↑ˢ} (ap {B = λ b → S{l}{Σ} (vtx D k)} (a ,_)
-        (funext λ b → act D k i j (f b))))
-
-      c : (a : Op Σ) → colim (Ar Σ a ⟶ D) → colim (S∘ D)
-      c a = ∫ (Ar Σ a ⟶ D) (φ a) (Coconeφ a)
-
-      lemma : {a : Op Σ} → canS D ∘ c a == (a ,_) ∘ can (Ar Σ a) D
-      lemma {a} = colimext (Ar Σ a ⟶ D) λ _ → refl
-
-      inv' : S{l}{Σ}(colim D) → colim (S∘{Σ} D)
-      inv' (a , f) = c a (((can (Ar Σ a) D)⁻¹) f)
-        where
-        instance
-          _ : isIso (can (Ar Σ a) D)
-          _ = p (ι₁ a) D
-
-      linv' : ∀ z → inv' (canS D z) == z
-      linv' = quot.ind (≈ (S∘ D)) _ λ{(i , a , f) →
-        let instance _ = p (ι₁ a) D in
-        ap (c a) (linv _ (ν (Ar Σ a ⟶ D) i f))}
-
-      rinv' : ∀ s → canS D (inv' s) == s
-      rinv' (a , f) =
-        let instance _ = p (ι₁ a) D
-        in proof
-             canS D (c a (((can _ D)⁻¹) f))
-           =[ ap (case ((can _ D ⁻¹) f)) lemma ]
-             (a , can _ D (((can _ D)⁻¹) f))
-           =[ ap (a ,_) (rinv _ f) ]
-             (a , f)
-           qed
+    ∃ Size ∶ Set l ,
+    ∃ ssz ∶ SizeStructure Size ,
+      (let open Colim Size {{ssz}} in
+        ((a : Op Σ)(D : Diag) → isIso (can (Ar Σ a) D)))
+  theorem
+    with IWISC (mkFam (Op Σ) (Ar Σ))
+  ... | ∃i (mkFam C F) w
+    with IWISC (mkFam (∑ (c , a) ∶ C × (Op Σ) , (F c → Ar Σ a)) λ{(_ , f) → ker f})
+  ... | ∃i (mkFam C' F') w' = ConstructiveCocontinuity.theorem
+    Σ (mkWISC-Cover C F w) (mkWISC-Cover C' F' w')
+    

@@ -109,3 +109,10 @@ postulate
     (F : Fam l)
     → ------------------------------------
     ∃ W ∶ Fam l , ∀ c → wisc (fiber F c) W
+
+record WISC-Cover {l : Level} (F' : Fam l) : Set (lsuc l) where
+  constructor mkWISC-Cover
+  field
+    C : Set l
+    F : C → Set l
+    w : ∀ c → wisc (fiber F' c) (mkFam C F)

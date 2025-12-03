@@ -41,7 +41,6 @@ module SimpleTree where
   open import QW.FixedPointsAreQWTypes 
 
   claim = FxSzAlg→QWType Σ ε
-  claim
 
 
 ----------------------------------------------------------------------
@@ -62,7 +61,6 @@ module ωTree (X : Set) where
 
   open import QW.FixedPointsAreQWTypes 
 
-  claim : {!!}
   claim = FxSzAlg→QWType Σ ε
 
 module 2^ωTree (X : Set) where
