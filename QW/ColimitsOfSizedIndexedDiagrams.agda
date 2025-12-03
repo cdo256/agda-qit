@@ -222,10 +222,11 @@ module _ {l : Level} where
   CoverSubTypeFam Σ U = mkFam (∑ (c , a) ∶ C × (Op Σ) , (F c → Ar Σ a)) λ{(_ , f) → ker f}
     where open WISC-Cover U
 
-  record WISC-CoveringRecord (Σ : Sig {l}) : Prop (lsuc l) where
-    field
-      U : WISC-Cover (Sig→Fam Σ) 
-      V : WISC-Cover (CoverSubTypeFam Σ U)
+  data WISC-CoveringRecord (Σ : Sig {l}) : Prop (lsuc l) where
+    mkWISC-CoveringRecord
+      : (U : WISC-Cover (Sig→Fam Σ))
+      → (V : WISC-Cover (CoverSubTypeFam Σ U))
+      → WISC-CoveringRecord Σ
 
   -- Strictly not definable without propositional truncation on the
   -- codomain, since output must be invariant to the possible covers
