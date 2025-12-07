@@ -574,60 +574,61 @@ module CocontinuityOfPolynomialEndofunctors
       G : ∃ Size ∶ Set l , ∃ szz ∶ SizeStructure Size , let open Colim Size {{szz}} in
         (a : Op (Σ ⊕ Γ))(D : Diag) → isIso (can (Ar (Σ ⊕ Γ) a) D)
       G = CocontinuityOfTakingPowers.theorem (Σ ⊕ Γ)
-    in casep {!G!} {!!}
- -- with CocontinuityOfTakingPowers.theorem {!Σ ⊕ Γ!}
- --  ... | ∃i Size (∃i ssz p) = ?
-  -- ... | ∃i Size (∃i ssz p) = {!∃i Size (∃i ssz Scont)!}
-    -- module _ where
-    -- open Colim Size
-    -- instance
-    --   _ : SizeStructure Size
-    --   _ = ssz
+    in (λ{ (∃i Size (∃i ssz p)) → {!∃i Size (∃i ssz Scont)!} 
+      -- with CocontinuityOfTakingPowers.theorem {!Σ ⊕ Γ!}
+      --  ... | ∃i Size (∃i ssz p) = ?
+        -- ... | ∃i Size (∃i ssz p) = {!∃i Size (∃i ssz Scont)!}
+      module _ where
+      open Colim Size
+      instance
+        _ : SizeStructure Size
+        _ = ssz
 
-    -- Scont : (D : Diag) → isIso (canS{Σ} D)
-    -- Scont D = ∃i inv' (∧i linv' rinv')
-    --   where
-    --   φ : (a : Op Σ)(i : Size) → (Ar Σ a → vtx D i) → colim (S∘{Σ} D)
-    --   φ a i f = ν (S∘ D) i (a , f)
+      Scont : (D : Diag) → isIso (canS{Σ} D)
+      Scont D = ∃i inv' (∧i linv' rinv')
+        where
+        φ : (a : Op Σ)(i : Size) → (Ar Σ a → vtx D i) → colim (S∘{Σ} D)
+        φ a i f = ν (S∘ D) i (a , f)
 
-    --   Coconeφ : ∀ a → Cocone (Ar Σ a ⟶ D) (φ a)
-    --   Coconeφ a i j {j<ᵇi} f =
-    --     let
-    --       instance
-    --         _ : SizeStructure Size
-    --         _ = ssz
-    --       k : Size
-    --       k = ↑ˢ i
-    --     in
-    --     quot.eq (≈ (S∘ D))
-    --     (mk≈ k {<ᵇ<ᵇ <ᵇ↑ˢ j<ᵇi} {<ᵇ↑ˢ} (ap {B = λ b → S{l}{Σ} (vtx D k)} (a ,_)
-    --     (funext λ b → act D k i j (f b))))
+        Coconeφ : ∀ a → Cocone (Ar Σ a ⟶ D) (φ a)
+        Coconeφ a i j {j<ᵇi} f =
+          let
+            instance
+              _ : SizeStructure Size
+              _ = ssz
+            k : Size
+            k = ↑ˢ i
+          in
+          quot.eq (≈ (S∘ D))
+          (mk≈ k {<ᵇ<ᵇ <ᵇ↑ˢ j<ᵇi} {<ᵇ↑ˢ} (ap {B = λ b → S{l}{Σ} (vtx D k)} (a ,_)
+          (funext λ b → act D k i j (f b))))
 
-    --   c : (a : Op Σ) → colim (Ar Σ a ⟶ D) → colim (S∘ D)
-    --   c a = ∫ (Ar Σ a ⟶ D) (φ a) (Coconeφ a)
+        c : (a : Op Σ) → colim (Ar Σ a ⟶ D) → colim (S∘ D)
+        c a = ∫ (Ar Σ a ⟶ D) (φ a) (Coconeφ a)
 
-    --   lemma : {a : Op Σ} → canS D ∘ c a == (a ,_) ∘ can (Ar Σ a) D
-    --   lemma {a} = colimext (Ar Σ a ⟶ D) λ _ → refl
+        lemma : {a : Op Σ} → canS D ∘ c a == (a ,_) ∘ can (Ar Σ a) D
+        lemma {a} = colimext (Ar Σ a ⟶ D) λ _ → refl
 
-    --   inv' : S{l}{Σ}(colim D) → colim (S∘{Σ} D)
-    --   -- inv' (a , f) = c a (((can (Ar Σ a) D)⁻¹) f)
-    --   --   where
-    --   --   instance
-    --   --     _ : isIso (can (Ar Σ a) D)
-    --   --     _ = p (ι₁ a) D
+        inv' : S{l}{Σ}(colim D) → colim (S∘{Σ} D)
+        -- inv' (a , f) = c a (((can (Ar Σ a) D)⁻¹) f)
+        --   where
+        --   instance
+        --     _ : isIso (can (Ar Σ a) D)
+        --     _ = p (ι₁ a) D
 
-    --   linv' : ∀ z → inv' (canS D z) == z
-    --   -- linv' = quot.ind (≈ (S∘ D)) _ λ{(i , a , f) →
-    --   --   let instance _ = p (ι₁ a) D in
-    --   --   ap (c a) (linv _ (ν (Ar Σ a ⟶ D) i f))}
+        linv' : ∀ z → inv' (canS D z) == z
+        -- linv' = quot.ind (≈ (S∘ D)) _ λ{(i , a , f) →
+        --   let instance _ = p (ι₁ a) D in
+        --   ap (c a) (linv _ (ν (Ar Σ a ⟶ D) i f))}
 
-    --   rinv' : ∀ s → canS D (inv' s) == s
-    --   -- rinv' (a , f) =
-    --   --   let instance _ = p (ι₁ a) D
-    --   --   in proof
-    --   --        canS D (c a (((can _ D)⁻¹) f))
-    --   --      =[ ap (case ((can _ D ⁻¹) f)) lemma ]
-    --   --        (a , can _ D (((can _ D)⁻¹) f))
-    --   --      =[ ap (a ,_) (rinv _ f) ]
-    --   --        (a , f)
-    --   --      qed
+        rinv' : ∀ s → canS D (inv' s) == s
+        -- rinv' (a , f) =
+        --   let instance _ = p (ι₁ a) D
+        --   in proof
+        --        canS D (c a (((can _ D)⁻¹) f))
+        --      =[ ap (case ((can _ D ⁻¹) f)) lemma ]
+        --        (a , can _ D (((can _ D)⁻¹) f))
+        --      =[ ap (a ,_) (rinv _ f) ]
+        --        (a , f)
+      --      qed
+  }) G
