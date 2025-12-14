@@ -1,4 +1,4 @@
 name: agda-qit
-depend: 
+depend:  standard-library
 include: .
 flags: --with-K --prop --rewriting --backtracking-instance-search --allow-unsolved-metas
