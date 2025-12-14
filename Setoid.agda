@@ -1,22 +1,23 @@
 module Setoid where
 
 open import Level using (Level; _⊔_) renaming (suc to lsuc)
-open import Relation.Binary.Bundles
+open import Relation.Binary.Bundles public
 open import Function.Bundles
 open import Function.Definitions
 open import Data.Product
 open import Relation.Binary.Core
 open import Relation.Binary.Structures
 open import Relation.Binary.Definitions
-open import Data.Product.Function.Dependent.Setoid 
-
+open import Data.Product.Function.Dependent.Setoid public
+open import Data.List.Relation.Binary.Equality.Setoid public
+open import Function.Indexed.Relation.Binary.Equality public
+ 
 private
   variable
     ℓ ℓ' ℓ'' ℓ''' ℓ'''' : Level
 
-open Setoid
-open import Function.Relation.Binary.Setoid.Equality using () renaming (_≈_ to _≈⃗_)
-open import Data.List.Relation.Binary.Equality.Setoid 
+open Setoid public
+open import Function.Relation.Binary.Setoid.Equality public using () renaming (_≈_ to _≈⃗_)
 open import Relation.Binary.Morphism.Bundles 
 
 private
@@ -116,3 +117,6 @@ f ∘ g = record
   { to   = λ x → f .Func.to (g .Func.to x)
   ; cong = λ x≈y → f .Func.cong (g .Func.cong x≈y)
   }
+
+⟨_⟩ : Setoid ℓ ℓ' → Set ℓ
+⟨ S ⟩ = Carrier S
