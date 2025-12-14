@@ -47,16 +47,15 @@ module _ {ℓ ℓ'} where
         { isMonomorphism = record
           { isHomomorphism = record
             { cong = cong }
-          ; injective = λ p → {!!} }
-        ; surjective = λ p → {!!} , λ q → {!!} } }
+          ; injective = λ p → inv-injective p }
+        ; surjective = λ p → ~.⟦ p ⟧
+                     , λ q → ~.injective (B.trans (right-inv _) q) } }
       where
         module ~ = SetoidIsomorphism A≅B
         module A = Setoid A
         module B = Setoid B
         ⟦_⟧ : (y : B.Carrier) → A.Carrier
         ⟦ y ⟧ = ~.surjective y .proj₁
-        inv : ∀ x y → ~.⟦ ⟦ x ⟧ ⟧ B.≈ ~.⟦ ⟦ y ⟧ ⟧ 
-        inv x y = {!!}
         right-inv : ∀ y → ~.⟦ ⟦ y ⟧ ⟧ B.≈ y
         right-inv y = ~.surjective y .proj₂ A.refl 
 
@@ -108,3 +107,12 @@ module _ {ℓ ℓ'} where
     ; _≈_ = SetoidIso ℓ ℓ'
     ; isEquivalence = isEquivalenceSetoidIso
     }
+
+infixr 1 _∘_
+_∘_ : ∀ {c₁ c₂ c₃ ℓ₁ ℓ₂ ℓ₃}
+        {A : Setoid c₁ ℓ₁} {B : Setoid c₂ ℓ₂} {C : Setoid c₃ ℓ₃} →
+        Func B C → Func A B → Func A C
+f ∘ g = record
+  { to   = λ x → f .Func.to (g .Func.to x)
+  ; cong = λ x≈y → f .Func.cong (g .Func.cong x≈y)
+  }
