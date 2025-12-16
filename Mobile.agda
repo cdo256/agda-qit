@@ -1,6 +1,6 @@
 module Mobile where
 
-open import Level using (Level; _⊔_; Lift; lift) renaming (suc to lsuc; zero to lzero)
+open import Prelude
 open import Data.Product
 open import Function.Bundles
 open import Function.Definitions
@@ -11,7 +11,7 @@ open import Function.Properties.Inverse
 open import Data.Empty renaming (⊥-elim to absurd)
 open import Data.W
 open import Data.Container hiding (_⇒_; identity)
-open import Relation.Binary.Structures
+-- open import Relation.Binary.Structures
 
 
 private
@@ -20,6 +20,8 @@ private
 
 
 module Mobile (B : Set ℓ) where
+  open Box
+  
   data NodeType : Set where
     l : NodeType
     n : NodeType

@@ -1,58 +1,12 @@
 module Setoid where
 
-open import Level using (Level; _⊔_) renaming (suc to lsuc)
--- open import Relation.Binary.Bundles public
--- open import Function.Bundles
--- open import Function.Definitions
+open import Prelude
 open import Data.Product
--- open import Relation.Binary.Core
--- open import Relation.Binary.Structures
--- open import Relation.Binary.Definitions
--- open import Data.Product.Function.Dependent.Setoid public
--- open import Data.List.Relation.Binary.Equality.Setoid public
--- open import Function.Indexed.Relation.Binary.Equality public
  
 private
   variable
     ℓ ℓ' ℓ'' ℓ''' ℓ'''' : Level
 
--- open Setoid public
-open import Function.Relation.Binary.Setoid.Equality public using () renaming (_≈_ to _≈⃗_)
-open import Relation.Binary.Morphism.Bundles 
--- open import Relation.Binary.PropositionalEquality as ≡
-
-
--- A wrapper to lift Prop into Set
-record Box {ℓ} (P : Prop ℓ) : Set ℓ where
-  constructor box
-  field unbox : P
-
-open Box
-
-
--- substp : ∀ {A : Set ℓ} (B : A → Prop ℓ') {a1 a2 : A} (p : a1 ≡.≡ a2) → B a1 → B a2
--- substp B p x = subst (λ x → Box (B x)) p (box x) .unbox
-
-
--- data Setoid c ℓ : Prop (lsuc (c ⊔ ℓ)) where
---   setoid : Setoid c ℓ → Setoid c ℓ
-
-Rel : ∀ (X : Set ℓ) ℓ' → Set (ℓ ⊔ lsuc ℓ')
-Rel X ℓ' = X → X → Prop ℓ'
-
--- Rel : ∀ (X : Set ℓ) ℓ' → Set (ℓ ⊔ lsuc ℓ')
--- Rel X ℓ' = X → X → Set ℓ'
-
-data ∥_∥ (A : Set ℓ) : Prop ℓ where
-  ∣_∣ : A → ∥ A ∥
-
-Trunc₁ : {A : Set ℓ} {ℓ' : Level} → (A → Set ℓ') → (A → Prop ℓ')
-Trunc₁ R x = ∥ R x ∥
-
-Trunc₂ : {A : Set ℓ} {ℓ' : Level} → (A → A → Set ℓ') → (A → A → Prop ℓ')
-Trunc₂ R x y = ∥ R x y ∥
-
-open import Relation.Binary.PropositionalEquality.Core as ≡ using (_≡_)
 
 Reflexive : ∀ {ℓ'} → {A : Set ℓ} (_≈_ : Rel A ℓ') → Prop (ℓ ⊔ ℓ')
 Reflexive _≈_ = ∀ {x} → x ≈ x
@@ -78,18 +32,8 @@ record Setoid c ℓ : Set (lsuc (c ⊔ ℓ)) where
 
   open IsEquivalence isEquivalence public
 
--- open Setoid public
-
-  -- open IsEquivalence isEquivalence public
-  --   using (refl; reflexive; isPartialEquivalence)
-
-  -- partialSetoid : PartialSetoid c ℓ
-  -- partialSetoid = record
-  --   { isPartialEquivalence = isPartialEquivalence
-  --   }
-
-  -- open PartialSetoid partialSetoid public
-  --   hiding (Carrier; _≈_; isPartialEquivalence)
+⟨_⟩ : Setoid ℓ ℓ' → Set ℓ
+⟨ S ⟩ = S .Setoid.Carrier
 
 module ≊syntax {ℓ ℓ'} {S : Setoid ℓ ℓ'} where
   open Setoid S renaming (Carrier to A)
@@ -192,14 +136,29 @@ module _ {ℓ ℓ'} where
     ; isEquivalence = isEquivalenceSetoidIso
     }
 
--- -- infixr 1 _∘_
--- -- _∘_ : ∀ {c₁ c₂ c₃ ℓ₁ ℓ₂ ℓ₃}
--- --         {A : Setoid c₁ ℓ₁} {B : Setoid c₂ ℓ₂} {C : Setoid c₃ ℓ₃} →
--- --         Func B C → Func A B → Func A C
--- -- f ∘ g = record
--- --   { to   = λ x → f .Func.to (g .Func.to x)
--- --   ; cong = λ x≈y → f .Func.cong (g .Func.cong x≈y)
--- --   }
+record Func (S T : Setoid ℓ ℓ') : Set (ℓ ⊔ ℓ') where
+  module S = Setoid S
+  module T = Setoid T
+  field
+    to   : ⟨ S ⟩ → ⟨ T ⟩
+    cong : ∀ {x y} → x S.≈ y → to x T.≈ to y
 
-⟨_⟩ : Setoid ℓ ℓ' → Set ℓ
-⟨ S ⟩ = S .Setoid.Carrier
+
+infixr 1 _∘_
+_∘_ : ∀ {A B C : Setoid ℓ ℓ'}
+    → Func B C → Func A B → Func A C
+f ∘ g = record
+  { to   = λ x → f .Func.to (g .Func.to x)
+  ; cong = λ x≈y → f .Func.cong (g .Func.cong x≈y)
+  }
+
+Rel≈ : (S : Setoid ℓ ℓ') → ∀ ℓ'' → Set (lsuc ℓ ⊔ lsuc ℓ'')
+Rel≈ {ℓ} S ℓ'' = A → A → Prop (ℓ ⊔ ℓ'')
+  where
+  open Setoid S renaming (Carrier to A)
+
+record IsPreorder {S : Setoid ℓ ℓ'} (_≲_ : Rel≈ S ℓ'') : Set (ℓ ⊔ ℓ' ⊔ ℓ'') where
+  module S = Setoid S
+  field
+    refl  : ∀ {x y} → x S.≈ y → x ≲ y
+    trans : Transitive _≲_
