@@ -19,47 +19,29 @@ private
     ℓ ℓ' ℓ'' ℓ''' ℓ'''' : Level
 
 
--- A wrapper to lift Prop into Set
-record Box {ℓ} (P : Prop ℓ) : Set ℓ where
-  constructor box
-  field unbox : P
-
-open Box
-
-
-substp : ∀ {A : Set ℓ} (B : A → Prop ℓ') {a1 a2 : A} (p : a1 ≡ a2) → B a1 → B a2
-substp B p x = subst (λ x → Box (B x)) p (box x) .unbox
-
-
-
 module Mobile (B : Set ℓ) where
-  data BTree (B : Set ℓ) : Set ℓ where
-    leaf : BTree B
-    node : (f : B → BTree B) → BTree B
+  data NodeType : Set where
+    l : NodeType
+    n : NodeType
 
   open import Data.Unit
   open import Data.Sum
 
-  BTreeCont : Container lzero ℓ
-  BTreeCont .Shape = ⊤ ⊎ ⊤
-  BTreeCont .Position (inj₁ tt) = Lift ℓ ⊥
-  BTreeCont .Position (inj₂ tt) = B
+  Branch : Container lzero ℓ
+  Branch .Shape = NodeType
+  Branch .Position l = Lift ℓ ⊥
+  Branch .Position n = B
 
-  tree→w : BTree B → W BTreeCont
-  tree→w leaf = sup (inj₁ tt , λ())
-  tree→w (node f) = sup (inj₂ tt , (λ b → tree→w (f b)))
-
-  w→tree : W BTreeCont → BTree B
-  w→tree (sup (inj₁ tt , _)) = leaf
-  w→tree (sup (inj₂ tt , f)) = node λ b → w→tree (f b)
-
-
+  BTree = W Branch
+  
+  pattern leaf {f} = sup (l , f)
+  pattern node f = sup (n , f)
 
   Bˢ : Setoid ℓ ℓ
   Bˢ = ≡.setoid B
   open Inverse renaming (inverse to inverse')
-  data _≈ᵗ_ : BTree B → BTree B → Set ℓ where
-    ≈leaf : leaf ≈ᵗ leaf
+  data _≈ᵗ_ : BTree → BTree → Set ℓ where
+    ≈leaf : ∀ {f g} → leaf {f} ≈ᵗ leaf {g}
     ≈node : ∀ {f g} → (c : ∀ b → f b ≈ᵗ g b)
           → node f ≈ᵗ node g
     ≈perm : ∀ {f} → (π : B ↔ B)
@@ -88,53 +70,37 @@ module Mobile (B : Set ℓ) where
 
   MobileSetoid : Setoid ℓ ℓ
   MobileSetoid = record
-    { Carrier = BTree B
+    { Carrier = BTree
     ; _≈_ = _≈ᵗ_
     ; isEquivalence = isEquiv-≈ᵗ }
 
-  open import Plump BTreeCont
-    renaming (_≺_ to _<ᵖ_; _≤_ to _≤ᵖ_; <≤ to <≤ᵖ; ≤< to ≤<ᵖ; ≤≤ to ≤≤ᵖ;
-              ≤refl to ≤reflᵖ; ≺sup to <supᵖ; sup≤ to sup≤ᵖ)
-  _<_ : BTree B → BTree B → Prop ℓ
-  s < t = tree→w s <ᵖ tree→w t
-  _≤_ : BTree B → BTree B → Prop ℓ
-  s ≤ t = tree→w s ≤ᵖ tree→w t
-  <→<ᵖ : ∀ {s t} → s < t → tree→w s <ᵖ tree→w t
-  <→<ᵖ p = p
-  ≤→≤ᵖ : ∀ {s t} → s ≤ t → tree→w s ≤ᵖ tree→w t
-  ≤→≤ᵖ p = p
-  ≤≤ : {s t u : BTree B} → t ≤ u → s ≤ t → s ≤ u
-  ≤≤ p q = ≤≤ᵖ p q
-  <≤ : {s t u : BTree B} → t < u → s ≤ t → s < u
-  <≤ p q = <≤ᵖ p q
-  ≤< : {s t u : BTree B} → t ≤ u → s < t → s < u
-  ≤< p q = ≤<ᵖ p q
-  ≤refl : ∀ {s} → s ≤ s
-  ≤refl {s} = ≤reflᵖ (tree→w s)
-  _≤ᴮ_ : BTree B → BTree B → Set ℓ
+  open import Plump Branch
+    renaming (_≺_ to _<_; ≺sup to <sup)
+  _≤ᴮ_ : BTree → BTree → Set ℓ
   _≤ᴮ_ s t = Box (s ≤ t)
 
-  leaf≉node : ∀ {f} → leaf ≈ᵗ node f → ⊥
+  leaf≉node : ∀ {f g} → leaf {g} ≈ᵗ node f → ⊥
   leaf≉node (≈trans {t = leaf} p q) = leaf≉node q
   leaf≉node (≈trans {t = node _} p q) = leaf≉node p
 
-
   open import Relation.Binary.Core
+  leaf≤leaf : ∀ {f g} → leaf {f} ≤ leaf {g}
+  leaf≤leaf = sup≤ (λ ())
   ≤-resp-≈ᵗ : _≈ᵗ_ ⇒ _≤ᴮ_
-  ≤-resp-≈ᵗ {leaf} {leaf} p = box (≤refl {leaf})
+  ≤-resp-≈ᵗ {leaf {f}} {leaf {g}} p = box leaf≤leaf 
   ≤-resp-≈ᵗ {leaf} {node f} p = absurd (leaf≉node p)
   ≤-resp-≈ᵗ {node f} {leaf} p = absurd (leaf≉node (≈sym p))
   ≤-resp-≈ᵗ {node f} {node g} (≈node c) .unbox =
-    sup≤ᵖ λ b → <supᵖ b (unbox (≤-resp-≈ᵗ (c b)))
+    sup≤ λ b → <sup b (unbox (≤-resp-≈ᵗ (c b)))
   ≤-resp-≈ᵗ {node f} {node g} (≈perm π) .unbox =
-    sup≤ᵖ (λ b → <supᵖ (π .from b) (u b))
+    sup≤ (λ b → <sup (π .from b) (u b))
     where
     u : ∀ b → (f b) ≤ (f (π .to (π .from b))) 
-    u b = substp (λ x → f b ≤ f x) p ≤refl
+    u b = substp (λ x → f b ≤ f x) p (≤refl (f b))
       where
       p = ≡.sym (inverseˡ π {x = b} {y = π .from b} ≡.refl)
   ≤-resp-≈ᵗ {node f} {node g} (≈trans {t = t} p q) .unbox =
-    ≤≤ {s = node f} {t = t} {u = node g}
+    ≤≤ {i = node f} {j = t} {k = node g}
        (≤-resp-≈ᵗ q .unbox) (≤-resp-≈ᵗ p .unbox)
 
   isPreorder-≤ : IsPreorder _≈ᵗ_ _≤ᴮ_
@@ -143,13 +109,13 @@ module Mobile (B : Set ℓ) where
     ; reflexive = ≤-resp-≈ᵗ
     ; trans = λ p q → box (≤≤ (q .unbox) (p .unbox)) }
 
-  record Sz₀ (t : BTree B) : Set ℓ where
+  record Sz₀ (t : BTree) : Set ℓ where
     constructor sz
     field
-      u : BTree B
+      u : BTree
       u<t : u < t
 
-  Sz : BTree B → Setoid ℓ ℓ
+  Sz : BTree → Setoid ℓ ℓ
   Sz t = record
     { Carrier = Sz₀ t
     ; _≈_ = λ (sz u _) (sz s _) → u ≈ᵗ s
@@ -169,17 +135,22 @@ module Mobile (B : Set ℓ) where
   open import Colimit
   open import Function.Construct.Identity using () renaming (function to identity)
 
-  Id : ∀ {t : BTree B}
+  module ≤ = IsPreorder isPreorder-≤
+
+  Id : ∀ {t : BTree}
      → _≈⃗_ (Sz t) (Sz t)
-            (P' (box ≤refl)) 
+            (P' (box (≤refl t))) 
             (identity (Sz t))
-  Id {leaf} (sz u u<t) = {!!}
-  Id {node f} (sz u u<t) = {!!}
+  Id (sz u u<t) = ≈refl
+
+  Comp : ∀{s t u} (p : s ≤ᴮ t) (q : t ≤ᴮ u) → _≈⃗_ (Sz s) (Sz u)
+         (P' (≤.trans p q)) (P' q ∘ P' p)   
+  Comp (box w) (box v) (sz u u<t) = {!!}
 
   D : Diagram isPreorder-≤ B
   D = record
     { D-ob = Sz
     ; D-mor = P'
     ; D-id = Id
-    ; D-comp = {!!} }
+    ; D-comp = Comp }
 
