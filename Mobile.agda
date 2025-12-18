@@ -1,3 +1,4 @@
+{-# OPTIONS --type-in-type #-}
 module Mobile where
 
 open import Prelude
@@ -14,13 +15,11 @@ open import Data.Container hiding (_⇒_; identity)
 -- open import Relation.Binary.Structures
 open import Colimit
 
-
 private
-  variable
-    ℓ ℓ' ℓ'' ℓ''' ℓ'''' : Level
+  l0 : Level
+  l0 = lzero
 
-
-module Mobile (B : Set ℓ) where
+module Mobile (B : Set) where
   open Box
   
   data NodeType : Set where
@@ -30,9 +29,9 @@ module Mobile (B : Set ℓ) where
   open import Data.Unit
   open import Data.Sum
 
-  Branch : Container lzero ℓ
+  Branch : Container l0 l0 
   Branch .Shape = NodeType
-  Branch .Position l = Lift ℓ ⊥
+  Branch .Position l = Lift l0 ⊥
   Branch .Position n = B
 
   BTree = W Branch
@@ -40,9 +39,9 @@ module Mobile (B : Set ℓ) where
   pattern leaf {f} = sup (l , f)
   pattern node f = sup (n , f)
 
-  Bˢ : Setoid ℓ ℓ
+  Bˢ : Setoid l0 l0
   Bˢ = ≡setoid B
-  data _≈ᵗ_ : BTree → BTree → Prop ℓ where
+  data _≈ᵗ_ : BTree → BTree → Prop l0 where
     ≈leaf : ∀ {f g} → leaf {f} ≈ᵗ leaf {g}
     ≈node : ∀ {f g} → (c : ∀ b → f b ≈ᵗ g b)
           → node f ≈ᵗ node g
@@ -62,7 +61,7 @@ module Mobile (B : Set ℓ) where
     where
     module π = SetoidIso π
     π' = SetoidIsoFlip π
-    A : (B → B) → Prop ℓ
+    A : (B → B) → Prop l0
     A = λ h → node (λ b → f π.⟦ b ⟧) ≈ᵗ node λ b → f (h b)
     p : (λ b → π.⟦ π.⟦ b ⟧⁻¹ ⟧) ≡p (λ b → b)
     p = funExtp λ b → (π.linv b)
@@ -76,7 +75,7 @@ module Mobile (B : Set ℓ) where
     ; sym = ≈sym
     ; trans = ≈trans }
 
-  MobileSetoid : Setoid ℓ ℓ
+  MobileSetoid : Setoid l0 l0
   MobileSetoid = record
     { Carrier = BTree
     ; _≈_ = _≈ᵗ_
@@ -86,7 +85,7 @@ module Mobile (B : Set ℓ) where
     renaming (_≺_ to _<_; ≺sup to <sup)
 
   data ⊥p : Prop where
-  absurdp : {A : Prop ℓ} → ⊥p → A
+  absurdp : {A : Prop} → ⊥p → A
   absurdp ()
 
   leaf≉node : ∀ {f g} → leaf {g} ≈ᵗ node f → ⊥p
@@ -117,18 +116,18 @@ module Mobile (B : Set ℓ) where
     ≤≤ {i = node f} {j = t} {k = node g}
        (≤-resp-≈ᵗ q) (≤-resp-≈ᵗ p)
 
-  isPreorder-≤ : IsPreorder {ℓ'' = ℓ} MobileSetoid _≤_
+  isPreorder-≤ : IsPreorder MobileSetoid _≤_
   isPreorder-≤ = record
     { refl = ≤-resp-≈ᵗ
     ; trans = λ p q → ≤≤ q p }
 
-  record Sz₀ (t : BTree) : Set ℓ where
+  record Sz₀ (t : BTree) : Set l0 where
     constructor sz
     field
       u : BTree
       u<t : u < t
 
-  Sz : BTree → Setoid ℓ ℓ
+  Sz : BTree → Setoid l0 l0
   Sz t = record
     { Carrier = Sz₀ t
     ; _≈_ = λ (sz u _) (sz s _) → u ≈ᵗ s
@@ -148,16 +147,16 @@ module Mobile (B : Set ℓ) where
 
   Id : ∀ {t : BTree}
      → SetoidHom≈ (P (≤refl t)) idHom 
-  Id  = record { forward = λ z → z }
+  Id p = p
 
   Comp : ∀{s t u} (p : s ≤ t) (q : t ≤ u)
        → SetoidHom≈ (P (≤.trans p q)) (P q ∘ P p)   
-  Comp w v = record { forward = λ z → z }
+  Comp _ _ r = r
 
   D : Diagram isPreorder-≤ B
   D = record
     { D-ob = Sz
     ; D-mor = P
-    ; D-id = Id
+    ; D-id = λ {i} {x} {y} → Id {i} {x} {y}
     ; D-comp = Comp }
 
