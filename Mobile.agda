@@ -13,7 +13,6 @@ open import Data.Empty renaming (⊥-elim to absurd)
 open import Data.W
 open import Data.Container hiding (_⇒_; identity)
 -- open import Relation.Binary.Structures
-open import Colimit
 
 private
   l0 : Level
@@ -153,10 +152,14 @@ module Mobile (B : Set) where
        → SetoidHom≈ (P (≤.trans p q)) (P q ∘ P p)   
   Comp _ _ r = r
 
-  D : Diagram isPreorder-≤ B
-  D = record
-    { D-ob = Sz
-    ; D-mor = P
-    ; D-id = λ {i} {x} {y} → Id {i} {x} {y}
-    ; D-comp = Comp }
+  module MobileColim where
+    open import Colimit isPreorder-≤ B
+    D : Diagram 
+    D = record
+      { D-ob = Sz
+      ; D-mor = P
+      ; D-id = λ {i} {x} {y} → Id {i} {x} {y}
+      ; D-comp = Comp }
 
+    open Colim D
+    
