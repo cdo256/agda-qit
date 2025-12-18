@@ -1,11 +1,16 @@
+{-# OPTIONS --type-in-type #-}
 module Setoid where
 
 open import Prelude
 open import Data.Product
  
 private
-  variable
-    ℓ ℓ' ℓ'' ℓ''' ℓ'''' : Level
+  ℓ ℓ' ℓ'' ℓ''' ℓ'''' : Level
+  ℓ = lzero
+  ℓ' = lzero
+  ℓ'' = lzero
+  ℓ''' = lzero
+  ℓ'''' = lzero
 
 
 Reflexive : ∀ {ℓ'} → {A : Set ℓ} (_≈_ : Rel A ℓ') → Prop (ℓ ⊔ ℓ')
@@ -170,7 +175,7 @@ f ∘ g = record
   module g = SetoidHom g
 
 Rel≈ : (S : Setoid ℓ ℓ') → ∀ ℓ'' → Set (lsuc ℓ ⊔ lsuc ℓ'')
-Rel≈ {ℓ} S ℓ'' = A → A → Prop (ℓ ⊔ ℓ'')
+Rel≈ S ℓ'' = A → A → Prop (ℓ ⊔ ℓ'')
   where
   open Setoid S renaming (Carrier to A)
 
@@ -194,3 +199,15 @@ isEquiv≡p A = record { refl = ∣ refl ∣ ; sym = sym ; trans = trans }
   { Carrier = B
   ; _≈_ = _≡p_
   ; isEquivalence = isEquiv≡p B }
+
+record SetoidFunctor : Set where
+  private
+    Hom = SetoidHom
+    _≈h_ = SetoidHom≈
+  module ≈ = Setoid
+  field
+    F-ob : ∀ (S : Setoid ℓ ℓ') → Setoid ℓ ℓ'
+    F-mor : ∀ {S T : Setoid ℓ ℓ'} → Hom S T → Hom (F-ob S) (F-ob T)
+    F-id : ∀ {S : Setoid ℓ ℓ'} → F-mor idHom ≈h idHom {S = F-ob S}
+    F-comp : ∀ {S T U : Setoid ℓ ℓ'} → (f : Hom S T) → (g : Hom T U)
+           → F-mor (g ∘ f) ≈h (F-mor g ∘ F-mor f)

@@ -7,7 +7,7 @@ open import Data.Product
 open import Function.Definitions
 open import Relation.Binary.PropositionalEquality as ≡
 open import Axiom
-open import Setoid as S
+open import Setoid as ≈
 open import Function.Properties.Inverse 
 open import Data.Empty renaming (⊥-elim to absurd)
 open import Data.W
@@ -91,7 +91,7 @@ module Mobile (B : Set) where
   leaf≉node (≈trans {t = leaf} p q) = leaf≉node q
   leaf≉node (≈trans {t = node _} p q) = leaf≉node p
 
-  open import Relation.Binary.Core
+  -- open import Relation.Binary.Core
   leaf≤leaf : ∀ {f g} → leaf {f} ≤ leaf {g}
   leaf≤leaf = sup≤ (λ ())
   ≤-resp-≈ᵗ : ∀ {x y} → x ≈ᵗ y → x ≤ y
@@ -154,7 +154,7 @@ module Mobile (B : Set) where
 
   module MobileColim where
     open import Colimit isPreorder-≤ B
-    D : Diagram 
+    D : Diagram
     D = record
       { D-ob = Sz
       ; D-mor = P
@@ -162,4 +162,88 @@ module Mobile (B : Set) where
       ; D-comp = Comp }
 
     open Colim D
-    
+
+    module ContainerFunctor (C : Container l0 l0) where
+      module Ob (S : Setoid l0 l0) where
+        open Setoid S 
+        record _≈ꟳ_ (x y : ⟦ C ⟧ ⟨ S ⟩) : Prop l0 where
+          constructor mk≈ꟳ
+          field
+            fst≡ : x .proj₁ ≡ y .proj₁
+            snd≈ : ∀ p → (x .proj₂) p ≈ (y .proj₂) (subst (C .Position) fst≡ p)
+
+        isReflexive : Reflexive _≈ꟳ_
+        isReflexive = mk≈ꟳ ≡.refl (λ p → S .≈.refl)
+
+        isSymmetric : Symmetric _≈ꟳ_
+        isSymmetric {x} {y} (mk≈ꟳ fst≡ snd≈) =
+          mk≈ꟳ (≡.sym fst≡) λ p → S .≈.sym (snd≈⁻¹ p)
+          where
+          u : ∀ p → x .proj₂ (subst (C .Position) (≡.sym fst≡) p) ≈
+                    y .proj₂ (subst (C .Position) fst≡
+                             (subst (C .Position) (≡.sym fst≡) p))
+          u p = snd≈ (subst (C .Position) (≡.sym fst≡) p)
+          v : ∀ p → (subst (C .Position) fst≡ (subst (C .Position) (≡.sym fst≡) p))
+                  ≡ p
+          v p = subst-subst-sym fst≡
+          snd≈⁻¹ : ∀ p → x .proj₂ (subst (C .Position) (≡.sym fst≡) p) ≈ y .proj₂ p
+          snd≈⁻¹ p =
+            substp (λ ○ → x .proj₂ (subst (C .Position) (≡.sym fst≡) p) ≈ y .proj₂ ○)
+                   (v p) (snd≈ (subst (C .Position) (≡.sym fst≡) p))
+
+        isTransitive : Transitive _≈ꟳ_
+        isTransitive {x = x} {y} {z} (mk≈ꟳ fst≡1 snd≈1) (mk≈ꟳ fst≡2 snd≈2) =
+          mk≈ꟳ (≡.trans fst≡1 fst≡2) v
+          where
+          u : ∀ p → x .proj₂ p ≈ z .proj₂ (subst (C .Position) fst≡2 (subst (C .Position) fst≡1 p)) 
+          u p = S .≈.trans (snd≈1 p) (snd≈2 (subst (C .Position) fst≡1 p))
+          v : ∀ p → x .proj₂ p ≈ z .proj₂ (subst (C .Position) (≡.trans fst≡1 fst≡2) p) 
+          v p = substp (λ ○ → x .proj₂ p ≈ z .proj₂ ○) (subst-subst fst≡1) (u p)
+
+
+        F̃-ob : Setoid l0 l0 
+        F̃-ob = record
+          { Carrier = ⟦ C ⟧ ⟨ S ⟩
+          ; _≈_ = _≈ꟳ_
+          ; isEquivalence = record
+            { refl = isReflexive
+            ; sym = isSymmetric
+            ; trans = isTransitive } }
+
+      open Ob using (F̃-ob)
+
+      module Mor {S T : Setoid l0 l0} (f : SetoidHom S T) where
+        module S = Setoid S
+        module T = Setoid T
+        module f = SetoidHom f
+        ⟦_⟧h : ⟦ C ⟧ ⟨ S ⟩ → ⟦ C ⟧ ⟨ T ⟩
+        ⟦ s , g ⟧h = s , λ x → f.⟦ g x ⟧ 
+        congh : ∀ {x y} → (F̃-ob S Setoid.≈ x) y → (T Ob.≈ꟳ ⟦ x ⟧h) ⟦ y ⟧h
+        congh (Ob.mk≈ꟳ fst≡ snd≈) = Ob.mk≈ꟳ fst≡ (λ p → f.cong (snd≈ p))
+        F̃-mor : SetoidHom (F̃-ob S) (F̃-ob T)
+        F̃-mor = record
+          { ⟦_⟧ = ⟦_⟧h
+          ; cong = congh
+          }
+
+      open Mor using (F̃-mor)
+
+      module Comp {S T U : Setoid l0 l0} (f : SetoidHom S T) (g : SetoidHom T U) where
+        module S = Setoid S
+        module T = Setoid T
+        module U = Setoid U
+        module f = SetoidHom f
+        module g = SetoidHom g
+
+        F̃-comp : SetoidHom≈ (F̃-mor (g ∘ f)) (F̃-mor g ∘ F̃-mor f)
+        F̃-comp (Ob.mk≈ꟳ fst≡ snd≈) =
+          Ob.mk≈ꟳ fst≡ λ p → g.cong (f.cong (snd≈ p))
+
+      open Comp using (F̃-comp)
+      
+      F̃ : SetoidFunctor
+      F̃ = record
+        { F-ob = F̃-ob
+        ; F-mor = F̃-mor
+        ; F-id = λ p → p
+        ; F-comp = F̃-comp }
