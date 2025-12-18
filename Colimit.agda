@@ -1,14 +1,16 @@
+{-# OPTIONS --type-in-type #-}
 module Colimit where
 
-open import Level using (Level; _⊔_) renaming (suc to lsuc)
-open import Relation.Binary.Bundles
-open import Function.Bundles
-open import Relation.Binary.Core
-open import Relation.Binary.Structures
-open import Data.Product
-open import Data.Product.Function.Dependent.Setoid
-open import Relation.Binary.Morphism.Bundles
+open import Prelude
 open import Setoid as S
+-- open import Relation.Binary.Bundles
+-- open import Function.Bundles
+-- open import Relation.Binary.Core
+-- -- open import Relation.Binary.Structures
+-- open import Data.Product
+-- -- open import Data.Product.Function.Dependent.Setoid
+-- open import Relation.Binary.Morphism.Bundles
+-- open import Setoid as S
 
 private
   variable
@@ -17,54 +19,53 @@ private
 module _ {ℓI} {ℓI'} {ℓ≤} {ℓB} {ℓB'}
   {I : Setoid ℓI ℓI'}
   {_≤_ : Rel (I .Setoid.Carrier) ℓ≤}
-  (isPreorder : IsPreorder (I .Setoid._≈_) _≤_)
+  (isPreorder : IsPreorder I _≤_)
   (B : Set ℓB) -- Note: B seems unused in the definition of Diagram, but kept as per user context
   where
 
-  open import Function.Relation.Binary.Setoid.Equality using () renaming (_≈_ to _≈⃗_)
-  open import Data.List.Relation.Binary.Equality.Setoid
-  open import Function.Construct.Identity using () renaming (function to identity)
-  import Relation.Binary.PropositionalEquality as ≡
+  -- open import Function.Relation.Binary.Setoid.Equality using () renaming (_≈_ to _≈⃗_)
+  -- open import Data.List.Relation.Binary.Equality.Setoid
+  -- open import Function.Construct.Identity using () renaming (function to identity)
+  -- import Relation.Binary.PropositionalEquality as ≡
 
   record Diagram : Set (ℓ≤ ⊔ ℓI ⊔ lsuc ℓB ⊔ lsuc ℓB') where
-    open IsPreorder isPreorder renaming (reflexive to ≤refl; trans to ≤trans)
+    module ≤ = IsPreorder isPreorder
     open Setoid I using () renaming (Carrier to Î)
     module I = Setoid I
 
     field
       D-ob : ∀ (i : Î) → Setoid ℓB ℓB'
-      D-mor : ∀ {i j} → (p : i ≤ j) → Func (D-ob i) (D-ob j)
-
-      D-id : ∀ {i : Î} →
-             _≈⃗_ (D-ob i) (D-ob i)
-                  (D-mor (≤refl (I.reflexive ≡.refl)))
-                  (identity (D-ob i))
-
-      D-comp : ∀ {i j k} → (p : i ≤ j) (q : j ≤ k) →
-               _≈⃗_ (D-ob i) (D-ob k)
-                    (D-mor (≤trans p q))
-                    (D-mor q S.∘ D-mor p)
+      D-mor : ∀ {i j} → (p : i ≤ j) → SetoidHom (D-ob i) (D-ob j)
+      D-id : ∀ {i : Î}
+           → SetoidHom≈ (D-mor (≤.refl I.refl))
+                        (idHom {S = D-ob i})
+      D-comp : ∀ {i j k} → (p : i ≤ j) (q : j ≤ k)
+             → SetoidHom≈ (D-mor (≤.trans p q))
+                          (D-mor q S.∘ D-mor p)
 
   module Colim (P : Diagram) where
     open Diagram P renaming (D-ob to P̂)
 
     -- Helper to access the function part of the diagram morphism
     Pf : ∀ {i j} (p : i ≤ j) → (⟨ P̂ i ⟩ → ⟨ P̂ j ⟩)
-    Pf p = D-mor p .Func.to
+    Pf p = SetoidHom.⟦ D-mor p ⟧
+      where open SetoidHom (D-mor p )
 
     -- Local syntax for equality in the fiber setoids
-    ≈j : ∀ i → (x y : ⟨ P̂ i ⟩) → Set _
-    ≈j i x y = x ≈' y
-      where open Setoid (P̂ i) renaming (_≈_ to _≈'_)
+    ≈j : ∀ i → (x y : ⟨ P̂ i ⟩) → Prop _
+    ≈j i x y = x ≈ y
+      where open Setoid (P̂ i)
 
     syntax ≈j i x y = x ≈[ i ] y
+
+    open import Data.Product
 
     -- The carrier of the colimit (Sigma type)
     Colim₀ : Set (ℓI ⊔ ℓB)
     Colim₀ = Σ[ i ∈ ⟨ I ⟩ ] ⟨ P̂ i ⟩
 
     -- The equivalence relation generating the colimit
-    data _≈ˡ_ : Colim₀ → Colim₀ → Set (ℓ≤ ⊔ ℓI ⊔ ℓB ⊔ ℓB') where
+    data _≈ˡ_ : Colim₀ → Colim₀ → Prop (ℓ≤ ⊔ ℓI ⊔ ℓB ⊔ ℓB') where
       ≈lstage : ∀ i → {x x' : ⟨ P̂ i ⟩} → x ≈[ i ] x' → (i , x) ≈ˡ (i , x')
       ≈lstep  : ∀ {i j} (p : i ≤ j) (x : ⟨ P̂ i ⟩) → (i , x) ≈ˡ (j , Pf p x)
       ≈lsym   : ∀ {s t} → s ≈ˡ t → t ≈ˡ s
@@ -76,6 +77,7 @@ module _ {ℓI} {ℓI'} {ℓ≤} {ℓB} {ℓB'}
       ; sym   = ≈lsym
       ; trans = ≈ltrans
       }
+      where open Setoid
 
     -- The Colimit Setoid
     Colim : Setoid (ℓI ⊔ ℓB) (ℓI ⊔ ℓ≤ ⊔ ℓB ⊔ ℓB')
@@ -90,9 +92,9 @@ module _ {ℓI} {ℓI'} {ℓ≤} {ℓB} {ℓB'}
     record Cocone : Set (lsuc (ℓ≤ ⊔ ℓB' ⊔ ℓB ⊔ ℓI)) where
       field
         Apex     : Setoid (ℓI ⊔ ℓB) (ℓI ⊔ ℓ≤ ⊔ ℓB ⊔ ℓB')
-        inj      : ∀ i → Func (P̂ i) Apex
+        inj      : ∀ i → SetoidHom (P̂ i) Apex
         commutes : ∀ {i j} (p : i ≤ j) →
-                   _≈⃗_ (P̂ i) Apex (inj i) (inj j ∘ D-mor p)
+                   SetoidHom≈ (inj i) (inj j ∘ D-mor p)
 
     open Cocone
 
@@ -100,15 +102,15 @@ module _ {ℓI} {ℓI'} {ℓ≤} {ℓB} {ℓB'}
     LimitCocone : Cocone
     LimitCocone = record
       { Apex     = Colim
-      ; inj      = λ i → record { to = λ x → i , x ; cong = ≈lstage i }
-      ; commutes = λ p x → ≈lstep p x
+      ; inj      = λ i → record { ⟦_⟧ = λ x → i , x ; cong = ≈lstage i }
+      ; commutes = λ p {x = x} {y = y} q → ≈ltrans (≈lstage _ q) (≈lstep p y)
       }
 
     -- Morphisms of cocones
     record ColimMorphism (C C' : Cocone) : Set (ℓI ⊔ ℓ≤ ⊔ ℓB ⊔ ℓB') where
       field
-        apexHom  : Func (C .Apex) (C' .Apex)
-        commutes : ∀ i → _≈⃗_ (P̂ i) (C' .Apex) (apexHom ∘ C .inj i) (C' .inj i)
+        apexHom  : SetoidHom (C .Apex) (C' .Apex)
+        commutes : ∀ i → SetoidHom≈ (apexHom ∘ C .inj i) (C' .inj i)
 
     open ColimMorphism
 
@@ -117,7 +119,7 @@ module _ {ℓI} {ℓI'} {ℓ≤} {ℓB} {ℓB'}
       field
         mor    : ∀ C' → ColimMorphism C C'
         unique : ∀ C' → (F : ColimMorphism C C') →
-                 _≈⃗_ (C .Apex) (C' .Apex) (F .apexHom) (mor C' .apexHom)
+                 SetoidHom≈ (F .apexHom) (mor C' .apexHom)
 
     open isLimitingCocone
 
@@ -126,29 +128,29 @@ module _ {ℓI} {ℓI'} {ℓ≤} {ℓB} {ℓB'}
       module C' = Cocone C'
       module ApexSetoid = Setoid C'.Apex
 
-      private
-        f : ⟨ Colim ⟩ → ⟨ C'.Apex ⟩
-        f (i , x) = C' .inj i .Func.to x
+    --   private
+    --     f : ⟨ Colim ⟩ → ⟨ C'.Apex ⟩
+    --     f (i , x) = C' .inj i .Func.to x
 
-      isRespecting : ∀ {i j x y} → (i , x) ≈ˡ (j , y) →
-                     f (i , x) ApexSetoid.≈ f (j , y)
-      isRespecting (≈lstage i x≈y) = C' .inj i .Func.cong x≈y
-      isRespecting (≈lstep p x)    = C'.commutes p x
-      isRespecting (≈lsym r)       = ApexSetoid.sym (isRespecting r)
-      isRespecting (≈ltrans r s)   = ApexSetoid.trans (isRespecting r) (isRespecting s)
+    --   isRespecting : ∀ {i j x y} → (i , x) ≈ˡ (j , y) →
+    --                  f (i , x) ApexSetoid.≈ f (j , y)
+    --   isRespecting (≈lstage i x≈y) = C' .inj i .Func.cong x≈y
+    --   isRespecting (≈lstep p x)    = C'.commutes p x
+    --   isRespecting (≈lsym r)       = ApexSetoid.sym (isRespecting r)
+    --   isRespecting (≈ltrans r s)   = ApexSetoid.trans (isRespecting r) (isRespecting s)
 
-      F : ColimMorphism LimitCocone C'
-      F .apexHom .Func.to   = f
-      F .apexHom .Func.cong = isRespecting
-      F .commutes i x       = ApexSetoid.reflexive ≡.refl
+    --   F : ColimMorphism LimitCocone C'
+    --   F .apexHom .Func.to   = f
+    --   F .apexHom .Func.cong = isRespecting
+    --   F .commutes i x       = ApexSetoid.reflexive ≡.refl
 
-      unq : (G : ColimMorphism LimitCocone C') →
-            ∀ x → G .apexHom .Func.to x ApexSetoid.≈ f x
-      unq G (i , x) = G .commutes i x
+    --   unq : (G : ColimMorphism LimitCocone C') →
+    --         ∀ x → G .apexHom .Func.to x ApexSetoid.≈ f x
+    --   unq G (i , x) = G .commutes i x
 
-    isLimitingCoconeLimitCocone : isLimitingCocone LimitCocone
-    isLimitingCoconeLimitCocone = record
-      { mor    = F
-      ; unique = unq
-      }
-      where open IsLimitingCocone
+    -- isLimitingCoconeLimitCocone : isLimitingCocone LimitCocone
+    -- isLimitingCoconeLimitCocone = record
+    --   { mor    = F
+    --   ; unique = unq
+    --   }
+    --   where open IsLimitingCocone

@@ -23,11 +23,11 @@ record IsEquivalence {ℓ'} {A : Set ℓ} (_≈_ : Rel A ℓ') : Prop (ℓ' ⊔ 
     sym   : Symmetric _≈_
     trans : Transitive _≈_
 
-record Setoid c ℓ : Set (lsuc (c ⊔ ℓ)) where
+record Setoid ℓ ℓ' : Set (lsuc (ℓ ⊔ ℓ')) where
   infix 4 _≈_
   field
-    Carrier       : Set c
-    _≈_           : Rel Carrier ℓ
+    Carrier       : Set ℓ 
+    _≈_           : Rel Carrier ℓ'
     isEquivalence : IsEquivalence _≈_
 
   open IsEquivalence isEquivalence public
@@ -35,7 +35,7 @@ record Setoid c ℓ : Set (lsuc (c ⊔ ℓ)) where
 ⟨_⟩ : Setoid ℓ ℓ' → Set ℓ
 ⟨ S ⟩ = S .Setoid.Carrier
 
-module ≊syntax {ℓ ℓ'} {S : Setoid ℓ ℓ'} where
+module ≈syntax {ℓ ℓ'} {S : Setoid ℓ ℓ'} where
   open Setoid S renaming (Carrier to A)
 
   infix 1 begin_
@@ -53,17 +53,20 @@ module ≊syntax {ℓ ℓ'} {S : Setoid ℓ ℓ'} where
   x ∎ = refl
 
 record SetoidHom {ℓ} {ℓ'} (S T : Setoid ℓ ℓ') : Set (ℓ ⊔ ℓ') where
-  private
-    module S = Setoid S
-    module T = Setoid T
+  module S = Setoid S
+  module T = Setoid T
   field
     ⟦_⟧ : S.Carrier → T.Carrier
     cong : ∀ {x y} → x S.≈ y → ⟦ x ⟧ T.≈ ⟦ y ⟧
 
+idHom : ∀ {S : Setoid ℓ ℓ'} → SetoidHom S S
+idHom {S} = record
+  { ⟦_⟧ = λ x → x
+  ; cong = λ p → p }
+
 record SetoidIso {ℓ} {ℓ'} (S T : Setoid ℓ ℓ') : Set (ℓ ⊔ ℓ') where
-  private
-    module S = Setoid S
-    module T = Setoid T
+  module S = Setoid S
+  module T = Setoid T
   field
     ⟦_⟧ : S.Carrier → T.Carrier
     ⟦_⟧⁻¹ : T.Carrier → S.Carrier
@@ -72,18 +75,37 @@ record SetoidIso {ℓ} {ℓ'} (S T : Setoid ℓ ℓ') : Set (ℓ ⊔ ℓ') where
     linv : ∀ y → ⟦ ⟦ y ⟧⁻¹ ⟧ T.≈ y
     rinv : ∀ x → ⟦ ⟦ x ⟧ ⟧⁻¹ S.≈ x
 
-_≈S_ : ∀ {ℓ ℓ'} → Rel (Setoid ℓ ℓ') (ℓ ⊔ ℓ')
-S ≈S T = ∥ SetoidIso S T ∥
-  
+SetoidIsoFlip : {S T : Setoid ℓ ℓ'} → SetoidIso S T → SetoidIso T S
+SetoidIsoFlip f = record
+  { ⟦_⟧ = ⟦_⟧⁻¹
+  ; ⟦_⟧⁻¹ = ⟦_⟧
+  ; cong = cong⁻¹
+  ; cong⁻¹ = cong
+  ; linv = rinv
+  ; rinv = linv
+  }
+  where open SetoidIso f
+
+SetoidHom≈ : ∀ {S T : Setoid ℓ ℓ'} (f g : SetoidHom S T) → Prop (ℓ ⊔ ℓ')
+SetoidHom≈ {S = S} {T} f g = ∀ {x y} → x S.≈ y → f.⟦ x ⟧ T.≈ g.⟦ y ⟧
+  where
+  module S = Setoid S
+  module T = Setoid T
+  module f = SetoidHom f
+  module g = SetoidHom g
+
+_≅_ : ∀ {ℓ ℓ'} → Rel (Setoid ℓ ℓ') (ℓ ⊔ ℓ')
+S ≅ T = ∥ SetoidIso S T ∥
+
 module _ {ℓ ℓ'} where
-  isEquivalenceSetoidIso : IsEquivalence (_≈S_ {ℓ} {ℓ'})
+  isEquivalenceSetoidIso : IsEquivalence (_≅_ {ℓ} {ℓ'})
   isEquivalenceSetoidIso = record
     { refl = isReflexive
     ; sym = isSymmetric
     ; trans = isTransitive
     }
     where
-    isReflexive : Reflexive (_≈S_ {ℓ} {ℓ'})
+    isReflexive : Reflexive (_≅_ {ℓ} {ℓ'})
     isReflexive {S} = ∣ S~S ∣
       where
       module S = Setoid S
@@ -96,7 +118,7 @@ module _ {ℓ ℓ'} where
         ; linv = λ _ → S.refl
         ; rinv = λ _ → S.refl
         }
-    isSymmetric : Symmetric (_≈S_ {ℓ} {ℓ'})
+    isSymmetric : Symmetric (_≅_ {ℓ} {ℓ'})
     isSymmetric {S} {T} ∣ p ∣ = ∣ q ∣
       where
       module S = Setoid S
@@ -132,33 +154,43 @@ module _ {ℓ ℓ'} where
   SetoidSetoid : Setoid (lsuc ℓ ⊔ lsuc ℓ') (ℓ ⊔ ℓ')
   SetoidSetoid = record
     { Carrier = Setoid ℓ ℓ'
-    ; _≈_ = _≈S_
+    ; _≈_ = _≅_
     ; isEquivalence = isEquivalenceSetoidIso
     }
 
-record Func (S T : Setoid ℓ ℓ') : Set (ℓ ⊔ ℓ') where
-  module S = Setoid S
-  module T = Setoid T
-  field
-    to   : ⟨ S ⟩ → ⟨ T ⟩
-    cong : ∀ {x y} → x S.≈ y → to x T.≈ to y
-
-
 infixr 1 _∘_
 _∘_ : ∀ {A B C : Setoid ℓ ℓ'}
-    → Func B C → Func A B → Func A C
+    → SetoidHom B C → SetoidHom A B → SetoidHom A C
 f ∘ g = record
-  { to   = λ x → f .Func.to (g .Func.to x)
-  ; cong = λ x≈y → f .Func.cong (g .Func.cong x≈y)
+  { ⟦_⟧  = λ x → f.⟦ g.⟦ x ⟧ ⟧
+  ; cong = λ x≈y → f.cong (g.cong x≈y)
   }
+  where
+  module f = SetoidHom f
+  module g = SetoidHom g
 
 Rel≈ : (S : Setoid ℓ ℓ') → ∀ ℓ'' → Set (lsuc ℓ ⊔ lsuc ℓ'')
 Rel≈ {ℓ} S ℓ'' = A → A → Prop (ℓ ⊔ ℓ'')
   where
   open Setoid S renaming (Carrier to A)
 
-record IsPreorder {S : Setoid ℓ ℓ'} (_≲_ : Rel≈ S ℓ'') : Set (ℓ ⊔ ℓ' ⊔ ℓ'') where
+record IsPreorder (S : Setoid ℓ ℓ') (_≲_ : Rel≈ S ℓ'') : Set (ℓ ⊔ ℓ' ⊔ ℓ'') where
   module S = Setoid S
   field
     refl  : ∀ {x y} → x S.≈ y → x ≲ y
     trans : Transitive _≲_
+
+isEquiv≡p : ∀ (A : Set ℓ) → IsEquivalence (_≡p_ {A = A})
+isEquiv≡p A = record { refl = ∣ refl ∣ ; sym = sym ; trans = trans }
+  where
+  open _≡_
+  sym : Symmetric (Trunc₂ _≡_)
+  sym ∣ refl ∣ = ∣ refl ∣
+  trans : Transitive (Trunc₂ _≡_)
+  trans ∣ refl ∣ ∣ refl ∣ = ∣ refl ∣
+
+≡setoid : ∀ (B : Set ℓ) → Setoid ℓ ℓ
+≡setoid B = record
+  { Carrier = B
+  ; _≈_ = _≡p_
+  ; isEquivalence = isEquiv≡p B }
