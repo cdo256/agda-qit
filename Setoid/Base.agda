@@ -36,6 +36,7 @@ module ≈syntax {ℓ ℓ'} {S : Setoid ℓ ℓ'} where
   begin_ : ∀ {x y} → x ≈ y → x ≈ y
   begin p = p
 
+  infixr 2 step-≈
   step-≈ : ∀ (x : A) {y z} → y ≈ z → x ≈ y → x ≈ z
   step-≈ _ q p = trans p q
   syntax step-≈ x q p = x ≈⟨ p ⟩ q

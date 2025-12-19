@@ -3,7 +3,7 @@ open import Prelude
 open import Setoid
 open import Equivalence
 open import Data.Product
- 
+
 open import Data.Container hiding (refl; sym; trans)
 
 module ContainerFunctor (C : Container lzero lzero) where
@@ -45,12 +45,12 @@ module Ob (S : Setoid l0 l0) where
   isTransitive {x = x} {y} {z} (mk≈ꟳ fst≡1 snd≈1) (mk≈ꟳ fst≡2 snd≈2) =
     mk≈ꟳ (≡.trans fst≡1 fst≡2) v
     where
-    u : ∀ p → x .proj₂ p ≈ z .proj₂ (subst (C .Position) fst≡2 (subst (C .Position) fst≡1 p)) 
+    u : ∀ p → x .proj₂ p ≈ z .proj₂ (subst (C .Position) fst≡2 (subst (C .Position) fst≡1 p))
     u p = trans (snd≈1 p) (snd≈2 (subst (C .Position) fst≡1 p))
-    v : ∀ p → x .proj₂ p ≈ z .proj₂ (subst (C .Position) (≡.trans fst≡1 fst≡2) p) 
+    v : ∀ p → x .proj₂ p ≈ z .proj₂ (subst (C .Position) (≡.trans fst≡1 fst≡2) p)
     v p = substp (λ ○ → x .proj₂ p ≈ z .proj₂ ○) (≡.subst-subst fst≡1) (u p)
 
-  F̃-ob : Setoid l0 l0 
+  F̃-ob : Setoid l0 l0
   F̃-ob = record
     { Carrier = ⟦ C ⟧ ⟨ S ⟩
     ; _≈_ = _≈ꟳ_
@@ -66,7 +66,7 @@ module Mor {S T : Setoid l0 l0} (f : ≈.Hom S T) where
   module T = ≈.Setoid T
   module f = ≈.Hom f
   ⟦_⟧h : ⟦ C ⟧ ⟨ S ⟩ → ⟦ C ⟧ ⟨ T ⟩
-  ⟦ s , g ⟧h = s , λ x → f.⟦ g x ⟧ 
+  ⟦ s , g ⟧h = s , λ x → f.⟦ g x ⟧
   congh : ∀ {x y} → (F̃-ob S Setoid.≈ x) y → (T Ob.≈ꟳ ⟦ x ⟧h) ⟦ y ⟧h
   congh (Ob.mk≈ꟳ fst≡ snd≈) = Ob.mk≈ꟳ fst≡ (λ p → f.cong (snd≈ p))
   F̃-mor : ≈.Hom (F̃-ob S) (F̃-ob T)
@@ -86,7 +86,7 @@ module Comp {S T U : Setoid l0 l0} (f : ≈.Hom S T) (g : ≈.Hom T U) where
 
   F̃-comp : ≈.Hom≈ (F̃-mor (g ≈.∘ f)) (F̃-mor g ≈.∘ F̃-mor f)
   F̃-comp (Ob.mk≈ꟳ fst≡ snd≈) =
-    Ob.mk≈ꟳ fst≡ λ p → g.cong (f.cong (snd≈ p))
+    Ob.mk≈ꟳ fst≡ λ p → (≈.Hom.cong g) ((≈.Hom.cong f) (snd≈ p))
 
 open Comp using (F̃-comp)
 

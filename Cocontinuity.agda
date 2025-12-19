@@ -45,25 +45,27 @@ F ∘ P = record
     open ≈.Setoid
     open ≈.Hom
     open import Equivalence
-    v : ≈.Hom (F.F-ob (P.D-ob i)) (F.F-ob (P.D-ob i))
-    v = F.F-mor (P.D-mor {i} {i} (≤.refl P.I.refl))
-    b : ∀ x' → P.D-ob i ⊢ P.D-mor (≤.refl P.I.refl) .⟦_⟧ x'
-                        ≈ ≈.idHom .⟦_⟧ x'
-    b x' = P.D-id (P.D-ob i .refl)
-    c : ≈.Hom≈ (F.F-mor {S = P.D-ob i} ≈.idHom) (≈.idHom)
-    c = F.F-id
-    d : {!!}
     u : D-ob i ⊢ (F.F-mor (P.D-mor (≤.refl P.I.refl)) .⟦_⟧ x)
                ≈ (F.F-mor ≈.idHom) .⟦_⟧ x
-    u = {!!}
-    x' y' : ⟨ P.D-ob i ⟩
-    x' = {!!}
-    x'≈y' : P.D-ob i ⊢ x' ≈ y'
-    x'≈y' = {!!}
-    a : P.D-ob i ⊢ (P.D-mor _ .⟦_⟧ x') ≈ y'
-    a = P.D-id {i} {x'} x'≈y'
-  D-comp : ∀ {i j k} → {!!}
-  D-comp = {!!}
+    u = F.F-resp P.D-id (F.F-ob (P.D-ob i) .refl)
+  D-comp : ∀ {i j k} → (p : i ≤ j) (q : j ≤ k)
+         → ≈.Hom≈ (D-mor (P.≤.trans p q)) (D-mor q ≈.∘ D-mor p)
+  D-comp {i} {j} {k} p q {x} {y} x≈y =
+    begin
+      ⟦ D-mor (P.≤.trans p q) ⟧ x
+        ≈⟨ D-ob _ .refl ⟩
+      ⟦ F.F-mor (P.D-mor (P.≤.trans p q)) ⟧ x
+        ≈⟨ F.F-resp (P.D-comp p q) (D-ob _ .refl) ⟩
+      ⟦ F.F-mor (P.D-mor q ≈.∘ P.D-mor p ) ⟧ x
+        ≈⟨ F.F-comp _ _ x≈y ⟩
+      ⟦ F.F-mor (P.D-mor q) ≈.∘ F.F-mor (P.D-mor p) ⟧ y
+        ≈⟨ D-ob _ .refl ⟩
+      ⟦ D-mor q ≈.∘ D-mor p ⟧ y ∎
+    where
+    open ≈.≈syntax {S = D-ob k}
+    open ≈.Setoid
+    open ≈.Hom
+    open import Equivalence
 
--- -- module _ (P : Diagram isPreorder B) (F : ≈.Functor) where
--- -- ϕ : Colim₀ {!F ≈.∘ P!}
+-- -- -- module _ (P : Diagram isPreorder B) (F : ≈.Functor) where
+-- -- -- ϕ : Colim₀ {!F ≈.∘ P!}
