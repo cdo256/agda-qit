@@ -11,6 +11,48 @@ This note describes a construction of infinitary mobiles as a quotient-inductive
 
 The key property of the index order $T_I$ is that it possesses a *definable supremum*: every family of elements indexed by $I$ has a canonical upper bound. This avoids the need for WISC (the Weakly Initial Set of Covers), which is typically required to ensure that polynomial functors preserve colimits in exact completions. Our construction is an instance where these general-purpose axioms are unnecessary.
 
+## Setoid Infrastructure
+
+Before presenting the construction, we establish the fundamental categorical infrastructure based on setoids.
+
+### Setoids
+
+A **setoid** $S = (|S|, {\approx_S})$ consists of a set $|S|$ equipped with an equivalence relation ${\approx_S}$ satisfying:
+
+- **Reflexivity**: $x \approx_S x$ for all $x \in |S|$
+- **Symmetry**: $x \approx_S y$ implies $y \approx_S x$ 
+- **Transitivity**: $x \approx_S y$ and $y \approx_S z$ implies $x \approx_S z$
+
+Setoids provide a foundation for working with quotient types while maintaining computational content.
+
+### Setoid Homomorphisms
+
+A **setoid homomorphism** $f: S \to T$ is a function $f: |S| \to |T|$ that respects the equivalence relations:
+
+$$x \approx_S y \implies f(x) \approx_T f(y)$$
+
+Setoid homomorphisms compose in the obvious way, and every setoid has an identity homomorphism.
+
+Two homomorphisms $f, g : S \to T$ are **homomorphically equivalent** if for all $x \approx_S y$, we have $f(x) \approx_T g(y)$. This yields an equivalence relation on the hom-sets, making setoids into a category **Setoid**.
+
+### Setoid Isomorphisms
+
+A **setoid isomorphism** $\phi: S \cong T$ consists of setoid homomorphisms $\phi: S \to T$ and $\phi^{-1}: T \to S$ such that:
+
+$$\phi^{-1} \circ \phi \approx \mathrm{id}_S \quad \text{and} \quad \phi \circ \phi^{-1} \approx \mathrm{id}_T$$
+
+where $\approx$ denotes homomorphic equivalence. Setoid isomorphism defines an equivalence relation on setoids.
+
+### Setoid Functors
+
+A **setoid functor** $F: \mathbf{Setoid} \to \mathbf{Setoid}$ assigns to each setoid $S$ a setoid $F(S)$, and to each homomorphism $f: S \to T$ a homomorphism $F(f): F(S) \to F(T)$, satisfying:
+
+- **Identity**: $F(\mathrm{id}_S) \approx \mathrm{id}_{F(S)}$
+- **Composition**: $F(g \circ f) \approx F(g) \circ F(f)$  
+- **Congruence**: $f \approx g$ implies $F(f) \approx F(g)$
+
+These conditions ensure that $F$ is a proper functor on the category of setoids.
+
 ## Raw infinitary trees and plumpness
 
 Fix a set $I$. Define the [[W Type]] of infinitary $I$-branching trees:
