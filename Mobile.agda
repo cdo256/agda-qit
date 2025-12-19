@@ -11,7 +11,7 @@ open import Setoid as ≈
 open import Function.Properties.Inverse 
 open import Data.Empty renaming (⊥-elim to absurd)
 open import Data.W
-open import Data.Container hiding (_⇒_; identity)
+open import Data.Container hiding (_⇒_; identity; refl; sym; trans)
 -- open import Relation.Binary.Structures
 
 private
@@ -83,15 +83,21 @@ module Mobile (B : Set) where
   open import Plump Branch
     renaming (_≺_ to _<_; ≺sup to <sup)
 
+
   data ⊥p : Prop where
   absurdp : {A : Prop} → ⊥p → A
   absurdp ()
+
+  ⊥→⊥p : ⊥ → ⊥p
+  ⊥→⊥p ()
 
   leaf≉node : ∀ {f g} → leaf {g} ≈ᵗ node f → ⊥p
   leaf≉node (≈trans {t = leaf} p q) = leaf≉node q
   leaf≉node (≈trans {t = node _} p q) = leaf≉node p
 
-  -- open import Relation.Binary.Core
+  l≢n : l ≡ n → ⊥p
+  l≢n ()
+
   leaf≤leaf : ∀ {f g} → leaf {f} ≤ leaf {g}
   leaf≤leaf = sup≤ (λ ())
   ≤-resp-≈ᵗ : ∀ {x y} → x ≈ᵗ y → x ≤ y
@@ -155,18 +161,130 @@ module Mobile (B : Set) where
        → ≈.Hom≈ (P (≤.trans p q)) (P q ≈.∘ P p)   
   Comp _ _ r = r
 
-  -- module MobileColim where
-  --   open import Colimit isPreorder-≤ B
-  --   D : Diagram
-  --   D = record
-  --     { D-ob = Sz
-  --     ; D-mor = P
-  --     ; D-id = λ {i} {x} {y} → Id {i} {x} {y}
-  --     ; D-comp = Comp }
+  module MobileColim where
+    open import Colimit ≤p
+    D : Diagram
+    D = record
+      { D-ob = Sz
+      ; D-mor = P
+      ; D-id = λ {i} {x} {y} → Id {i} {x} {y}
+      ; D-comp = Comp }
 
-  --   open Colim D
+    open Colim D
 
-  -- module MobileFunctor where
-  --   open import ContainerFunctor Branch using (F̃)
+  open MobileColim
+
+  module Cocontinuity where
+    open import Colimit ≤p
+    open Colim hiding (≈j)
+    open import ContainerFunctor Branch
+    open import Cocontinuity ≤p 
+
+    module F = ≈.Functor F̃
+    module D = Diagram D
+    open ≈.Hom
+    ϕ₀ : ⟨ Colim (F̃ ∘ D) ⟩ → ⟨ F.F-ob (Colim D) ⟩
+    ϕ₀ (i , (l , _)) = l , (λ ())
+    ϕ₀ (i , (n , f)) = n , (λ b → i , f b)
+
+    ψ₀ : ⟨ F.F-ob (Colim D) ⟩ → ⟨ Colim (F̃ ∘ D) ⟩
+    ψ₀ (l , _) = sup (l , (λ ())) , l , (λ ())
+    ψ₀ (n , f) = sup (n , g) , (n , h)
+      where
+      g : B → ⟨ MobileSetoid ⟩
+      g b = f b .proj₁
+      h : B → ⟨ D.D-ob (node g) ⟩
+      h b = sz (g b) gb<ng
+        where
+        gb<ng : g b < node g
+        gb<ng = <sup b (≤refl (g b))
+
+    -- colimExt : ∀ b → f b ≈[ i ] g b
+    -- colimExt = ∀ {t u : BTree} → t ≈ᵗ u → 
+
+    l≉ꟳn : ∀ {f g} → Ob._≈ꟳ_ (Colim D) (l , f) (n , g) → ⊥p
+    l≉ꟳn ∣ () ∣
+
+    ϕ-cong : ∀ {x y} → Colim (F̃ ∘ D) [ x ≈ y ]
+           → F.F-ob (Colim D) [ ϕ₀ x ≈ ϕ₀ y ]
+    -- ϕ-cong {i , s , f} {i , t , g} (≈lstage _ (Ob.mk≈ꟳ fst≡ snd≈)) = Ob.mk≈ꟳ {!!} {!!}
+    ϕ-cong {i , l , f} {i , l , g} (≈lstage _ (Ob.mk≈ꟳ fst≡ snd≈)) = Ob.mk≈ꟳ fst≡ λ ()
+    ϕ-cong {i , n , f} {i , l , g} (≈lstage _ (Ob.mk≈ꟳ fst≡ snd≈)) =
+      absurdp (l≢n (≡.sym fst≡))
+    ϕ-cong {i , l , f} {i , n , g} (≈lstage _ (Ob.mk≈ꟳ fst≡ snd≈)) =
+      absurdp (l≢n fst≡)
+    ϕ-cong {i , n , f} {i , n , g} (≈lstage _ (Ob.mk≈ꟳ fst≡ snd≈)) =
+      Ob.mk≈ꟳ ≡.refl λ b → ≈lstage i (u b)
+      where
+      open ≈.≈syntax {S = Colim D}
+      open Colim D using (≈j)
+      s : ∀ b → f b .Sz₀.u ≈ᵗ g b .Sz₀.u
+      s b = substp (λ ○ → f b .Sz₀.u ≈ᵗ g ○ .Sz₀.u) (subst-id fst≡ b) (snd≈ b)
+      u : ∀ b → f b ≈[ i ] g b
+      u b = s b
+    ϕ-cong {i , l , _} {j , l , _} (≈lstep p (l , _)) = F.F-id (Ob.mk≈ꟳ ≡.refl (λ ()))
+    ϕ-cong {i , n , f} {j , n , g} (≈lstep p (n , f)) =
+      Ob.mk≈ꟳ ≡.refl (λ q → ≈lstep p (f q))
+    ϕ-cong {i , l , f} {j , l , g} (≈lsym s≈t) = ϕ-cong s≈t
+    ϕ-cong {i , l , f} {j , n , g} (≈lsym s≈t) = absurdp (l≉ꟳn u)
+      where
+      u : (F.F-ob (Colim D) Setoid.≈ ϕ₀ (i , l , f)) (ϕ₀ (j , n , g))
+      u = (Setoid.sym (F.F-ob (Colim D)) (ϕ-cong s≈t))
+    ϕ-cong {i , n , f} {j , l , g} (≈lsym s≈t) = absurdp (l≉ꟳn (ϕ-cong s≈t))
+    ϕ-cong {i , n , f} {j , n , g} (≈lsym s≈t) = Ob.mk≈ꟳ ≡.refl (u v)
+      where
+      _≈'_ = _≈ˡ_ D
+      _≈F_ = _≈ˡ_ (F̃ ∘ D)
+      -- v : F.F-ob (Colim D) [ n , (λ b → j , g b) ≈ n , (λ b → i , f b) ]
+      v : (Ob._≈ꟳ_ (Colim D) (n , (λ b → j , g b)) (n , (λ b → i , f b)))
+      v = ϕ-cong s≈t
+      u : (Ob._≈ꟳ_ (Colim D) (n , (λ b → j , g b)) (n , (λ b → i , f b)))
+        → (b : B) → (i , f b) ≈' (j , g b)
+      u (mk≈ꟳ ≡.refl snd≈) b = ≈lsym (snd≈ b)
+    ϕ-cong {i , l , f} {k , l , h} (≈ltrans {t = j , t , g} s≈t t≈u)
+      with (ϕ-cong s≈t) | (ϕ-cong t≈u)
+    ... | mk≈ꟳ fst≡1 snd≈1 | mk≈ꟳ fst≡2 snd≈2 =
+      mk≈ꟳ w λ{ (lift ()) }
+      where
+      w : ϕ₀ (i , l , f) .proj₁ ≡ ϕ₀ (k , l , h) .proj₁
+      w = ≡.trans fst≡1 fst≡2
+    ϕ-cong {i , n , f} {k , l , h} (≈ltrans {t = j , t , g} s≈t t≈u)
+      with (ϕ-cong s≈t) | (ϕ-cong t≈u)
+    ... | mk≈ꟳ fst≡1 snd≈1 | mk≈ꟳ fst≡2 snd≈2 =
+      absurdp (l≢n (≡.sym (≡.trans fst≡1 fst≡2)))
+    ϕ-cong {i , l , f} {k , n , h} (≈ltrans {t = j , t , g} s≈t t≈u)
+      with (ϕ-cong s≈t) | (ϕ-cong t≈u)
+    ... | mk≈ꟳ fst≡1 snd≈1 | mk≈ꟳ fst≡2 snd≈2 =
+      absurdp (l≢n ((≡.trans fst≡1 fst≡2)))
+    ϕ-cong {i , n , f} {k , n , h} (≈ltrans {t = j , t , g} s≈t t≈u)
+      with (ϕ-cong s≈t) | (ϕ-cong t≈u)
+    ... | mk≈ꟳ fst≡1 snd≈1 | mk≈ꟳ fst≡2 snd≈2 =
+      mk≈ꟳ w v
+      where
+      w : ϕ₀ (i , n , f) .proj₁ ≡ ϕ₀ (k , n , h) .proj₁
+      w = ≡.trans fst≡1 fst≡2
+      Pos = Branch .Position
+      v : ∀ b → Colim D [ ϕ₀ (i , n , f) .proj₂ b
+                        ≈ ϕ₀ (k , n , h) .proj₂ (subst Pos w b) ]
+      v b = begin
+          ϕ₀ (i , n , f) .proj₂ b
+            ≈⟨ C.refl ⟩
+          (i , f b)
+            ≈⟨ ≈ltrans (snd≈1 b) (snd≈2 (subst Pos fst≡1 b)) ⟩
+          ϕ₀ (k , n , h) .proj₂ (subst Pos fst≡2 (subst Pos fst≡1 b))
+            ≈⟨ ≡→≈ (Colim D) (≡.cong (ϕ₀ (k , n , h) .proj₂) (≡.subst-subst fst≡1)) ⟩
+          ϕ₀ (k , n , h) .proj₂ (subst Pos (≡.trans fst≡1 fst≡2) b) ∎
+        where
+        module C = Setoid (Colim D)
+        open ≈.≈syntax {S = Colim D}
+    ϕ : ≈.Hom (Colim (F̃ ∘ D)) (F.F-ob (Colim D))
+    ϕ = record
+      { ⟦_⟧ = ϕ₀
+      ; cong = ϕ-cong }
 
     
+
+    cocontinuous : Cocontinuous F̃ D
+    cocontinuous = {!!}
+
+

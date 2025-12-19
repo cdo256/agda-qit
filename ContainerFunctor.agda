@@ -59,7 +59,7 @@ module Ob (S : Setoid l0 l0) where
       ; sym = isSymmetric
       ; trans = isTransitive } }
 
-open Ob using (F̃-ob)
+open Ob using (F̃-ob; _≈ꟳ_; mk≈ꟳ; mk≈ꟳ') public
 
 module Mor {S T : Setoid l0 l0} (f : ≈.Hom S T) where
   module S = ≈.Setoid S
@@ -75,7 +75,7 @@ module Mor {S T : Setoid l0 l0} (f : ≈.Hom S T) where
     ; cong = congh
     }
 
-open Mor using (F̃-mor)
+open Mor using (F̃-mor) public
 
 module Comp {S T U : Setoid l0 l0} (f : ≈.Hom S T) (g : ≈.Hom T U) where
   module S = ≈.Setoid S
@@ -88,7 +88,7 @@ module Comp {S T U : Setoid l0 l0} (f : ≈.Hom S T) (g : ≈.Hom T U) where
   F̃-comp (Ob.mk≈ꟳ fst≡ snd≈) =
     Ob.mk≈ꟳ fst≡ λ p → (≈.Hom.cong g) ((≈.Hom.cong f) (snd≈ p))
 
-open Comp using (F̃-comp)
+open Comp using (F̃-comp) public  
 
 module Resp
   {S T : Setoid l0 l0}
@@ -106,7 +106,7 @@ module Resp
   F̃-resp (Ob.mk≈ꟳ fst≡ snd≈) =
     Ob.mk≈ꟳ fst≡ λ p → f≈g (snd≈ p)
 
-open Resp using (F̃-resp)
+open Resp using (F̃-resp) public
 
 F̃ : ≈.Functor l0 l0
 F̃ = record

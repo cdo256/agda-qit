@@ -65,3 +65,7 @@ Preorder S ℓ'' = Σ (Rel≈ S ℓ'') (IsPreorder S)
   { Carrier = B
   ; _≈_ = _≡p_
   ; isEquivalence = isEquiv≡p B }
+
+≡→≈ : ∀ (A : Setoid ℓ ℓ') → {x y : ⟨ A ⟩} → x ≡ y → A [ x ≈ y ]
+≡→≈ A {x} p = substp (λ ○ → x ≈ ○) p refl
+  where open Setoid A

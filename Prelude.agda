@@ -52,5 +52,6 @@ open import Axiom.Extensionality.Propositional
 postulate
   funExt : ∀ {ℓ ℓ'} → Extensionality ℓ ℓ'
 
-
-
+subst-id : {A : Set} {P : A → Set} {x : A} (p : x ≡ x) (b : P x) 
+         → subst P p b ≡ b
+subst-id ≡.refl b = ≡.refl
