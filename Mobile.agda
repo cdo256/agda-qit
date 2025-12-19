@@ -2,11 +2,11 @@
 module Mobile where
 
 open import Prelude
+open import Equivalence
 open import Data.Product
 -- open import Function.Bundles
 open import Function.Definitions
-open import Relation.Binary.PropositionalEquality as ≡
-open import Axiom
+-- open import Relation.Binary.PropositionalEquality as ≡
 open import Setoid as ≈
 open import Function.Properties.Inverse 
 open import Data.Empty renaming (⊥-elim to absurd)
@@ -44,8 +44,8 @@ module Mobile (B : Set) where
     ≈leaf : ∀ {f g} → leaf {f} ≈ᵗ leaf {g}
     ≈node : ∀ {f g} → (c : ∀ b → f b ≈ᵗ g b)
           → node f ≈ᵗ node g
-    ≈perm : ∀ {f} → (π : SetoidIso Bˢ Bˢ)
-          → node f ≈ᵗ node λ b → f (π .SetoidIso.⟦_⟧ b)
+    ≈perm : ∀ {f} → (π : ≈.Iso Bˢ Bˢ)
+          → node f ≈ᵗ node λ b → f (≈.Iso.⟦_⟧ π b)
     ≈trans : ∀ {s t u} → s ≈ᵗ t → t ≈ᵗ u → s ≈ᵗ u
 
   ≈refl : ∀ {t} → t ≈ᵗ t
@@ -58,8 +58,8 @@ module Mobile (B : Set) where
   ≈sym (≈perm {f} π) =
     substp' A p x
     where
-    module π = SetoidIso π
-    π' = SetoidIsoFlip π
+    module π = ≈.Iso π
+    π' = ≈.IsoFlip π
     A : (B → B) → Prop l0
     A = λ h → node (λ b → f π.⟦ b ⟧) ≈ᵗ node λ b → f (h b)
     p : (λ b → π.⟦ π.⟦ b ⟧⁻¹ ⟧) ≡p (λ b → b)
@@ -103,13 +103,13 @@ module Mobile (B : Set) where
   ≤-resp-≈ᵗ {node f} {node g} (≈perm π) =
     sup≤ (λ b → <sup (π.⟦ b ⟧⁻¹) (u b))
     where
-    module π = SetoidIso π
+    module π = ≈.Iso π
     u : ∀ b → f b ≤ f (π.⟦ π.⟦ b ⟧⁻¹ ⟧) 
     u b = q p
       where
-      p : ∥ π.⟦ π.⟦ b ⟧⁻¹ ⟧ ≡ b ∥
+      p : π.⟦ π.⟦ b ⟧⁻¹ ⟧ ≡p b
       p = π.linv b
-      q : ∀ (p : ∥ π.⟦ π.⟦ b ⟧⁻¹ ⟧ ≡ b ∥) → f b ≤ f (π.⟦ π.⟦ b ⟧⁻¹ ⟧) 
+      q : ∀ (p : π.⟦ π.⟦ b ⟧⁻¹ ⟧ ≡p b) → f b ≤ f (π.⟦ π.⟦ b ⟧⁻¹ ⟧) 
       q ∣ p ∣ = substp (λ x → f b ≤ f x) (≡.sym p) (≤refl (f b))
   ≤-resp-≈ᵗ {node f} {node g} (≈trans {t = t} p q) =
     ≤≤ {i = node f} {j = t} {k = node g}
@@ -119,6 +119,9 @@ module Mobile (B : Set) where
   isPreorder-≤ = record
     { refl = ≤-resp-≈ᵗ
     ; trans = λ p q → ≤≤ q p }
+
+  ≤p : Preorder MobileSetoid _
+  ≤p = _≤_ , isPreorder-≤
 
   record Sz₀ (t : BTree) : Set l0 where
     constructor sz
@@ -135,7 +138,7 @@ module Mobile (B : Set) where
       ; sym = ≈sym
       ; trans = ≈trans } }
 
-  P : ∀ {t u} → u ≤ t → SetoidHom (Sz u) (Sz t)
+  P : ∀ {t u} → u ≤ t → ≈.Hom (Sz u) (Sz t)
   P {t} {u} u≤t = record
     { ⟦_⟧ = λ (sz s s<u) → sz s (≤< u≤t s<u)
     ; cong = λ s≈u → s≈u }
@@ -145,105 +148,25 @@ module Mobile (B : Set) where
   module ≤ = IsPreorder isPreorder-≤
 
   Id : ∀ {t : BTree}
-     → SetoidHom≈ (P (≤refl t)) idHom 
+     → ≈.Hom≈ (P (≤refl t)) ≈.idHom 
   Id p = p
 
   Comp : ∀{s t u} (p : s ≤ t) (q : t ≤ u)
-       → SetoidHom≈ (P (≤.trans p q)) (P q ∘ P p)   
+       → ≈.Hom≈ (P (≤.trans p q)) (P q ≈.∘ P p)   
   Comp _ _ r = r
 
-  module MobileColim where
-    open import Colimit isPreorder-≤ B
-    D : Diagram
-    D = record
-      { D-ob = Sz
-      ; D-mor = P
-      ; D-id = λ {i} {x} {y} → Id {i} {x} {y}
-      ; D-comp = Comp }
+  -- module MobileColim where
+  --   open import Colimit isPreorder-≤ B
+  --   D : Diagram
+  --   D = record
+  --     { D-ob = Sz
+  --     ; D-mor = P
+  --     ; D-id = λ {i} {x} {y} → Id {i} {x} {y}
+  --     ; D-comp = Comp }
 
-    open Colim D
+  --   open Colim D
 
-    module ContainerFunctor (C : Container l0 l0) where
-      module Ob (S : Setoid l0 l0) where
-        open Setoid S 
-        record _≈ꟳ_ (x y : ⟦ C ⟧ ⟨ S ⟩) : Prop l0 where
-          constructor mk≈ꟳ
-          field
-            fst≡ : x .proj₁ ≡ y .proj₁
-            snd≈ : ∀ p → (x .proj₂) p ≈ (y .proj₂) (subst (C .Position) fst≡ p)
+  -- module MobileFunctor where
+  --   open import ContainerFunctor Branch using (F̃)
 
-        isReflexive : Reflexive _≈ꟳ_
-        isReflexive = mk≈ꟳ ≡.refl (λ p → S .≈.refl)
-
-        isSymmetric : Symmetric _≈ꟳ_
-        isSymmetric {x} {y} (mk≈ꟳ fst≡ snd≈) =
-          mk≈ꟳ (≡.sym fst≡) λ p → S .≈.sym (snd≈⁻¹ p)
-          where
-          u : ∀ p → x .proj₂ (subst (C .Position) (≡.sym fst≡) p) ≈
-                    y .proj₂ (subst (C .Position) fst≡
-                             (subst (C .Position) (≡.sym fst≡) p))
-          u p = snd≈ (subst (C .Position) (≡.sym fst≡) p)
-          v : ∀ p → (subst (C .Position) fst≡ (subst (C .Position) (≡.sym fst≡) p))
-                  ≡ p
-          v p = subst-subst-sym fst≡
-          snd≈⁻¹ : ∀ p → x .proj₂ (subst (C .Position) (≡.sym fst≡) p) ≈ y .proj₂ p
-          snd≈⁻¹ p =
-            substp (λ ○ → x .proj₂ (subst (C .Position) (≡.sym fst≡) p) ≈ y .proj₂ ○)
-                   (v p) (snd≈ (subst (C .Position) (≡.sym fst≡) p))
-
-        isTransitive : Transitive _≈ꟳ_
-        isTransitive {x = x} {y} {z} (mk≈ꟳ fst≡1 snd≈1) (mk≈ꟳ fst≡2 snd≈2) =
-          mk≈ꟳ (≡.trans fst≡1 fst≡2) v
-          where
-          u : ∀ p → x .proj₂ p ≈ z .proj₂ (subst (C .Position) fst≡2 (subst (C .Position) fst≡1 p)) 
-          u p = S .≈.trans (snd≈1 p) (snd≈2 (subst (C .Position) fst≡1 p))
-          v : ∀ p → x .proj₂ p ≈ z .proj₂ (subst (C .Position) (≡.trans fst≡1 fst≡2) p) 
-          v p = substp (λ ○ → x .proj₂ p ≈ z .proj₂ ○) (subst-subst fst≡1) (u p)
-
-
-        F̃-ob : Setoid l0 l0 
-        F̃-ob = record
-          { Carrier = ⟦ C ⟧ ⟨ S ⟩
-          ; _≈_ = _≈ꟳ_
-          ; isEquivalence = record
-            { refl = isReflexive
-            ; sym = isSymmetric
-            ; trans = isTransitive } }
-
-      open Ob using (F̃-ob)
-
-      module Mor {S T : Setoid l0 l0} (f : SetoidHom S T) where
-        module S = Setoid S
-        module T = Setoid T
-        module f = SetoidHom f
-        ⟦_⟧h : ⟦ C ⟧ ⟨ S ⟩ → ⟦ C ⟧ ⟨ T ⟩
-        ⟦ s , g ⟧h = s , λ x → f.⟦ g x ⟧ 
-        congh : ∀ {x y} → (F̃-ob S Setoid.≈ x) y → (T Ob.≈ꟳ ⟦ x ⟧h) ⟦ y ⟧h
-        congh (Ob.mk≈ꟳ fst≡ snd≈) = Ob.mk≈ꟳ fst≡ (λ p → f.cong (snd≈ p))
-        F̃-mor : SetoidHom (F̃-ob S) (F̃-ob T)
-        F̃-mor = record
-          { ⟦_⟧ = ⟦_⟧h
-          ; cong = congh
-          }
-
-      open Mor using (F̃-mor)
-
-      module Comp {S T U : Setoid l0 l0} (f : SetoidHom S T) (g : SetoidHom T U) where
-        module S = Setoid S
-        module T = Setoid T
-        module U = Setoid U
-        module f = SetoidHom f
-        module g = SetoidHom g
-
-        F̃-comp : SetoidHom≈ (F̃-mor (g ∘ f)) (F̃-mor g ∘ F̃-mor f)
-        F̃-comp (Ob.mk≈ꟳ fst≡ snd≈) =
-          Ob.mk≈ꟳ fst≡ λ p → g.cong (f.cong (snd≈ p))
-
-      open Comp using (F̃-comp)
-      
-      F̃ : SetoidFunctor
-      F̃ = record
-        { F-ob = F̃-ob
-        ; F-mor = F̃-mor
-        ; F-id = λ p → p
-        ; F-comp = F̃-comp }
+    

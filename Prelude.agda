@@ -2,8 +2,9 @@ module Prelude where
 
 open import Level public using (Level; _⊔_; Lift; lift)
   renaming (suc to lsuc; zero to lzero)
-open import Relation.Binary.PropositionalEquality using (_≡_) public
-open import Axiom public
+import Relation.Binary.PropositionalEquality 
+module ≡ = Relation.Binary.PropositionalEquality 
+open ≡ public using (_≡_; subst) public
 
 private
   variable
@@ -45,3 +46,11 @@ substp' B ∣ _≡_.refl ∣ x = x
 postulate
   -- Cannot be proven from funExt
   funExtp : ∀ {ℓ ℓ'} → {A : Set ℓ} {B : Set ℓ'} {f g : A → B} → (∀ x → f x ≡p g x) → f ≡p g
+
+open import Axiom.Extensionality.Propositional
+
+postulate
+  funExt : ∀ {ℓ ℓ'} → Extensionality ℓ ℓ'
+
+
+
