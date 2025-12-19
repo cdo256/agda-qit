@@ -1,0 +1,75 @@
+\documentclass[4pt,a4paper]{report}
+\input{latex/preamble.tex}
+
+\title{Toward a Formalization of 'Virtual Sets'}
+\author{Christina O'Donnell\, \\
+  School of Computer Science, University of Nottingham}
+\date{September 2025}
+\begin{document}
+
+\maketitle
+
+\section*{Acknowledgements}
+I would like to thank Thorsten Altenkirch
+for helping direct this project and for his invaluable feedback. I
+also must thank Mark Williams for sharing his idea with me that
+motivated dissertation.
+
+\section*{Delcaration}
+Submitted 21st September 2025, in partial fulfilment of the condiations for the award of the degree of MSc (Computer Science).
+
+\begin{abstract}
+  This dissertation investigates the categorical structure underlying
+  the monoidal category of finite sets and injective functions, with
+  the goal of understanding whether it admits a well-defined trace
+  operator. A trace is a categorical generalization of feedback
+  structures such as recursion, or feedback, introduced by Joyal
+  et. al. (1996), traces can be applied to perform the role of
+  recursion in categorical semantics of programming langauges, and the
+  role of feedback in quantum computing. Mark Williams (2025) recently
+  conjectured that the category of finite sets and injective functions
+  may have a sufficient trace operator, however the construction has
+  yet to be formally verified.
+
+  The notion of 'virtual set', introduced by Williams (2025) is a set
+  that can contain 'negative elements', satisfying the condition for a
+  compact closed category. This construction amounts to taking a
+  quotient of $\mathrm{Inj}^2$, and then proving coherence of the
+  result, as spelled out in Joyal et. al. (1996). The difficulty is to
+  prove all of the coherence lemmas required to show it has monoidal,
+  and trace structure, which is independent of equivalent pairs of
+  functions. Such a structure is of interest in simplicial
+  type theory, where all inclusion map between simplicial complexes
+  must necessarily be injective.
+
+  This dissertation proceeds by developing the category \textrm{Inj}
+  of finite sets and injective functions, constructing a composition
+  operator and proving associativity and unit laws. A tensor product
+  is then defined as well as a partial proof of the monoidal laws.
+  We then define a trace operator and prove some of the required
+  properties about its behavior. Finally, the \textrm{Int}
+  construction is discussed.
+
+  All definitions and proofs are implemented in cubical Agda, making
+  this one of the first attempts to formalize the notion of traced
+  monoidal categories. We discuss my two main approaches at
+  formalizing the monoidal category of injective functions, and
+  constructing the tensor operator, and trace, as well as proving some
+  of the properties about it. \\
+  \textbf{Keywords}: Trace Monoidal Categories, Compact Closed Categories, Cubical Agda 
+\end{abstract}
+\tableofcontents
+\listoffigures
+
+\include{latex/chapters/introduction}
+\include{latex/chapters/prelim}
+\include{latex/chapters/lit-review}
+\include{latex/chapters/formalization}
+\include{latex/chapters/conclusion}
+
+\appendix
+\chapter{References}
+\bibliographystyle{plain}
+\bibliography{latex/report}
+\chapter{Agda Source Listings}
+\end{document}

@@ -1,0 +1,352 @@
+\chapter{Introduction} \label{introduction}
+\section{Motivation and Scope}
+The motivation for this project is mainly exploritory. It was observed
+by a preprint by Mark Williams (2025) \cite{williams2025-vsets} that the
+category of finite sets and injective function (\textrm{Inj}) admits a
+trace operator, as introduced in Joyal-Steet-Verity
+(1996)\cite{joyal1996-traced-monoidal-categories} . A trace operator
+acts like a subtraction on morphisms, and in the case of finite sets,
+it literally removes elements from the map, decreasing the size of the
+domain and codomain by the same amount.
+
+The intuition is then that if we have a tensor that acts as an
+addition, and a trace acting as a subtract operator, then can we
+construct an extension that is closed under traced using these
+operations? To put another way, can we construct a category in
+which every map has an inverse. It was proven by Joyal
+et. al. (1996) \cite{joyal1996-traced-monoidal-categories} that a
+category with a trace satisfying certain coherence conditions in
+section \ref{traced-monoidal-categories} can
+be used to construct a category closed under trace, called a compact
+closed category, in which the original category forms a
+sub-category. In other words, it forms an extension to the original
+category, that is closed under trace.
+
+Although traced monoidal categories have been expressed in the Agda
+categories library\cite{agda-categories} the \textrm{Int}-construction (as
+defined in Joyal et. al. 1996 \cite{joyal1996-traced-monoidal-categories})
+has not been formalized to date in any major proof assistant
+(Agda\cite{vezzosi2021-cubical-agda-dependently},
+Coq\cite{team2021-coq-proof-assistant},
+Isabell/HOL\cite{nipkow2002-isabelle}, LEAN
+Mathlib\cite{mathlib2020}). The original plan was to implement it
+here, however it was found after some time developing this, that the
+process was more complex that initially expected.
+
+\section{Informal Problem Statement}
+At a high level, this dissertation investigates whether an injective
+function on finite sets can be operated on by a certain 'trace'
+operator, satisfies the Joyal-Street-Verity axioms
+\cite{joyal1996-traced-monoidal-categories} for a traced monoidal
+category, and hence a compact closed category, using the
+Int-construction.
+
+\section{Research Objectives}
+
+The aim of this project is to build a up a definition of the category of 'virtual
+sets' by constructing a category of injective functions, defining a tensor and
+trace opoerator, and proving that the coherence conditions hold, and finally to
+use the \textrm{Int}-construction to build a compact closed category, which is a
+symmetric monoidal category in which every object has a dual.
+
+We list seven objectives, each of which building of the previous objective: 
+
+\begin{objective}[Define the 'precategory' \textrm{Inj}] \label{obj:precategory}
+  Build the precategory \cite{maclane1998-categories-book} \textrm{Inj}:
+  \begin{itemize}
+  \item[\textbf{objects}] Define the type finite sets
+  \item[\textbf{morphism}] Formally define injective functions
+  \item[\textbf{identity}] Define an identity $\mathit{id}\ :\ A \to A$ morphism for every object.
+  \item[\textbf{composition}] Define a composition operator $\circ$ on morphisms:
+    $$
+    g \circ f \text{ is an arrow from $A$ to $C$ where } f : A \to B \text{ and } g : B \to C
+    $$
+  \end{itemize}
+\end{objective}
+\begin{objective}[Show that \textrm{Inj} forms a (full) category] \label{obj:category}
+  Show that the precategory defined in objective \ref{obj:precategory} forms a
+  (full) category \cite{awodey2010-category-theory-book}. This requires the following:
+  \begin{itemize}
+  \item[\textbf{associativity}] show that for suitable morphism types $f,g,h$ that both ways of composing results in the same morphism:
+    $$
+    h \circ (g \circ f) = (h \circ g) \circ f
+    $$
+    \begin{align*}
+      \text{where } & f : A \to B
+      & g : B \to C
+      & h : C \to D
+      & A, B, C, D \text{ objects}
+    \end{align*}
+  \item[\textbf{unit}]
+    \begin{align*}
+    \mathit{id} \circ f = f \text{ and,}\\ 
+    f \circ \mathit{id} = f
+    \end{align*}
+    \begin{align*}
+      \text{where } & f : A \to B
+    \end{align*}
+  \end{itemize}
+
+  Build the category \textrm{Inj}, with a suitable composition function $\circ$ and
+  identity element $\mathrm{id}$. Construct a proof of associativity of and
+  left and right unitor laws (cf. common texts include MacLane 1998 and Awodey
+  2010 \cite{maclane1998-categories-book,awodey2010-category-theory-book}).
+  Finally show that the type \textit{Inj} is set-like in the homotopy sense (see definition \ref{def:set}).
+\end{objective}
+\begin{objective}[Define a tensor operator] \label{obj:tensor}
+  Define a tensor operator $\oplus$ and unit $𝟘$ on \textrm{Inj}.
+  That is a *bifunctor* $F$ from $\textrm{Inj}^2$ to \textrm{Inj} (see definition \ref{def:functor}) and an object selected to act as the unit.
+  It must be checked that the functor $F$ preserve the following operations:
+  \begin{itemize}
+  \item[\textbf{dom/cod}] Given a morphisms $f$, then, \\
+    the domain $\mathrm{dom}(F f) = F \mathrm{dom f}$, and \\
+    the codomain $\mathrm{cod}(F f) = F \mathrm{cod f}$. \\
+    (NB. This is handled by the type system in Agda.)
+  \item[\textbf{identity}] A functor must map identity arrows to identity arrows.
+  \item[\textbf{composition}] $F$ applied to the composition $g \circ f$ is equal to $F g \circ F f$ for arrows $f,g$.
+  \end{itemize}
+\end{objective}
+\begin{objective}[Construct a (weak) Monoidal Category] \label{obj:monoidal}
+  Show that the tensor product defined above forms a monoidal
+  category. This required the following natural isomorphisms:
+  \begin{itemize}
+  \item[\textbf{associator}] $\alpha_{A,B,C} : A \oplus (B \oplus C) \cong (A \oplus B) \oplus C$.
+  \item[\textbf{left-unitor}] $\eta_{A} : 𝟘 \oplus A = A$
+  \item[\textbf{right-unitor}] $\rho_{A} : A \oplus 𝟘 = A$
+  \end{itemize}
+  Then show that the following two coherence laws hold: \\  
+  \begin{itemize}
+  \item[\textbf{'triangle' law}] when there are two ways to use
+    unitors to to cancel the unit, then the two resulting morphisms
+    are equal.
+  \item[\textbf{'pentagon' law}] When there are two different ways to
+    convert between $(A \oplus (B \oplus C)) \oplus$ and
+    $(A \oplus B) \oplus (C \oplus D)$, using the associator $\alpha$,
+    then these arrows must be equivalent.
+  \end{itemize}
+Aside: It turns out that these two laws are sufficient to say that if there
+is any way to convert from one object to another using just the
+unitors, and associators, then it must be unique. (Mac
+Lane 1998 \cite{maclane1998-categories-book} in Ch VII § 2.)
+\end{objective}
+\begin{objective}[Define a trace operator on \texttt{Inj}]
+  Define a function $Tr_X : ((A \oplus X) ↣ (B \oplus X)) \to (A ↣ B)$. See definition \ref{def:trace}.
+\end{objective}
+\begin{objective}[Check trace coherence laws]
+  \label{obj:trace-coherence}
+  The following laws must hold:
+  \begin{itemize}
+    \item[tightening] See axiom \ref{axiom:tightening}.
+    \item[sliding] See axiom \ref{axiom:sliding}.
+    \item[vanishing] See axiom \ref{axiom:vanishing}.
+    \item[superimposing] See axiom \ref{axiom:superimposing}.
+  \end{itemize}
+\end{objective}
+\begin{objective}[Implement \textrm{Int}-construction]
+  \label{obj:int-construction}
+  Implement the construcion of a compact closed
+  category\cite{day1977-note-compact-closed} from a traced monoidal
+  category. This involves reproducing the results from Joyal
+  et. al. 1996 \cite{joyal1996-traced-monoidal-categories}.
+\end{objective}
+
+\begin{figure}[h]
+  \centering
+    \begin{tikzcd}
+      (A \oplus 𝟘) \oplus B \arrow[rr, "\alpha_{A,𝟘,B}"] \arrow[dr, "\lambda_A \oplus \mathit{id}_B"'] & &
+      A \oplus (𝟘 \oplus B) \arrow[dl, "\mathit{id}_A \oplus \rho_B"] \\
+      & A \oplus B &
+    \end{tikzcd}
+  \caption{The triangle coherence law for a monoidal category (\(\mathcal{C}, \oplus, 𝟘\)).} \cite{awodey2010-category-theory-book,egbert1998-coherence-theorem}
+  \label{fig:monoidal-triangle}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+    \begin{tikzcd}[column sep=small]
+      & ((A \oplus B) \oplus C) \oplus D \arrow[dr, "\alpha_{A\oplus B, C, D}"] \\
+      (A \oplus (B \oplus C)) \oplus D \arrow[ur, "\alpha_{A, B, C} \oplus \mathit{id}_D"] \arrow[d, "\alpha_{A, B\oplus C, D}"'] 
+      && (A \oplus B) \oplus (C \oplus D) \\
+      A \oplus ((B \oplus C) \oplus D) \arrow[rr, "\mathit{id}_A \oplus \alpha_{B, C, D}"'] 
+      && A \oplus (B \oplus (C \oplus D)) \arrow[u, "\alpha_{A, B, C\oplus D}"']
+    \end{tikzcd}
+  \caption{The pentagon coherence law for a monoidal category (\(\mathcal{C}, \oplus, 𝟘\)). \cite{awodey2010-category-theory-book,egbert1998-coherence-theorem}}
+  \label{fig:monoidal-pentagon}
+\end{figure}
+
+\section{Structure of the Dissertation}
+
+We begin this dissertation by defining some category-theoretic
+definitions we will be relying on in chapter \ref{prelim}. In chapter \ref{lit-review},
+we perform a brief literature review of traced monoidal categories. In
+chapter \ref{formalization}, we build up the formalization of
+injective functions up to defining a trace operator. 
+Following on from there, in  we construct the formalization of the
+structures in two streams, each starting from the defintion and
+properties on finite sets, building up to category theoretic
+definitions. The first stream builds injective functions as a
+dependent sum of a function and a proof that function is injective,
+and the second stream defines functions inductively, which are
+injective by construction. Finally, in chapter \ref{conclusion} we
+list the results, discuss further work, and limitations of this
+formalization effort.
+
+\section{Methodology}
+
+The majority of this work was carried out in a single Git
+\cite{chacon2014-git} repository hosted on 
+\href{https://github.com/cdo256/virtualsets}{GitHub}
+\cite{odonnell2025-virtual-sets}. Is is implemented in cubical Agda
+\cite{vezzosi2021-cubical-agda-dependently} using the cubical Agda
+standard library \cite{cubical-agda-lib}. Originally I started working
+in the Agda standard library \cite{agda-stdlib} however it was
+suggested by Thorsten that I should switch to a cubical library, to
+avoid "setoid hell" (cf. Altenkirch 2017
+\cite{altenkirch2017-setoid-hell}, more generally, Allais et. al 2025
+\cite{allais2025-frex}), suggesting 1Lab library \cite{1lab}. I
+moved my definitions over to 1Lab but there were some akward
+definitions, which were slowing me down. Most notably the definition
+of finite sets (\texttt{Fin}), which used a quotient (truncation) type
+\cite{huber2017-cubical-canonicity,doorn2016-hit-truncation}. I eventially
+settled on the standard cubical library \cite{cubical-agda-lib}.
+
+The work is fully reproducible for its Git repository
+\cite{odonnell2025-virtual-sets}, using Nix flakes \cite{nix-flakes},
+and include all of depdencies all of the lemmas I have completed. It
+even include the list of dependencies and python script for building
+the report. The code is structured modularly and designed
+intentionally for ease of further development.
+
+The layout of the repository is as follows:
+
+\dirtree{%
+.1 build.py.
+.1 flake.lock.
+.1 flake.nix.
+.1 justfile.
+.1 latex.
+.2     agda.sty.
+.2     chapters.
+.3         conclusion.tex.
+.3         formalization.tex.
+.3         introduction.tex.
+.3         lit-reivew.tex.
+.3         prelim.tex.
+.2     main.tex.
+.2     preamble.tex.
+.2     report.bib.
+.1 libraries.
+.1 nix.
+.2     args.nix.
+.2     packages.nix.
+.2     shells.nix.
+.1 postprocess-latex.pl.
+.1 src.
+.2     Compat.
+.3         1Lab.
+.3         1Lab.agda.
+.2     Dissertation.
+.2     DissertationTex.
+.2     Notes.
+.2     VSet.
+.3         All.agda.
+.3         Cat.
+.4             Inj.agda.
+.4             InjFun.agda.
+.4             Trace.agda.
+.3         Data.
+.4             Fin.
+.4             Fin.agda.
+.4             HITTree.
+.4             Inj.
+.4             InjFun.
+.4             Maybe.agda.
+.4             Nat.
+.4             Nat.agda.
+.4             NatPlus.
+.4             Sum.
+.4             SumTree.
+.4             Tree.
+.4             VecFun.
+.3         Function.
+.4             Base.agda.
+.4             Injection.agda.
+.4             Iso.agda.
+.4             Properties.agda.
+.3         Path.agda.
+.3         Prelude.agda.
+.3         Relation.
+.4             Definitions.agda.
+.4             WellFounded.
+.3         Transform.
+.4             Inj.
+.5                 Compose.
+.5                 Elementary.
+.5                 Inverse.
+.5                 Tensor.
+.5                 Trace.
+.4             InjFun.
+.5                 Compose.agda.
+.5                 Flattern.agda.
+.5                 Inflate.agda.
+.5                 Pred.agda.
+.5                 Properties.agda.
+.5                 Sub.agda.
+.5                 Tensor.agda.
+.5                 Unused.agda.
+.1 virtual-set.agda-lib.
+}
+
+There are 3 main top-level directories for different
+purposes:
+
+\texttt{./latex/} defines the parts of this dissertation
+that are written in \textit{TeX} or an ajacent language, such as
+\textit{BibTeX}. These are assembled by `./build.py` with the sections
+of the dissertation written in literate Agda (with markdown), to
+produce the final PDF file. Everything in \texttt{./src/Dissertation/}
+is converted into TeX with Pandoc, in order to process the embedded
+TeX commands, then Agda type checks the file, before adding syntax
+hylighting and references before inserting it into
+\texttt{./latex/generated/}, where it in turn is referred to by
+\texttt{./latex/chapters/formalization.tex}. This circuitous route was
+required as to date, Agda does not currently have a markdown-to-latex
+backed.
+
+\texttt{./nix/} together with \texttt{./flake.nix} and
+\texttt{./flake.lock}.
+
+Finally all of the Agda source is contained in \texttt{./src}. Compat
+contains functions that allow the use the functions of other
+libraries, such as 1Lab. These are not source I have developed myself,
+but they are functions copied into the repo to enable use of certain
+functions from other libraries. Normally libraries can't be mixed,
+because it can result in mismatch of primitive definitions, meaning
+you have to convert between these definitions manually every time you
+want to use a function from a foreign
+library. \texttt{./src/Dissertation/} and
+\texttt{./src/DissertationTex/} contins the files to generate the
+formalization chapter.
+
+The bulk of the source is in \texttt{./src/VSet/}:
+
+\begin{itemize}
+  \item[\texttt{./src/VSet/All.agda}] is a list of all files to type
+    check to ensure the repository is still valid. I run this
+    regularly to ensure I haven't broken anything.
+  \item[\texttt{./src/VSet/Cat/}]: This contains category definitions
+    and category constructions. Inj.agda and InjFun.agda are the two
+    category constructions for the two ways to define injective maps
+    explored in this work.
+  \item[\texttt{./src/VSet/Data/}]: This directory contains various
+    definitions and properties of Data types. Most properties of data
+    types are defined here, except the main development for Inj and
+    InjFun is performed inside \texttt{./src/VSet/Transform}.
+  \item[\texttt{./src/VSet/Function.agda}, and \texttt{./src/VSet/Path.agda}] define basic properties of functions and paths, for use elsewhere.
+  \item[\texttt{./src/VSet/Relation/}] defines basic properties of functions and paths, for use elsewhere.
+  \item[\texttt{./src/VSet/Transform/}] defiens transformations of
+    injective functions, such as inserting/removing links up to
+    describing a trace function. This is where the majority of the
+    development is situated.
+\end{itemize}
+  

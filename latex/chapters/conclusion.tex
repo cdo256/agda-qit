@@ -1,0 +1,64 @@
+\chapter{Conclusion}\label{conclusion}
+
+\section{Results}
+This dissertation formalizes two category constructions of the
+category of finite sets and injective funcitons, providing two
+foundations for further development.
+
+\begin{itemize}
+  \item We defined two encodings of injective functions:
+    \texttt{InjFun}, defined using a dependent sum; and \texttt{Inj},
+    defined inductively.
+  \item We proved they both form a category
+  \item We defined a tensor product for both of these.
+  \item We sketched a construction of the monoid laws.
+  \item We define a trace operator.
+  \item We prove some basic properties (omitted from this report due to time).
+\end{itemize}
+
+All definitions were formalized in Cubical Agda, and most of the
+lemmas proven were formalized, though there are still significant
+holes which require further work to complete.
+
+\section{Discussion}
+The central research question (objective \ref{obj:trace-coherence},
+and \ref{obj:int-construction}: whether the category \textbf{Inj}
+admits a trace satisfying the JSV axioms, which form the foundations
+for a full treatment of the \textbf{Int}-construction for compact
+closed completionremains only partially answered here. In practice,
+the proof burden fell on a long tail of elementary lemmas about finite
+sets, sums, and path manipulations. Midway through, I pivoted from the
+dependent-sum encoding to an inductive encoding in the hope of
+simplifying coherence proofs; however, both approaches incurred
+distinct overheads (transport management vs.\ structural bureaucracy),
+and neither reached a full monoidal (let alone traced) package within
+the project time-frame.
+
+This project turned out to be much more challenging than initially
+anticipated. Neither of my approaches gave a simple way to go about
+the formalization of the result that injective maps on finite sets
+form a traced monoidal category. Progress was limited by the large
+amount of lemmas and sub-lemmas that need to be completed. After
+feeling like the progress had slowed with the depdent sum half-way
+though the project, I thought that starting again with an inductive
+approach would be significantly simpler. It turns out this assessment
+was wrong and both approaches had significant limitations that I was
+unable to overcome to complete the construction of even a symmetric
+monidal category let alone a traced monoidal category.
+
+If I was doing this project again, I would shrink the scope
+significantly and commit to a single representation for the duration
+of the project. This would have been better for either approach if I'd
+stuck with it and proven the monoidal axioms before attempting traced
+monoidal categories and implementing the \textrm{Int}-construction
+\cite{joyal1996-traced-monoidal-categories}.
+
+Additionally I noticed that I hadn't allocated enough time to do the
+report justice, and I started it too late. I wasn't able to finish
+writing up the formalization of the tensor product on `Inj`, because I
+spent too much time trying to make progress on the code, to have
+something impressive to show at the end.
+
+The project was very engaging, and I would be very interested in
+trying to complete the construction after I have submitted this
+dissertation.

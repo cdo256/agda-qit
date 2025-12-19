@@ -1,0 +1,242 @@
+\documentclass[aspectratio=169,16pt]{beamer}
+\input{latex/slides/preamble.tex}
+
+\title{Toward a Formalization of 'Virtual Sets'}
+\author{Christina O'Donnell\\ Under supervision of Thorsten Altenkirch}
+\subtitle{School of Computer Science, University of Nottingham}
+\date{September 2025}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Overview}
+  The aim of this project was to formally construct a structure called
+  a 'Traced Monoidal Category' around the notion of injective
+  functions on finite sets. And implementing the \textrm{Int}
+  construction to explore a notion of 'negative sets'.
+
+\begin{center}
+  \begin{tikzpicture}[thickedge, node distance=7mm]
+    \dotrow{3}{b}{above}
+    \begin{scope}[yshift=-2cm]
+      \dotrow{2}{a}{below}
+    \end{scope}
+    \draw[midarrow] (a0) -- (b2);
+    \draw[midarrow] (a1) -- (b0);
+    \draw[midarrow] (a2) -- (b3);
+    \draw[midarrow] (0,0)
+      arc [start angle=0, end angle=180, radius=5mm]
+      -- (-1,-2)
+      arc [start angle=180, end angle=360, radius=5mm];
+  \end{tikzpicture}%
+  \captionof{figure}{$(2\ 0\ 3)$}
+\end{center}
+\end{frame}
+
+\begin{frame}{Objectives}
+  \begin{itemize}
+  \item Construct the category of finite sets and injective in Agda
+  \item $(\oplus)$ Define a tensor produt and prove coherence
+  \item $(\ominus)$ Define a trace operation and prove coherence
+  \item Formalize the \textbf{Int}-construction to produce virutal sets
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Methodology}
+  \begin{itemize}
+    \item Written in Cubical Agda, a proof assistant and
+      implementation of homotopy type theory.
+    \item Two different representations of injective functions were
+      used: depdendent sum representation, and inductive representation.
+    \item Work was performed between June and September, and involved
+      the production of 5.6k SLoC accross 74 files with 340
+      definitions.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Category Construction}
+  \begin{itemize}
+    \item A category is an abstract structure with many examples.
+    \item Many examples come from algebraic objects and
+      structure preserving maps called \textit{morphisms}.
+    \item We use the following mapping:
+    \begin{itemize}
+    \item \textbf{objects} are natural numbers ($\mathbb{N}$) representing each
+      finite set size.
+    \item \textbf{morphisms} are injective maps between finite sets, defined
+      inductively.
+    \item \textbf{composition} comes from joining two function graphs in a way
+      that preserves application.
+    \item \textbf{identity} is just the graph that maps all elements to themselves.
+    \item \textbf{associativity} and \textbf{left/right-unit} laws also hold.
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Tensor Product ($\oplus$)}
+  Components of the tensor product:
+  \begin{itemize}
+  \item object level: arithmetic +
+  \item morphism level: split \to apply \to join (see next slide)
+  \item unit object: $𝟘 = 0$
+  \item preserves identity: $\mathit{id} \oplus \mathit{id} = \mathit{id}$
+  \item preserves composition: $(f \circ f') \oplus (g \circ g') = (f \oplus g) \circ (f' \oplus g')$
+  \item associator: $\alpha_{A,B,C} : A \oplus (B \oplus C) \cong (A \oplus B) \oplus C$. 
+  \item left-unitor: $\eta_{A} : 𝟘 \oplus A = A$
+  \item right-unitor: $\rho_{A} : A \oplus 𝟘 = A$
+  \item coherence laws: Show result of composition is indepdendent of order
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Tensor Product ($\oplus$): Example}
+\begin{center}
+\begin{tikzpicture}[rectangle, thickedge, node distance=7mm]
+  \begin{scope}[shift={(-0.5, -1)}]
+    \dotrow{6}{f}{above}
+  \end{scope}
+  \begin{scope}[shift={(-1, -2)}]
+    \dotrow{2}{d}{right}
+  \end{scope}
+  \begin{scope}[shift={(2.5, -2)}]
+    \dotrow{3}{e}{right}
+  \end{scope}
+  \begin{scope}[shift={(-0.5, -4)}]
+    \dotrow{1}{b}{right}
+  \end{scope}
+  \begin{scope}[shift={(2.5, -4)}]
+    \dotrow{3}{c}{right}
+  \end{scope}
+  \begin{scope}[shift={(0, -5)}]
+    \dotrow{5}{a}{below}
+  \end{scope}
+  \draw (a0) -- (b0);
+  \draw (a1) -- (b1);
+  \draw (a2) -- (c0);
+  \draw (a3) -- (c1);
+  \draw (a4) -- (c2);
+  \draw (a5) -- (c3);
+  \draw[color=green] (b0) -- (d2);
+  \draw[color=green] (b1) -- (d0);
+  \draw[color=blue] (c0) -- (e3);
+  \draw[color=blue] (c1) -- (e1);
+  \draw[color=blue] (c2) -- (e0);
+  \draw[color=blue] (c3) -- (e2);
+  \draw (d0) -- (f0);
+  \draw (d1) -- (f1);
+  \draw (d2) -- (f2);
+  \draw (e0) -- (f3);
+  \draw (e1) -- (f4);
+  \draw (e2) -- (f5);
+  \draw (e3) -- (f6);
+\end{tikzpicture}
+\captionof{figure}{$(2\ 0) \oplus (3\ 1 \ 0\ 2) = (2\ 0\ 6\ 4\ 3\ 5)$}
+\end{center}
+\end{frame}
+
+\begin{frame}{Trace ($\ominus$): By example}
+  \Large We will construct $\mathrm{tr}_1((2\ 0\ 3)$: \\
+  \centering
+  \resizebox{0.5\linewidth}{!}{\TraceStepZero}
+\end{frame}
+
+\begin{frame}{Trace ($\ominus$): Example: Step 1 Add Loop}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.48\textwidth}
+  \centering
+  \resizebox{0.5\linewidth}{!}{\TraceStepZero}
+
+  \column{0.04\textwidth}
+  \centering \Large $\Longrightarrow$
+
+  \column{0.48\textwidth}
+  \centering
+  \resizebox{0.5\linewidth}{!}{\TraceStepOne}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Trace ($\ominus$): Example: Step 2 Shift indices}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.48\textwidth}
+  \centering
+  \resizebox{0.5\linewidth}{!}{\TraceStepOne}
+
+  \column{0.04\textwidth}
+  \centering \Large $\Longrightarrow$
+
+  \column{0.48\textwidth}
+  \centering
+  \resizebox{0.5\linewidth}{!}{\TraceStepTwo}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Trace ($\ominus$): Example: Step 3 Join directly}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.48\textwidth}
+  \centering
+  \resizebox{0.5\linewidth}{!}{\TraceStepTwo}
+
+  \column{0.04\textwidth}
+  \centering \Large $\Longrightarrow$
+
+  \column{0.48\textwidth}
+  \centering
+  \resizebox{0.3\linewidth}{!}{\TraceStepThree}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Trace ($\ominus$): Definition (part 2)}
+  Let $f : [X + A \rightarrowtail X + B]$ \\
+  Then $f \ominus X : [ A \rightarrowtail B ]$,
+  Such that the following properties are satisfied:
+  \begin{itemize}
+  \item Vanishing
+  \\~\\~\\~\\~\\~\\
+  \item Superimposing
+  \\~\\~\\~\\~\\~\\
+  \end{itemize} $\qquad (\forall A,B,X : \mathbb{N})$
+\end{frame}
+
+\begin{frame}{Trace ($\ominus$): Definition (part 3)}
+  Let $f : [X + A \rightarrowtail X + B]$ \\
+  Then $f \ominus X : [ A \rightarrowtail B ]$,
+  Such that the following properties are satisfied:
+  \begin{itemize}
+  \item Tightening
+  \\~\\~\\~\\~\\~\\
+  \item Sliding
+  \\~\\~\\~\\~\\~\\
+  \end{itemize} $\qquad (\forall A,B,X : \mathbb{N})$
+\end{frame}
+
+\begin{frame}{Results}
+  \large
+  \begin{itemize}
+  \item Constructed the category of injective functions \textrm{Inj}.
+  \item Defined a tensor product, showing that it preserves identity
+    and composition
+  \item Defined a trace operation
+  \item Proven 'vanishing' on the trace.
+  \item Partial construciton of monoidal category
+  \item Partial proof of superimposing axiom
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Future Work}
+  \Large
+  \begin{itemize}
+    \item Finish completion of monoidal construction
+    \item Express the remaining trace axioms formally
+    \item Complete the \textrm{Int}-construction
+    \item 'Upstream' results to Agda Cubical library.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Thank you}
+  \Huge
+  Thank you for listening
+\end{frame}
+\end{document}

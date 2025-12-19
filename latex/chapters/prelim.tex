@@ -1,0 +1,233 @@
+\chapter{Preliminaries} \label{prelim}
+\section{Category Theory}
+\subsection{Introduction}
+Category theory is the study of abstract structure generalizing
+concepts seen across many disciplines such as mathematics, computer
+science and physics. \cite{maclane1998-categories-book,awodey2010-category-theory-book} 
+\begin{definition}[Category \cite{hott2013-book, awodey2010-category-theory-book}]
+	From the perspective of type theory, \emph{category} consists
+	of the following data:
+	\begin{itemize}
+		\item a type of objects $\mathsf{Obj} : \mathcal{U}$;
+		\item for every $A,B:\mathsf{Obj}$, a type of morphisms
+		      $\mathsf{Hom}(A,B) : \mathcal{U}$;
+		\item for every $A:\mathsf{Obj}$, an identity morphism
+		      $\mathsf{id}_A : \mathsf{Hom}(A,A)$;
+		\item a composition operation
+		      \[
+			      \circ \;:\; \prod_{A,B,C:\mathsf{Obj}}
+			      \mathsf{Hom}(B,C) \to \mathsf{Hom}(A,B) \to \mathsf{Hom}(A,C).
+		      \]
+	\end{itemize}
+	These are equipped with terms demonstrating that:
+	$$
+		\begin{aligned}
+			 & \mathsf{assoc}_{h,g,f} \;:\;
+			(h \circ g) \circ f \;=\; h \circ (g \circ f),                  \
+			 & \mathsf{idl}_{f} \;:\; \mathsf{id}_B \circ f \;=\; f, \qquad
+			\mathsf{idr}_{f} \;:\; f \circ \mathsf{id}_A \;=\; f,
+		\end{aligned}
+	$$
+	for all $A,B,C,D:\mathsf{Obj}$ and
+	$f:\mathsf{Hom}(A,B)$, $g:\mathsf{Hom}(B,C)$, $h:\mathsf{Hom}(C,D)$.
+	Here $=$ denotes the identity type of the ambient type theory.
+\end{definition}
+Classically objects are considered to be collection of objects with some structure, and morphisms considered structure preserving maps. However there is a wide array of interpretations are possible. To list a few:
+\begin{table}
+	\begin{tabular}{|l|l|l|}
+		\hline
+		\textbf{Category} & \textbf{Objects} & \textbf{Morphisms} \\
+			\hline
+			$\mathbf{Set}$                                                                                                                                       & Sets               & Maps between sets                 \\
+			\hline
+			$\mathbf{Ord}$                                                                                                                                       & Total orders       & Order preserving maps             \\
+			\hline
+			$\mathbf{Type}$ \footnote{Note that this name is not universal, and there is no consensus as to what definition to use to define this specifically. See for example Univalent Foundations HoTT book §9.9 The Rezk Completion.} & Types              & Computable functions between types\\
+			\hline
+			$\mathbf{Grp}$                                                                                                                                       & Groups             & Group homomorphisms               \\
+			\hline
+			$\mathbf{Top}$                                                                                                                                       & Topological spaces & Continuous maps                   \\
+			\hline
+			$\mathbf{Cat}$                                                                                                                                       & 'small' categories & Functors                          \\
+			\hline
+			$\mathbf{FinSet}$                                                                                                                                    & Finite Sets        & maps                              \\
+			\hline
+	\end{tabular}
+	\caption{Examples of common categories. Standard definitions and names come from \cite{maclane1998-categories-book,awodey2010-category-theory-book,leinster2014-basic-category-theory}.}
+\end{table}
+\begin{note}
+	Categories are considered 'small' if their objects and morphisms can be
+	represented as sets. This is done at the type level, ensuring that the
+	category $\mathrm{Cat}$ is not contained in itself, to avoid
+	contradictions.
+\end{note}
+\subsection{Functors}
+Functors are mappings between categories that preserve the categorical
+structure, allowing us to relate different categorical contexts. A functor $F$
+must map identity morphisms to identity morphisms, map morphisms from
+A to B to morphisms between $F A$ and $F B$, as well as respecting composition.
+\cite{awodey2010-category-theory-book}
+\begin{definition}[Functor] \label{def:functor}
+	A functor F between categories $\mathcal{C}$ and $\mathcal{D}$ is made up of two components:
+	object-part: Function between $obj(C)$ and $obj(D)$
+	arrow-part: Function between $arr(C)$ and $arr(D)$
+	with the property that compositionality is preserved.
+	If $f : x \to y$ and $g : y \to z$ are arrows in C
+	Then $F(f) \circ F(g) = F(f \circ g)$ \cite{awodey2010-category-theory-book}
+\end{definition}
+\begin{definition}[Product Category]
+	Given a category C and a category D, the product category, written C x D is constructed of objects made of pairs of $c \in C, d \in D$, and morphisms made from pairs of morphisms $f : c1 \to c2; g : d1 \to d2$ then (f , g) is a morphism from (c1 , d1) to (c2 , d2).
+	It can be seen that these satisfy the property of being associative, and having identities.\cite{leinster2014-basic-category-theory}
+n\end{definition}
+The product operator on categories is not strictly associative in terms of equality, but it is common in category theory to only be interested in isomorphism of objects and in this case isomorphism of categories. We will see later the construction of a monoidal product and
+\begin{definition}[Multifunctor] \label{def:multifunctor}
+	\begin{itemize}
+
+		\item A \emph{bifunctor} F from $C x C \to D$ is simply a functor from the product category C x C to D.
+		\item A \emph{trifunctor} F from $C x C x C \to D$ is likewise a functor from the product category C x C x C to D.
+	\end{itemize} \cite{awodey2010-category-theory-book}
+\end{definition}
+\subsection{Natural Transformations}\cite{maclane1998-categories-book}
+Natural transformations provide a way to compare functors and encapsulate the
+idea of systematic correspondence between categorical maps.
+\begin{definition}[Natural Transformation]
+Given a pair of categories C, D and a pair of functor $F, G : C \to D$.
+A natural transformation is a family of maps $\eta_{x} : F x \to G x$ for
+all $x : C$.
+This map must have the following property, called naturality property for
+all $x, y : C; f : x \to y$ arrow in C:
+$\eta_y \circ F f = G f \circ \eta_x$
+\end{definition}
+
+\section{Monoidal Categories}
+
+Monoidal categories are an extension of the notion of a \emph{monoid}, a
+category with only one object, but instead of being composed by the category
+composition operator $\circ$ and identity arrows $id$, it works on the object
+level, having a separate tensor product $\otimes$ and identity object $I$.
+These must satisfy the monoid laws, but only up to natural
+isomorphisms. For example the associator given by $\alpha_{A,B,C}$,
+
+$$\alpha_{A,B,C} : A \otimes (B \otimes C) \equiv (A \otimes B) \otimes C$$
+
+is an natural isomorphism and doesn't need to be a strict
+equality. However it does need to be subject to 'coherence laws' these
+are rules that state that certain diagrams commute (which means that
+when you have multiple paths to get between certain objects, then, if
+the transformations are used then the result will be an identical
+morphism. In other words, there's at most one canonical way to convert
+between two objects forllowing the transformations.
+
+We now formally state the definition of monoidal category.
+
+\begin{definition}[Monoidal Category \cite{egbert1998-coherence-theorem}]
+  Given a category $𝓒$, a monoidal category is made up of the following
+  data:
+
+\begin{itemize}
+  \item $I : 𝓒$: Identiy object
+  \item $\otimes : 𝓒 × 𝓒 → 𝓒$: A product bifunctor.
+  \item $\alpha_{A,B,C} : A \otimes (B \otimes C) \equiv (A \otimes B) \otimes C$
+  \item $\rho_A : A \otimes I \equiv A$
+  \item $λ_A : I \otimes A \equiv A$
+  Such that certain coherence conditions hold, spelled out CITE
+\end{itemize}
+
+\end{definition}
+\section{Traced Monoidal Categories} \label{traced-monoidal-categories}
+\begin{definition}[Right Trace]
+        \label{def:trace}
+	In a traced monoidal category $\mathcal{C}$, a \emph{right trace} is a natural transformation
+	$$
+		\mathrm{tr}_{R} : \prod_{X : \mathcal{C}} \mathcal{C}[A \otimes X,\, B \otimes X]
+		\;\Rightarrow\; \mathcal{C}[A,B]
+		\qquad \forall A,B : \mathcal{C}.
+	$$
+	Equivalently, written with the parameter $X$ as a superscript:
+	$$
+		\mathrm{tr}_{R}^{X} : \mathcal{C}[A \otimes X,\, B \otimes X]
+		\;\Rightarrow\; \mathcal{C}[A,B]
+		\qquad \forall A,B,X : \mathcal{C}.
+	$$
+	Intuitively, the trace can be understood as a feedback loop: part of the output of a morphism is ``fed back'' into ts input.
+\end{definition}
+A right trace must satisfy the following axioms.
+Let $A,B,C,D,X,Y : \mathcal{C}$. (Originally introduced in Joyal et. al. 1996 \cite{joyal1996-traced-monoidal-categories}.) 
+\begin{axiom}[Tightening]
+        \label{axiom:tightening}
+	For morphisms
+	$$
+		h : A \to B,
+		\quad f : B \otimes X \to C \otimes X,
+		\quad g : C \to D,
+	$$
+	we have
+	$$
+		\mathrm{tr}_{R}^{X}\!\big( (g \otimes 1_X) \circ f \circ (h \otimes 1_X) \big)
+		= g \circ \mathrm{tr}_{R}^{X}(f) \circ h.
+	$$
+\end{axiom}
+\begin{axiom}[Sliding]
+        \label{axiom:sliding}
+	For morphisms
+	$$
+		f : A \otimes X \to B \otimes Y,
+		\quad g : Y \to X,
+	$$
+	we have
+	$$
+		\mathrm{tr}_{R}^{X}\!\big( (1_B \otimes g) \circ f \big)
+		= \mathrm{tr}_{R}^{Y}\!\big( f \circ (1_A \otimes g) \big).
+	$$
+\end{axiom}
+\begin{axiom}[Vanishing]
+        \label{axiom:vanishing}
+	\begin{enumerate}
+		\item For all $f : A \otimes I \to B \otimes I$,
+		      $$
+			      \mathrm{tr}_{R}^{I}(f) = f,
+		      $$
+		      where $I$ is the monoidal unit.
+		\item For all $f : A \otimes (X \otimes Y) \to B \otimes (X \otimes Y)$,
+		      $$
+			      \mathrm{tr}_{R}^{X \otimes Y}(f)
+			      = \mathrm{tr}_{R}^{X}\!\big( \mathrm{tr}_{R}^{Y}(f) \big).
+		      $$
+	\end{enumerate}
+\end{axiom}
+\begin{axiom}[Superposing]
+        \label{axiom:superimposing}
+	For morphisms
+	$$
+		f : A \otimes X \to B \otimes X,
+		\quad g : C \to D,
+	$$
+	we have
+	$$
+		\mathrm{tr}_{R}^{X}(f) \otimes g
+		= \mathrm{tr}_{R}^{X}(f \otimes g)
+	$$
+\end{axiom}
+\begin{definition}[Left trace operator]
+A left trace is a trace operator on the opposite functor $⊗⁻$, obtained by swapping the order of the arguments, so $A ⊗⁻ B = B ⊗ A$.
+\cite{joyal1996-traced-monoidal-categories}
+\end{definition}
+\begin{definition}[Planar Category]
+A planar category is a category with a left and right trace.
+\cite{joyal1996-traced-monoidal-categories}
+\end{definition}
+\begin{definition}[Symmetric Trace Category]
+A planar category is symmetric monoidal. if the cross transformation 
+\cite{joyal1996-traced-monoidal-categories}
+\end{definition}
+\begin{definition}[Spherical Category]
+A spherical category is category in which left and right traces agree.
+\cite{barrett1999-spherical}
+\end{definition}
+
+\begin{definition}[Compact Closed Category]
+A compact closed category is a traced monoidal category in which every
+object has a dual, which is roughly its inverse with respect to the
+monoidal product. Joyal-Stree-Verity introduce the \textbf{Int}-construction.
+\cite{joyal1996-traced-monoidal-categories}
+\end{definition}

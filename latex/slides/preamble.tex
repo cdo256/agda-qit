@@ -1,0 +1,150 @@
+\usepackage[references]{latex/agda}
+\usepackage{amsfonts}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{amsthm}
+\usepackage{booktabs}
+\usepackage{caption}  
+\usepackage{cite}
+\usepackage{dirtree}
+\usepackage{fontspec}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{lmodern}
+\usepackage{newunicodechar}
+\usepackage{stmaryrd}
+\usepackage{tikz-cd}
+\usepackage{tikz}
+\usepackage{ucharclasses}
+\usepackage{unicode-math}
+\usepackage{xcolor}
+\usepackage{xspace}
+% Make the diacritic dot symbol invisible to distinguish symbols
+\newunicodechar{̣}{}
+
+\usepackage{fontspec}
+\usefonttheme{professionalfonts}
+\setsansfont{Liberation Sans}
+\setmainfont{Liberation Sans}
+\setmonofont{Liberation Sans}
+
+%% \usetheme{Madrid}
+%% \usecolortheme{dolphin}
+%% \setbeamertemplate{navigation symbols}{}
+%% \setbeamertemplate{caption}[numbered]
+%% \setbeamertemplate{itemize items}[default]
+%% \setbeamertemplate{enumerate items}[default]
+%% \setbeamercolor{item projected}{bg=green!70!black,fg=blue}
+%% \setbeamercolor{enumerate subitem}{fg=red!80!black}
+%% \setbeamertemplate{enumerate items}[default]
+%% \usefonttheme{serif}
+
+%% \setmainfont{DejaVu Serif}
+%% \setsansfont{Liberation Sans}
+%% \setmonofont{JuliaMono}
+%% \let\oldttfamily\ttfamily
+%% \renewcommand{\ttfamily}{\footnotesize\oldttfamily}
+
+% Agda code style
+\renewcommand{\AgdaCodeStyle}{%
+	\setmainfont{JuliaMono}
+	\setsansfont{JuliaMono}
+	\setmonofont{JuliaMono}
+	\footnotesize % Make the code smaller to fit within width.
+}
+\setlength{\mathindent}{0pt}
+
+% TikZ
+\usetikzlibrary{positioning,chains,fit,shapes,calc,arrows.meta,decorations.markings}
+\tikzset{
+dotnode/.style = {circle, fill, inner sep=0.5mm},
+thickedge/.style  = {thick},
+largestep/.style = {
+ultra thick,
+-{>[length=8mm, width=8mm]},
+shorten >=1cm,
+shorten <=1cm},
+pivot/.style={circle, fill=white, inner sep=0.5mm, draw=red},
+midarrow/.style={
+		postaction={
+				decorate,
+				decoration={
+						markings,
+						mark=at position 0.5 with {\arrow{>}}
+					}
+			}
+	}
+}
+
+\newcommand{\dotrow}[3]{% end, label, labelpos
+	\begin{scope}[start chain=going right]
+		\foreach \i in {0,...,#1}
+		\node[on chain, dotnode, label=#3:{\i}] (#2\i) {};
+	\end{scope}
+}
+
+% Pandoc expects this to be defined.
+\providecommand{\tightlist}{%
+	\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}
+}
+
+\definecolor{darkgreen}{HTML}{023020}
+\definecolor{darkblue}{HTML}{00008b}
+
+
+\newcommand{\TraceStepZero}{%
+\begin{tikzpicture}[thickedge, node distance=7mm]
+  \dotrow{3}{b}{above}
+  \begin{scope}[yshift=-2cm]
+    \dotrow{2}{a}{below}
+  \end{scope}
+  \draw[midarrow] (a0) -- (b2);
+  \draw[midarrow] (a1) -- (b0);
+  \draw[midarrow] (a2) -- (b3);
+\end{tikzpicture}%
+}
+
+\newcommand{\TraceStepOne}{%
+  \begin{tikzpicture}[thickedge, node distance=7mm]
+    \dotrow{3}{b}{above}
+    \begin{scope}[yshift=-2cm]
+      \dotrow{2}{a}{below}
+    \end{scope}
+    \draw[midarrow] (a0) -- (b2);
+    \draw[midarrow] (a1) -- (b0);
+    \draw[midarrow] (a2) -- (b3);
+    \draw[midarrow] (0,0)
+      arc [start angle=0, end angle=180, radius=5mm]
+      -- (-1,-2)
+      arc [start angle=180, end angle=360, radius=5mm];
+  \end{tikzpicture}%
+}
+
+\newcommand{\TraceStepTwo}{%
+  \begin{tikzpicture}[thickedge, node distance=7mm]
+    \dotrow{2}{b}{above}
+    \begin{scope}[yshift=-2cm]
+      \dotrow{1}{a}{below}
+    \end{scope}
+    \node[dotnode] (bn1) at (-1,0) {};
+    \node[dotnode] (an1) at (-1,-2) {};
+    \draw[midarrow] (an1) -- (b1);
+    \draw[midarrow] (a0) -- (bn1);
+    \draw[midarrow] (a1) -- (b2);
+    \draw[midarrow] (-1,0)
+      arc [start angle=0, end angle=180, radius=5mm]
+      -- (-2,-2)
+      arc [start angle=180, end angle=360, radius=5mm];
+  \end{tikzpicture}%
+}
+
+\newcommand{\TraceStepThree}{%
+  \begin{tikzpicture}[thickedge, node distance=7mm]
+    \dotrow{2}{b}{above}
+    \begin{scope}[yshift=-2cm]
+      \dotrow{1}{a}{below}
+    \end{scope}
+    \draw[midarrow] (a0) -- (b1);
+    \draw[midarrow] (a1) -- (b2);
+  \end{tikzpicture}
+}
