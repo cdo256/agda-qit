@@ -199,9 +199,6 @@ module Mobile (B : Set) where
         gb<ng : g b < node g
         gb<ng = <sup b (≤refl (g b))
 
-    -- colimExt : ∀ b → f b ≈[ i ] g b
-    -- colimExt = ∀ {t u : BTree} → t ≈ᵗ u → 
-
     l≉ꟳn : ∀ {f g} → Ob._≈ꟳ_ (Colim D) (l , f) (n , g) → ⊥p
     l≉ꟳn ∣ () ∣
 
@@ -282,7 +279,36 @@ module Mobile (B : Set) where
       { ⟦_⟧ = ϕ₀
       ; cong = ϕ-cong }
 
-    
+    ψ-cong : ∀ {x y} → F.F-ob (Colim D) [ x ≈ y ]
+           → Colim (F̃ ∘ D) [ ψ₀ x ≈ ψ₀ y ]
+    ψ-cong {l , _} {l , _} (mk≈ꟳ fst≡ snd≈) = ≡→≈ (Colim (F̃ ∘ D)) ≡.refl
+    ψ-cong {l , _} {n , _} (mk≈ꟳ fst≡ snd≈) = absurdp (l≢n fst≡)
+    ψ-cong {n , _} {l , _} (mk≈ꟳ fst≡ snd≈) = absurdp (l≢n (≡.sym fst≡))
+    ψ-cong {n , f1} {n , f2} (mk≈ꟳ fst≡ snd≈) = begin
+      ψ₀ (n , f1)
+        ≈⟨ C.refl ⟩
+      sup (n , g1) , (n , h1)
+        ≈⟨ {!!} ⟩
+      sup (n , g2) , (n , h2)
+        ≈⟨ C.refl ⟩
+      ψ₀ (n , f2) ∎
+      where
+      module C = Setoid (Colim (F̃ ∘ D))
+      module M = Setoid MobileSetoid
+      open ≈.≈syntax {S = Colim (F̃ ∘ D)}
+      g1 : B → ⟨ MobileSetoid ⟩
+      g1 b = f1 b .proj₁
+      h1 : B → ⟨ D.D-ob (node g1) ⟩
+      h1 b = sz (g1 b) (<sup b (≤refl (g1 b)))
+      g2 : B → ⟨ MobileSetoid ⟩
+      g2 b = f2 b .proj₁
+      h2 : B → ⟨ D.D-ob (node g2) ⟩
+      h2 b = sz (g2 b) (<sup b (≤refl (g2 b)))
+
+      g1≈g2 : ∀ b → g1 b M.≈ g2 b
+      g1≈g2 b = {!!}
+      
+
 
     cocontinuous : Cocontinuous F̃ D
     cocontinuous = {!!}
