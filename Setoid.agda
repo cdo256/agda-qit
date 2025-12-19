@@ -6,4 +6,4 @@ module ≈ where
   open import Setoid.Iso public
   open import Setoid.Functor public
 
-open ≈ using (≡setoid; Setoid; IsPreorder; Preorder; ⟨_⟩; _≈h_; _[_≈_]) public
+open ≈ using (≡setoid; Setoid; IsPreorder; Preorder; ⟨_⟩; _≈h_; _[_≈_]; _≅_) public

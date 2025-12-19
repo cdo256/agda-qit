@@ -67,5 +67,23 @@ F ∘ P = record
     open ≈.Hom
     open import Equivalence
 
--- -- -- module _ (P : Diagram isPreorder B) (F : ≈.Functor) where
--- -- -- ϕ : Colim₀ {!F ≈.∘ P!}
+Cocontinuous : ∀ {ℓF ℓF'} → (F : ≈.Functor ℓF ℓF') (P : Diagram ≤p) → Prop lzero
+Cocontinuous F P = Colim (F ∘ P) ≅ F.F-ob (Colim P)
+  where
+  module F = ≈.Functor F
+
+-- module _ {ℓF ℓF'} (F : ≈.Functor ℓF ℓF') (P : Diagram ≤p) where
+--   module F = ≈.Functor F
+--   module P = Diagram P
+--   open ≈.Hom
+--   ϕ₀ : ⟨ Colim (F ∘ P) ⟩ → ⟨ F.F-ob (Colim P) ⟩
+--   ϕ₀ (i , x) = {!!}
+--   -- ϕ : ≈.Hom (Colim (F ∘ P)) (F.F-ob (Colim P))
+--   -- ϕ .⟦_⟧ x = ⟦
+--   --             F.F-mor
+--   --             (record
+--   --              { ⟦_⟧ = λ z → x .proj₁ , z ; cong = Colim.≈lstage (x .proj₁) })
+--   --             ⟧
+--   --             (x .proj₂)
+--   -- ϕ .cong = {!!}
+--   -- ψ : ≈.Hom (F.F-ob (Colim P)) (Colim (F ∘ P))
