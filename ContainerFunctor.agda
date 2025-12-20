@@ -10,6 +10,7 @@ module ContainerFunctor (C : Container lzero lzero) where
 
 private
   l0 = lzero
+  Pos = C .Position
 
 module Ob (S : Setoid l0 l0) where
   open ≈.Setoid S
@@ -17,10 +18,13 @@ module Ob (S : Setoid l0 l0) where
     constructor mk≈ꟳ'
     field
       fst≡ : x .proj₁ ≡ y .proj₁
-      snd≈ : ∀ p → (x .proj₂) p ≈ (y .proj₂) (≡.subst (C .Position) fst≡ p)
+      snd≈ : ∀ p → (x .proj₂) p ≈ (y .proj₂) (≡.subst Pos fst≡ p)
 
   _≈ꟳ_ = Trunc₂ _≈ꟳ'_
   pattern mk≈ꟳ fst≡ snd≈ = ∣ mk≈ꟳ' fst≡ snd≈ ∣
+
+  flatten≈ꟳ : ∀ s f g → (s , f) ≈ꟳ (s , g) → ∀ p → f p ≈ g p
+  flatten≈ꟳ s f g (mk≈ꟳ ≡.refl snd≈) = snd≈
 
   isReflexive : Reflexive _≈ꟳ_
   isReflexive = mk≈ꟳ ≡.refl (λ p → refl)
@@ -29,25 +33,25 @@ module Ob (S : Setoid l0 l0) where
   isSymmetric {x} {y} (mk≈ꟳ fst≡ snd≈) =
     mk≈ꟳ (≡.sym fst≡) λ p → sym (snd≈⁻¹ p)
     where
-    u : ∀ p → x .proj₂ (subst (C .Position) (≡.sym fst≡) p) ≈
-              y .proj₂ (subst (C .Position) fst≡
-                        (subst (C .Position) (≡.sym fst≡) p))
-    u p = snd≈ (subst (C .Position) (≡.sym fst≡) p)
-    v : ∀ p → (subst (C .Position) fst≡ (subst (C .Position) (≡.sym fst≡) p))
+    u : ∀ p → x .proj₂ (subst Pos (≡.sym fst≡) p) ≈
+              y .proj₂ (subst Pos fst≡
+                        (subst Pos (≡.sym fst≡) p))
+    u p = snd≈ (subst Pos (≡.sym fst≡) p)
+    v : ∀ p → (subst Pos fst≡ (subst Pos (≡.sym fst≡) p))
             ≡ p
     v p = ≡.subst-subst-sym fst≡
-    snd≈⁻¹ : ∀ p → x .proj₂ (subst (C .Position) (≡.sym fst≡) p) ≈ y .proj₂ p
+    snd≈⁻¹ : ∀ p → x .proj₂ (subst Pos (≡.sym fst≡) p) ≈ y .proj₂ p
     snd≈⁻¹ p =
-      substp (λ ○ → x .proj₂ (subst (C .Position) (≡.sym fst≡) p) ≈ y .proj₂ ○)
-              (v p) (snd≈ (subst (C .Position) (≡.sym fst≡) p))
+      substp (λ ○ → x .proj₂ (subst Pos (≡.sym fst≡) p) ≈ y .proj₂ ○)
+              (v p) (snd≈ (subst Pos (≡.sym fst≡) p))
 
   isTransitive : Transitive _≈ꟳ_
   isTransitive {x = x} {y} {z} (mk≈ꟳ fst≡1 snd≈1) (mk≈ꟳ fst≡2 snd≈2) =
     mk≈ꟳ (≡.trans fst≡1 fst≡2) v
     where
-    u : ∀ p → x .proj₂ p ≈ z .proj₂ (subst (C .Position) fst≡2 (subst (C .Position) fst≡1 p))
-    u p = trans (snd≈1 p) (snd≈2 (subst (C .Position) fst≡1 p))
-    v : ∀ p → x .proj₂ p ≈ z .proj₂ (subst (C .Position) (≡.trans fst≡1 fst≡2) p)
+    u : ∀ p → x .proj₂ p ≈ z .proj₂ (subst Pos fst≡2 (subst Pos fst≡1 p))
+    u p = trans (snd≈1 p) (snd≈2 (subst Pos fst≡1 p))
+    v : ∀ p → x .proj₂ p ≈ z .proj₂ (subst Pos (≡.trans fst≡1 fst≡2) p)
     v p = substp (λ ○ → x .proj₂ p ≈ z .proj₂ ○) (≡.subst-subst fst≡1) (u p)
 
   F̃-ob : Setoid l0 l0

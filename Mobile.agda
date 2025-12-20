@@ -284,7 +284,8 @@ module Mobile (B : Set) where
     ψ-cong {l , _} {l , _} (mk≈ꟳ fst≡ snd≈) = ≡→≈ (Colim (F̃ ∘ D)) ≡.refl
     ψ-cong {l , _} {n , _} (mk≈ꟳ fst≡ snd≈) = absurdp (l≢n fst≡)
     ψ-cong {n , _} {l , _} (mk≈ꟳ fst≡ snd≈) = absurdp (l≢n (≡.sym fst≡))
-    ψ-cong {n , f1} {n , f2} (mk≈ꟳ fst≡ snd≈) = begin
+    ψ-cong {n , f1} {n , f2} (mk≈ꟳ ≡.refl snd≈) =
+      begin
       ψ₀ (n , f1)
         ≈⟨ C.refl ⟩
       sup (n , g1) , (n , h1)
@@ -298,17 +299,17 @@ module Mobile (B : Set) where
       open ≈.≈syntax {S = Colim (F̃ ∘ D)}
       g1 : B → ⟨ MobileSetoid ⟩
       g1 b = f1 b .proj₁
-      h1 : B → ⟨ D.D-ob (node g1) ⟩
+      h1 : B → ⟨ D.D-ob (sup (n , g1)) ⟩
       h1 b = sz (g1 b) (<sup b (≤refl (g1 b)))
       g2 : B → ⟨ MobileSetoid ⟩
       g2 b = f2 b .proj₁
-      h2 : B → ⟨ D.D-ob (node g2) ⟩
+      h2 : B → ⟨ D.D-ob (sup (n , g2)) ⟩
       h2 b = sz (g2 b) (<sup b (≤refl (g2 b)))
-
-      g1≈g2 : ∀ b → g1 b M.≈ g2 b
-      g1≈g2 b = {!!}
-      
-
+      Pos = Branch .Position
+      r : ∀ b → (p : Colim D [ f1 b ≈ f2 b ])
+        → Colim (F̃ ∘ D) [ sup (n , g1) , (n , h1)
+                        ≈ sup (n , g2) , (n , h2) ]
+      r b p = {!!}
 
     cocontinuous : Cocontinuous F̃ D
     cocontinuous = {!!}
