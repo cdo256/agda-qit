@@ -4,6 +4,9 @@ build:
 paper:
   ./build-paper.py
 
+paper-fast:
+  ./build-paper.py --no-typecheck
+
 clean:
   git clean -X -fd
 

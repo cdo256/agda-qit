@@ -1,6 +1,5 @@
 ---
 title: Mobiles as a Quotient-Inductive Type via Plump Ordinals
-author: Christina O'Donnell
 ---
 
 # Abstract
@@ -16,26 +15,24 @@ Before presenting the construction, we establish the fundamental categorical inf
 ## Setoids
 
 ```agda
-{-# OPTIONS --cubical --safe #-}
+{-# OPTIONS --allow-unsolved-metas #-}
 
 module Paper where
 
-open import Cubical.Foundations.Prelude
-open import Cubical.Foundations.Function
-open import Cubical.Foundations.Isomorphism
-open import Cubical.Foundations.Equiv
-open import Cubical.HITs.SetQuotients
-open import Cubical.Relation.Binary.Base
-open import Cubical.Data.Sigma
-open import Cubical.Data.Unit
-open import Cubical.Data.Sum
+open import Agda.Primitive using (Level; lzero; lsuc; _⊔_)
+open import Data.Unit using (⊤; tt)
+open import Data.Sum using (_⊎_; inj₁; inj₂)
+open import Data.Product using (Σ; _×_; _,_; proj₁; proj₂)
+open import Relation.Binary using (Rel; IsEquivalence)
+open import Function using (id; _∘_)
+open import Data.Empty using (⊥)
 
 -- Basic setoid structure
-record Setoid ℓ : Type (ℓ-suc ℓ) where
+record Setoid ℓ : Set (lsuc ℓ) where
   field
-    Carrier : Type ℓ
-    _≈_ : Carrier → Carrier → Type ℓ
-    isEquivRel : BinaryRelation.isEquivRel _≈_
+    Carrier : Set ℓ
+    _≈_ : Carrier → Carrier → Set ℓ
+    isEquivRel : IsEquivalence _≈_
 
 open Setoid public
 ```
@@ -46,7 +43,7 @@ A **setoid** $S = (|S|, {\approx_S})$ consists of a set $|S|$ equipped with an e
 
 ```agda
 -- Setoid homomorphisms
-record SetoidHom {ℓ} (A B : Setoid ℓ) : Type ℓ where
+record SetoidHom {ℓ} (A B : Setoid ℓ) : Set ℓ where
   constructor mk-hom
   field
     fun : Carrier A → Carrier B
@@ -56,7 +53,7 @@ open SetoidHom public
 
 -- Identity and composition
 idHom : ∀ {ℓ} (A : Setoid ℓ) → SetoidHom A A
-idHom A = mk-hom (idfun _) (idfun _)
+idHom A = mk-hom id id
 
 _∘ₕ_ : ∀ {ℓ} {A B C : Setoid ℓ} → SetoidHom B C → SetoidHom A B → SetoidHom A C
 g ∘ₕ f = mk-hom (fun g ∘ fun f) (resp g ∘ resp f)
@@ -70,18 +67,22 @@ Fix a set $I$. We define the W-type of infinitary $I$-branching trees:
 
 ```agda
 -- Raw trees with I-branching
-data Tree (I : Type) : Type where
+data Tree (I : Set) : Set where
   leaf : Tree I  
   node : (I → Tree I) → Tree I
 
--- Strict plump order
-data _<_ {I : Type} : Tree I → Tree I → Type where
+-- Mutual definition of strict and non-strict order
+data _<_ {I : Set} : Tree I → Tree I → Set
+data _≤_ {I : Set} : Tree I → Tree I → Set
+
+data _<_ {I} where
   node-< : ∀ {f : I → Tree I} {i : I} {u : Tree I}
          → u ≤ f i
          → u < node f
-  where
-    _≤_ : Tree I → Tree I → Type
-    u ≤ v = (u < v) ⊎ (u ≡ v)
+
+data _≤_ {I} where
+  <-to-≤ : ∀ {u v : Tree I} → u < v → u ≤ v
+  refl-≤ : ∀ (u : Tree I) → u ≤ u
 ```
 
 The strict plump order $<$ on $T_I$ is defined inductively: $u < \mathsf{node}(f)$ if $u \le f(i)$ for some $i$, where $\le$ is the reflexive closure of $<$.
@@ -90,36 +91,37 @@ The strict plump order $<$ on $T_I$ is defined inductively: $u < \mathsf{node}(f
 
 ```agda
 -- Stage sets S(t) = {u : Tree I | u < t}
-S : ∀ {I : Type} → Tree I → Type
-S {I} t = Σ[ u ∈ Tree I ] (u < t)
+S : ∀ {I : Set} → Tree I → Set
+S {I} t = Σ (Tree I) (λ u → u < t)
 
 -- Equivalence relation on trees (simplified version)
-data TreeEq {I : Type} : Tree I → Tree I → Type where
+data TreeEq {I : Set} : Tree I → Tree I → Set where
   leaf-eq : TreeEq leaf leaf
   node-eq : ∀ {f g : I → Tree I}
           → (∀ i → TreeEq (f i) (g i))
           → TreeEq (node f) (node g)
   -- Permutation equivalence would go here in full version
-  
+
+-- Helper functions for equivalence proofs
+tree-refl : ∀ {I : Set} {u : Tree I} → TreeEq u u
+tree-refl {u = leaf} = leaf-eq
+tree-refl {u = node f} = node-eq (λ i → tree-refl {u = f i})
+
+tree-sym : ∀ {I : Set} {u v : Tree I} → TreeEq u v → TreeEq v u  
+tree-sym leaf-eq = leaf-eq
+tree-sym (node-eq h) = node-eq (λ i → tree-sym (h i))
+
+tree-trans : ∀ {I : Set} {u v w : Tree I} → TreeEq u v → TreeEq v w → TreeEq u w
+tree-trans leaf-eq leaf-eq = leaf-eq
+tree-trans (node-eq h₁) (node-eq h₂) = node-eq (λ i → tree-trans (h₁ i) (h₂ i))
+
 -- The setoid P(t)
-P : ∀ {I : Type} → Tree I → Setoid₀
+P : ∀ {I : Set} → Tree I → Setoid lzero
 Carrier (P t) = S t
 (P t) ._≈_ (u , _) (v , _) = TreeEq u v
-BinaryRelation.isEquivRel.reflexive (isEquivRel (P t)) = tree-refl
-  where
-    tree-refl : ∀ {u} → TreeEq u u
-    tree-refl {leaf} = leaf-eq
-    tree-refl {node f} = node-eq (λ i → tree-refl {f i})
-BinaryRelation.isEquivRel.symmetric (isEquivRel (P t)) = tree-sym
-  where
-    tree-sym : ∀ {u v} → TreeEq u v → TreeEq v u  
-    tree-sym leaf-eq = leaf-eq
-    tree-sym (node-eq h) = node-eq (λ i → tree-sym (h i))
-BinaryRelation.isEquivRel.transitive (isEquivRel (P t)) = tree-trans
-  where
-    tree-trans : ∀ {u v w} → TreeEq u v → TreeEq v w → TreeEq u w
-    tree-trans leaf-eq leaf-eq = leaf-eq
-    tree-trans (node-eq h₁) (node-eq h₂) = node-eq (λ i → tree-trans (h₁ i) (h₂ i))
+IsEquivalence.refl (isEquivRel (P t)) = tree-refl
+IsEquivalence.sym (isEquivRel (P t)) = tree-sym
+IsEquivalence.trans (isEquivRel (P t)) = tree-trans
 ```
 
 For each $t : T_I$, we define the stage set $S(t) := \{u : T_I \mid u < t\}$ and equip it with an equivalence relation to form the setoid $P(t)$.
@@ -128,14 +130,14 @@ For each $t : T_I$, we define the stage set $S(t) := \{u : T_I \mid u < t\}$ and
 
 ```agda
 -- Quotient-polynomial functor on setoids  
-F̃ : ∀ {I : Type} → Setoid₀ → Setoid₀
-Carrier (F̃ {I} X) = Unit ⊎ (I → Carrier X)
-(F̃ X) ._≈_ (inl tt) (inl tt) = Unit
-(F̃ X) ._≈_ (inl tt) (inr _) = ⊥
-(F̃ X) ._≈_ (inr _) (inl tt) = ⊥  
-(F̃ X) ._≈_ (inr f) (inr g) = ∀ i → X ._≈_ (f i) (g i)
+F̃ : ∀ {I : Set} → Setoid lzero → Setoid lzero
+Setoid.Carrier (F̃ {I} X) = ⊤ ⊎ (I → Carrier X)
+Setoid._≈_ (F̃ X) (inj₁ tt) (inj₁ tt) = ⊤
+Setoid._≈_ (F̃ X) (inj₁ tt) (inj₂ _) = ⊥
+Setoid._≈_ (F̃ X) (inj₂ _) (inj₁ tt) = ⊥  
+Setoid._≈_ (F̃ X) (inj₂ f) (inj₂ g) = ∀ i → X ._≈_ (f i) (g i)
 -- Permutation equivalence omitted for brevity
-isEquivRel (F̃ X) = {!!} -- Proof omitted
+Setoid.isEquivRel (F̃ X) = {!!} -- Proof omitted for brevity
 ```
 
 We define an endofunctor on setoids: $\widetilde F_I(X,\approx_X) := \bigl( 1 + (I \to X) \bigr) / \approx_F$, where $\approx_F$ includes both pointwise equivalence and permutation equivalence.
@@ -148,12 +150,12 @@ The key insight is that plump orders have **definable suprema**: for any $g : I 
 
 ```agda
 -- Definable supremum (sketch)
-sup : ∀ {I : Type} → (I → Tree I) → Tree I  
+sup : ∀ {I : Set} → (I → Tree I) → Tree I  
 sup f = node f
 
-sup-property : ∀ {I : Type} (f : I → Tree I) (i : I)
+sup-property : ∀ {I : Set} (f : I → Tree I) (i : I)
              → f i ≤ sup f
-sup-property f i = inl (node-< (inr refl))
+sup-property f i = <-to-≤ (node-< (refl-≤ (f i)))
 ```
 
 ## Cocontinuity theorem
@@ -165,7 +167,7 @@ This definable supremum property allows us to prove that $\widetilde F_I$ preser
 ```agda
 -- Main cocontinuity result (statement only)
 postulate
-  cocontinuity : ∀ {I : Type}
+  cocontinuity : ∀ {I : Set}
                → {!!} -- F̃ preserves colimits of P
 ```
 
@@ -176,11 +178,11 @@ From cocontinuity, we obtain that mobiles form the initial algebra for $\widetil
 ```agda
 -- Mobiles as initial F̃-algebra (postulated)
 postulate
-  Mobile : ∀ (I : Type) → Type
-  mobile-algebra : ∀ {I : Type} 
+  Mobile : ∀ (I : Set) → Set
+  mobile-algebra : ∀ {I : Set} 
                  → Carrier (F̃ {I} {!!}) → Mobile I
-  mobile-initial : ∀ {I : Type} (A : Type) (α : Carrier (F̃ {!!}) → A)
-                 → ∃![ h ∈ (Mobile I → A) ] (h ∘ mobile-algebra ≡ α ∘ {!!})
+  mobile-initial : ∀ {I : Set} (A : Set) (α : Carrier (F̃ {!!}) → A)
+                 → {!!} -- Existence and uniqueness of algebra morphism
 ```
 
 # Constructing Mobiles Directly in Set

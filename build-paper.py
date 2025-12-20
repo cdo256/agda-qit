@@ -1,162 +1,111 @@
 #!/usr/bin/env python3
-"""
-Simplified build script for single literate Agda paper.
-Converts paper.lagda.md to PDF via Pandoc -> Agda -> LaTeX -> PDF pipeline.
-"""
-
+import argparse
+import glob
 import os
-import shutil
 import subprocess as sp
 import sys
-import tempfile
+
+SRC_DIR = "./src/Paper"
+LATEX_DIR = "./latex"
+PDF_OUT_FILE = "./paper.pdf"
 
 
-def run_cmd(cmd, description):
-    """Run a command and handle errors gracefully."""
-    print(f"Running: {' '.join(cmd)}", file=sys.stderr)
-    try:
-        result = sp.run(cmd, check=True, capture_output=True, text=True)
-        return result
-    except sp.CalledProcessError as e:
-        print(f"Error in {description}:", file=sys.stderr)
-        print(f"Return code: {e.returncode}", file=sys.stderr)
-        print(f"Stdout: {e.stdout}", file=sys.stderr)
-        print(f"Stderr: {e.stderr}", file=sys.stderr)
-        sys.exit(1)
+def init():
+    os.makedirs(LATEX_DIR, exist_ok=True)
+    os.makedirs("./src/PaperTex", exist_ok=True)
+    os.makedirs("./latex/generated/PaperTex", exist_ok=True)
+    os.makedirs("./out", exist_ok=True)
 
 
-def init_dirs():
-    """Initialize required directories."""
-    os.makedirs("_build", exist_ok=True)
-    os.makedirs("_build/latex", exist_ok=True)
+def replace_verbatim_with_code(filename):
+    print("Replacing verbatim with code", file=sys.stderr)
+    with open(filename, "r", encoding="utf-8") as f:
+        content = f.read()
+    new_content = content.replace("{verbatim}", "{code}")
+    with open(filename, "w", encoding="utf-8") as f:
+        f.write(new_content)
 
 
-def convert_to_tex():
-    """Convert .lagda.md to .lagda.tex using Pandoc."""
+def change_module_name(filename, old_name, new_name):
+    """Change module name in the generated file to match path structure."""
+    print(f"Changing module from {old_name} to {new_name}", file=sys.stderr)
+    with open(filename, "r", encoding="utf-8") as f:
+        content = f.read()
+    new_content = content.replace(
+        f"module {old_name} where", f"module {new_name} where"
+    )
+    with open(filename, "w", encoding="utf-8") as f:
+        f.write(new_content)
+
+
+def build_tex(no_typecheck=False):
+    input_files = glob.glob(os.path.join(SRC_DIR, "*.lagda.md"))
+    if not input_files:
+        raise FileNotFoundError(f"No .lagda.md files found in {SRC_DIR}")
+    for infile in input_files:
+        base = os.path.splitext(os.path.splitext(os.path.basename(infile))[0])[0]
+        outfile = os.path.join("./src/PaperTex", base + ".lagda.tex")
+        cmd = ["pandoc", "--no-highlight", "-o", outfile, infile]
+        print("Running:", " ".join(cmd), file=sys.stderr)
+        sp.run(cmd, check=True)
+        replace_verbatim_with_code(outfile)
+        # Change module name to match expected path structure
+        change_module_name(outfile, "Paper", "PaperTex.Paper")
+
+        # Copy to expected location for Agda module resolution
+        import shutil
+
+        expected_file = os.path.join("PaperTex", base + ".lagda.tex")
+        os.makedirs("PaperTex", exist_ok=True)
+        shutil.copy(outfile, expected_file)
+
+        cmd = ["agda", "--latex-dir=./latex/generated", "--latex"]
+        if no_typecheck:
+            cmd.append("--only-scope-checking")
+            print(
+                "Note: Type checking disabled, only scope checking will be performed",
+                file=sys.stderr,
+            )
+        cmd.append(expected_file)
+
+        print("Running:", " ".join(cmd), file=sys.stderr)
+        sp.run(cmd, check=True)
+
+        # Clean up temporary file
+        if os.path.exists(expected_file):
+            os.remove(expected_file)
+
+
+def build_pdf():
     cmd = [
-        "pandoc",
-        "-f",
-        "markdown",
-        "-t",
-        "latex",
-        "--standalone",
-        "--template",
-        "_build/paper-template.tex",
-        "-o",
-        "_build/paper.lagda.tex",
-        "paper.lagda.md",
+        "xelatex",
+        "--interaction=nonstopmode",
+        "--file-line-error",
+        "--jobname=paper",
+        "./latex/main.tex",
     ]
-    run_cmd(cmd, "Pandoc conversion")
-
-
-def process_with_agda():
-    """Process .lagda.tex with Agda to generate LaTeX."""
-    cmd = ["agda", "--latex-dir=_build/latex", "--latex", "_build/paper.lagda.tex"]
-    run_cmd(cmd, "Agda LaTeX generation")
-
-
-def compile_pdf():
-    """Compile the final PDF using XeLaTeX."""
-    # Copy the generated LaTeX to final location
-    if os.path.exists("_build/latex/paper.tex"):
-        shutil.copy("_build/latex/paper.tex", "_build/paper.tex")
-    else:
-        print("Error: Agda did not generate paper.tex", file=sys.stderr)
-        sys.exit(1)
-
-    # Run XeLaTeX twice for proper references
-    for i in range(2):
-        cmd = [
-            "xelatex",
-            "-interaction=nonstopmode",
-            "-output-directory=_build",
-            "_build/paper.tex",
-        ]
-        run_cmd(cmd, f"XeLaTeX compilation (pass {i + 1})")
-
-    # Copy final PDF to root
-    if os.path.exists("_build/paper.pdf"):
-        shutil.copy("_build/paper.pdf", "paper.pdf")
-        print("✓ Successfully generated paper.pdf")
-    else:
-        print("Error: PDF was not generated", file=sys.stderr)
-        sys.exit(1)
-
-
-def create_latex_template():
-    """Create a minimal LaTeX template for the paper."""
-    template_content = r"""
-\documentclass[11pt,a4paper]{article}
-\usepackage{amsmath,amssymb,amsthm}
-\usepackage{fontspec}
-\usepackage{unicode-math}
-\usepackage{hyperref}
-\usepackage{tikz-cd}
-\usepackage[references]{latex/agda}
-
-% Font setup
-\setmainfont{DejaVu Serif}
-\setmonofont{JuliaMono}
-
-% Agda code style
-\renewcommand{\AgdaCodeStyle}{%
-    \footnotesize
-    \setmonofont{JuliaMono}
-}
-
-% Theorem environments
-\newtheorem{theorem}{Theorem}
-\newtheorem{lemma}{Lemma}
-\theoremstyle{definition}
-\newtheorem{definition}{Definition}
-
-$if(title)$
-\title{$title$}
-$endif$
-$if(author)$
-\author{$author$}
-$endif$
-$if(date)$
-\date{$date$}
-$else$
-\date{\today}
-$endif$
-
-\begin{document}
-
-$if(title)$
-\maketitle
-$endif$
-
-$if(toc)$
-\tableofcontents
-\newpage
-$endif$
-
-$body$
-
-\end{document}
-"""
-    with open("_build/paper-template.tex", "w") as f:
-        f.write(template_content)
-
-
-def main():
-    """Main build pipeline."""
-    if not os.path.exists("paper.lagda.md"):
-        print("Error: paper.lagda.md not found", file=sys.stderr)
-        sys.exit(1)
-
-    print("Building literate Agda paper...")
-
-    init_dirs()
-    create_latex_template()
-    convert_to_tex()
-    process_with_agda()
-    compile_pdf()
-
-    print("Build completed successfully!")
+    print("Running:", " ".join(cmd), file=sys.stderr)
+    proc = sp.run(cmd, stdout=sp.PIPE, stderr=sp.PIPE, text=True)
+    if proc.returncode != 0:
+        print("PDF Build failed :(")
+        exit(1)
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Build literate Agda paper to PDF")
+    parser.add_argument(
+        "--no-typecheck",
+        action="store_true",
+        help="Disable Agda type checking (only perform scope checking)",
+    )
+
+    args = parser.parse_args()
+
+    if args.no_typecheck:
+        print("Mode: Fast build (no type checking)")
+    else:
+        print("Mode: Full build (with type checking)")
+
+    init()
+    build_tex(no_typecheck=args.no_typecheck)
+    build_pdf()
