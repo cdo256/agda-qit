@@ -14,14 +14,12 @@ private
   l0 : Level
   l0 = lzero
 
-Bˢ : Setoid l0 l0
-Bˢ = ≡setoid B
 data _≈ᵗ_ : BTree → BTree → Prop l0 where
   ≈leaf : ∀ {f g} → leaf {f} ≈ᵗ leaf {g}
   ≈node : ∀ {f g} → (c : ∀ b → f b ≈ᵗ g b)
         → node f ≈ᵗ node g
-  ≈perm : ∀ {f} → (π : ≈.Iso Bˢ Bˢ)
-        → node f ≈ᵗ node λ b → f (≈.Iso.⟦_⟧ π b)
+  ≈perm : ∀ {f} → (π : B ↔ B)
+        → node f ≈ᵗ node λ b → f (π .↔.to b)
   ≈trans : ∀ {s t u} → s ≈ᵗ t → t ≈ᵗ u → s ≈ᵗ u
 
 ≈refl : ∀ {t} → t ≈ᵗ t
@@ -32,16 +30,16 @@ data _≈ᵗ_ : BTree → BTree → Prop l0 where
 ≈sym ≈leaf = ≈leaf
 ≈sym (≈node c) = ≈node λ b → ≈sym (c b)
 ≈sym (≈perm {f} π) =
-  substp' A p x
+  substp A p x
   where
-  module π = ≈.Iso π
-  π' = ≈.IsoFlip π
+  module π = _↔_ π
+  π' = ↔.flip π
   A : (B → B) → Prop l0
-  A = λ h → node (λ b → f π.⟦ b ⟧) ≈ᵗ node λ b → f (h b)
-  p : (λ b → π.⟦ π.⟦ b ⟧⁻¹ ⟧) ≡p (λ b → b)
-  p = funExtp λ b → (π.linv b)
-  x : node (λ b → f π.⟦ b ⟧) ≈ᵗ node (λ b → f π.⟦ π.⟦ b ⟧⁻¹ ⟧)
-  x = ≈perm {f = λ b → f π.⟦ b ⟧} π'
+  A = λ h → node (λ b → f (π.to b)) ≈ᵗ node λ b → f (h b)
+  p : (λ b → π.to (π.from b)) ≡ (λ b → b)
+  p = funExt λ b → π.linv b
+  x : node (λ b → f (π.to b)) ≈ᵗ node (λ b → f (π.to (π.from b)))
+  x = ≈perm {f = λ b → f (π.to b)} π'
 ≈sym (≈trans s≈t t≈u) = ≈trans (≈sym t≈u) (≈sym s≈t)
 
 isEquiv-≈ᵗ : IsEquivalence _≈ᵗ_

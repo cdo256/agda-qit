@@ -13,8 +13,6 @@ private
   l0 : Level
   l0 = lzero
 
-open Box
-
 data NodeType : Set where
   l : NodeType
   n : NodeType

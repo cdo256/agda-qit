@@ -64,3 +64,23 @@ absurdp ()
 
 ⊥→⊥p : ⊥ → ⊥p
 ⊥→⊥p ()
+
+module ↔ where
+  record _↔_ (X Y : Set) : Set where
+    field
+      to : X → Y
+      from : Y → X
+      rinv : ∀ x → from (to x) ≡ x
+      linv : ∀ y → to (from y) ≡ y
+
+  open _↔_ public
+
+  flip : {X Y : Set} → X ↔ Y → Y ↔ X
+  flip X↔Y = record
+    { to = X↔Y .from
+    ; from = X↔Y .to
+    ; rinv = X↔Y .linv
+    ; linv = X↔Y .rinv }
+    where open _↔_ X↔Y
+  
+open ↔ using (_↔_) public
