@@ -3,18 +3,16 @@ open import Prelude
 open import Setoid
 open import Colimit 
 
-module Cocontinuity {ℓI} {ℓI'} {ℓ≤} -- {ℓB}
-  {I : Setoid ℓI ℓI'}
+module Cocontinuity {ℓI} {ℓ≤} -- {ℓB}
+  {I : Set ℓI}
   (≤p : Preorder I ℓ≤) where
 
 open Colim ≤p
 open import Data.Product
 
 module ≤ = IsPreorder (≤p .proj₂)
-_≤_ : ≈.Rel≈ I ℓ≤
+_≤_ : Rel I ℓ≤
 _≤_ = ≤p .proj₁
-open ≈.Setoid I using () renaming (Carrier to Î)
-module I = ≈.Setoid I
 
 private
   variable
@@ -30,7 +28,7 @@ F ∘ P = record
   module F = ≈.Functor F
   module P = Diagram P
   open ≈.Setoid using () renaming (_≈_ to _⊢_≈_)
-  D-ob : (i : P.I.Carrier) → Setoid _ _
+  D-ob : (i : I) → Setoid _ _
   D-ob = λ i → F.F-ob (P.D-ob i)
   D-mor : ∀ {i j} → ≤p .proj₁ i j
       → ≈.Hom (F.F-ob (P.D-ob i)) (F.F-ob (P.D-ob j))
@@ -39,13 +37,13 @@ F ∘ P = record
     ; cong = F.F-mor (P.D-mor _) .≈.Hom.cong }
   D-id : ∀ {i} → {x y : ⟨ D-ob i ⟩}
        → D-ob i ⊢ x ≈ y
-       → D-ob i ⊢ (F.F-mor (P.D-mor (≤.refl P.I.refl)) .≈.Hom.⟦_⟧ x) ≈ y
+       → D-ob i ⊢ (F.F-mor (P.D-mor ≤.refl) .≈.Hom.⟦_⟧ x) ≈ y
   D-id {i} {x} {y} x≈y = D-ob i .trans u (F.F-id x≈y)
     where
     open ≈.Setoid
     open ≈.Hom
     open import Equivalence
-    u : D-ob i ⊢ (F.F-mor (P.D-mor (≤.refl P.I.refl)) .⟦_⟧ x)
+    u : D-ob i ⊢ (F.F-mor (P.D-mor ≤.refl ) .⟦_⟧ x)
                ≈ (F.F-mor ≈.idHom) .⟦_⟧ x
     u = F.F-resp P.D-id (F.F-ob (P.D-ob i) .refl)
   D-comp : ∀ {i j k} → (p : i ≤ j) (q : j ≤ k)
@@ -71,19 +69,3 @@ Cocontinuous : ∀ {ℓF ℓF'} → (F : ≈.Functor ℓF ℓF') (P : Diagram �
 Cocontinuous F P = Colim (F ∘ P) ≅ F.F-ob (Colim P)
   where
   module F = ≈.Functor F
-
--- module _ {ℓF ℓF'} (F : ≈.Functor ℓF ℓF') (P : Diagram ≤p) where
---   module F = ≈.Functor F
---   module P = Diagram P
---   open ≈.Hom
---   ϕ₀ : ⟨ Colim (F ∘ P) ⟩ → ⟨ F.F-ob (Colim P) ⟩
---   ϕ₀ (i , x) = {!!}
---   -- ϕ : ≈.Hom (Colim (F ∘ P)) (F.F-ob (Colim P))
---   -- ϕ .⟦_⟧ x = ⟦
---   --             F.F-mor
---   --             (record
---   --              { ⟦_⟧ = λ z → x .proj₁ , z ; cong = Colim.≈lstage (x .proj₁) })
---   --             ⟧
---   --             (x .proj₂)
---   -- ϕ .cong = {!!}
---   -- ψ : ≈.Hom (F.F-ob (Colim P)) (Colim (F ∘ P))

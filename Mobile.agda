@@ -41,7 +41,7 @@ module Mobile (B : Set) where
   Bˢ : Setoid l0 l0
   Bˢ = ≡setoid B
   data _≈ᵗ_ : BTree → BTree → Prop l0 where
-    ≈leaf : ∀ {f g} → leaf {f} ≈ᵗ leaf {g}
+    ≈leaf : leaf ≈ᵗ leaf
     ≈node : ∀ {f g} → (c : ∀ b → f b ≈ᵗ g b)
           → node f ≈ᵗ node g
     ≈perm : ∀ {f} → (π : ≈.Iso Bˢ Bˢ)
@@ -217,7 +217,7 @@ module Mobile (B : Set) where
       open Colim D using (≈j)
       s : ∀ b → f b .Sz₀.u ≈ᵗ g b .Sz₀.u
       s b = substp (λ ○ → f b .Sz₀.u ≈ᵗ g ○ .Sz₀.u) (subst-id fst≡ b) (snd≈ b)
-      u : ∀ b → f b ≈[ i ] g b
+      u : ∀ b → ? [ f b ≈ g b ]
       u b = s b
     ϕ-cong {i , l , _} {j , l , _} (≈lstep p (l , _)) = F.F-id (Ob.mk≈ꟳ ≡.refl (λ ()))
     ϕ-cong {i , n , f} {j , n , g} (≈lstep p (n , f)) =
@@ -281,9 +281,12 @@ module Mobile (B : Set) where
 
     ψ-cong : ∀ {x y} → F.F-ob (Colim D) [ x ≈ y ]
            → Colim (F̃ ∘ D) [ ψ₀ x ≈ ψ₀ y ]
-    ψ-cong {l , _} {l , _} (mk≈ꟳ fst≡ snd≈) = ≡→≈ (Colim (F̃ ∘ D)) ≡.refl
-    ψ-cong {l , _} {n , _} (mk≈ꟳ fst≡ snd≈) = absurdp (l≢n fst≡)
-    ψ-cong {n , _} {l , _} (mk≈ꟳ fst≡ snd≈) = absurdp (l≢n (≡.sym fst≡))
+    ψ-cong {l , _} {l , _} (mk≈ꟳ fst≡ snd≈) =
+      ≡→≈ (Colim (F̃ ∘ D)) ≡.refl
+    ψ-cong {l , _} {n , _} (mk≈ꟳ fst≡ snd≈) =
+      absurdp (l≢n fst≡)
+    ψ-cong {n , _} {l , _} (mk≈ꟳ fst≡ snd≈) =
+      absurdp (l≢n (≡.sym fst≡))
     ψ-cong {n , f1} {n , f2} (mk≈ꟳ ≡.refl snd≈) =
       begin
       ψ₀ (n , f1)
@@ -307,8 +310,8 @@ module Mobile (B : Set) where
       h2 b = sz (g2 b) (<sup b (≤refl (g2 b)))
       Pos = Branch .Position
       r : ∀ b → (p : Colim D [ f1 b ≈ f2 b ])
-        → Colim (F̃ ∘ D) [ sup (n , g1) , (n , h1)
-                        ≈ sup (n , g2) , (n , h2) ]
+        → {!Colim (F̃ ∘ D) [ sup (n , g1) , (n , h1)
+                        ≈ sup (n , g2) , (n , h2) ]!}
       r b p = {!!}
 
     cocontinuous : Cocontinuous F̃ D

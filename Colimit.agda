@@ -5,8 +5,8 @@ open import Equivalence
 open import Setoid
 open import Data.Product
 
-module Colimit {ℓI} {ℓI'} {ℓ≤} {ℓB} {ℓB'}
-  {I : Setoid ℓI ℓI'}
+module Colimit {ℓI} {ℓ≤} {ℓB} {ℓB'}
+  {I : Set ℓI}
   (≤p : Preorder I ℓ≤)
   where
 
@@ -14,18 +14,16 @@ private
   variable
     ℓ ℓ' ℓ'' ℓ''' ℓ'''' : Level
 
-record Diagram : Set (ℓ≤ ⊔ ℓI ⊔ lsuc ℓB ⊔ lsuc ℓB') where
+record Diagram : Set (ℓ≤ ⊔ lsuc ℓB ⊔ lsuc ℓB') where
   module ≤ = IsPreorder (≤p .proj₂)
-  _≤_ : ≈.Rel≈ I ℓ≤
+  _≤_ : Rel I ℓ≤
   _≤_ = ≤p .proj₁
-  open ≈.Setoid I using () renaming (Carrier to Î)
-  module I = ≈.Setoid I
 
   field
-    D-ob : ∀ (i : Î) → Setoid ℓB ℓB'
+    D-ob : ∀ (i : I) → Setoid ℓB ℓB'
     D-mor : ∀ {i j} → (p : i ≤ j) → ≈.Hom (D-ob i) (D-ob j)
-    D-id : ∀ {i : Î}
-         → ≈.Hom≈ (D-mor (≤.refl I.refl))
+    D-id : ∀ {i : I}
+         → ≈.Hom≈ (D-mor (≤.refl))
                   (≈.idHom {S = D-ob i})
     D-comp : ∀ {i j k} → (p : i ≤ j) (q : j ≤ k)
            → ≈.Hom≈ (D-mor (≤.trans p q))
@@ -34,27 +32,20 @@ record Diagram : Set (ℓ≤ ⊔ ℓI ⊔ lsuc ℓB ⊔ lsuc ℓB') where
 module Colim (P : Diagram) where
   open Diagram P renaming (D-ob to P̂)
 
-  -- Helper to access the function part of the diagram morphism
-  Pf : ∀ {i j} (p : i ≤ j) → (⟨ P̂ i ⟩ → ⟨ P̂ j ⟩)
-  Pf p = ⟦_⟧
-    where open ≈.Hom (D-mor p )
-
-  -- Local syntax for equality in the fiber setoids
-  ≈j : ∀ i → (x y : ⟨ P̂ i ⟩) → Prop _
-  ≈j i x y = x ≈ y
-    where open ≈.Setoid (P̂ i)
-
-  syntax ≈j i x y = x ≈[ i ] y
+  private 
+    Pf : ∀ {i j} (p : i ≤ j) → (⟨ P̂ i ⟩ → ⟨ P̂ j ⟩)
+    Pf p = ⟦_⟧
+      where open ≈.Hom (D-mor p)
 
   open import Data.Product
 
   -- The carrier of the colimit (Sigma type)
   Colim₀ : Set (ℓI ⊔ ℓB)
-  Colim₀ = Σ[ i ∈ ⟨ I ⟩ ] ⟨ P̂ i ⟩
+  Colim₀ = Σ[ i ∈ I ] ⟨ P̂ i ⟩
 
   -- The equivalence relation generating the colimit
   data _≈ˡ_ : Colim₀ → Colim₀ → Prop (ℓ≤ ⊔ ℓI ⊔ ℓB ⊔ ℓB') where
-    ≈lstage : ∀ i → {x x' : ⟨ P̂ i ⟩} → x ≈[ i ] x' → (i , x) ≈ˡ (i , x')
+    ≈lstage : ∀ i → {x x' : ⟨ P̂ i ⟩} → P̂ i [ x ≈ x' ] → (i , x) ≈ˡ (i , x')
     ≈lstep  : ∀ {i j} (p : i ≤ j) (x : ⟨ P̂ i ⟩) → (i , x) ≈ˡ (j , Pf p x)
     ≈lsym   : ∀ {s t} → s ≈ˡ t → t ≈ˡ s
     ≈ltrans : ∀ {s t u} → s ≈ˡ t → t ≈ˡ u → s ≈ˡ u
