@@ -65,9 +65,13 @@ The `Plump` module implements size-based termination checking using container-ba
 
 ## 3. General Categorical Definitions
 
-The root-level modules provide general definitions that are later specialized:
+The root-level modules provide general definitions that are later specialized in the mobile setting:
 
 ### Colimit Theory (General Framework)
+
+```agda
+open import Colimit ≤p  -- where ≤p is a preorder
+```
 
 The `Colimit` module develops the general theory of colimits in categories of setoids. This provides:
 - Diagram definitions over arbitrary preorders
@@ -77,6 +81,11 @@ The `Colimit` module develops the general theory of colimits in categories of se
 
 ### Cocontinuity Theory (General Framework) 
 
+```agda
+-- Note: Cocontinuity module is parameterized and not imported directly
+-- open import Cocontinuity ≤p  -- where ≤p is a preorder
+```
+
 The `Cocontinuity` module studies cocontinuous functors and their interaction with colimits:
 - Preservation of colimits by functors
 - Cocontinuity conditions and characterizations
@@ -84,19 +93,34 @@ The `Cocontinuity` module studies cocontinuous functors and their interaction wi
 
 ### Container Functors
 
+```agda
+-- Note: ContainerFunctor module is parameterized and not imported directly
+-- open import ContainerFunctor C  -- where C is a container
+```
+
 The `ContainerFunctor` module provides a setoid-based treatment of container functors, giving concrete representations for the shapes of data structures that can be turned into QITs.
 
 ### Tree Ordinals
+
+```agda
+-- Note: TreeOrdinals has naming conflicts with standard library
+-- open import TreeOrdinals  -- import separately when needed
+```
 
 The `TreeOrdinals` module develops tree-based ordinal representations using binary trees, providing a concrete model for well-founded relations used in QIT constructions. Note: This module has naming conflicts with the standard library's `Setoid` and should be imported separately when needed.
 
 ## 4. The Mobile Construction (Main Development)
 
-The core theoretical contribution lies in the `Mobile/` directory, which develops the mobile category framework specifically designed for QIT semantics:
+The core theoretical contribution lies in the `Mobile/` directory, which develops the mobile category framework specifically designed for QIT semantics. Due to the parameterized nature of these modules, they are described here but not imported directly.
 
 ### Mobile Base Theory
 
 **`Mobile.Base`** introduces the fundamental mobile structures parameterized by a branching type `B : Set`:
+
+```agda
+-- Example usage (not imported to avoid parameter conflicts):
+-- open import Mobile.Base B
+```
 
 - **`NodeType`**: The basic shape `{l, n}` distinguishing leaves from nodes
 - **`Branch` container**: The container `Branch : Container` with:
@@ -111,6 +135,11 @@ This establishes the basic mobile data structures where `B` represents the branc
 
 **`Mobile.Equivalence`** defines the crucial mobile equivalence `_≈ᵗ_` that captures the essential QIT equivalences:
 
+```agda
+-- Example usage (not imported to avoid parameter conflicts):
+-- open import Mobile.Equivalence B
+```
+
 - **`≈leaf`**: All leaves are equivalent (structural irrelevance of leaf data)
 - **`≈node`**: Node equivalence respects the underlying setoid structure pointwise
 - **`≈perm`**: Critical symmetry - nodes are equivalent up to permutation of branches indexed by `B`
@@ -121,6 +150,11 @@ This equivalence relation encodes the key QIT properties: structural equivalence
 ### Mobile Colimit Construction
 
 **`Mobile.Colimit`** constructs colimits in the mobile setting using the plump/size-based approach:
+
+```agda
+-- Example usage (not imported to avoid parameter conflicts):
+-- open import Mobile.Colimit B
+```
 
 - **Size-based indexing**: Uses the `_<_` relation from `Plump Branch` to create well-founded size orderings
 - **`Sz` setoids**: For each tree `t`, constructs `Sz t` as the setoid of smaller trees with mobile equivalence
@@ -133,6 +167,11 @@ This provides the categorical colimit structure needed to model QIT constructors
 
 **`Mobile.Functor`** develops functors in the mobile category setting:
 
+```agda
+-- Example usage (not imported to avoid parameter conflicts):
+-- open import Mobile.Functor B
+```
+
 - **Mobile functor objects**: `F̃-ob` constructed from the branch container applied to setoids
 - **Mobile functor morphisms**: Respecting the mobile equivalence structure
 - **Branch equivalence**: `_≈ᵇ_` relation with leaf equivalence, permutation symmetry, and extensionality
@@ -141,6 +180,11 @@ This provides the categorical colimit structure needed to model QIT constructors
 ### Mobile Cocontinuity
 
 **`Mobile.Cocontinuity`** establishes the cocontinuity properties crucial for QIT semantics:
+
+```agda
+-- Example usage (not imported to avoid parameter conflicts):
+-- open import Mobile.Cocontinuity B
+```
 
 - **Isomorphisms**: `ϕ` and `ψ` establishing `Colim(F ∘ D) ≅ F(Colim D)` for mobile functors
 - **Cocontinuity verification**: Proving mobile functors preserve colimits
