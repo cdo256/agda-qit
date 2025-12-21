@@ -15,16 +15,16 @@ private
   l0 = lzero
 
 data _≈ᵗ_ : BTree → BTree → Prop l0 where
-  ≈leaf : ∀ {f g} → leaf {f} ≈ᵗ leaf {g}
+  ≈leaf : ∀ {f g} → sup (l , f) ≈ᵗ sup (l , g)
   ≈node : ∀ {f g} → (c : ∀ b → f b ≈ᵗ g b)
-        → node f ≈ᵗ node g
+        → sup (n , f) ≈ᵗ sup (n , g)
   ≈perm : ∀ {f} → (π : B ↔ B)
-        → node f ≈ᵗ node λ b → f (π .↔.to b)
+        → sup (n , f) ≈ᵗ sup (n , λ b → f (π .↔.to b))
   ≈trans : ∀ {s t u} → s ≈ᵗ t → t ≈ᵗ u → s ≈ᵗ u
 
 ≈refl : ∀ {t} → t ≈ᵗ t
-≈refl {leaf} = ≈leaf
-≈refl {node f} = ≈node λ b → ≈refl {f b}
+≈refl {sup (l , f)} = ≈leaf
+≈refl {sup (n , f)} = ≈node λ b → ≈refl {f b}
 
 ≈sym : ∀ {s t} → s ≈ᵗ t → t ≈ᵗ s
 ≈sym ≈leaf = ≈leaf
@@ -35,10 +35,10 @@ data _≈ᵗ_ : BTree → BTree → Prop l0 where
   module π = _↔_ π
   π' = ↔.flip π
   A : (B → B) → Prop l0
-  A = λ h → node (λ b → f (π.to b)) ≈ᵗ node λ b → f (h b)
+  A = λ h → sup (n , λ b → f (π.to b)) ≈ᵗ sup (n , λ b → f (h b))
   p : (λ b → π.to (π.from b)) ≡ (λ b → b)
   p = funExt λ b → π.linv b
-  x : node (λ b → f (π.to b)) ≈ᵗ node (λ b → f (π.to (π.from b)))
+  x : sup (n , λ b → f (π.to b)) ≈ᵗ sup (n , λ b → f (π.to (π.from b)))
   x = ≈perm {f = λ b → f (π.to b)} π'
 ≈sym (≈trans s≈t t≈u) = ≈trans (≈sym t≈u) (≈sym s≈t)
 
@@ -54,9 +54,9 @@ MobileSetoid = record
   ; _≈_ = _≈ᵗ_
   ; isEquivalence = isEquiv-≈ᵗ }
 
-leaf≉node : ∀ {f g} → leaf {g} ≈ᵗ node f → ⊥p
-leaf≉node (≈trans {t = leaf} p q) = leaf≉node q
-leaf≉node (≈trans {t = node _} p q) = leaf≉node p
+leaf≉node : ∀ {f g} → sup (l , g) ≈ᵗ sup (n , f) → ⊥p
+leaf≉node (≈trans {t = sup (l , _)} p q) = leaf≉node q
+leaf≉node (≈trans {t = sup (n , _)} p q) = leaf≉node p
 
 l≢n : l ≡ n → ⊥p
 l≢n ()
