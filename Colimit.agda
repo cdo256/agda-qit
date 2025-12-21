@@ -72,8 +72,8 @@ module Colim (P : Diagram) where
     field
       Apex     : Setoid (ℓI ⊔ ℓB) (ℓI ⊔ ℓ≤ ⊔ ℓB ⊔ ℓB')
       inj      : ∀ i → ≈.Hom (P̂ i) Apex
-      commutes : ∀ {i j} (p : i ≤ j) →
-                  ≈.Hom≈ (inj i) (inj j ≈.∘ D-mor p)
+      commutes : ∀ {i j} (p : i ≤ j)
+               → ≈.Hom≈ (inj i) (inj j ≈.∘ D-mor p)
 
   open Cocone
 
