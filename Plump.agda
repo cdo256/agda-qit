@@ -1,9 +1,9 @@
-
+{-# OPTIONS --type-in-type #-}
 open import Level using (Level; _⊔_; Lift; lift) renaming (suc to lsuc; zero to lzero)
 open import Data.Product
 open import Data.W
 open import Data.Container
-
+open import Setoid.Base
 
 module Plump {ℓs ℓp} (C : Container ℓs ℓp) where
 
@@ -60,3 +60,11 @@ iswf< i = acc λ j j<i → α i j (<→≤ j<i)
     α' : WfRec _<_ (Acc _<_) j
     α' k k<j with ≤< j≤i k<j
     ... | <sup x k≤fx = α (f x) k k≤fx
+
+isPreorder-≤ : IsPreorder (W C) _≤_
+isPreorder-≤ = record
+  { refl = λ {x} → ≤refl x
+  ; trans = λ p q → ≤≤ q p }
+
+≤p : Preorder (W C) _
+≤p = _≤_ , isPreorder-≤

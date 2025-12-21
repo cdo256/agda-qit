@@ -103,7 +103,6 @@ module Colim (P : Diagram) where
   open isLimitingCocone
 
   open ≈.Hom
-  -- module ≈ = Setoid
 
   -- Proof that LimitCocone is limiting
   module IsLimitingCocone (C' : Cocone) where

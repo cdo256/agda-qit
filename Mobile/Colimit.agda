@@ -19,13 +19,7 @@ private
   l0 = lzero
 
 
-isPreorder-≤ : IsPreorder BTree _≤_
-isPreorder-≤ = record
-  { refl = λ {x} → ≤refl x
-  ; trans = λ p q → ≤≤ q p }
 
-≤p : Preorder BTree _
-≤p = _≤_ , isPreorder-≤
 
 record Sz₀ (t : BTree) : Set l0 where
   constructor sz
