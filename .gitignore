@@ -173,3 +173,4 @@ TSWLatexianTemp*
 *.sta
 *.lpz
 *.xwm
+.direnv/bin/nix-direnv-reload
