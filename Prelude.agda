@@ -55,3 +55,12 @@ postulate
 subst-id : {A : Set} {P : A → Set} {x : A} (p : x ≡ x) (b : P x) 
          → subst P p b ≡ b
 subst-id ≡.refl b = ≡.refl
+
+open import Data.Empty
+
+data ⊥p : Prop where
+absurdp : {A : Prop} → ⊥p → A
+absurdp ()
+
+⊥→⊥p : ⊥ → ⊥p
+⊥→⊥p ()

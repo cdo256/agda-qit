@@ -12,7 +12,6 @@ open import Function.Properties.Inverse
 open import Data.Empty renaming (⊥-elim to absurd)
 open import Data.W
 open import Data.Container hiding (_⇒_; identity; refl; sym; trans)
--- open import Relation.Binary.Structures
 
 private
   l0 : Level
@@ -83,14 +82,6 @@ module Mobile (B : Set) where
   open import Plump Branch
     renaming (_≺_ to _<_; ≺sup to <sup)
 
-
-  data ⊥p : Prop where
-  absurdp : {A : Prop} → ⊥p → A
-  absurdp ()
-
-  ⊥→⊥p : ⊥ → ⊥p
-  ⊥→⊥p ()
-
   leaf≉node : ∀ {f g} → leaf {g} ≈ᵗ node f → ⊥p
   leaf≉node (≈trans {t = leaf} p q) = leaf≉node q
   leaf≉node (≈trans {t = node _} p q) = leaf≉node p
@@ -98,35 +89,35 @@ module Mobile (B : Set) where
   l≢n : l ≡ n → ⊥p
   l≢n ()
 
-  leaf≤leaf : ∀ {f g} → leaf {f} ≤ leaf {g}
-  leaf≤leaf = sup≤ (λ ())
-  ≤-resp-≈ᵗ : ∀ {x y} → x ≈ᵗ y → x ≤ y
-  ≤-resp-≈ᵗ {leaf {f}} {leaf {g}} p = leaf≤leaf 
-  ≤-resp-≈ᵗ {leaf} {node f} p = absurdp (leaf≉node p)
-  ≤-resp-≈ᵗ {node f} {leaf} p = absurdp (leaf≉node (≈sym p))
-  ≤-resp-≈ᵗ {node f} {node g} (≈node c) =
-    sup≤ λ b → <sup b ((≤-resp-≈ᵗ (c b)))
-  ≤-resp-≈ᵗ {node f} {node g} (≈perm π) =
-    sup≤ (λ b → <sup (π.⟦ b ⟧⁻¹) (u b))
-    where
-    module π = ≈.Iso π
-    u : ∀ b → f b ≤ f (π.⟦ π.⟦ b ⟧⁻¹ ⟧) 
-    u b = q p
-      where
-      p : π.⟦ π.⟦ b ⟧⁻¹ ⟧ ≡p b
-      p = π.linv b
-      q : ∀ (p : π.⟦ π.⟦ b ⟧⁻¹ ⟧ ≡p b) → f b ≤ f (π.⟦ π.⟦ b ⟧⁻¹ ⟧) 
-      q ∣ p ∣ = substp (λ x → f b ≤ f x) (≡.sym p) (≤refl (f b))
-  ≤-resp-≈ᵗ {node f} {node g} (≈trans {t = t} p q) =
-    ≤≤ {i = node f} {j = t} {k = node g}
-       (≤-resp-≈ᵗ q) (≤-resp-≈ᵗ p)
+  -- leaf≤leaf : ∀ {f g} → leaf {f} ≤ leaf {g}
+  -- leaf≤leaf = sup≤ (λ ())
+  -- ≤-resp-≈ᵗ : ∀ {x y} → x ≈ᵗ y → x ≤ y
+  -- ≤-resp-≈ᵗ {leaf {f}} {leaf {g}} p = leaf≤leaf 
+  -- ≤-resp-≈ᵗ {leaf} {node f} p = absurdp (leaf≉node p)
+  -- ≤-resp-≈ᵗ {node f} {leaf} p = absurdp (leaf≉node (≈sym p))
+  -- ≤-resp-≈ᵗ {node f} {node g} (≈node c) =
+  --   sup≤ λ b → <sup b ((≤-resp-≈ᵗ (c b)))
+  -- ≤-resp-≈ᵗ {node f} {node g} (≈perm π) =
+  --   sup≤ (λ b → <sup (π.⟦ b ⟧⁻¹) (u b))
+  --   where
+  --   module π = ≈.Iso π
+  --   u : ∀ b → f b ≤ f (π.⟦ π.⟦ b ⟧⁻¹ ⟧) 
+  --   u b = q p
+  --     where
+  --     p : π.⟦ π.⟦ b ⟧⁻¹ ⟧ ≡p b
+  --     p = π.linv b
+  --     q : ∀ (p : π.⟦ π.⟦ b ⟧⁻¹ ⟧ ≡p b) → f b ≤ f (π.⟦ π.⟦ b ⟧⁻¹ ⟧) 
+  --     q ∣ p ∣ = substp (λ x → f b ≤ f x) (≡.sym p) (≤refl (f b))
+  -- ≤-resp-≈ᵗ {node f} {node g} (≈trans {t = t} p q) =
+  --   ≤≤ {i = node f} {j = t} {k = node g}
+  --      (≤-resp-≈ᵗ q) (≤-resp-≈ᵗ p)
 
-  isPreorder-≤ : IsPreorder MobileSetoid _≤_
+  isPreorder-≤ : IsPreorder BTree _≤_
   isPreorder-≤ = record
-    { refl = ≤-resp-≈ᵗ
+    { refl = λ {x} → ≤refl x
     ; trans = λ p q → ≤≤ q p }
 
-  ≤p : Preorder MobileSetoid _
+  ≤p : Preorder BTree _
   ≤p = _≤_ , isPreorder-≤
 
   record Sz₀ (t : BTree) : Set l0 where
@@ -176,7 +167,7 @@ module Mobile (B : Set) where
 
   module Cocontinuity where
     open import Colimit ≤p
-    open Colim hiding (≈j)
+    open Colim
     open import ContainerFunctor Branch
     open import Cocontinuity ≤p 
 
@@ -211,13 +202,13 @@ module Mobile (B : Set) where
     ϕ-cong {i , l , f} {i , n , g} (≈lstage _ (Ob.mk≈ꟳ fst≡ snd≈)) =
       absurdp (l≢n fst≡)
     ϕ-cong {i , n , f} {i , n , g} (≈lstage _ (Ob.mk≈ꟳ fst≡ snd≈)) =
-      Ob.mk≈ꟳ ≡.refl λ b → ≈lstage i (u b)
+      Ob.mk≈ꟳ ≡.refl λ b → {!≈lstage i (u b)!}
       where
       open ≈.≈syntax {S = Colim D}
-      open Colim D using (≈j)
+      open Colim D
       s : ∀ b → f b .Sz₀.u ≈ᵗ g b .Sz₀.u
       s b = substp (λ ○ → f b .Sz₀.u ≈ᵗ g ○ .Sz₀.u) (subst-id fst≡ b) (snd≈ b)
-      u : ∀ b → ? [ f b ≈ g b ]
+      u : ∀ b → Sz i [ f b ≈ g b ]
       u b = s b
     ϕ-cong {i , l , _} {j , l , _} (≈lstep p (l , _)) = F.F-id (Ob.mk≈ꟳ ≡.refl (λ ()))
     ϕ-cong {i , n , f} {j , n , g} (≈lstep p (n , f)) =
