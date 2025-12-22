@@ -22,7 +22,7 @@ open import Data.Sum
 
 Branch : Container l0 l0 
 Branch .Shape = NodeType
-Branch .Position l = Lift l0 ⊥
+Branch .Position l = ⊥*
 Branch .Position n = B
 
 BTree = W Branch

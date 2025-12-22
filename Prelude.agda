@@ -84,3 +84,6 @@ module ↔ where
     where open _↔_ X↔Y
   
 open ↔ using (_↔_) public
+
+⊥* : ∀ {ℓ} → Set ℓ
+⊥* {ℓ} = Lift ℓ ⊥
