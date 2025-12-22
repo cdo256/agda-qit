@@ -68,3 +68,20 @@ isPreorder-≤ = record
 
 ≤p : Preorder (W C) _
 ≤p = _≤_ , isPreorder-≤
+
+_⊆_ : Size → Size → Prop (ℓs ⊔ ℓp)
+i ⊆ j = ∀ k → k < i → k < j
+
+_⊇_ : Size → Size → Prop
+i ⊇ j = ∀ k → i < k → j < k
+
+⊆→≤ : ∀ {i j} → i ⊆ j → i ≤ j
+⊆→≤ {sup (s , f)} {sup (t , g)} p = 
+  sup≤ (λ x → p (f x) (<sup x (≤refl (f x))))
+
+≤→⊆ : ∀ i j → i ≤ j → i ⊆ j
+≤→⊆ (sup (s , f)) (sup (t , g)) sf≤tg =
+  λ k k<sf → ≤< sf≤tg k<sf
+
+≤→⊇ : ∀ i j → i ≤ j → j ⊇ i
+≤→⊇ i j i≤j k j<k = <≤ j<k i≤j
