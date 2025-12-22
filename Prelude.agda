@@ -34,8 +34,9 @@ infix 4 _≡p_
 _≡p_ : ∀ {ℓ} {A : Set ℓ} (x y : A) → Prop ℓ
 x ≡p y = ∥ x ≡ y ∥
 
-≡p→≡ : ∀ {A : Set ℓ} → ∀ {x y : A} → x ≡p y → x ≡ y
-≡p→≡ {x = x} {y = y} w = {!!}
+infix 4 _≡ᴾ_
+_≡ᴾ_ : ∀ {ℓ} {A : Prop ℓ} (x y : A) → Set ℓ
+x ≡ᴾ y = box x ≡ box y
 
 substp : ∀ {A : Set ℓ} (B : A → Prop ℓ') {a1 a2 : A} (p : a1 ≡ a2) → B a1 → B a2
 substp B _≡_.refl x = x
@@ -87,3 +88,11 @@ open ↔ using (_↔_) public
 
 ⊥* : ∀ {ℓ} → Set ℓ
 ⊥* {ℓ} = Lift ℓ ⊥
+
+congp : ∀ {a b} {A : Set a} {B : Prop b} (f : A → B)
+      → ∀ {x y} → x ≡ y → f x ≡ᴾ f y
+congp f ≡.refl = ≡.refl
+
+congp' : ∀ {a b} {A : Prop a} {B : Set b} (f : A → B)
+      → ∀ {x y : A} → x ≡ᴾ y → f x ≡ f y
+congp' f ≡.refl = ≡.refl
