@@ -13,6 +13,8 @@ open import Data.Container hiding (_⇒_; identity; refl; sym; trans)
 open import Data.Unit
 open import Data.Sum
 open import Plump Branch
+open import Colimit ≤p
+open import Subset
 
 private
   l0 : Level

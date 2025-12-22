@@ -1,5 +1,5 @@
 {-# OPTIONS --type-in-type #-}
-open import Level using (Level; _⊔_; Lift; lift) renaming (suc to lsuc; zero to lzero)
+open import Prelude
 open import Data.Product
 open import Data.W
 open import Data.Container
@@ -49,7 +49,7 @@ mutual
 << : ∀{i j k} → j < k → i < j → i < k
 << (<sup x i≤fx) i<j = <sup x (<→≤ (≤< i≤fx i<j))
 
-open import WellFounded
+open import Order
 
 iswf< : WellFounded _<_
 iswf< i = acc λ j j<i → α i j (<→≤ j<i)
@@ -61,7 +61,7 @@ iswf< i = acc λ j j<i → α i j (<→≤ j<i)
     α' k k<j with ≤< j≤i k<j
     ... | <sup x k≤fx = α (f x) k k≤fx
 
-isPreorder-≤ : IsPreorder (W C) _≤_
+isPreorder-≤ : IsPreorder _≤_
 isPreorder-≤ = record
   { refl = λ {x} → ≤refl x
   ; trans = λ p q → ≤≤ q p }

@@ -1,6 +1,7 @@
 {-# OPTIONS --type-in-type #-}
 
 open import Prelude
+open import Order
 open import Equivalence
 open import Setoid
 open import Data.Product

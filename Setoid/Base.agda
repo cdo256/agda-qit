@@ -51,13 +51,6 @@ Rel≈ S ℓ'' = A → A → Prop (ℓ ⊔ ℓ'')
   where
   open Setoid S renaming (Carrier to A)
 
-record IsPreorder (S : Set ℓ) (_≤_ : Rel S ℓ'') : Set (ℓ ⊔ ℓ'') where
-  field
-    refl  : Reflexive _≤_
-    trans : Transitive _≤_
-
-Preorder : (S : Set ℓ) → ∀ ℓ'' → Set lzero
-Preorder S ℓ'' = Σ (Rel S ℓ'') (IsPreorder S)
 
 ≡setoid : ∀ (B : Set ℓ) → Setoid ℓ ℓ
 ≡setoid B = record
