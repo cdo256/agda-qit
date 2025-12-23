@@ -34,7 +34,7 @@ module _ (S : Setoid l0 l0) where
   ≈sym ≈leaf = ≈leaf
   ≈sym (≈node c) = ≈node λ b → S.sym (c b)
   ≈sym (≈perm {f} π) =
-    substp A p x
+    substp A p q
     where
     module π = _↔_ π
     π' = ↔.flip π
@@ -42,8 +42,8 @@ module _ (S : Setoid l0 l0) where
     A = λ h → (n , λ b → f (π.to b)) ≈ᵗ (n , λ b → f (h b))
     p : (λ b → π.to (π.from b)) ≡ (λ b → b)
     p = funExt λ b → π.linv b
-    x : (n , λ b → f (π.to b)) ≈ᵗ (n , λ b → f (π.to (π.from b)))
-    x = ≈perm {f = λ b → f (π.to b)} π'
+    q : (n , λ b → f (π.to b)) ≈ᵗ (n , λ b → f (π.to (π.from b)))
+    q = ≈perm {f = λ b → f (π.to b)} π'
   ≈sym (≈trans s≈t t≈u) = ≈trans (≈sym t≈u) (≈sym s≈t)
 
   isEquiv-≈ᵗ : IsEquivalence _≈ᵗ_

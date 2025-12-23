@@ -85,3 +85,4 @@ i ⊇ j = ∀ k → i < k → j < k
 
 ≤→⊇ : ∀ i j → i ≤ j → j ⊇ i
 ≤→⊇ i j i≤j k j<k = <≤ j<k i≤j
+
