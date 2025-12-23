@@ -22,7 +22,7 @@ private
 open import Colimit ≤p
 open Colim
 open import ContainerFunctor Branch
-open import Cocontinuity ≤p 
+open import Cocontinuity ≤p
 
 -- module F = ≈.Functor F̃
 -- module D = Diagram D
@@ -37,10 +37,10 @@ open import Cocontinuity ≤p
 --   where
 --   g : B → ⟨ MobileSetoid ⟩
 --   g b = f b .proj₁
---   h : B → ⟨ D.D-ob (node g) ⟩
+--   h : B → ⟨ D.D-ob (sup (n , g)) ⟩
 --   h b = sz (g b) gb<ng
 --     where
---     gb<ng : g b < node g
+--     gb<ng : g b < sup (n , g)
 --     gb<ng = <sup b (≤refl (g b))
 
 -- l≉ꟳn : ∀ {f g} → Ob._≈ꟳ_ (Colim D) (l , f) (n , g) → ⊥p
@@ -160,5 +160,3 @@ open import Cocontinuity ≤p
 
 -- cocontinuous : Cocontinuous F̃ D
 -- cocontinuous = {!!}
-
-
