@@ -27,6 +27,6 @@ Branch .Position n = B
 
 BTree = W Branch
 
-pattern leaf {f} = sup (l , f)
-pattern node f = sup (n , f)
+-- pattern leaf {f} = sup (l , f)
+-- pattern node f = sup (n , f)
 
