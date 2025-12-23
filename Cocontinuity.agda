@@ -2,6 +2,7 @@
 open import Prelude
 open import Setoid
 open import Colimit 
+open import Order 
 
 module Cocontinuity {ℓI} {ℓ≤} -- {ℓB}
   {I : Set ℓI}
