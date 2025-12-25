@@ -27,10 +27,10 @@ open import Equivalence
 The `Equivalence` module defines fundamental notions of equivalence relations including reflexivity, symmetry, and transitivity properties. This provides the basic relational foundation for working with setoids and mobile equivalences.
 
 ```agda
-open import WellFounded
+open import Order
 ```
 
-The `WellFounded` module provides accessibility predicates and well-founded recursion principles essential for defining inductive types and proving termination of QIT eliminators.
+The `Order` module provides accessibility predicates and well-founded recursion principles essential for defining inductive types and proving termination of QIT eliminators.
 
 ### 2. Setoid Category
 
@@ -69,11 +69,7 @@ The root-level modules provide general definitions that are later specialized in
 
 ### Colimit Theory (General Framework)
 
-```agda
-open import Colimit ≤p  -- where ≤p is a preorder
-```
-
-The `Colimit` module develops the general theory of colimits in categories of setoids. This provides:
+The `Colimit` module develops the general theory of colimits in categories of setoids, parameterized by a preorder. This provides:
 - Diagram definitions over arbitrary preorders
 - Colimit construction as quotients of disjoint unions  
 - Cocone definitions and universal properties
@@ -211,7 +207,7 @@ This development makes several fundamental contributions to QIT theory:
 The logical development follows these key dependencies:
 
 **Foundation Layer:**
-- `Prelude` → `Equivalence` → `WellFounded` → `Plump`
+- `Prelude` → `Equivalence` → `Order` → `Plump`
 
 **Setoid Category Layer:**  
 - `Setoid/{Base,Hom,Iso,Functor,Sigma}` → `Setoid`
