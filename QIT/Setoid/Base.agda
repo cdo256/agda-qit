@@ -1,10 +1,10 @@
 {-# OPTIONS --type-in-type #-}
-module Setoid.Base where
+module QIT.Setoid.Base where
 
-open import Prelude
+open import QIT.Prelude
 open import Data.Product
-open import Equivalence
- 
+open import QIT.Equivalence
+
 private
   ℓ ℓ' ℓ'' ℓ''' ℓ'''' : Level
   ℓ = lzero
@@ -16,7 +16,7 @@ private
 record Setoid ℓ ℓ' : Set (lsuc (ℓ ⊔ ℓ')) where
   infix 4 _≈_
   field
-    Carrier       : Set ℓ 
+    Carrier       : Set ℓ
     _≈_           : Rel Carrier ℓ'
     isEquivalence : IsEquivalence _≈_
 
@@ -40,7 +40,7 @@ module ≈syntax {ℓ ℓ'} {S : Setoid ℓ ℓ'} where
   step-≈ : ∀ (x : A) {y z} → y ≈ z → x ≈ y → x ≈ z
   step-≈ _ q p = trans p q
   syntax step-≈ x q p = x ≈⟨ p ⟩ q
-  
+
   infix 3 _∎
 
   _∎ : ∀ x → x ≈ x

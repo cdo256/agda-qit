@@ -1,12 +1,12 @@
 {-# OPTIONS --type-in-type #-}
 
-open import Prelude
-open import Order
-open import Equivalence
-open import Setoid
+open import QIT.Prelude
+open import QIT.Order
+open import QIT.Equivalence
+open import QIT.Setoid
 open import Data.Product
 
-module Colimit {ℓI} {ℓ≤} {ℓB} {ℓB'}
+module QIT.Colimit {ℓI} {ℓ≤} {ℓB} {ℓB'}
   {I : Set ℓI}
   (≤p : Preorder I ℓ≤)
   where
@@ -33,7 +33,7 @@ record Diagram : Set (ℓ≤ ⊔ lsuc ℓB ⊔ lsuc ℓB') where
 module Colim (P : Diagram) where
   open Diagram P renaming (D-ob to P̂)
 
-  private 
+  private
     Pf : ∀ {i j} (p : i ≤ j) → (⟨ P̂ i ⟩ → ⟨ P̂ j ⟩)
     Pf p = ⟦_⟧
       where open ≈.Hom (D-mor p)

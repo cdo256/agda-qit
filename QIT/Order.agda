@@ -1,9 +1,9 @@
 {-# OPTIONS --type-in-type #-}
-module Order where
+module QIT.Order where
 
-open import Prelude
+open import QIT.Prelude
 open import Data.Product
-open import Equivalence
+open import QIT.Equivalence
 
 module _ {ℓA ℓ<} {A : Set ℓA} (_<_ : A → A → Prop ℓ<) where
     WfRec : (A → Prop (ℓA ⊔ ℓ<)) → (A → Prop (ℓA ⊔ ℓ<))
@@ -24,7 +24,7 @@ Preorder : ∀ {ℓ} (S : Set ℓ) → ∀ ℓ'' → Set lzero
 Preorder S ℓ'' = Σ (Rel S ℓ'') IsPreorder
 
 IsWeaklyExtensional : ∀ {ℓA ℓ≤} {A : Set ℓA} (_≤_ _<_ : Rel A ℓ≤) → Prop
-IsWeaklyExtensional {A = A} _≤_ _<_ = ∀ x y → x ≲ y → y ≲ x → x ≡p y 
+IsWeaklyExtensional {A = A} _≤_ _<_ = ∀ x y → x ≲ y → y ≲ x → x ≡p y
   where
   _≲_ : (x y : A) → Prop
   x ≲ y = ∀ z → z < x → z < y

@@ -20,7 +20,7 @@ Before presenting the construction, we establish the fundamental categorical inf
 A **setoid** $S = (|S|, {\approx_S})$ consists of a set $|S|$ equipped with an equivalence relation ${\approx_S}$ satisfying:
 
 - **Reflexivity**: $x \approx_S x$ for all $x \in |S|$
-- **Symmetry**: $x \approx_S y$ implies $y \approx_S x$ 
+- **Symmetry**: $x \approx_S y$ implies $y \approx_S x$
 - **Transitivity**: $x \approx_S y$ and $y \approx_S z$ implies $x \approx_S z$
 
 Setoids provide a foundation for working with quotient types while maintaining computational content.
@@ -48,7 +48,7 @@ where $\approx$ denotes homomorphic equivalence. Setoid isomorphism defines an e
 A **setoid functor** $F: \mathbf{Setoid} \to \mathbf{Setoid}$ assigns to each setoid $S$ a setoid $F(S)$, and to each homomorphism $f: S \to T$ a homomorphism $F(f): F(S) \to F(T)$, satisfying:
 
 - **Identity**: $F(\mathrm{id}_S) \approx \mathrm{id}_{F(S)}$
-- **Composition**: $F(g \circ f) \approx F(g) \circ F(f)$  
+- **Composition**: $F(g \circ f) \approx F(g) \circ F(f)$
 - **Congruence**: $f \approx g$ implies $F(f) \approx F(g)$
 
 These conditions ensure that $F$ is a proper functor on the category of setoids.

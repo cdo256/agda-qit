@@ -1,10 +1,10 @@
 {-# OPTIONS --type-in-type #-}
 
-module Setoid.Functor where
+module QIT.Setoid.Functor where
 
-open import Prelude
-open import Setoid.Base
-open import Setoid.Hom
+open import QIT.Prelude
+open import QIT.Setoid.Base
+open import QIT.Setoid.Hom
 open import Data.Product
 
 private

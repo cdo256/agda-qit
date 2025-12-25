@@ -1,20 +1,20 @@
 {-# OPTIONS --type-in-type #-}
-module Mobile.Functor (B : Set) where
+module QIT.Mobile.Functor (B : Set) where
 
-open import Prelude
-open import Equivalence
-open import Mobile.Base B
-open import Mobile.Equivalence B
-open import Mobile.Colimit B
-open import Setoid as ≈
+open import QIT.Prelude
+open import QIT.Equivalence
+open import QIT.Mobile.Base B
+open import QIT.Mobile.Equivalence B
+open import QIT.Mobile.Colimit B
+open import QIT.Setoid as ≈
 open import Data.Product
 open import Data.Empty renaming (⊥-elim to absurd)
 open import Data.W
 open import Data.Container hiding (_⇒_; identity; refl; sym; trans)
 open import Data.Unit
 open import Data.Sum
-open import Setoid
-open import Equivalence
+open import QIT.Setoid
+open import QIT.Equivalence
 open import Data.Product
 open import Data.Container hiding (refl; sym; trans)
 

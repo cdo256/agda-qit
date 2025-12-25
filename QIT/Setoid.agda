@@ -1,9 +1,9 @@
-module Setoid where
+module QIT.Setoid where
 
 module ≈ where
-  open import Setoid.Base public
-  open import Setoid.Hom public
-  open import Setoid.Iso public
-  open import Setoid.Functor public
+  open import QIT.Setoid.Base public
+  open import QIT.Setoid.Hom public
+  open import QIT.Setoid.Iso public
+  open import QIT.Setoid.Functor public
 
 open ≈ using (≡setoid; Setoid; ⟨_⟩; _≈h_; _[_≈_]; _≅_; ≡→≈) public

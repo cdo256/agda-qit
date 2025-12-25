@@ -1,12 +1,12 @@
 {-# OPTIONS --type-in-type #-}
-open import Prelude
-open import Setoid
-open import Equivalence
+open import QIT.Prelude
+open import QIT.Setoid
+open import QIT.Equivalence
 open import Data.Product
 
 open import Data.Container hiding (refl; sym; trans)
 
-module ContainerFunctor (C : Container lzero lzero) where
+module QIT.ContainerFunctor (C : Container lzero lzero) where
 
 private
   l0 = lzero
@@ -92,7 +92,7 @@ module Comp {S T U : Setoid l0 l0} (f : ≈.Hom S T) (g : ≈.Hom T U) where
   F̃-comp (Ob.mk≈ꟳ fst≡ snd≈) =
     Ob.mk≈ꟳ fst≡ λ p → (≈.Hom.cong g) ((≈.Hom.cong f) (snd≈ p))
 
-open Comp using (F̃-comp) public  
+open Comp using (F̃-comp) public
 
 module Resp
   {S T : Setoid l0 l0}

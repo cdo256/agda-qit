@@ -1,28 +1,28 @@
 {-# OPTIONS --type-in-type #-}
-module Mobile.Cocontinuity (B : Set) where
+module QIT.Mobile.Cocontinuity (B : Set) where
 
-open import Prelude
-open import Equivalence
-open import Mobile.Base B
-open import Mobile.Equivalence B
-open import Mobile.Colimit B
-open import Setoid as ≈
+open import QIT.Prelude
+open import QIT.Equivalence
+open import QIT.Mobile.Base B
+open import QIT.Mobile.Equivalence B
+open import QIT.Mobile.Colimit B
+open import QIT.Setoid as ≈
 open import Data.Product
 open import Data.Empty renaming (⊥-elim to absurd)
 open import Data.W
 open import Data.Container hiding (_⇒_; identity; refl; sym; trans)
 open import Data.Unit
 open import Data.Sum
-open import Plump Branch
+open import QIT.Plump Branch
 
 private
   l0 : Level
   l0 = lzero
 
-open import Colimit ≤p
+open import QIT.Colimit ≤p
 open Colim
-open import ContainerFunctor Branch
-open import Cocontinuity ≤p
+open import QIT.ContainerFunctor Branch
+open import QIT.Cocontinuity ≤p
 
 -- module F = ≈.Functor F̃
 -- module D = Diagram D

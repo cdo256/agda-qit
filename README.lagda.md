@@ -15,19 +15,19 @@ The development follows a carefully structured dependency order, building from f
 First, we establish basic utilities and type-theoretic foundations:
 
 ```agda
-open import Prelude
+open import QIT.Prelude
 ```
 
 The `Prelude` module provides essential utilities including level management, propositional equality, the `Box` type for lifting propositions, and crucially, postulates for function extensionality and propositional extensionality that are needed throughout the development.
 
 ```agda
-open import Equivalence
+open import QIT.Equivalence
 ```
 
 The `Equivalence` module defines fundamental notions of equivalence relations including reflexivity, symmetry, and transitivity properties. This provides the basic relational foundation for working with setoids and mobile equivalences.
 
 ```agda
-open import Order
+open import QIT.Order
 ```
 
 The `Order` module provides accessibility predicates and well-founded recursion principles essential for defining inductive types and proving termination of QIT eliminators.
@@ -37,11 +37,11 @@ The `Order` module provides accessibility predicates and well-founded recursion 
 Building on equivalence relations, we develop the category of setoids:
 
 ```agda
-open import Setoid.Base
-open import Setoid.Hom
-open import Setoid.Iso
-open import Setoid.Functor
-open import Setoid.Sigma
+open import QIT.Setoid.Base
+open import QIT.Setoid.Hom
+open import QIT.Setoid.Iso
+open import QIT.Setoid.Functor
+open import QIT.Setoid.Sigma
 ```
 
 The setoid modules establish the categorical infrastructure:
@@ -52,13 +52,13 @@ The setoid modules establish the categorical infrastructure:
 - **Sigma**: Dependent sum types in the setoid category for dependent constructions
 
 ```agda
-open import Setoid
+open import QIT.Setoid
 ```
 
 The main `Setoid` module provides a unified interface to all setoid constructions, serving as the entry point to setoid category theory.
 
 ```agda
-open import Plump
+open import QIT.Plump
 ```
 
 The `Plump` module implements size-based termination checking using container-based sizes, following Fiore et al. 2022. This provides the technical foundation for ensuring termination in QIT eliminators and is crucial for the mobile construction.
@@ -71,11 +71,11 @@ The root-level modules provide general definitions that are later specialized in
 
 The `Colimit` module develops the general theory of colimits in categories of setoids, parameterized by a preorder. This provides:
 - Diagram definitions over arbitrary preorders
-- Colimit construction as quotients of disjoint unions  
+- Colimit construction as quotients of disjoint unions
 - Cocone definitions and universal properties
 - The foundational colimit machinery that is specialized in the mobile setting
 
-### Cocontinuity Theory (General Framework) 
+### Cocontinuity Theory (General Framework)
 
 ```agda
 -- Note: Cocontinuity module is parameterized and not imported directly
@@ -120,7 +120,7 @@ The core theoretical contribution lies in the `Mobile/` directory, which develop
 
 - **`NodeType`**: The basic shape `{l, n}` distinguishing leaves from nodes
 - **`Branch` container**: The container `Branch : Container` with:
-  - Shape = `NodeType` 
+  - Shape = `NodeType`
   - Positions: `l` has no positions (empty), `n` has positions indexed by `B`
 - **`BTree`**: The well-founded trees `W Branch` representing mobile structures
 - **Pattern synonyms**: `leaf` and `node` for convenient tree construction
@@ -159,7 +159,7 @@ This equivalence relation encodes the key QIT properties: structural equivalence
 
 This provides the categorical colimit structure needed to model QIT constructors as colimits of mobile diagrams.
 
-### Mobile Functor Theory  
+### Mobile Functor Theory
 
 **`Mobile.Functor`** develops functors in the mobile category setting:
 
@@ -209,12 +209,12 @@ The logical development follows these key dependencies:
 **Foundation Layer:**
 - `Prelude` → `Equivalence` → `Order` → `Plump`
 
-**Setoid Category Layer:**  
+**Setoid Category Layer:**
 - `Setoid/{Base,Hom,Iso,Functor,Sigma}` → `Setoid`
 
 **General Category Theory:**
 - `Colimit` (general colimits in setoid categories)
-- `Cocontinuity` (general cocontinuous functors)  
+- `Cocontinuity` (general cocontinuous functors)
 - `ContainerFunctor` (container-based functors)
 
 **Mobile Category Theory (Main Development):**
@@ -222,7 +222,7 @@ The logical development follows these key dependencies:
 The mobile modules form the core development, all parameterized by `B : Set`:
 
 - **Mobile.Base** - Fundamental mobile structures (NodeType, Branch, BTree)
-- **Mobile.Equivalence** - Mobile equivalences with permutation symmetry  
+- **Mobile.Equivalence** - Mobile equivalences with permutation symmetry
 - **Mobile.Colimit** - Size-indexed mobile colimit constructions
 - **Mobile.Functor** - Mobile functor theory and constructions
 - **Mobile.Cocontinuity** - Cocontinuity isomorphisms F(Colim D) ≅ Colim(F ∘ D)
@@ -234,7 +234,7 @@ The parameter `B : Set` represents the "signature" or branching structure of the
 The mobile framework provides the semantic foundation for QITs as follows:
 
 1. **QIT Signature** → Mobile parameter `B : Set`
-2. **QIT Constructors** → Cocontinuous mobile functors  
+2. **QIT Constructors** → Cocontinuous mobile functors
 3. **QIT Equivalences** → Mobile equivalence relations `_≈ᵗ_`
 4. **QIT Induction** → Colimit universal properties
 5. **QIT Computation** → Cocontinuity isomorphisms

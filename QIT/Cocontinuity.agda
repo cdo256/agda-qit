@@ -1,10 +1,10 @@
 {-# OPTIONS --type-in-type #-}
-open import Prelude
-open import Setoid
-open import Colimit 
-open import Order 
+open import QIT.Prelude
+open import QIT.Setoid
+open import QIT.Colimit
+open import QIT.Order
 
-module Cocontinuity {ℓI} {ℓ≤} -- {ℓB}
+module QIT.Cocontinuity {ℓI} {ℓ≤} -- {ℓB}
   {I : Set ℓI}
   (≤p : Preorder I ℓ≤) where
 
@@ -43,7 +43,7 @@ F ∘ P = record
     where
     open ≈.Setoid
     open ≈.Hom
-    open import Equivalence
+    open import QIT.Equivalence
     u : D-ob i ⊢ (F.F-mor (P.D-mor ≤.refl ) .⟦_⟧ x)
                ≈ (F.F-mor ≈.idHom) .⟦_⟧ x
     u = F.F-resp P.D-id (F.F-ob (P.D-ob i) .refl)
@@ -64,7 +64,7 @@ F ∘ P = record
     open ≈.≈syntax {S = D-ob k}
     open ≈.Setoid
     open ≈.Hom
-    open import Equivalence
+    open import QIT.Equivalence
 
 Cocontinuous : ∀ {ℓF ℓF'} → (F : ≈.Functor ℓF ℓF') (P : Diagram ≤p) → Prop lzero
 Cocontinuous F P = Colim (F ∘ P) ≅ F.F-ob (Colim P)

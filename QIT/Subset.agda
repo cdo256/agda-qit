@@ -1,6 +1,6 @@
-module Subset where
+module QIT.Subset where
 
-open import Prelude
+open import QIT.Prelude
 open import Data.Product
 
 record ΣP {a b} (A : Set a) (B : A → Prop b) : Set (a ⊔ b) where
@@ -20,7 +20,7 @@ infixr 4 _,_
   where
   C : ∀ a2 → a1 ≡ a2 → Set (a ⊔ b)
   C a2 p = ∀ (b1 : B a1) (b2 : B a2) → _≡_ {A = ΣP A B} (a1 , b1) (a2 , b2)
- 
+
 ΣP≡ : ∀ {a b} {A : Set a} {B : A → Prop b}
     → (x y : ΣP A B) → x .fst ≡ y .fst → x ≡ y
 ΣP≡ x y p = ΣP≡' (x .fst) (y .fst) p (x .snd) (y .snd)

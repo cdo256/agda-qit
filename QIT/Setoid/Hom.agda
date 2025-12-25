@@ -1,10 +1,10 @@
 {-# OPTIONS --type-in-type #-}
-module Setoid.Hom where
+module QIT.Setoid.Hom where
 
-open import Prelude
-open import Setoid.Base
+open import QIT.Prelude
+open import QIT.Setoid.Base
 open import Data.Product
- 
+
 private
   ℓ ℓ' ℓ'' ℓ''' ℓ'''' : Level
   ℓ = lzero

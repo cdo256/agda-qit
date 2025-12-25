@@ -1,11 +1,11 @@
 {-# OPTIONS --type-in-type #-}
 
-open import Prelude
-open import Setoid.Base
-open import Setoid.Hom
+open import QIT.Prelude
+open import QIT.Setoid.Base
+open import QIT.Setoid.Hom
 open import Data.Product
 
-module Setoid.Sigma
+module QIT.Setoid.Sigma
   {ℓI} {ℓS} {ℓS'}
   (I : Set ℓI) (S : I → Setoid ℓS ℓS')
   where

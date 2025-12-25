@@ -1,10 +1,10 @@
 {-# OPTIONS --type-in-type #-}
-module Mobile.Equivalence (B : Set) where
+module QIT.Mobile.Equivalence (B : Set) where
 
-open import Prelude
-open import Mobile.Base B
-open import Equivalence
-open import Setoid as ≈
+open import QIT.Prelude
+open import QIT.Mobile.Base B
+open import QIT.Equivalence
+open import QIT.Setoid as ≈
 open import Data.Product
 open import Data.Empty renaming (⊥-elim to absurd)
 open import Data.W

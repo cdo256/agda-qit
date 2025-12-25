@@ -1,9 +1,9 @@
-module Prelude where
+module QIT.Prelude where
 
 open import Level public using (Level; _⊔_; Lift; lift)
   renaming (suc to lsuc; zero to lzero)
-import Relation.Binary.PropositionalEquality 
-module ≡ = Relation.Binary.PropositionalEquality 
+import Relation.Binary.PropositionalEquality
+module ≡ = Relation.Binary.PropositionalEquality
 open ≡ public using (_≡_; subst) public
 
 private
@@ -53,7 +53,7 @@ open import Axiom.Extensionality.Propositional
 postulate
   funExt : ∀ {ℓ ℓ'} → Extensionality ℓ ℓ'
 
-subst-id : {A : Set} {P : A → Set} {x : A} (p : x ≡ x) (b : P x) 
+subst-id : {A : Set} {P : A → Set} {x : A} (p : x ≡ x) (b : P x)
          → subst P p b ≡ b
 subst-id ≡.refl b = ≡.refl
 
@@ -83,7 +83,7 @@ module ↔ where
     ; rinv = X↔Y .linv
     ; linv = X↔Y .rinv }
     where open _↔_ X↔Y
-  
+
 open ↔ using (_↔_) public
 
 ⊥* : ∀ {ℓ} → Set ℓ
@@ -97,7 +97,7 @@ congp' : ∀ {a b} {A : Prop a} {B : Set b} (f : A → B)
       → ∀ {x y : A} → x ≡ᴾ y → f x ≡ f y
 congp' f ≡.refl = ≡.refl
 
-¬p_ : ∀ {ℓ} (X : Prop ℓ) → Prop ℓ 
+¬p_ : ∀ {ℓ} (X : Prop ℓ) → Prop ℓ
 ¬p X = X → ⊥p
 
 ¬_ : ∀ {ℓ} (X : Set ℓ) → Set ℓ

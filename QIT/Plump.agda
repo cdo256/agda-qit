@@ -1,14 +1,14 @@
 {-# OPTIONS --type-in-type #-}
-open import Prelude
+open import QIT.Prelude
 open import Data.Product
 open import Data.W
 open import Data.Container
-open import Setoid.Base
+open import QIT.Setoid.Base
 
-module Plump {ℓs ℓp} (C : Container ℓs ℓp) where
+module QIT.Plump {ℓs ℓp} (C : Container ℓs ℓp) where
 
 -- From Fiore et al. 2022
-Size : Set (ℓs ⊔ ℓp) 
+Size : Set (ℓs ⊔ ℓp)
 Size = W C
 -- The well-founded order (<) on Size
 mutual
@@ -49,7 +49,7 @@ mutual
 << : ∀{i j k} → j < k → i < j → i < k
 << (<sup x i≤fx) i<j = <sup x (<→≤ (≤< i≤fx i<j))
 
-open import Order
+open import QIT.Order
 
 iswf< : WellFounded _<_
 iswf< i = acc λ j j<i → α i j (<→≤ j<i)
@@ -76,7 +76,7 @@ _⊇_ : Size → Size → Prop
 i ⊇ j = ∀ k → i < k → j < k
 
 ⊆→≤ : ∀ {i j} → i ⊆ j → i ≤ j
-⊆→≤ {sup (s , f)} {sup (t , g)} p = 
+⊆→≤ {sup (s , f)} {sup (t , g)} p =
   sup≤ (λ x → p (f x) (<sup x (≤refl (f x))))
 
 ≤→⊆ : ∀ i j → i ≤ j → i ⊆ j

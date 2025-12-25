@@ -1,9 +1,9 @@
 {-# OPTIONS --type-in-type #-}
-module Equivalence where
+module QIT.Equivalence where
 
-open import Prelude
+open import QIT.Prelude
 open import Data.Product
- 
+
 private
   ℓ ℓ' ℓ'' ℓ''' ℓ'''' : Level
   ℓ = lzero

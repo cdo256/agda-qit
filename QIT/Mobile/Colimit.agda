@@ -1,21 +1,21 @@
 {-# OPTIONS --type-in-type #-}
-module Mobile.Colimit (B : Set) where
+module QIT.Mobile.Colimit (B : Set) where
 
-open import Prelude
-open import Equivalence
-open import Mobile.Base B
-open import Mobile.Equivalence B
-open import Setoid as ≈
+open import QIT.Prelude
+open import QIT.Equivalence
+open import QIT.Mobile.Base B
+open import QIT.Mobile.Equivalence B
+open import QIT.Setoid as ≈
 open import Data.Product
 open import Data.Empty renaming (⊥-elim to absurd)
 open import Data.W
 open import Data.Container hiding (_⇒_; identity; refl; sym; trans)
 open import Data.Unit
 open import Data.Sum
-open import Plump Branch
-open import Colimit ≤p
-open import Subset
-open import Order
+open import QIT.Plump Branch
+open import QIT.Colimit ≤p
+open import QIT.Subset
+open import QIT.Order
 
 private
   l0 : Level
@@ -47,11 +47,11 @@ record Sz₀ (t : BTree) : Set l0 where
 -- module ≤ = IsPreorder isPreorder-≤
 
 -- Id : ∀ {t : BTree}
---     → ≈.Hom≈ (P (≤refl t)) ≈.idHom 
+--     → ≈.Hom≈ (P (≤refl t)) ≈.idHom
 -- Id p = p
 
 -- Comp : ∀{s t u} (p : s ≤ t) (q : t ≤ u)
---       → ≈.Hom≈ (P (≤.trans p q)) (P q ≈.∘ P p)   
+--       → ≈.Hom≈ (P (≤.trans p q)) (P q ≈.∘ P p)
 -- Comp _ _ r = r
 
 -- D : Diagram

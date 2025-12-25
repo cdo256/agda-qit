@@ -1,9 +1,9 @@
 {-# OPTIONS --type-in-type #-}
-module Mobile.Base (B : Set) where
+module QIT.Mobile.Base (B : Set) where
 
-open import Prelude
-open import Equivalence
-open import Setoid as ≈
+open import QIT.Prelude
+open import QIT.Equivalence
+open import QIT.Setoid as ≈
 open import Data.Product
 open import Data.Empty renaming (⊥-elim to absurd)
 open import Data.W
@@ -20,7 +20,7 @@ data NodeType : Set where
 open import Data.Unit
 open import Data.Sum
 
-Branch : Container l0 l0 
+Branch : Container l0 l0
 Branch .Shape = NodeType
 Branch .Position l = ⊥*
 Branch .Position n = B
