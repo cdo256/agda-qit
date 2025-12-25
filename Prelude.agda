@@ -96,3 +96,9 @@ congp f ≡.refl = ≡.refl
 congp' : ∀ {a b} {A : Prop a} {B : Set b} (f : A → B)
       → ∀ {x y : A} → x ≡ᴾ y → f x ≡ f y
 congp' f ≡.refl = ≡.refl
+
+¬p_ : ∀ {ℓ} (X : Prop ℓ) → Prop ℓ 
+¬p X = X → ⊥p
+
+¬_ : ∀ {ℓ} (X : Set ℓ) → Set ℓ
+¬ X = X → ⊥
