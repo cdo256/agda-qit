@@ -102,3 +102,15 @@ congp' f ≡.refl = ≡.refl
 
 ¬_ : ∀ {ℓ} (X : Set ℓ) → Set ℓ
 ¬ X = X → ⊥
+
+record _∧_ {ℓ ℓ'} (A : Prop ℓ) (B : Prop ℓ') : Prop (ℓ ⊔ ℓ') where
+  field
+    fst : A
+    snd : B
+
+data _∨_ {ℓ ℓ'} (A : Prop ℓ) (B : Prop ℓ') : Prop (ℓ ⊔ ℓ') where
+  inl : A → A ∨ B
+  inr : B → A ∨ B
+
+_⇔_ : ∀ {ℓ ℓ'} (A : Prop ℓ) (B : Prop ℓ') → Prop (ℓ ⊔ ℓ')
+A ⇔ B = (A → B) ∧ (B → A)
