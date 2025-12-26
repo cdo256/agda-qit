@@ -27,3 +27,10 @@ Branch .Position n = B
 
 BTree = W Branch
 
+leaf≡leaf : ∀ (f g : ⊥* → BTree) → sup (l , f) ≡ sup (l , g)
+leaf≡leaf f g =
+  ≡.cong (λ ○ → sup (l , ○)) (funExt λ ())
+
+_∘ᵗ_ : ∀ (α : B → BTree) (π : B ↔ B)
+     → B → BTree
+(f ∘ᵗ π) = λ b → f (π .↔.to b)
