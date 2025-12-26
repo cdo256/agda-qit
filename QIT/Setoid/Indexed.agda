@@ -16,6 +16,11 @@ record Setoid ℓI ℓA ℓR : Set (lsuc (ℓI ⊔ ℓA ⊔ ℓR)) where
 
   open IndexedBinary.IsEquivalence isEquivalence public
 
+  infix 4 _≈_
+  _≈_ : ∀ {i j} → A i → A j → Prop _
+  _≈_ {i} {j} x y = R i j x y
+
+
 module _ {ℓI ℓA ℓR} (S : Setoid ℓI ℓA ℓR) where
   open Setoid S
 
@@ -24,10 +29,6 @@ module _ {ℓI ℓA ℓR} (S : Setoid ℓI ℓA ℓR) where
 
   _[_≈_] : ∀ {i j} → A i → A j → Prop _
   _[_≈_] {i} {j} x y = R i j x y
-
-  infix 4 _≈_
-  _≈_ : ∀ {i j} → A i → A j → Prop _
-  _≈_ {i} {j} x y = R i j x y
 
   module ≈syntax where
     infix 1 begin_
@@ -60,3 +61,10 @@ module _ where
         ; sym = S.sym
         ; trans = S.trans } }
     where module S = Unindexed.Setoid S
+
+  IndexedSetoid→UnindexedSetoid : ∀ {ℓA ℓR} → Setoid lzero ℓA ℓR → Unindexed.Setoid ℓA ℓR
+  IndexedSetoid→UnindexedSetoid S = record
+    { Carrier = Σ S.I S.A
+    ; _≈_ = λ (i , x) (j , y) → S.R i j x y
+    ; isEquivalence = record { refl = S.refl ; sym = S.sym ; trans = S.trans } }
+    where module S = Setoid S
