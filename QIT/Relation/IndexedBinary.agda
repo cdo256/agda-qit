@@ -7,8 +7,10 @@ module _
   {ℓI ℓA ℓR} {I : Set ℓI} (A : I → Set ℓA) (R : IndexedBinaryRel A ℓR)
   where
 
-  _≈_ : ∀ {i j} → A i → A j → Prop ℓR
-  _≈_ {i} {j} x y = R i j x y
+  private
+    infix 4 _≈_
+    _≈_ : ∀ {i j} → A i → A j → Prop ℓR
+    _≈_ {i} {j} x y = R i j x y
 
   Reflexive : Prop (ℓI ⊔ ℓA ⊔ ℓR)
   Reflexive = ∀ {i} {x : A i} → x ≈ x
