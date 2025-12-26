@@ -1,25 +1,26 @@
 {-# OPTIONS --type-in-type #-}
 open import QIT.Prelude
 open import QIT.Setoid
-open import QIT.Colimit
-open import QIT.Order
+import QIT.Colimit as Colimit
+open import QIT.Relation.Base
+open import QIT.Relation.Binary
 
 module QIT.Cocontinuity {ℓI} {ℓ≤} -- {ℓB}
   {I : Set ℓI}
   (≤p : Preorder I ℓ≤) where
 
-open Colim ≤p
+open Colimit ≤p
 open import Data.Product
 
 module ≤ = IsPreorder (≤p .proj₂)
-_≤_ : Rel I ℓ≤
+_≤_ : BinaryRel I ℓ≤
 _≤_ = ≤p .proj₁
 
 private
   variable
     ℓF ℓF' : Level
 
-_∘_ : ∀ {ℓF ℓF'} → (F : ≈.Functor ℓF ℓF') (P : Diagram ≤p) → Diagram ≤p
+_∘_ : ∀ {ℓF ℓF'} → (F : ≈.Functor ℓF ℓF') (P : Diagram) → Diagram
 F ∘ P = record
   { D-ob = D-ob
   ; D-mor = D-mor
@@ -43,7 +44,7 @@ F ∘ P = record
     where
     open ≈.Setoid
     open ≈.Hom
-    open import QIT.Equivalence
+    open import QIT.Relation.Binary
     u : D-ob i ⊢ (F.F-mor (P.D-mor ≤.refl ) .⟦_⟧ x)
                ≈ (F.F-mor ≈.idHom) .⟦_⟧ x
     u = F.F-resp P.D-id (F.F-ob (P.D-ob i) .refl)
@@ -64,9 +65,9 @@ F ∘ P = record
     open ≈.≈syntax {S = D-ob k}
     open ≈.Setoid
     open ≈.Hom
-    open import QIT.Equivalence
+    open import QIT.Relation.Binary
 
-Cocontinuous : ∀ {ℓF ℓF'} → (F : ≈.Functor ℓF ℓF') (P : Diagram ≤p) → Prop lzero
-Cocontinuous F P = Colim (F ∘ P) ≅ F.F-ob (Colim P)
+Cocontinuous : ∀ {ℓF ℓF'} → (F : ≈.Functor ℓF ℓF') (P : Diagram) → Prop lzero
+Cocontinuous F P = Colim.Colim (F ∘ P) ≅ F.F-ob (Colim.Colim P)
   where
   module F = ≈.Functor F

@@ -2,7 +2,7 @@
 module QIT.Mobile.Colimit (B : Set) where
 
 open import QIT.Prelude
-open import QIT.Equivalence
+open import QIT.Relation.Binary
 open import QIT.Mobile.Base B
 open import QIT.Mobile.Equivalence B
 open import QIT.Setoid as ≈
@@ -12,10 +12,10 @@ open import Data.W
 open import Data.Container hiding (_⇒_; identity; refl; sym; trans)
 open import Data.Unit
 open import Data.Sum
-open import QIT.Plump Branch
+open import QIT.Relation.Plump Branch
 open import QIT.Colimit ≤p
-open import QIT.Subset
-open import QIT.Order
+open import QIT.Relation.Subset
+open import QIT.Relation.Binary
 
 private
   l0 : Level

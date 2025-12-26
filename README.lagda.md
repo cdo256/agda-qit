@@ -21,13 +21,13 @@ open import QIT.Prelude
 The `Prelude` module provides essential utilities including level management, propositional equality, the `Box` type for lifting propositions, and crucially, postulates for function extensionality and propositional extensionality that are needed throughout the development.
 
 ```agda
-open import QIT.Equivalence
+open import QIT.Relation.Binary
 ```
 
 The `Equivalence` module defines fundamental notions of equivalence relations including reflexivity, symmetry, and transitivity properties. This provides the basic relational foundation for working with setoids and mobile equivalences.
 
 ```agda
-open import QIT.Order
+open import QIT.Relation.Binary
 ```
 
 The `Order` module provides accessibility predicates and well-founded recursion principles essential for defining inductive types and proving termination of QIT eliminators.
@@ -58,7 +58,7 @@ open import QIT.Setoid
 The main `Setoid` module provides a unified interface to all setoid constructions, serving as the entry point to setoid category theory.
 
 ```agda
-open import QIT.Plump
+open import QIT.Relation.Plump
 ```
 
 The `Plump` module implements size-based termination checking using container-based sizes, following Fiore et al. 2022. This provides the technical foundation for ensuring termination in QIT eliminators and is crucial for the mobile construction.

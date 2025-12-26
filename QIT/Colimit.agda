@@ -1,8 +1,8 @@
 {-# OPTIONS --type-in-type #-}
 
 open import QIT.Prelude
-open import QIT.Order
-open import QIT.Equivalence
+open import QIT.Relation.Base
+open import QIT.Relation.Binary
 open import QIT.Setoid
 open import Data.Product
 
@@ -17,7 +17,7 @@ private
 
 record Diagram : Set (ℓ≤ ⊔ lsuc ℓB ⊔ lsuc ℓB') where
   module ≤ = IsPreorder (≤p .proj₂)
-  _≤_ : Rel I ℓ≤
+  _≤_ : BinaryRel I ℓ≤
   _≤_ = ≤p .proj₁
 
   field

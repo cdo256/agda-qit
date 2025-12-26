@@ -1,7 +1,6 @@
-module QIT.Subset where
+module QIT.Relation.Subset where
 
 open import QIT.Prelude
-open import Data.Product
 
 record ΣP {a b} (A : Set a) (B : A → Prop b) : Set (a ⊔ b) where
   constructor _,_

@@ -1,7 +1,7 @@
 {-# OPTIONS --type-in-type #-}
 open import QIT.Prelude
 open import QIT.Setoid
-open import QIT.Equivalence
+open import QIT.Relation.Binary
 open import Data.Product
 
 open import Data.Container hiding (refl; sym; trans)

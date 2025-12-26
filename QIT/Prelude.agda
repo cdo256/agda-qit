@@ -18,9 +18,6 @@ record Box {ℓ} (P : Prop ℓ) : Set ℓ where
 
 open Box
 
-Rel : ∀ (X : Set ℓ) ℓ' → Set (ℓ ⊔ lsuc ℓ')
-Rel X ℓ' = X → X → Prop ℓ'
-
 data ∥_∥ (A : Set ℓ) : Prop ℓ where
   ∣_∣ : A → ∥ A ∥
 

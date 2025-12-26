@@ -1,11 +1,12 @@
 {-# OPTIONS --type-in-type #-}
 open import QIT.Prelude
+open import QIT.Relation.Binary
+
 open import Data.Product
 open import Data.W
 open import Data.Container
-open import QIT.Setoid.Base
 
-module QIT.Plump {ℓs ℓp} (C : Container ℓs ℓp) where
+module QIT.Relation.Plump {ℓs ℓp} (C : Container ℓs ℓp) where
 
 -- From Fiore et al. 2022
 Size : Set (ℓs ⊔ ℓp)
@@ -49,7 +50,6 @@ mutual
 << : ∀{i j k} → j < k → i < j → i < k
 << (<sup x i≤fx) i<j = <sup x (<→≤ (≤< i≤fx i<j))
 
-open import QIT.Order
 
 iswf< : WellFounded _<_
 iswf< i = acc λ j j<i → α i j (<→≤ j<i)
@@ -86,3 +86,13 @@ i ⊇ j = ∀ k → i < k → j < k
 ≤→⊇ : ∀ i j → i ≤ j → j ⊇ i
 ≤→⊇ i j i≤j k j<k = <≤ j<k i≤j
 
+_≤≥_ : ∀ (x y : W C) → Prop
+x ≤≥ y = (x ≤ y) ∧ (y ≤ x)
+_⊆⊇_ : ∀ (x y : W C) → Prop
+x ⊆⊇ y = (x ⊆ y) ∧ (y ⊆ x)
+
+isWeaklyExtensional : Prop
+isWeaklyExtensional = ∀ x y → x ⊆ y → y ⊆ x → x ≡p y
+
+isQuasiExtensional : Prop
+isQuasiExtensional = ∀ x y → (x ≤≥ y) ⇔ (x ⊆⊇ y)

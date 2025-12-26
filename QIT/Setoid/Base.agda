@@ -3,7 +3,8 @@ module QIT.Setoid.Base where
 
 open import QIT.Prelude
 open import Data.Product
-open import QIT.Equivalence
+open import QIT.Relation.Base
+open import QIT.Relation.Binary
 
 private
   ℓ ℓ' ℓ'' ℓ''' ℓ'''' : Level
@@ -17,7 +18,7 @@ record Setoid ℓ ℓ' : Set (lsuc (ℓ ⊔ ℓ')) where
   infix 4 _≈_
   field
     Carrier       : Set ℓ
-    _≈_           : Rel Carrier ℓ'
+    _≈_           : BinaryRel Carrier ℓ'
     isEquivalence : IsEquivalence _≈_
 
   open IsEquivalence isEquivalence public
@@ -47,7 +48,7 @@ module ≈syntax {ℓ ℓ'} {S : Setoid ℓ ℓ'} where
   x ∎ = refl
 
 Rel≈ : (S : Setoid ℓ ℓ') → ∀ ℓ'' → Set (lsuc ℓ ⊔ lsuc ℓ'')
-Rel≈ S ℓ'' = A → A → Prop (ℓ ⊔ ℓ'')
+Rel≈ S ℓ'' = BinaryRel A (ℓ ⊔ ℓ'')
   where
   open Setoid S renaming (Carrier to A)
 
@@ -56,7 +57,7 @@ Rel≈ S ℓ'' = A → A → Prop (ℓ ⊔ ℓ'')
 ≡setoid B = record
   { Carrier = B
   ; _≈_ = _≡p_
-  ; isEquivalence = isEquiv≡p B }
+  ; isEquivalence = isEquiv-≡p B }
 
 ≡→≈ : ∀ (A : Setoid ℓ ℓ') → {x y : ⟨ A ⟩} → x ≡ y → A [ x ≈ y ]
 ≡→≈ A {x} p = substp (λ ○ → x ≈ ○) p refl

@@ -2,7 +2,8 @@
 module QIT.Setoid.Iso where
 
 open import QIT.Prelude
-open import QIT.Equivalence
+open import QIT.Relation.Base
+open import QIT.Relation.Binary
 open import Data.Product
 open import QIT.Setoid.Base
 open import QIT.Setoid.Hom
@@ -46,7 +47,7 @@ Hom≈ {S = S} {T} f g = ∀ {x y} → x S.≈ y → f.⟦ x ⟧ T.≈ g.⟦ y �
   module f = Hom f
   module g = Hom g
 
-_≅_ : ∀ {ℓ ℓ'} → Rel (Setoid ℓ ℓ') (ℓ ⊔ ℓ')
+_≅_ : ∀ {ℓ ℓ'} → BinaryRel (Setoid ℓ ℓ') (ℓ ⊔ ℓ')
 S ≅ T = ∥ Iso S T ∥
 
 module _ {ℓ ℓ'} where

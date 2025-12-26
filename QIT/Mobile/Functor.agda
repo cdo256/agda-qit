@@ -2,7 +2,7 @@
 module QIT.Mobile.Functor (B : Set) where
 
 open import QIT.Prelude
-open import QIT.Equivalence
+open import QIT.Relation.Binary
 open import QIT.Mobile.Base B
 open import QIT.Mobile.Equivalence B
 open import QIT.Mobile.Colimit B
@@ -14,7 +14,7 @@ open import Data.Container hiding (_⇒_; identity; refl; sym; trans)
 open import Data.Unit
 open import Data.Sum
 open import QIT.Setoid
-open import QIT.Equivalence
+open import QIT.Relation.Binary
 open import Data.Product
 open import Data.Container hiding (refl; sym; trans)
 

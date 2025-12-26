@@ -2,7 +2,7 @@
 module QIT.Mobile.Base (B : Set) where
 
 open import QIT.Prelude
-open import QIT.Equivalence
+open import QIT.Relation.Binary
 open import QIT.Setoid as ≈
 open import Data.Product
 open import Data.Empty renaming (⊥-elim to absurd)
