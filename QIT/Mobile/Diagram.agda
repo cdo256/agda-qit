@@ -1,5 +1,5 @@
 {-# OPTIONS --type-in-type #-}
-module QIT.Mobile.Colimit (B : Set) (inhabB : B) where
+module QIT.Mobile.Diagram (B : Set) (inhabB : B) where
 
 open import QIT.Prelude
 open import QIT.Relation.Binary
@@ -13,7 +13,7 @@ open import Data.Unit
 open import Data.Sum
 open import QIT.Relation.Plump Branch
 open import QIT.Relation.Subset
-open import QIT.Colimit ≤p
+open import QIT.Diagram ≤p
 
 private
   l0 : Level
@@ -111,5 +111,3 @@ D = record
       ≈⟨ ≈pweaken q (weaken i j _ y) ⟩
     weaken j k q (weaken i j p y) ∎
     where open Indexed.≈syntax Pᴵ
-
-open Colim D public
