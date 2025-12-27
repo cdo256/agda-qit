@@ -18,4 +18,4 @@ record Functor ℓ ℓ' : Set where
     F-id : ∀ {S : Setoid ℓ ℓ'} → F-mor idHom ≈h idHom {S = F-ob S}
     F-comp : ∀ {S T U : Setoid ℓ ℓ'} → (f : Hom S T) → (g : Hom T U)
            → F-mor (g ∘ f) ≈h (F-mor g ∘ F-mor f)
-    F-resp : ∀ {S T} {f g : Hom S T} → f ≈h g → F-mor f ≈h F-mor g
+    F-resp : ∀ {S T} (f g : Hom S T) → f ≈h g → F-mor f ≈h F-mor g

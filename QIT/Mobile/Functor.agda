@@ -100,30 +100,39 @@ open Comp using (F̃-comp) public
 
 module Resp
   {S T : Setoid l0 l0}
-  {f g : ≈.Hom S T}
+  (f g : ≈.Hom S T)
   (f≈g : f ≈h g)
   where
   module S = Setoid S
   module T = Setoid T
-  -- module f = ≈.Hom f
-  -- module g = ≈.Hom g
+  open Mor
 
-  open Mor {S} {T} hiding (F̃-mor)
+  fg-equal : ∀ (x : ⟨ F̃-ob S ⟩) →
+    F̃-ob T [ ⟦ f ⟧h x ≈ ⟦ g ⟧h x ]
+  fg-equal (l , h) = ≈leaf
+  fg-equal (n , h) = ≈node (λ b → f≈g S.refl)
 
   F̃-resp : F̃-mor f ≈h F̃-mor g
-  F̃-resp {s , u} {t , v} (≈leaf) = ≈leaf
-  F̃-resp {n , u} {n , v} (≈node c) = ≈node (λ b → f≈g (c b))
-  F̃-resp {n , u} {n , v} (≈perm π) =
-    ≈trans (≈perm π) (≈node (λ b → f≈g (S.refl)))
-  F̃-resp {s , g} {u , h} (≈trans {t = t , i} p q) =
-    ≈trans (F̃-resp p) {!F̃-resp ?!}
+  F̃-resp {s , i} {t , k} ≈leaf = ≈leaf
+  F̃-resp {n , i} {n , k} (≈node c) = ≈node (λ b → f≈g (c b))
+  F̃-resp {n , i} {n , k} (≈perm π) =
+    ≈trans (≈perm π) (≈node (λ b → f≈g S.refl))
+  F̃-resp {s , i} {u , k} (≈trans {t = t , j} p q) = begin
+    ⟦ f ⟧h (s , i)
+      ≈⟨ congh f p ⟩
+    ⟦ f ⟧h (t , j)
+      ≈⟨ fg-equal (t , j) ⟩
+    ⟦ g ⟧h (t , j)
+      ≈⟨ congh g q ⟩
+    ⟦ g ⟧h (u , k) ∎
+    where
+    open ≈.≈syntax {S = F̃-ob T}
+open Resp using (F̃-resp) public
 
--- open Resp using (F̃-resp) public
-
--- F̃ : ≈.Functor l0 l0
--- F̃ = record
---   { F-ob = F̃-ob
---   ; F-mor = F̃-mor
---   ; F-id = λ p → p
---   ; F-comp = F̃-comp
---   ; F-resp = F̃-resp }
+F̃ : ≈.Functor l0 l0
+F̃ = record
+  { F-ob = F̃-ob
+  ; F-mor = F̃-mor
+  ; F-id = λ p → p
+  ; F-comp = F̃-comp
+  ; F-resp = F̃-resp }
