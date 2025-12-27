@@ -4,7 +4,7 @@ open import QIT.Setoid
 open import QIT.Relation.Binary
 open import Data.Product
 
-open import Data.Container hiding (refl; sym; trans)
+open import Data.Container as Cont hiding (refl; sym; trans)
 
 module QIT.ContainerFunctor (C : Container lzero lzero) where
 
@@ -69,13 +69,14 @@ module Mor {S T : Setoid l0 l0} (f : ≈.Hom S T) where
   module S = ≈.Setoid S
   module T = ≈.Setoid T
   module f = ≈.Hom f
+  open Container
   ⟦_⟧h : ⟦ C ⟧ ⟨ S ⟩ → ⟦ C ⟧ ⟨ T ⟩
-  ⟦ s , g ⟧h = s , λ x → f.⟦ g x ⟧
+  ⟦ s , g ⟧h = s , λ x → f.to (g x)
   congh : ∀ {x y} → (F̃-ob S Setoid.≈ x) y → (T Ob.≈ꟳ ⟦ x ⟧h) ⟦ y ⟧h
   congh (Ob.mk≈ꟳ fst≡ snd≈) = Ob.mk≈ꟳ fst≡ (λ p → f.cong (snd≈ p))
   F̃-mor : ≈.Hom (F̃-ob S) (F̃-ob T)
   F̃-mor = record
-    { ⟦_⟧ = ⟦_⟧h
+    { to = ⟦_⟧h
     ; cong = congh
     }
 

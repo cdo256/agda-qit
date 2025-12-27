@@ -17,16 +17,16 @@ record Hom {ℓ} {ℓ'} (S T : Setoid ℓ ℓ') : Set (ℓ ⊔ ℓ') where
   module S = Setoid S
   module T = Setoid T
   field
-    ⟦_⟧ : S.Carrier → T.Carrier
-    cong : ∀ {x y} → x S.≈ y → ⟦ x ⟧ T.≈ ⟦ y ⟧
+    to : S.Carrier → T.Carrier
+    cong : ∀ {x y} → x S.≈ y → to x T.≈ to y
 
 idHom : ∀ {S : Setoid ℓ ℓ'} → Hom S S
 idHom {S} = record
-  { ⟦_⟧ = λ x → x
+  { to = λ x → x
   ; cong = λ p → p }
 
 _≈h_ : ∀ {S T : Setoid ℓ ℓ'} (f g : Hom S T) → Prop (ℓ ⊔ ℓ')
-_≈h_ {S = S} {T} f g = ∀ {x y} → x S.≈ y → f.⟦ x ⟧ T.≈ g.⟦ y ⟧
+_≈h_ {S = S} {T} f g = ∀ {x y} → x S.≈ y → f.to x T.≈ g.to y
   where
   module S = Setoid S
   module T = Setoid T
@@ -37,7 +37,7 @@ infixr 1 _∘_
 _∘_ : ∀ {A B C : Setoid ℓ ℓ'}
     → Hom B C → Hom A B → Hom A C
 f ∘ g = record
-  { ⟦_⟧  = λ x → f.⟦ g.⟦ x ⟧ ⟧
+  { to  = λ x → f.to (g.to x)
   ; cong = λ x≈y → f.cong (g.cong x≈y)
   }
   where

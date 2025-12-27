@@ -4,7 +4,7 @@ module QIT.Mobile.Diagram (B : Set) (inhabB : B) where
 open import QIT.Prelude
 open import QIT.Relation.Binary
 open import QIT.Mobile.Base B
-open import QIT.Mobile.Equivalence B
+open import QIT.Mobile.Functor B
 open import QIT.Setoid as ≈
 open import Data.Product
 open import Data.Empty renaming (⊥-elim to absurd)
@@ -13,7 +13,7 @@ open import Data.Unit
 open import Data.Sum
 open import QIT.Relation.Plump Branch
 open import QIT.Relation.Subset
-open import QIT.Diagram ≤p
+open import QIT.Diagram ≤p hiding (_≤_)
 
 private
   l0 : Level
@@ -64,8 +64,6 @@ data _≈ᴾ_ : ∀ {i j} → P₀ i → P₀ j → Prop where
 
 import QIT.Setoid.Indexed as Indexed
 
-
-
 P : (i : BTree) → Setoid l0 l0
 P i = record
   { Carrier = P₀ i
@@ -94,7 +92,7 @@ D = record
   where
   Hom : ∀ {i j} → i ≤ j → ≈.Hom (P i) (P j)
   Hom {i} {j} i≤j = record
-    { ⟦_⟧ = weaken i j i≤j
+    { to = weaken i j i≤j
     ; cong = ≈pweaken-cong i j i≤j }
   Id : ∀ {i} → (Hom (≤refl i)) ≈h ≈.idHom 
   Id {i} p = ≈ptrans (≈psym (≈pweaken (≤refl i) _)) p

@@ -5,21 +5,21 @@ open import QIT.Relation.Base
 open import QIT.Relation.Binary
 open import QIT.Setoid
 open import Data.Product
-open import QIT.Diagram
+import QIT.Diagram
 
 module QIT.Colimit {ℓI} {ℓ≤} {ℓB} {ℓB'}
   {I : Set ℓI}
   (≤p : Preorder I ℓ≤)
-  (P : Diagram ≤p)
+  (P : QIT.Diagram.Diagram ≤p)
   where
 
+  open QIT.Diagram ≤p
   open Diagram P renaming (D-ob to P̂)
 
   private
     Pf : ∀ {i j} (p : i ≤ j) → (⟨ P̂ i ⟩ → ⟨ P̂ j ⟩)
-    Pf p = ⟦_⟧
+    Pf p = to
       where open ≈.Hom (D-mor p)
-
 
   -- The carrier of the colimit (Sigma type)
   Colim₀ : Set (ℓI ⊔ ℓB)
@@ -63,7 +63,7 @@ module QIT.Colimit {ℓI} {ℓ≤} {ℓB} {ℓB'}
   LimitCocone : Cocone
   LimitCocone = record
     { Apex     = Colim
-    ; inj      = λ i → record { ⟦_⟧ = λ x → i , x ; cong = ≈lstage i }
+    ; inj      = λ i → record { to = λ x → i , x ; cong = ≈lstage i }
     ; commutes = λ p {x = x} {y = y} q → ≈ltrans (≈lstage _ q) (≈lstep p y)
     }
 
@@ -93,7 +93,7 @@ module QIT.Colimit {ℓI} {ℓ≤} {ℓB} {ℓB'}
 
     private
       f : ⟨ Colim ⟩ → ⟨ C'.Apex ⟩
-      f (i , x) = C'.inj i .⟦_⟧ x
+      f (i , x) = C'.inj i .to x
 
     isRespecting : ∀ {i j x y} → (i , x) ≈ˡ (j , y) →
                    f (i , x) ApexSetoid.≈ f (j , y)
@@ -104,13 +104,13 @@ module QIT.Colimit {ℓI} {ℓ≤} {ℓB} {ℓB'}
       ApexSetoid.trans (isRespecting r) (isRespecting s)
 
     F : ColimMorphism LimitCocone C'
-    F .apexHom .⟦_⟧  = f
+    F .apexHom .to  = f
     F .apexHom .cong = isRespecting
     F .commutes i {x} {y} p =
-      (C'.inj (LimitCocone .inj i .⟦_⟧ x .proj₁)) .cong p
+      (C'.inj (LimitCocone .inj i .to x .proj₁)) .cong p
 
     unq : (G : ColimMorphism LimitCocone C') →
-          ∀ x → G .apexHom .⟦_⟧ x ApexSetoid.≈ f x
+          ∀ x → G .apexHom .to x ApexSetoid.≈ f x
     unq G (i , x) = G .commutes i ((P̂ _) .Setoid.refl)
 
   isLimitingCoconeLimitCocone : isLimitingCocone LimitCocone

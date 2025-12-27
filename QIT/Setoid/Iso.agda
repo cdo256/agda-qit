@@ -40,7 +40,7 @@ IsoFlip f = record
   where open Iso f
 
 Hom≈ : ∀ {S T : Setoid ℓ ℓ'} (f g : Hom S T) → Prop (ℓ ⊔ ℓ')
-Hom≈ {S = S} {T} f g = ∀ {x y} → x S.≈ y → f.⟦ x ⟧ T.≈ g.⟦ y ⟧
+Hom≈ {S = S} {T} f g = ∀ {x y} → x S.≈ y → f.to x T.≈ g.to y
   where
   module S = Setoid S
   module T = Setoid T
