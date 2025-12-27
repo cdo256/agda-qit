@@ -5,32 +5,14 @@ open import QIT.Relation.Base
 open import QIT.Relation.Binary
 open import QIT.Setoid
 open import Data.Product
+open import QIT.Diagram
 
 module QIT.Colimit {ℓI} {ℓ≤} {ℓB} {ℓB'}
   {I : Set ℓI}
   (≤p : Preorder I ℓ≤)
+  (P : Diagram ≤p)
   where
 
-private
-  variable
-    ℓ ℓ' ℓ'' ℓ''' ℓ'''' : Level
-
-record Diagram : Set (ℓ≤ ⊔ lsuc ℓB ⊔ lsuc ℓB') where
-  module ≤ = IsPreorder (≤p .proj₂)
-  _≤_ : BinaryRel I ℓ≤
-  _≤_ = ≤p .proj₁
-
-  field
-    D-ob : ∀ (i : I) → Setoid ℓB ℓB'
-    D-mor : ∀ {i j} → (p : i ≤ j) → ≈.Hom (D-ob i) (D-ob j)
-    D-id : ∀ {i : I}
-         → ≈.Hom≈ (D-mor (≤.refl))
-                  (≈.idHom {S = D-ob i})
-    D-comp : ∀ {i j k} → (p : i ≤ j) (q : j ≤ k)
-           → ≈.Hom≈ (D-mor (≤.trans p q))
-                    (D-mor q ≈.∘ D-mor p)
-
-module Colim (P : Diagram) where
   open Diagram P renaming (D-ob to P̂)
 
   private
@@ -38,7 +20,6 @@ module Colim (P : Diagram) where
     Pf p = ⟦_⟧
       where open ≈.Hom (D-mor p)
 
-  open import Data.Product
 
   -- The carrier of the colimit (Sigma type)
   Colim₀ : Set (ℓI ⊔ ℓB)
