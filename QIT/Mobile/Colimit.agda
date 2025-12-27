@@ -1,5 +1,5 @@
 {-# OPTIONS --type-in-type #-}
-module QIT.Mobile.Colimit (B : Set) where
+module QIT.Mobile.Colimit (B : Set) (inhabB : B) where
 
 open import QIT.Prelude
 open import QIT.Relation.Binary
@@ -9,161 +9,107 @@ open import QIT.Setoid as ≈
 open import Data.Product
 open import Data.Empty renaming (⊥-elim to absurd)
 open import Data.W
-open import Data.Container hiding (_⇒_; identity; refl; sym; trans)
 open import Data.Unit
 open import Data.Sum
 open import QIT.Relation.Plump Branch
-open import QIT.Colimit ≤p
 open import QIT.Relation.Subset
-open import QIT.Relation.Binary
+open import QIT.Colimit ≤p
 
 private
   l0 : Level
   l0 = lzero
 
-P₀ : (i : BTree) → Set l0
-P₀ i = ΣP BTree (_< i)
+data P₀ : (i : BTree) → Set where
+  leaf : ∀ α → P₀ (sup (n , α))
+  node : ∀ α (f : (b : B) → P₀ (α b)) → P₀ (sup (n , α))
+  weaken : ∀ i j → i ≤ j → P₀ i → P₀ j
 
-t≮l : ∀ t {f} → t < sup (l , f) → ⊥p
-t≮l t (<sup () _)
+n≰l : ∀ {f g} → ¬p (sup (n , f) ≤ sup (l , g))
+n≰l {f} {g} (sup≤ f<l) with f<l inhabB
+... | <sup () i≤fx
 
-perm : ∀ i → (f : B → BTree) (p : sup (n , f) < i)
-      → (π : B ↔ B)→ P₀ i
-perm i f p π = sup (n , g) , g<i
+t≤l→t≡l : ∀ {f} t → (_ : t ≤ sup (l , f)) → t ≡p sup (l , λ())
+t≤l→t≡l {f} (sup (l , g)) p = ∣ (leaf≡leaf g λ ()) ∣
+t≤l→t≡l {f} (sup (n , g)) p = absurdp (n≰l p)
+
+¬Pl : ∀ {α} → (P₀ (sup (l , α))) → ⊥p
+¬Pl (weaken (sup (l , _)) (sup (l , _)) _ t) = ¬Pl t
+¬Pl (weaken (sup (n , _)) (sup (l , _)) p _) = n≰l p
+
+⟦_⟧ : ∀ {i} → P₀ i → BTree
+⟦ leaf α ⟧ = sup (l , λ ())
+⟦ node α f ⟧ = sup (n , λ b → ⟦ f b ⟧)
+⟦ weaken i j p s ⟧ = ⟦ s ⟧
+
+_∘ᴾ_ : ∀ {α : B → BTree} (f : (b : B) → P₀ (α b)) (π : B ↔ B)
+     → (b : B) → P₀ (α (π .↔.to b))
+_∘ᴾ_ {α} f π = λ b → f (π .↔.to b)
+
+data _≈ᴾ_ : ∀ {i j} → P₀ i → P₀ j → Prop where
+  ≈pleaf : ∀ α β → leaf α ≈ᴾ leaf β
+  ≈pnode : ∀ α β {f g} → (∀ b → f b ≈ᴾ g b) → node α f ≈ᴾ node β g
+  ≈pperm : ∀ α {f} → (π : B ↔ B) → node α f ≈ᴾ node (α ∘ᵗ π) (f ∘ᴾ π)
+  ≈pweaken : ∀ {i j} (p : i ≤ j) (s : P₀ i) → s ≈ᴾ weaken i j p s
+  ≈psym : ∀ {i j} {s : P₀ i} {t : P₀ j} → s ≈ᴾ t → t ≈ᴾ s
+  ≈ptrans : ∀ {i j k} {s : P₀ i} {t : P₀ j} {u : P₀ k} → s ≈ᴾ t → t ≈ᴾ u → s ≈ᴾ u
+
+≈pweaken-cong : ∀ i j p → {s t : P₀ i} → s ≈ᴾ t → weaken i j p s ≈ᴾ weaken i j p t
+≈pweaken-cong i j p s≈t =
+  ≈ptrans (≈psym (≈pweaken p _)) (≈ptrans s≈t (≈pweaken p _))
+
+≈prefl : ∀ {i} (s : P₀ i) → s ≈ᴾ s
+≈prefl (leaf α) = ≈pleaf α α
+≈prefl (node α f) = ≈pnode α α λ b → ≈prefl (f b)
+≈prefl (weaken j i p s) = ≈pweaken-cong j i p (≈prefl s)
+
+import QIT.Setoid.Indexed as Indexed
+
+
+
+P : (i : BTree) → Setoid l0 l0
+P i = record
+  { Carrier = P₀ i
+  ; _≈_ = _≈ᴾ_
+  ; isEquivalence = record
+    { refl = λ {x} → ≈prefl x
+    ; sym = λ {x} {y} → ≈psym {i} {i} {x} {y}
+    ; trans = λ {x} {y} {z} → ≈ptrans {i} {i} {i} {x} {y} {z} } }
+
+Pᴵ : Indexed.Setoid l0 l0 l0
+Pᴵ = record
+  { I = BTree
+  ; A = P₀
+  ; R = λ i j x y → x ≈ᴾ y
+  ; isEquivalence = record
+    { refl = λ {i} {x} → ≈prefl x
+    ; sym = ≈psym
+    ; trans = ≈ptrans } }
+
+D : Diagram
+D = record
+  { D-ob = P
+  ; D-mor = Hom
+  ; D-id = Id
+  ; D-comp = Comp }
   where
-  open _↔_ π renaming (to to π'; from to π⁻¹)
-  g : B → BTree
-  g b = f (π' b) 
-  g≤f : sup (n , g) ≤ sup (n , f)
-  g≤f = sup≤ λ b → <sup (π' b) (≤refl (g b))
-  g<i : sup (n , g) < i
-  g<i = <≤ p g≤f
+  Hom : ∀ {i j} → i ≤ j → ≈.Hom (P i) (P j)
+  Hom {i} {j} i≤j = record
+    { ⟦_⟧ = weaken i j i≤j
+    ; cong = ≈pweaken-cong i j i≤j }
+  Id : ∀ {i} → (Hom (≤refl i)) ≈h ≈.idHom 
+  Id {i} p = ≈ptrans (≈psym (≈pweaken (≤refl i) _)) p
+  Comp : ∀ {i j k} (p : i ≤ j) (q : j ≤ k) →
+      ≈.Hom≈ (Hom (≤≤ q p)) (Hom q ≈.∘ Hom p)
+  Comp {i} {j} {k} p q {x} {y} x≈y = begin
+    weaken i k (≤≤ q p) x
+      ≈⟨ ≈psym (≈pweaken (≤≤ q p) x) ⟩
+    x
+      ≈⟨ x≈y ⟩
+    y
+      ≈⟨ ≈pweaken p y ⟩
+    weaken i j p y
+      ≈⟨ ≈pweaken q (weaken i j _ y) ⟩
+    weaken j k q (weaken i j p y) ∎
+    where open Indexed.≈syntax Pᴵ
 
-injP' : ∀ {α} b → P₀ (α b) → P₀ (sup (n , α))
-injP' b (x , x<αb) = x , <sup b (<→≤ x<αb)
-
--- infix 5 _≈ᶻ_
--- data _≈ᶻ_ {i : BTree} : (s t : P₀ i) → Prop where
---   ≈zleaf : ∀ {f} (p q : sup (l , f) < i)
---           → (sup (l , f) , p) ≈ᶻ (sup (l , f) , q)
---   ≈znode : ∀ (f g : B → BTree)
---          → (p : ∀ b → f b < i)
---          → (q : ∀ b → g b < i)
---          → (eq : ∀ b → (f b , p b) ≈ᶻ (g b , q b))
---          → (sup (n , f) , {!!}) ≈ᶻ {!!}
---   ≈zperm : ∀ {f p} → (π : B ↔ B)
---          →  sup (n , f) , p
---          ≈ᶻ perm i f p π
---   ≈ztrans : ∀ {s t u} → s ≈ᶻ t → t ≈ᶻ u → s ≈ᶻ u
-
-
-infix 5 _⊢_≈ᶻ_
-data _⊢_≈ᶻ_ : (i : BTree) (s t : P₀ i) → Prop where
-  ≈zleaf : ∀ {i} {f} (p q : sup (l , f) < i)
-          → i ⊢ (sup (l , f) , p) ≈ᶻ (sup (l , f) , q)
-  -- ≈znode : ∀ {α} b (s t : P₀ (α b))
-  --        → (eq : α b ⊢ s ≈ᶻ t)
-  --        → sup (n , α) ⊢ injP b s ≈ᶻ injP b t
-  ≈zcong : ∀ {α f g p q}
-         → (fb<αb : ∀ b → f b < α b)
-         → (gb<αb : ∀ b → g b < α b)
-         → (_ : ∀ b → α b ⊢ (f b , fb<αb b) ≈ᶻ (g b , gb<αb b))
-         → sup (n , α) ⊢  (sup (n , f) , p)
-                       ≈ᶻ (sup (n , g) , q)
-  ≈zperm : ∀ {i f p} → (π : B ↔ B)
-         → i ⊢  sup (n , f) , p
-            ≈ᶻ perm i f p π
-  ≈ztrans : ∀ {i s t u} → i ⊢ s ≈ᶻ t → i ⊢ t ≈ᶻ u → i ⊢ s ≈ᶻ u
-
-
--- ≡→≈ᶻ : ∀ {i} s t
---         → {p : s < i} {q : t < i}
---         → s ≡ t
---         → _≡_ {A = P₀ i} (s , p)  (t , q)
--- ≡→≈ᶻ {i} s t {p = p} {q = q} = ΣP≡ (s , p) (t , q)
-
-
-injP : ∀ {i j} (s : P₀ i) → i ≤ j → P₀ j
-injP (s , s<i) i≤j = s , ≤< i≤j s<i
-
--- inj≈ᶻ : ∀ {i j} s t (p : s < i) (q : t < i)
---       → i ⊢ (s , p) ≈ᶻ (t , q)
-
-
-≡→≈ᶻ : ∀ {i} s (p : s < i)
-     → i ⊢ (s , p) ≈ᶻ (s , p)
-≡→≈ᶻ s p = {!!}
-
--- ≡→≈ᶻ : ∀ {i} s t
---      → {p : s < i} {q : t < i}
---      → s ≡ t
---      → i ⊢ (s , p) ≈ᶻ (t , q)
--- ≡→≈ᶻ {sup (l , _)} s t {p} = absurdp (t≮l s p)
--- ≡→≈ᶻ {sup (n , α)} (sup (l , f)) (sup (l , f)) {p} {q} ≡.refl =
---   ≈zleaf p q
--- ≡→≈ᶻ {sup (n , α)} (sup (n , f)) (sup (n , f)) {p} {q} ≡.refl =
---   ≈zcong lt lt λ b → {!!}
---   where
---   lt : ∀ b → f b < α b
---   lt b = {!!}
-
--- -- ≡→≈ᶻ {sup (n , α)} (sup (n , f)) (sup (n , f)) {<sup bp (sup≤ p)} {<sup bq (sup≤ q)} ≡.refl = {!!}
--- --   -- ≈znode α (λ i → {!!} , {!!}) {!!} λ b → {!!}
-
--- ≈zrefl : ∀ i t → i ⊢ t ≈ᶻ t
--- ≈zrefl i (sup (l , f) , p) = substp (λ ○ → {!!} ) {!!} ≈zleaf
--- ≈zrefl i (sup (n , f) , p) = {!!}
-
--- P : (i : BTree) → Setoid l0 l0
--- P i = record
---   { Carrier = P₀ i
---   ; _≈_ = i ⊢_≈ᶻ_
---   ; isEquivalence = {!!} }
-
-  
--- -- -- Sz : BTree → Setoid l0 l0
--- -- -- Sz t .Setoid.Carrier = P₀ t
--- -- -- Sz t@(sup (γ , h)) .Setoid._≈_ (sz (sup (α , f)) sf<t@(<sup c d)) (sz (sup (β , g)) sg<t) = _≈ᵗ_ (Sz t) (α , λ b → sz (f b) {!<sup {!!} {!!}!}) ({!!} , {!!})
--- -- -- Sz t .Setoid.isEquivalence = {!!}
-
-
--- -- -- Sz : BTree → Setoid l0 l0
--- -- -- Sz t = record
--- -- --   { Carrier = Sz₀ t
--- -- --   ; _≈_ = λ (sz u _) (sz s _) → u ≈' s
--- -- --   ; isEquivalence = {!!} } --record
--- -- --     -- { refl = ≈refl
--- -- --     -- ; sym = ≈sym
--- -- --     -- ; trans = ≈trans } }
--- -- --   where
--- -- --     _≈'_ : (a b : BTree) → Prop
--- -- --     sup (l , _) ≈' sup (l , _) = _≈ᵗ_ (Sz t) (l , λ ()) (l , λ ())
--- -- --     sup (l , _) ≈' sup (n , g) = _≈ᵗ_ (Sz t) (l , λ ()) (n , λ b → {!sz ? ?!})
--- -- --     sup (n , f) ≈' sup (l , _) = {!!}
--- -- --     sup (n , f) ≈' sup (n , g) = {!!}
--- -- --     -- data _≈'_ (a b : BTree) : Prop where
--- -- --     --   w : ∀ (a b : F̃-ob₀ (Sz t)) → _≈ᵗ_ (Sz t) a b → {!a ≈' b!}
-
--- -- -- P : ∀ {t u} → u ≤ t → ≈.Hom (Sz u) (Sz t)
--- -- -- P {t} {u} u≤t = record
--- -- --   { ⟦_⟧ = λ (sz s s<u) → sz s (≤< u≤t s<u)
--- -- --   ; cong = λ s≈u → s≈u }
-
--- -- -- module ≤ = IsPreorder isPreorder-≤
-
--- -- -- Id : ∀ {t : BTree}
--- -- --     → ≈.Hom≈ (P (≤refl t)) ≈.idHom 
--- -- -- Id p = p
-
--- -- -- Comp : ∀{s t u} (p : s ≤ t) (q : t ≤ u)
--- -- --       → ≈.Hom≈ (P (≤.trans p q)) (P q ≈.∘ P p)   
--- -- -- Comp _ _ r = r
-
--- -- -- D : Diagram
--- -- -- D = record
--- -- --   { D-ob = Sz
--- -- --   ; D-mor = P
--- -- --   ; D-id = λ {i} {x} {y} → Id {i} {x} {y}
--- -- --   ; D-comp = Comp }
-
--- -- -- open Colim D
+open Colim D public
