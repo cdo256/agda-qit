@@ -1,7 +1,8 @@
 {-# OPTIONS --type-in-type #-}
-module QIT.Mobile.Cocontinuity (B : Set) (inhabB : B) where
-
 open import QIT.Prelude
+
+module QIT.Mobile.Cocontinuity (B : Set) (inhabB :  ∥ B ∥) where
+
 open import QIT.Relation.Binary
 open import QIT.Mobile.Base B
 open import QIT.Mobile.Diagram B inhabB

@@ -1,7 +1,9 @@
 {-# OPTIONS --type-in-type #-}
-module QIT.Mobile.Diagram (B : Set) (inhabB : B) where
 
 open import QIT.Prelude
+
+module QIT.Mobile.Diagram (B : Set) (inhabB : ∥ B ∥) where
+
 open import QIT.Relation.Binary
 open import QIT.Mobile.Base B
 open import QIT.Mobile.Functor B
@@ -25,8 +27,11 @@ data P₀ : (i : BTree) → Set where
   weaken : ∀ i j → i ≤ j → P₀ i → P₀ j
 
 n≰l : ∀ {f g} → ¬p (sup (n , f) ≤ sup (l , g))
-n≰l {f} {g} (sup≤ f<l) with f<l inhabB
-... | <sup () i≤fx
+n≰l {f} {g} (sup≤ f<l) = r inhabB
+  where
+  r : ∥ B ∥ → ⊥p
+  r ∣ b ∣ with f<l b
+  ... | <sup () i≤fx
 
 t≤l→t≡l : ∀ {f} t → (_ : t ≤ sup (l , f)) → t ≡p sup (l , λ())
 t≤l→t≡l {f} (sup (l , g)) p = ∣ (leaf≡leaf g λ ()) ∣
