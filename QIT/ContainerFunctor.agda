@@ -97,7 +97,7 @@ open Comp using (F̃-comp) public
 
 module Resp
   {S T : Setoid l0 l0}
-  {f g : ≈.Hom S T}
+  (f g : ≈.Hom S T)
   (f≈g : f ≈h g)
   where
   module S = ≈.Setoid S

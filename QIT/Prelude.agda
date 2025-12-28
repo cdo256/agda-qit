@@ -86,6 +86,9 @@ open ↔ using (_↔_) public
 ⊥* : ∀ {ℓ} → Set ℓ
 ⊥* {ℓ} = Lift ℓ ⊥
 
+absurd* : ∀ {ℓ ℓ'} {A : Set ℓ} → ⊥* {ℓ = ℓ'} → A
+absurd* ()
+
 congp : ∀ {a b} {A : Set a} {B : Prop b} (f : A → B)
       → ∀ {x y} → x ≡ y → f x ≡ᴾ f y
 congp f ≡.refl = ≡.refl

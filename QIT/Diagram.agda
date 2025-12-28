@@ -53,7 +53,7 @@ F ∘ P = record
     open import QIT.Relation.Binary
     u : D-ob i ⊢ (F.F-mor (P.D-mor ≤.refl ) .to x)
                ≈ (F.F-mor ≈.idHom) .to x
-    u = F.F-resp P.D-id (F.F-ob (P.D-ob i) .refl)
+    u = F.F-resp (P.D-mor _) ≈.idHom P.D-id (F.F-ob (P.D-ob i) .refl)
   D-comp : ∀ {i j k} → (p : i ≤ j) (q : j ≤ k)
          → ≈.Hom≈ (D-mor (≤.trans p q)) (D-mor q ≈.∘ D-mor p)
   D-comp {i} {j} {k} p q {x} {y} x≈y =
@@ -61,7 +61,8 @@ F ∘ P = record
       to (D-mor (≤.trans p q)) x
         ≈⟨ D-ob _ .refl ⟩
       to (F.F-mor (P.D-mor (≤.trans p q))) x
-        ≈⟨ F.F-resp (P.D-comp p q) (D-ob _ .refl) ⟩
+        ≈⟨ F.F-resp (P.D-mor _) (P.D-mor _ ≈.∘ P.D-mor _)
+                    (P.D-comp p q) (D-ob _ .refl) ⟩
       to (F.F-mor (P.D-mor q ≈.∘ P.D-mor p )) x
         ≈⟨ F.F-comp _ _ x≈y ⟩
       to (F.F-mor (P.D-mor q) ≈.∘ F.F-mor (P.D-mor p)) y

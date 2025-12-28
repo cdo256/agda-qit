@@ -16,10 +16,9 @@ module QIT.Colimit {ℓI} {ℓ≤} {ℓB} {ℓB'}
   open QIT.Diagram ≤p
   open Diagram P renaming (D-ob to P̂)
 
-  private
-    Pf : ∀ {i j} (p : i ≤ j) → (⟨ P̂ i ⟩ → ⟨ P̂ j ⟩)
-    Pf p = to
-      where open ≈.Hom (D-mor p)
+  Pf : ∀ {i j} (p : i ≤ j) → (⟨ P̂ i ⟩ → ⟨ P̂ j ⟩)
+  Pf p = to
+    where open ≈.Hom (D-mor p)
 
   -- The carrier of the colimit (Sigma type)
   Colim₀ : Set (ℓI ⊔ ℓB)

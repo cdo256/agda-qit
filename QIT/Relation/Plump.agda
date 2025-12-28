@@ -50,6 +50,8 @@ mutual
 << : ∀{i j k} → j < k → i < j → i < k
 << (<sup x i≤fx) i<j = <sup x (<→≤ (≤< i≤fx i<j))
 
+fi≤sup : ∀ s f i → f i ≤ sup (s , f)
+fi≤sup s f i = <→≤ (<sup i (≤refl (f i)))
 
 iswf< : WellFounded _<_
 iswf< i = acc λ j j<i → α i j (<→≤ j<i)
@@ -96,3 +98,4 @@ isWeaklyExtensional = ∀ x y → x ⊆ y → y ⊆ x → x ≡p y
 
 isQuasiExtensional : Prop
 isQuasiExtensional = ∀ x y → (x ≤≥ y) ⇔ (x ⊆⊇ y)
+
