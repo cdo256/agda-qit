@@ -26,23 +26,27 @@ open import QIT.Mobile.Functor B
 module F = ≈.Functor F̃
 module D = Diagram D
 
+private
+  L = Colim (F̃ ∘ D)
+  R = F.F-ob (Colim D)
+
 ϕ₀ : ⟨ Colim (F̃ ∘ D) ⟩ → ⟨ F.F-ob (Colim D) ⟩
 ϕ₀ (i , (l , _)) = l , (λ ())
 ϕ₀ (i , (n , f)) = n , (λ b → i , f b)
 
-𝟘 : BTree
-𝟘 = sup (l , λ())
-suc : BTree → BTree
-suc x = sup (n , λ _ → x)
-
-<suc : ∀ t → t < suc t
-<suc t = f inhabB
+ϕ-cong : ∀ {x y} → Colim (F̃ ∘ D) [ x ≈ y ] → F.F-ob (Colim D) [ ϕ₀ x ≈ ϕ₀ y ]
+ϕ-cong (≈lstage i ≈leaf) = ≈leaf
+ϕ-cong (≈lstage i (≈node c)) = ≈node λ b → ≈lstage i (c b)
+ϕ-cong (≈lstage i (≈perm π)) = ≈perm π
+ϕ-cong (≈lstage i {u , x} {v , x'} (≈trans {t = w , z} p q)) =
+  ≈trans α β
   where
-  f : ∥ B ∥ → t < suc t
-  f ∣ b ∣ = <sup b (≤refl t)
-
-𝟘≤t : ∀ t → 𝟘 ≤ t
-𝟘≤t _ = sup≤ λ ()
+  α = ϕ-cong (≈lstage i p)
+  β = ϕ-cong (≈lstage i q)
+ϕ-cong (≈lstep {i} {j} p (l , _)) = ≈leaf
+ϕ-cong (≈lstep {i} {j} (sup≤ p) (n , f)) = ≈node λ b → ≈lstep (sup≤ p) (f b)
+ϕ-cong (≈lsym p) = ≈sym (Colim D) (ϕ-cong p)
+ϕ-cong (≈ltrans p q) = ≈trans (ϕ-cong p) (ϕ-cong q)
 
 ψ₀ : ⟨ F.F-ob (Colim D) ⟩ → ⟨ Colim (F̃ ∘ D) ⟩
 ψ₀ (l , _) = 𝟘 , (l , λ ())
@@ -63,6 +67,29 @@ suc x = sup (n , λ _ → x)
     h' : ≈.Hom (D-ob (t b)) (D-ob t*)
     h' = D-mor tb≤t*
     module h' = ≈.Hom h'
+
+ψ-cong : ∀ {x y} → F.F-ob (Colim D) [ x ≈ y ] → Colim (F̃ ∘ D) [ ψ₀ x ≈ ψ₀ y ]
+ψ-cong ≈leaf = ≈lstage 𝟘 ≈leaf
+ψ-cong (≈node {f} {g} c) = begin
+  sup (n , f1) , (n , λ b → D-mor (fi≤sup n f1 b) .to (f2 b))
+    ≈⟨ {!!} ⟩
+  sup (n , f1) , (n , λ b → D-mor (fi≤sup n f1 b) .to (f2 b))
+    ≈⟨ {!!} ⟩
+  sup (n , g1) , (n , λ b → D-mor (fi≤sup n g1 b) .to (g2 b)) ∎
+  where
+  open Diagram D
+  f1 : B → BTree
+  f1 b = f b .proj₁
+  f2 : ∀ b → P₀ (f1 b)
+  f2 b = f b .proj₂
+  g1 : B → BTree
+  g1 b = f b .proj₁
+  g2 : ∀ b → P₀ (g1 b)
+  g2 b = f b .proj₂
+  open ≈.Hom
+  open ≈.≈syntax {S = Colim (F̃ ∘ D)}
+ψ-cong (≈perm π) = {!!}
+ψ-cong (≈trans p q) = {!!}
 
 linv : ∀ y → F.F-ob (Colim D) [ (ϕ₀ (ψ₀ y)) ≈ y ]
 linv (l , f) = begin
@@ -131,8 +158,8 @@ cocontinuous = ∣ iso ∣
   iso = record
     { ⟦_⟧ = ϕ₀
     ; ⟦_⟧⁻¹ = ψ₀
-    ; cong = {!!}
-    ; cong⁻¹ = {!!}
+    ; cong = ϕ-cong
+    ; cong⁻¹ = ψ-cong
     ; linv = linv
     ; rinv = rinv
     }

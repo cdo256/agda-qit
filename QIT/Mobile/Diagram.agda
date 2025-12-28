@@ -33,6 +33,20 @@ n≰l {f} {g} (sup≤ f<l) = r inhabB
   r ∣ b ∣ with f<l b
   ... | <sup () i≤fx
 
+𝟘 : BTree
+𝟘 = sup (l , λ())
+suc : BTree → BTree
+suc x = sup (n , λ _ → x)
+
+<suc : ∀ t → t < suc t
+<suc t = f inhabB
+  where
+  f : ∥ B ∥ → t < suc t
+  f ∣ b ∣ = <sup b (≤refl t)
+
+𝟘≤t : ∀ t → 𝟘 ≤ t
+𝟘≤t _ = sup≤ λ ()
+
 t≤l→t≡l : ∀ {f} t → (_ : t ≤ sup (l , f)) → t ≡p sup (l , λ())
 t≤l→t≡l {f} (sup (l , g)) p = ∣ (leaf≡leaf g λ ()) ∣
 t≤l→t≡l {f} (sup (n , g)) p = absurdp (n≰l p)
