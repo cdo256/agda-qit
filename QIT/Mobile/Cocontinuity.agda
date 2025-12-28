@@ -68,25 +68,43 @@ private
     h' = D-mor tb≤t*
     module h' = ≈.Hom h'
 
+module _ where
+  open Diagram D
+  ≈ˡ→≤ : ∀ {i j : BTree} (s : P₀ i) (t : P₀ j)
+       → Colim D [ i , s ≈ j , t ] → ⟦ s ⟧ ≤ ⟦ t ⟧
+  ≈ˡ→≤ s t (≈lstage i p) = {!!}
+  ≈ˡ→≤ s t (≈lstep p x) = {!!}
+  ≈ˡ→≤ s t (≈lsym p) = {!!}
+  ≈ˡ→≤ s t (≈ltrans p q) = {!!}
+
 ψ-cong : ∀ {x y} → F.F-ob (Colim D) [ x ≈ y ] → Colim (F̃ ∘ D) [ ψ₀ x ≈ ψ₀ y ]
 ψ-cong ≈leaf = ≈lstage 𝟘 ≈leaf
 ψ-cong (≈node {f} {g} c) = begin
-  sup (n , f1) , (n , λ b → D-mor (fi≤sup n f1 b) .to (f2 b))
+  nf , (n , λ b → weaken (f1 b) nf (fi≤sup n f1 b) (f2 b))
     ≈⟨ {!!} ⟩
-  sup (n , f1) , (n , λ b → D-mor (fi≤sup n f1 b) .to (f2 b))
+  nf , ({!!})
     ≈⟨ {!!} ⟩
-  sup (n , g1) , (n , λ b → D-mor (fi≤sup n g1 b) .to (g2 b)) ∎
+  ng , (n , λ b → weaken (g1 b) ng (fi≤sup n g1 b) (g2 b)) ∎
   where
   open Diagram D
   f1 : B → BTree
   f1 b = f b .proj₁
   f2 : ∀ b → P₀ (f1 b)
   f2 b = f b .proj₂
+  nf : BTree
+  nf = sup (n , f1)
   g1 : B → BTree
-  g1 b = f b .proj₁
+  g1 b = g b .proj₁
   g2 : ∀ b → P₀ (g1 b)
-  g2 b = f b .proj₂
+  g2 b = g b .proj₂
+  ng : BTree
+  ng = sup (n , g1)
+  fb≤gb : ∀ b → f1 b ≤ g1 b
+  fb≤gb b = {!!}
+  nf≤ng : nf ≤ ng
+  nf≤ng = sup≤ (λ b → <sup b (fb≤gb b))
   open ≈.Hom
+  open Setoid (Colim (F̃ ∘ D))
   open ≈.≈syntax {S = Colim (F̃ ∘ D)}
 ψ-cong (≈perm π) = {!!}
 ψ-cong (≈trans p q) = {!!}
