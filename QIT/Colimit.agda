@@ -5,13 +5,14 @@ open import QIT.Setoid
 open import Data.Product
 import QIT.Diagram
 
-module QIT.Colimit {ℓI} {ℓ≤} {ℓD} {ℓD'}
+module QIT.Colimit {ℓI} {ℓ≤} 
   {I : Set ℓI}
   (≤p : Preorder I ℓ≤)
-  (P : QIT.Diagram.Diagram {ℓD = ℓD} {ℓD' = ℓD'} ≤p)
+  (ℓD ℓD' : Level)
+  (P : QIT.Diagram.Diagram ≤p ℓD ℓD')
   where
 
-  open QIT.Diagram{ℓD = ℓD} {ℓD' = ℓD'}  ≤p
+  open QIT.Diagram ≤p
   open Diagram P renaming (D-ob to P̂)
 
   Pf : ∀ {i j} (p : i ≤ j) → (⟨ P̂ i ⟩ → ⟨ P̂ j ⟩)

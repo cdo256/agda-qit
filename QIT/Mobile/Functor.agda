@@ -1,4 +1,3 @@
-{-# OPTIONS --type-in-type #-}
 module QIT.Mobile.Functor (B : Set) where
 
 open import QIT.Prelude
@@ -129,7 +128,7 @@ module Resp
     open ≈.≈syntax {S = F̃-ob T}
 open Resp using (F̃-resp) public
 
-F̃ : ≈.Functor l0 l0
+F̃ : ≈.Functor {!!} {!!} {!!} {!!}
 F̃ = record
   { F-ob = F̃-ob
   ; F-mor = F̃-mor

@@ -1,4 +1,3 @@
-{-# OPTIONS --type-in-type #-}
 module QIT.Mobile.Base (B : Set) where
 
 open import QIT.Prelude
