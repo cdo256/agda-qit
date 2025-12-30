@@ -4,7 +4,9 @@ open import QIT.Prelude
 open import QIT.Setoid.Base
 open import Data.Product
 
-record Hom {ℓ} {ℓ'} (S T : Setoid ℓ ℓ') : Set (ℓ ⊔ ℓ') where
+record Hom {ℓS ℓS' ℓT ℓT'}
+       (S : Setoid ℓS ℓS') (T : Setoid ℓT ℓT') : Set (ℓS ⊔ ℓS' ⊔ ℓT ⊔ ℓT')
+       where
   module S = Setoid S
   module T = Setoid T
   field
@@ -16,7 +18,8 @@ idHom {S} = record
   { to = λ x → x
   ; cong = λ p → p }
 
-_≈h_ : ∀ {ℓ ℓ'} → {S T : Setoid ℓ ℓ'} (f g : Hom S T) → Prop (ℓ ⊔ ℓ')
+_≈h_ : ∀ {ℓS ℓS' ℓT ℓT'} → {S : Setoid ℓS ℓS'} {T : Setoid ℓT ℓT'}
+     → (f g : Hom S T) → Prop (ℓS ⊔ ℓS' ⊔ ℓT')
 _≈h_ {S = S} {T} f g = ∀ {x y} → x S.≈ y → f.to x T.≈ g.to y
   where
   module S = Setoid S
@@ -25,7 +28,8 @@ _≈h_ {S = S} {T} f g = ∀ {x y} → x S.≈ y → f.to x T.≈ g.to y
   module g = Hom g
 
 infixr 1 _∘_
-_∘_ : ∀ {ℓ ℓ'} → {A B C : Setoid ℓ ℓ'}
+_∘_ : ∀ {ℓA ℓA' ℓB ℓB' ℓC ℓC' }
+    → {A : Setoid ℓA ℓA'} {B : Setoid ℓB ℓB'} {C : Setoid ℓC ℓC'}
     → Hom B C → Hom A B → Hom A C
 f ∘ g = record
   { to  = λ x → f.to (g.to x)

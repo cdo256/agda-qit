@@ -53,3 +53,13 @@ Rel≈ {ℓ} S ℓ'' = BinaryRel A (ℓ ⊔ ℓ'')
 ≡→≈ : ∀ {ℓ ℓ'} → (A : Setoid ℓ ℓ') → {x y : ⟨ A ⟩} → x ≡ y → A [ x ≈ y ]
 ≡→≈ A {x} p = substp (λ ○ → x ≈ ○) p refl
   where open Setoid A
+
+liftSetoid : ∀ {ℓ₁ ℓ₁'} ℓ₂ ℓ₂' → Setoid ℓ₁ ℓ₁' → Setoid (ℓ₁ ⊔ ℓ₂) (ℓ₁' ⊔ ℓ₂')
+liftSetoid ℓ₂ ℓ₂' S = record
+  { Carrier = Lift ℓ₂ Carrier
+  ; _≈_ = λ x y → LiftP ℓ₂' (x .Lift.lower ≈ y .Lift.lower)
+  ; isEquivalence = record
+    { refl = λ {x} → liftp refl
+    ; sym = λ p → liftp (sym (p .lowerp))
+    ; trans = λ p q → liftp (trans (p .lowerp) (q .lowerp))} }
+  where open Setoid S

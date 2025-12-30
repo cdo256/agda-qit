@@ -10,7 +10,7 @@ module QIT.Setoid.Sigma
 
   Carrier = Σ I λ i → ⟨ S i ⟩
 
-  data _≈Σ_ : Carrier → Carrier → Set where
+  data _≈Σ_ : Carrier → Carrier → Set (ℓI ⊔ ℓS ⊔ ℓS') where
     ≈Σ, : ∀ {i j : I} (p : i ≡ j) {x : ⟨ S i ⟩} {y : ⟨ S j ⟩}
         → S j [ subst (λ i → ⟨ S i ⟩) p x ≈ y ]
         → (i , x) ≈Σ (j , y)

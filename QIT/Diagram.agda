@@ -1,12 +1,10 @@
-{-# OPTIONS --type-in-type #-}
-
 open import QIT.Prelude
 open import QIT.Relation.Base
 open import QIT.Relation.Binary
 open import QIT.Setoid
 open import Data.Product
 
-module QIT.Diagram {ℓI} {ℓ≤} {ℓB} {ℓB'}
+module QIT.Diagram {ℓI} {ℓ≤} {ℓD} {ℓD'}
   {I : Set ℓI}
   (≤p : Preorder I ℓ≤)
   where
@@ -15,19 +13,17 @@ module ≤ = IsPreorder (≤p .proj₂)
 _≤_ : BinaryRel I ℓ≤
 _≤_ = ≤p .proj₁
 
-record Diagram : Set (ℓ≤ ⊔ lsuc ℓB ⊔ lsuc ℓB') where
+record Diagram : Set (ℓ≤ ⊔ ℓI ⊔ lsuc ℓD ⊔ lsuc ℓD') where
   field
-    D-ob : ∀ (i : I) → Setoid ℓB ℓB'
+    D-ob : ∀ (i : I) → Setoid ℓD ℓD'
     D-mor : ∀ {i j} → (p : i ≤ j) → ≈.Hom (D-ob i) (D-ob j)
     D-id : ∀ {i : I}
-         → ≈.Hom≈ (D-mor (≤.refl))
-                  (≈.idHom {S = D-ob i})
+         → D-mor (≤.refl) ≈h (≈.idHom {S = D-ob i})
     D-comp : ∀ {i j k} → (p : i ≤ j) (q : j ≤ k)
-           → ≈.Hom≈ (D-mor (≤.trans p q))
-                    (D-mor q ≈.∘ D-mor p)
+           → D-mor (≤.trans p q) ≈h (D-mor q ≈.∘ D-mor p)
 
-_∘_ : ∀ {ℓF ℓF'} → (F : ≈.Functor ℓF ℓF') (P : Diagram) → Diagram
-F ∘ P = record
+_∘_ : (F : ≈.Functor ℓD ℓD') (P : Diagram) → Diagram
+_∘_ F P = record
   { D-ob = D-ob
   ; D-mor = D-mor
   ; D-id = λ {i} → D-id {i}
@@ -36,7 +32,7 @@ F ∘ P = record
   module F = ≈.Functor F
   module P = Diagram P
   open ≈.Setoid using () renaming (_≈_ to _⊢_≈_)
-  D-ob : (i : I) → Setoid _ _
+  D-ob : (i : I) → Setoid ℓD ℓD'
   D-ob = λ i → F.F-ob (P.D-ob i)
   D-mor : ∀ {i j} → ≤p .proj₁ i j
       → ≈.Hom (F.F-ob (P.D-ob i)) (F.F-ob (P.D-ob j))
@@ -55,7 +51,7 @@ F ∘ P = record
                ≈ (F.F-mor ≈.idHom) .to x
     u = F.F-resp (P.D-mor _) ≈.idHom P.D-id (F.F-ob (P.D-ob i) .refl)
   D-comp : ∀ {i j k} → (p : i ≤ j) (q : j ≤ k)
-         → ≈.Hom≈ (D-mor (≤.trans p q)) (D-mor q ≈.∘ D-mor p)
+         → D-mor (≤.trans p q) ≈h (D-mor q ≈.∘ D-mor p)
   D-comp {i} {j} {k} p q {x} {y} x≈y =
     begin
       to (D-mor (≤.trans p q)) x
