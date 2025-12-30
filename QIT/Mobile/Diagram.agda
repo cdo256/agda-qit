@@ -60,11 +60,6 @@ t≤l→t≡l {f} (sup (n , g)) p = absurdp (n≰l p)
 ⟦ node α f ⟧ = sup (n , λ b → ⟦ f b ⟧)
 ⟦ weaken i j p s ⟧ = ⟦ s ⟧
 
-⟦_⟧-inj : ∀ {i j} → (t : P₀ i) → (u : P₀ j)
-        → {!!} [ ⟦ t ⟧ ≈ ⟦ u ⟧ ]
-        → _≈ᵗ_ {!!} {!!} {!!}
-⟦_⟧-inj = {!!}
-
 _∘ᴾ_ : ∀ {α : B → BTree} (f : (b : B) → P₀ (α b)) (π : B ↔ B)
      → (b : B) → P₀ (α (π .↔.to b))
 _∘ᴾ_ {α} f π = λ b → f (π .↔.to b)
