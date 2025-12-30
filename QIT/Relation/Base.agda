@@ -1,4 +1,3 @@
-{-# OPTIONS --type-in-type #-}
 module QIT.Relation.Base where
 
 open import QIT.Prelude
