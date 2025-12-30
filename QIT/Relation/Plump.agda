@@ -1,4 +1,3 @@
-{-# OPTIONS --type-in-type #-}
 open import QIT.Prelude
 open import QIT.Relation.Binary
 
@@ -74,7 +73,7 @@ isPreorder-≤ = record
 _⊆_ : Size → Size → Prop (ℓs ⊔ ℓp)
 i ⊆ j = ∀ k → k < i → k < j
 
-_⊇_ : Size → Size → Prop
+_⊇_ : Size → Size → Prop (ℓs ⊔ ℓp)
 i ⊇ j = ∀ k → i < k → j < k
 
 ⊆→≤ : ∀ {i j} → i ⊆ j → i ≤ j
@@ -88,14 +87,14 @@ i ⊇ j = ∀ k → i < k → j < k
 ≤→⊇ : ∀ i j → i ≤ j → j ⊇ i
 ≤→⊇ i j i≤j k j<k = <≤ j<k i≤j
 
-_≤≥_ : ∀ (x y : W C) → Prop
+_≤≥_ : ∀ (x y : W C) → Prop (ℓs ⊔ ℓp)
 x ≤≥ y = (x ≤ y) ∧ (y ≤ x)
-_⊆⊇_ : ∀ (x y : W C) → Prop
+_⊆⊇_ : ∀ (x y : W C) → Prop (ℓs ⊔ ℓp)
 x ⊆⊇ y = (x ⊆ y) ∧ (y ⊆ x)
 
-isWeaklyExtensional : Prop
+isWeaklyExtensional : Prop (ℓs ⊔ ℓp)
 isWeaklyExtensional = ∀ x y → x ⊆ y → y ⊆ x → x ≡p y
 
-isQuasiExtensional : Prop
+isQuasiExtensional : Prop (ℓs ⊔ ℓp)
 isQuasiExtensional = ∀ x y → (x ≤≥ y) ⇔ (x ⊆⊇ y)
 

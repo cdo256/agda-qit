@@ -1,4 +1,3 @@
-{-# OPTIONS --type-in-type #-}
 module QIT.Relation.Binary where
 
 open import QIT.Prelude
@@ -35,8 +34,8 @@ module _ {ℓA ℓR} {A : Set ℓA} (R : BinaryRel A ℓR) where
       refl  : Reflexive
       trans : Transitive
 
-Preorder : ∀ {ℓA} (S : Set ℓA) → ∀ ℓR' → Set lzero
-Preorder S ℓR' = Σ (BinaryRel S ℓR') IsPreorder
+Preorder : ∀ {ℓA} (S : Set ℓA) → ∀ ℓR → Set (ℓA ⊔ lsuc ℓR)
+Preorder S ℓR = Σ (BinaryRel S ℓR) IsPreorder
 
 module _ {ℓA} (A : Set ℓA) where
   private
