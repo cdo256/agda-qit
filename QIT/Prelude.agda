@@ -114,3 +114,15 @@ data _∨_ {ℓ ℓ'} (A : Prop ℓ) (B : Prop ℓ') : Prop (ℓ ⊔ ℓ') where
 
 _⇔_ : ∀ {ℓ ℓ'} (A : Prop ℓ) (B : Prop ℓ') → Prop (ℓ ⊔ ℓ')
 A ⇔ B = (A → B) ∧ (B → A)
+
+data Dec {ℓA} (A : Set ℓA) : Set ℓA where
+  yes : A → Dec A
+  no : ¬ A → Dec A
+
+Discrete : ∀ {ℓA} (A : Set ℓA) → Set ℓA
+Discrete A = ∀ (x y : A) → Dec (x ≡ y)
+  
+infixr 3 if_then_else_ 
+if_then_else_ : ∀ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} (decA : Dec A) → B → B → B
+if yes _ then b else b' = b
+if no _ then b else b' = b'

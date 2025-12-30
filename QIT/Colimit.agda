@@ -24,16 +24,54 @@ module QIT.Colimit {ℓI} {ℓ≤} {ℓB} {ℓB'}
   Colim₀ : Set (ℓI ⊔ ℓB)
   Colim₀ = Σ[ i ∈ I ] ⟨ P̂ i ⟩
 
+  -- data _≈ˡ'_ : Colim₀ → Colim₀ → Prop (ℓ≤ ⊔ ℓI ⊔ ℓB ⊔ ℓB') where
+  --   ≈lstage' : ∀ i → {x x' : ⟨ P̂ i ⟩} → P̂ i [ x ≈ x' ]
+  --            → (i , x) ≈ˡ' (i , x')
+  --   ≈lstep   : ∀ {i j} (p : i ≤ j) (x : ⟨ P̂ i ⟩) → (i , x) ≈ˡ' (j , Pf p x)
+  --   ≈lsym    : ∀ {s t} → s ≈ˡ' t → t ≈ˡ' s
+  --   ≈ltrans  : ∀ {s t u} → s ≈ˡ' t → t ≈ˡ' u → s ≈ˡ' u
+
   -- The equivalence relation generating the colimit
   data _≈ˡ_ : Colim₀ → Colim₀ → Prop (ℓ≤ ⊔ ℓI ⊔ ℓB ⊔ ℓB') where
-    ≈lstage : ∀ i → {x x' : ⟨ P̂ i ⟩} → P̂ i [ x ≈ x' ] → (i , x) ≈ˡ (i , x')
+    ≈lstage : ∀ i → {x x' : ⟨ P̂ i ⟩} → P̂ i [ x ≈ x' ]
+            → (i , x) ≈ˡ (i , x')
     ≈lstep  : ∀ {i j} (p : i ≤ j) (x : ⟨ P̂ i ⟩) → (i , x) ≈ˡ (j , Pf p x)
     ≈lsym   : ∀ {s t} → s ≈ˡ t → t ≈ˡ s
     ≈ltrans : ∀ {s t u} → s ≈ˡ t → t ≈ˡ u → s ≈ˡ u
 
+  recˡ : ∀ {ℓ} (C : ∀ {s t} → s ≈ˡ t → Prop ℓ)
+       → (c-stage : ∀ i {x x'} (e : P̂ i [ x ≈ x' ]) → C (≈lstage i e))
+       → (c-step  : ∀ {i j} (p : i ≤ j) (x : ⟨ P̂ i ⟩) → C (≈lstep p x))
+       → (c-sym   : ∀ {s t} (r : s ≈ˡ t) → C r → C (≈lsym r))
+       → (c-trans : ∀ {s t u} (r₁ : s ≈ˡ t) (r₂ : t ≈ˡ u) → C r₁ → C r₂ → C (≈ltrans r₁ r₂))
+       → ∀ {s t} (r : s ≈ˡ t) → C r
+  recˡ C c-stage c-step c-sym c-trans = go
+    where
+      go : ∀ {s t} (r : s ≈ˡ t) → C r
+      go (≈lstage i e)    = c-stage i e
+      go (≈lstep p x)     = c-step p x
+      go (≈lsym r)        = c-sym r (go r)
+      go (≈ltrans r₁ r₂)  = c-trans r₁ r₂ (go r₁) (go r₂)
+
+  -- ≈ˡ→≈ˡ' : ∀ {i j x y} → (i , x) ≈ˡ (j , y) → (i , x) ≈ˡ' (j , y)
+  -- ≈ˡ→≈ˡ' (≈lstage i i ≡.refl {x} {x'} q) = ≈lstage' i q
+  -- ≈ˡ→≈ˡ' (≈lstep p x) = ≈lstep p x
+  -- ≈ˡ→≈ˡ' (≈lsym p) = ≈lsym (≈ˡ→≈ˡ' p)
+  -- ≈ˡ→≈ˡ' (≈ltrans p p₁) = ≈ltrans (≈ˡ→≈ˡ' p) (≈ˡ→≈ˡ' p₁)
+
+  -- ≈ˡ'→≈ˡ : ∀ {i j x y} → (i , x) ≈ˡ' (j , y) → (i , x) ≈ˡ (j , y)
+  -- ≈ˡ'→≈ˡ (≈lstage' i q) = ≈lstage i i ≡.refl q
+  -- ≈ˡ'→≈ˡ (≈lstep p x) = ≈lstep p x
+  -- ≈ˡ'→≈ˡ (≈lsym p) = ≈lsym (≈ˡ'→≈ˡ p)
+  -- ≈ˡ'→≈ˡ (≈ltrans p p₁) = ≈ltrans (≈ˡ'→≈ˡ p) (≈ˡ'→≈ˡ p₁)
+
+  ≈lrefl : ∀ {t} → t ≈ˡ t
+  ≈lrefl {i , x} = ≈lstage i (P̂ i .refl)
+    where open ≈.Setoid
+
   equiv : IsEquivalence _≈ˡ_
   equiv = record
-    { refl  = λ { {(i , x)} → ≈lstage i (P̂ i .refl) }
+    { refl  = ≈lrefl
     ; sym   = ≈lsym
     ; trans = ≈ltrans
     }

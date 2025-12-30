@@ -1,7 +1,9 @@
-{-# OPTIONS --type-in-type #-}
+{-# OPTIONS --type-in-type --lossy-unification #-}
 open import QIT.Prelude
 
-module QIT.Mobile.Cocontinuity (B : Set) (inhabB :  ∥ B ∥) where
+module QIT.Mobile.Cocontinuity
+  (B : Set) (inhabB : ∥ B ∥) (_≟_ : Discrete B)
+  (b₁ b₂ : B) (b₁≢b₂ : b₁ ≡.≢ b₂)  where 
 
 open import QIT.Relation.Binary
 open import QIT.Mobile.Base B
@@ -10,7 +12,7 @@ open import QIT.Setoid as ≈
 open import Data.Product
 open import Data.Empty renaming (⊥-elim to absurd)
 open import Data.W
-open import Data.Unit
+open import Data.Unit hiding (_≟_)
 open import Data.Sum
 open import QIT.Relation.Plump Branch
 
@@ -68,22 +70,45 @@ private
     h' = D-mor tb≤t*
     module h' = ≈.Hom h'
 
-module _ where
-  open Diagram D
-  ≈ˡ→≤ : ∀ {i j : BTree} (s : P₀ i) (t : P₀ j)
-       → Colim D [ i , s ≈ j , t ] → ⟦ s ⟧ ≤ ⟦ t ⟧
-  ≈ˡ→≤ s t (≈lstage i p) = {!!}
-  ≈ˡ→≤ s t (≈lstep p x) = {!!}
-  ≈ˡ→≤ s t (≈lsym p) = {!!}
-  ≈ˡ→≤ s t (≈ltrans p q) = {!!}
+module _ {ℓA} {A : Set ℓA} (s t u : A) where
+  fork : B → A
+  fork b =
+    if (b ≟ b₁)
+    then s
+    else if (b ≟ b₂)
+      then t
+      else u
+
+  forkᵗ-l : fork b₁ ≡ s
+  forkᵗ-l with (b₁ ≟ b₁)
+  ... | yes _ = ≡.refl
+  ... | no ¬q = absurd (¬q ≡.refl)
+  forkᵗ-r : fork b₂ ≡ t
+  forkᵗ-r with (b₂ ≟ b₁) | (b₂ ≟ b₂)
+  ... | yes b₂≡b₁ | _ = absurd (b₁≢b₂ (≡.sym b₂≡b₁))
+  ... | no _ | yes _ = ≡.refl
+  ... | no _ | no ¬r = absurd (¬r ≡.refl)
+
+_∨ᵗ_ : (s t : BTree) → BTree
+s ∨ᵗ t = sup (n , fork s t 𝟘)
+
+∨ᵗ-l : ∀ s t → s ≤ s ∨ᵗ t
+∨ᵗ-l (sup (s , f)) (sup (t , g)) =
+  sup≤ λ b → <sup b₁ (substp (f b ≤_) (≡.sym (forkᵗ-l (sup (s , f)) (sup (t , g)) 𝟘)) (fi≤sup s f b))
+
+∨ᵗ-r : ∀ s t → t ≤ s ∨ᵗ t
+∨ᵗ-r (sup (s , f)) (sup (t , g)) =
+  sup≤ λ b → <sup b₂ (substp (g b ≤_) (≡.sym (forkᵗ-r (sup (s , f)) (sup (t , g)) 𝟘)) (fi≤sup t g b))
 
 ψ-cong : ∀ {x y} → F.F-ob (Colim D) [ x ≈ y ] → Colim (F̃ ∘ D) [ ψ₀ x ≈ ψ₀ y ]
 ψ-cong ≈leaf = ≈lstage 𝟘 ≈leaf
 ψ-cong (≈node {f} {g} c) = begin
   nf , (n , λ b → weaken (f1 b) nf (fi≤sup n f1 b) (f2 b))
-    ≈⟨ {!!} ⟩
-  nf , ({!!})
-    ≈⟨ {!!} ⟩
+    ≈⟨ ≈lstep (∨ᵗ-l nf ng) u ⟩
+  nf ∨ᵗ ng , (n , λ b → weaken nf (nf ∨ᵗ ng) _ (weaken (f1 b) nf _ (f2 b)))
+    ≈⟨ ≈lstage (nf ∨ᵗ ng) (≈node c') ⟩
+  nf ∨ᵗ ng , (n , λ b → weaken ng (nf ∨ᵗ ng) _ (weaken (g1 b) ng _ (g2 b)))
+    ≈⟨ ≈lsym (≈lstep (∨ᵗ-r nf ng) (n , (λ b → weaken (g1 b) ng _ (g2 b)))) ⟩
   ng , (n , λ b → weaken (g1 b) ng (fi≤sup n g1 b) (g2 b)) ∎
   where
   open Diagram D
@@ -99,15 +124,36 @@ module _ where
   g2 b = g b .proj₂
   ng : BTree
   ng = sup (n , g1)
-  fb≤gb : ∀ b → f1 b ≤ g1 b
-  fb≤gb b = {!!}
-  nf≤ng : nf ≤ ng
-  nf≤ng = sup≤ (λ b → <sup b (fb≤gb b))
+  d : ∀ b → Colim D [ f b ≈ g b ] → f2 b ≈ᴾ g2 b
+  d b = recˡ D (λ {s} {t} p → s .proj₂ ≈ᴾ t .proj₂)
+             (λ i e → e)
+             ≈pweaken
+             (λ _ → ≈psym)
+             (λ _ _ → ≈ptrans)
+  c' : ∀ b → P (nf ∨ᵗ ng) [ weaken nf (nf ∨ᵗ ng) _ (weaken (f1 b) nf _ (f2 b))
+                          ≈ weaken ng (nf ∨ᵗ ng) _ (weaken (g1 b) ng _ (g2 b)) ]
+  c' b = begin
+    weaken nf (nf ∨ᵗ ng) _ (weaken (f1 b) nf _ (f2 b)) 
+      ≈⟨ ≈psym (≈pweaken (∨ᵗ-l nf ng) (weaken (f1 b) nf _ (f2 b))) ⟩
+    weaken (f1 b) nf _ (f2 b) 
+      ≈⟨ ≈psym (≈pweaken (fi≤sup n f1 b) (f2 b)) ⟩
+    f2 b
+      ≈⟨ d b (c b) ⟩
+    g2 b
+      ≈⟨ ≈pweaken (fi≤sup n g1 b) (g2 b) ⟩
+    weaken (g1 b) ng _ (g2 b)
+      ≈⟨ ≈pweaken (∨ᵗ-r nf ng) (weaken (g1 b) ng _ (g2 b)) ⟩
+    weaken ng (nf ∨ᵗ ng) _ (weaken (g1 b) ng _ (g2 b)) ∎
+    where
+    import QIT.Setoid.Indexed as Indexed
+    open Indexed.≈syntax Pᴵ
   open ≈.Hom
   open Setoid (Colim (F̃ ∘ D))
   open ≈.≈syntax {S = Colim (F̃ ∘ D)}
+  u : ⟨ Diagram.D-ob (F̃ ∘ D) nf ⟩
+  u = n , (λ b → weaken (f1 b) nf _ (f2 b))
 ψ-cong (≈perm π) = {!!}
-ψ-cong (≈trans p q) = {!!}
+ψ-cong (≈trans p q) = ≈ltrans (ψ-cong p) (ψ-cong q)
 
 linv : ∀ y → F.F-ob (Colim D) [ (ϕ₀ (ψ₀ y)) ≈ y ]
 linv (l , f) = begin
