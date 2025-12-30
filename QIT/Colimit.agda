@@ -1,5 +1,3 @@
-{-# OPTIONS --type-in-type #-}
-
 open import QIT.Prelude
 open import QIT.Relation.Base
 open import QIT.Relation.Binary
@@ -7,13 +5,13 @@ open import QIT.Setoid
 open import Data.Product
 import QIT.Diagram
 
-module QIT.Colimit {ℓI} {ℓ≤} {ℓB} {ℓB'}
+module QIT.Colimit {ℓI} {ℓ≤} {ℓD} {ℓD'}
   {I : Set ℓI}
   (≤p : Preorder I ℓ≤)
-  (P : QIT.Diagram.Diagram ≤p)
+  (P : QIT.Diagram.Diagram {ℓD = ℓD} {ℓD' = ℓD'} ≤p)
   where
 
-  open QIT.Diagram ≤p
+  open QIT.Diagram{ℓD = ℓD} {ℓD' = ℓD'}  ≤p
   open Diagram P renaming (D-ob to P̂)
 
   Pf : ∀ {i j} (p : i ≤ j) → (⟨ P̂ i ⟩ → ⟨ P̂ j ⟩)
@@ -21,18 +19,11 @@ module QIT.Colimit {ℓI} {ℓ≤} {ℓB} {ℓB'}
     where open ≈.Hom (D-mor p)
 
   -- The carrier of the colimit (Sigma type)
-  Colim₀ : Set (ℓI ⊔ ℓB)
+  Colim₀ : Set (ℓI ⊔ ℓD)
   Colim₀ = Σ[ i ∈ I ] ⟨ P̂ i ⟩
 
-  -- data _≈ˡ'_ : Colim₀ → Colim₀ → Prop (ℓ≤ ⊔ ℓI ⊔ ℓB ⊔ ℓB') where
-  --   ≈lstage' : ∀ i → {x x' : ⟨ P̂ i ⟩} → P̂ i [ x ≈ x' ]
-  --            → (i , x) ≈ˡ' (i , x')
-  --   ≈lstep   : ∀ {i j} (p : i ≤ j) (x : ⟨ P̂ i ⟩) → (i , x) ≈ˡ' (j , Pf p x)
-  --   ≈lsym    : ∀ {s t} → s ≈ˡ' t → t ≈ˡ' s
-  --   ≈ltrans  : ∀ {s t u} → s ≈ˡ' t → t ≈ˡ' u → s ≈ˡ' u
-
   -- The equivalence relation generating the colimit
-  data _≈ˡ_ : Colim₀ → Colim₀ → Prop (ℓ≤ ⊔ ℓI ⊔ ℓB ⊔ ℓB') where
+  data _≈ˡ_ : Colim₀ → Colim₀ → Prop (ℓ≤ ⊔ ℓI ⊔ ℓD ⊔ ℓD') where
     ≈lstage : ∀ i → {x x' : ⟨ P̂ i ⟩} → P̂ i [ x ≈ x' ]
             → (i , x) ≈ˡ (i , x')
     ≈lstep  : ∀ {i j} (p : i ≤ j) (x : ⟨ P̂ i ⟩) → (i , x) ≈ˡ (j , Pf p x)
@@ -53,18 +44,6 @@ module QIT.Colimit {ℓI} {ℓ≤} {ℓB} {ℓB'}
       go (≈lsym r)        = c-sym r (go r)
       go (≈ltrans r₁ r₂)  = c-trans r₁ r₂ (go r₁) (go r₂)
 
-  -- ≈ˡ→≈ˡ' : ∀ {i j x y} → (i , x) ≈ˡ (j , y) → (i , x) ≈ˡ' (j , y)
-  -- ≈ˡ→≈ˡ' (≈lstage i i ≡.refl {x} {x'} q) = ≈lstage' i q
-  -- ≈ˡ→≈ˡ' (≈lstep p x) = ≈lstep p x
-  -- ≈ˡ→≈ˡ' (≈lsym p) = ≈lsym (≈ˡ→≈ˡ' p)
-  -- ≈ˡ→≈ˡ' (≈ltrans p p₁) = ≈ltrans (≈ˡ→≈ˡ' p) (≈ˡ→≈ˡ' p₁)
-
-  -- ≈ˡ'→≈ˡ : ∀ {i j x y} → (i , x) ≈ˡ' (j , y) → (i , x) ≈ˡ (j , y)
-  -- ≈ˡ'→≈ˡ (≈lstage' i q) = ≈lstage i i ≡.refl q
-  -- ≈ˡ'→≈ˡ (≈lstep p x) = ≈lstep p x
-  -- ≈ˡ'→≈ˡ (≈lsym p) = ≈lsym (≈ˡ'→≈ˡ p)
-  -- ≈ˡ'→≈ˡ (≈ltrans p p₁) = ≈ltrans (≈ˡ'→≈ˡ p) (≈ˡ'→≈ˡ p₁)
-
   ≈lrefl : ∀ {t} → t ≈ˡ t
   ≈lrefl {i , x} = ≈lstage i (P̂ i .refl)
     where open ≈.Setoid
@@ -78,7 +57,7 @@ module QIT.Colimit {ℓI} {ℓ≤} {ℓB} {ℓB'}
     where open ≈.Setoid
 
   -- The Colimit Setoid
-  Colim : Setoid (ℓI ⊔ ℓB) (ℓI ⊔ ℓ≤ ⊔ ℓB ⊔ ℓB')
+  Colim : Setoid (ℓI ⊔ ℓD) (ℓI ⊔ ℓ≤ ⊔ ℓD ⊔ ℓD')
   Colim = record
     { Carrier       = Colim₀
     ; _≈_           = _≈ˡ_
@@ -87,12 +66,12 @@ module QIT.Colimit {ℓI} {ℓ≤} {ℓB} {ℓB'}
 
   -- Cocones for this diagram
   -- Note: Apex lives in the same universe as the Colimit for simplicity here
-  record Cocone : Set (lsuc (ℓ≤ ⊔ ℓB' ⊔ ℓB ⊔ ℓI)) where
+  record Cocone : Set (lsuc (ℓ≤ ⊔ ℓD' ⊔ ℓD ⊔ ℓI)) where
     field
-      Apex     : Setoid (ℓI ⊔ ℓB) (ℓI ⊔ ℓ≤ ⊔ ℓB ⊔ ℓB')
+      Apex     : Setoid (ℓI ⊔ ℓD) (ℓI ⊔ ℓ≤ ⊔ ℓD ⊔ ℓD')
       inj      : ∀ i → ≈.Hom (P̂ i) Apex
       commutes : ∀ {i j} (p : i ≤ j)
-               → ≈.Hom≈ (inj i) (inj j ≈.∘ D-mor p)
+               → (inj i) ≈h (inj j ≈.∘ D-mor p)
 
   open Cocone
 
@@ -105,19 +84,19 @@ module QIT.Colimit {ℓI} {ℓ≤} {ℓB} {ℓB'}
     }
 
   -- Morphisms of cocones
-  record ColimMorphism (C C' : Cocone) : Set (ℓI ⊔ ℓ≤ ⊔ ℓB ⊔ ℓB') where
+  record ColimMorphism (C C' : Cocone) : Set (ℓI ⊔ ℓ≤ ⊔ ℓD ⊔ ℓD') where
     field
       apexHom  : ≈.Hom (C .Apex) (C' .Apex)
-      commutes : ∀ i → ≈.Hom≈ (apexHom ≈.∘ C .inj i) (C' .inj i)
+      commutes : ∀ i → (apexHom ≈.∘ C .inj i) ≈h (C' .inj i)
 
   open ColimMorphism
 
   -- Universal Property Definition
-  record isLimitingCocone (C : Cocone) : Set (lsuc ℓI ⊔ lsuc ℓ≤ ⊔ lsuc ℓB ⊔ lsuc ℓB') where
+  record isLimitingCocone (C : Cocone) : Set (lsuc ℓI ⊔ lsuc ℓ≤ ⊔ lsuc ℓD ⊔ lsuc ℓD') where
     field
       mor    : ∀ C' → ColimMorphism C C'
-      unique : ∀ C' → (F : ColimMorphism C C') →
-                ≈.Hom≈ (F .apexHom) (mor C' .apexHom)
+      unique : ∀ C' → (F : ColimMorphism C C')
+             → F .apexHom ≈h mor C' .apexHom
 
   open isLimitingCocone
 

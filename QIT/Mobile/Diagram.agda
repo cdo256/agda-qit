@@ -113,10 +113,10 @@ D = record
   Hom {i} {j} i≤j = record
     { to = weaken i j i≤j
     ; cong = ≈pweaken-cong i j i≤j }
-  Id : ∀ {i} → (Hom (≤refl i)) ≈h ≈.idHom 
+  Id : ∀ {i} → (Hom (≤refl i)) ≈h ≈.idHom
   Id {i} p = ≈ptrans (≈psym (≈pweaken (≤refl i) _)) p
   Comp : ∀ {i j k} (p : i ≤ j) (q : j ≤ k) →
-      ≈.Hom≈ (Hom (≤≤ q p)) (Hom q ≈.∘ Hom p)
+      Hom (≤≤ q p) ≈h (Hom q ≈.∘ Hom p)
   Comp {i} {j} {k} p q {x} {y} x≈y = begin
     weaken i k (≤≤ q p) x
       ≈⟨ ≈psym (≈pweaken (≤≤ q p) x) ⟩

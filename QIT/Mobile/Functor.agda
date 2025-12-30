@@ -90,7 +90,7 @@ module Comp {S T U : Setoid l0 l0} (f : ≈.Hom S T) (g : ≈.Hom T U) where
   module f = ≈.Hom f
   module g = ≈.Hom g
 
-  F̃-comp : ≈.Hom≈ (F̃-mor (g ≈.∘ f)) (F̃-mor g ≈.∘ F̃-mor f)
+  F̃-comp : F̃-mor (g ≈.∘ f) ≈h (F̃-mor g ≈.∘ F̃-mor f)
   F̃-comp {s , h} {t , k} ≈leaf = ≈leaf
   F̃-comp {s , h} {t , k} (≈node c) = ≈node (λ b → (≈.Hom.cong g) ((≈.Hom.cong f) (c b)))
   F̃-comp {s , h} {t , k} (≈perm π) = ≈perm π
@@ -136,4 +136,3 @@ F̃ = record
   ; F-id = λ p → p
   ; F-comp = F̃-comp
   ; F-resp = F̃-resp }
-

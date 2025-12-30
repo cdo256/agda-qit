@@ -29,14 +29,6 @@ IsoFlip f = record
   }
   where open Iso f
 
-Hom≈ : ∀ {ℓ ℓ'} → {S T : Setoid ℓ ℓ'} (f g : Hom S T) → Prop (ℓ ⊔ ℓ')
-Hom≈ {S = S} {T} f g = ∀ {x y} → x S.≈ y → f.to x T.≈ g.to y
-  where
-  module S = Setoid S
-  module T = Setoid T
-  module f = Hom f
-  module g = Hom g
-
 _≅_ : ∀ {ℓ ℓ'} → BinaryRel (Setoid ℓ ℓ') (ℓ ⊔ ℓ')
 S ≅ T = ∥ Iso S T ∥
 

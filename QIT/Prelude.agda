@@ -10,6 +10,11 @@ private
   variable
     ℓ ℓ' ℓ'' ℓ''' ℓ'''' : Level
 
+record LiftP {a} ℓ (A : Prop a) : Prop (a ⊔ ℓ) where
+  constructor liftp
+  field lowerp : A
+
+open LiftP public
 
 -- A wrapper to lift Prop into Set
 record Box {ℓ} (P : Prop ℓ) : Set ℓ where
