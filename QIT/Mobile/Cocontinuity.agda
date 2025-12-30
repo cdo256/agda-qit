@@ -152,7 +152,51 @@ s ∨ᵗ t = sup (n , fork s t 𝟘)
   open ≈.≈syntax {S = Colim (F̃ ∘ D)}
   u : ⟨ Diagram.D-ob (F̃ ∘ D) nf ⟩
   u = n , (λ b → weaken (f1 b) nf _ (f2 b))
-ψ-cong (≈perm π) = {!!}
+ψ-cong (≈perm {f} π) = u
+  where
+  π' : B → B
+  π' = π .↔.to
+  g : B → P₀ (sup (n , (λ b → f b .proj₁)))
+  g b = weaken (f b .proj₁) (sup (n , (λ b → f b .proj₁)))
+               (fi≤sup n _ b) (f b .proj₂)
+  h : B → P₀ (sup (n , (λ b → f (π' b) .proj₁)))
+  h b = weaken (f (π' b) .proj₁) (sup (n , (λ b → f (π' b) .proj₁)))
+                (fi≤sup n _ b) (f (π' b) .proj₂)
+  g' : B → P₀ (sup (n , (λ b → f b .proj₁)))
+  g' b = weaken (f (π' b) .proj₁) (sup (n , (λ b → f b .proj₁)))
+                (fi≤sup n _ (π' b)) (f (π' b) .proj₂)
+  le : sup (n , λ b → f b .proj₁) ≤ sup (n , λ b → f (π' b) .proj₁)
+  le = sup≤ λ b → <sup (π .↔.from b)
+    (substp (λ ○ → f b .proj₁ ≤ f ○ .proj₁) (≡.sym (↔.linv π b)) (≤refl (f b .proj₁)))
+  u : Colim (F̃ ∘ D)
+    [ sup (n , λ b → f b .proj₁) , (n , g)
+    ≈ sup (n , λ b → f (π' b) .proj₁) , (n , h) ]
+  u = begin
+    sup (n , (λ b → f b .proj₁)) , (n , g)
+      ≈⟨ ≈lstage (sup (n , (λ b → f b .proj₁))) (≈perm π) ⟩
+    sup (n , (λ b → f b .proj₁)) , (n , g')
+      ≈⟨ ≈lstep le (n , g') ⟩
+    sup (n , (λ b → f (π' b) .proj₁)) , (n , λ b → weaken _ _ le (g' b))
+      ≈⟨ ≈lstage _ (≈node v) ⟩
+    sup (n , (λ b → f (π' b) .proj₁)) , (n , h) ∎
+    where
+    v : ∀ b → weaken _ _ le (g' b) ≈ᴾ h b
+    v b = begin
+      weaken _ _ le (g' b)
+        ≈⟨ ≈psym (≈pweaken le (g' b)) ⟩
+      g' b
+        ≈⟨ ≈psym (≈pweaken (fi≤sup n (λ b₃ → f b₃ .proj₁) (π' b)) (f (π' b) .proj₂)) ⟩
+      f (π' b) .proj₂
+        ≈⟨ (≈pweaken (fi≤sup n (λ b₃ → f (π' b₃) .proj₁) b) (f (π' b) .proj₂)) ⟩
+      h b ∎
+      where
+      import QIT.Setoid.Indexed as Indexed
+      open Indexed.≈syntax Pᴵ
+    open Setoid (Colim (F̃ ∘ D))
+    open ≈.≈syntax {S = Colim (F̃ ∘ D)}
+  open ≈.Hom
+  open Setoid (Colim (F̃ ∘ D))
+  open ≈.≈syntax {S = Colim (F̃ ∘ D)}
 ψ-cong (≈trans p q) = ≈ltrans (ψ-cong p) (ψ-cong q)
 
 linv : ∀ y → F.F-ob (Colim D) [ (ϕ₀ (ψ₀ y)) ≈ y ]
