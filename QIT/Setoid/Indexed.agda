@@ -1,4 +1,3 @@
-{-# OPTIONS --type-in-type #-}
 module QIT.Setoid.Indexed where
 
 open import QIT.Prelude

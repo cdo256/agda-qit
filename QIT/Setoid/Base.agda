@@ -1,18 +1,9 @@
-{-# OPTIONS --type-in-type #-}
 module QIT.Setoid.Base where
 
 open import QIT.Prelude
 open import Data.Product
 open import QIT.Relation.Base
 open import QIT.Relation.Binary
-
-private
-  ℓ ℓ' ℓ'' ℓ''' ℓ'''' : Level
-  ℓ = lzero
-  ℓ' = lzero
-  ℓ'' = lzero
-  ℓ''' = lzero
-  ℓ'''' = lzero
 
 record Setoid ℓ ℓ' : Set (lsuc (ℓ ⊔ ℓ')) where
   infix 4 _≈_
@@ -23,10 +14,10 @@ record Setoid ℓ ℓ' : Set (lsuc (ℓ ⊔ ℓ')) where
 
   open IsEquivalence isEquivalence public
 
-⟨_⟩ : Setoid ℓ ℓ' → Set ℓ
+⟨_⟩ : ∀ {ℓ ℓ'} → Setoid ℓ ℓ' → Set ℓ
 ⟨ S ⟩ = S .Setoid.Carrier
 
-_[_≈_] : (S : Setoid ℓ ℓ') → (x y : S .Setoid.Carrier) → Prop _
+_[_≈_] : ∀ {ℓ ℓ'} → (S : Setoid ℓ ℓ') → (x y : S .Setoid.Carrier) → Prop _
 S [ x ≈ y ] = S .Setoid._≈_ x y
 
 module ≈syntax {ℓ ℓ'} {S : Setoid ℓ ℓ'} where
@@ -47,18 +38,18 @@ module ≈syntax {ℓ ℓ'} {S : Setoid ℓ ℓ'} where
   _∎ : ∀ x → x ≈ x
   x ∎ = refl
 
-Rel≈ : (S : Setoid ℓ ℓ') → ∀ ℓ'' → Set (lsuc ℓ ⊔ lsuc ℓ'')
-Rel≈ S ℓ'' = BinaryRel A (ℓ ⊔ ℓ'')
+Rel≈ : ∀ {ℓ ℓ'} → (S : Setoid ℓ ℓ') → ∀ ℓ'' → Set (lsuc ℓ ⊔ lsuc ℓ'')
+Rel≈ {ℓ} S ℓ'' = BinaryRel A (ℓ ⊔ ℓ'')
   where
   open Setoid S renaming (Carrier to A)
 
 
-≡setoid : ∀ (B : Set ℓ) → Setoid ℓ ℓ
+≡setoid : ∀ {ℓ} (B : Set ℓ) → Setoid ℓ ℓ
 ≡setoid B = record
   { Carrier = B
   ; _≈_ = _≡p_
   ; isEquivalence = isEquiv-≡p B }
 
-≡→≈ : ∀ (A : Setoid ℓ ℓ') → {x y : ⟨ A ⟩} → x ≡ y → A [ x ≈ y ]
+≡→≈ : ∀ {ℓ ℓ'} → (A : Setoid ℓ ℓ') → {x y : ⟨ A ⟩} → x ≡ y → A [ x ≈ y ]
 ≡→≈ A {x} p = substp (λ ○ → x ≈ ○) p refl
   where open Setoid A
