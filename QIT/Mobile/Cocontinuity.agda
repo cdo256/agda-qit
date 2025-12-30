@@ -1,4 +1,4 @@
-{-# OPTIONS --type-in-type --lossy-unification #-}
+{-# OPTIONS --lossy-unification #-}
 open import QIT.Prelude
 
 module QIT.Mobile.Cocontinuity

@@ -1,19 +1,23 @@
-{-# OPTIONS --type-in-type #-}
 open import QIT.Prelude
 open import QIT.Setoid
-import QIT.Colimit as Colimit
 open import QIT.Relation.Base
 open import QIT.Relation.Binary
+open import Data.Product
 
 module QIT.Cocontinuity {ℓI} {ℓ≤}
   {I : Set ℓI}
   (≤p : Preorder I ℓ≤) where
 
-open import QIT.Diagram ≤p
-open import QIT.Colimit ≤p
-open import Data.Product
+module _ {ℓD ℓD' : Level} where
+  private
+    ℓc = ℓI ⊔ ℓD
+    ℓc' = ℓI ⊔ ℓ≤ ⊔ ℓD ⊔ ℓD'
 
-Cocontinuous : ∀ {ℓF ℓF'} → (F : ≈.Functor ℓF ℓF') (P : Diagram) → Prop lzero
-Cocontinuous F P = Colim (F ∘ P) ≅ F.F-ob (Colim P)
-  where
-  module F = ≈.Functor F
+  open import QIT.Diagram ≤p
+  open import QIT.Colimit ≤p ℓc ℓc'
+
+  Cocontinuous : (F : ≈.Functor ℓc ℓc' ℓc ℓc') (P : Diagram ℓc ℓc') → Prop ℓc'
+  Cocontinuous F P =
+    Colim (F ∘ P) ≅ F.F-ob (Colim P)
+    where
+    module F = ≈.Functor F

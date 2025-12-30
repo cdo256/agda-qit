@@ -1,5 +1,3 @@
-{-# OPTIONS --type-in-type #-}
-
 open import QIT.Prelude
 
 module QIT.Mobile.Diagram (B : Set) (inhabB : ∥ B ∥) where
@@ -15,7 +13,7 @@ open import Data.Unit
 open import Data.Sum
 open import QIT.Relation.Plump Branch
 open import QIT.Relation.Subset
-open import QIT.Diagram ≤p hiding (_≤_)
+open import QIT.Diagram {ℓD} {ℓD'} ≤p hiding (_≤_)
 
 private
   l0 : Level
