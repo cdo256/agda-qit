@@ -36,6 +36,7 @@ private
 ϕ₀ (i , (l , _)) = l , (λ ())
 ϕ₀ (i , (n , f)) = n , (λ b → i , f b)
 
+{-# TERMINATING #-}
 ϕ-cong : ∀ {x y} → Colim (F̃ ∘ D) [ x ≈ y ] → F.F-ob (Colim D) [ ϕ₀ x ≈ ϕ₀ y ]
 ϕ-cong (≈lstage i ≈leaf) = ≈leaf
 ϕ-cong (≈lstage i (≈node c)) = ≈node λ b → ≈lstage i (c b)
