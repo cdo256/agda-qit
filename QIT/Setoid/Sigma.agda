@@ -1,5 +1,3 @@
-{-# OPTIONS --type-in-type #-}
-
 open import QIT.Prelude
 open import QIT.Setoid.Base
 open import QIT.Setoid.Hom

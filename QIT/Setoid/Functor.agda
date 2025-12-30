@@ -1,5 +1,3 @@
-{-# OPTIONS --type-in-type #-}
-
 module QIT.Setoid.Functor where
 
 open import QIT.Prelude
@@ -7,11 +5,7 @@ open import QIT.Setoid.Base
 open import QIT.Setoid.Hom
 open import Data.Product
 
-private
-  variable
-    ℓ ℓ' : Level
-
-record Functor ℓ ℓ' : Set where
+record Functor ℓ ℓ' : Set (lsuc ℓ ⊔ lsuc ℓ') where
   field
     F-ob : ∀ (S : Setoid ℓ ℓ') → Setoid ℓ ℓ'
     F-mor : ∀ {S T : Setoid ℓ ℓ'} → Hom S T → Hom (F-ob S) (F-ob T)

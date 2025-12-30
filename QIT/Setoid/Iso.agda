@@ -1,4 +1,3 @@
-{-# OPTIONS --type-in-type #-}
 module QIT.Setoid.Iso where
 
 open import QIT.Prelude
@@ -7,15 +6,6 @@ open import QIT.Relation.Binary
 open import Data.Product
 open import QIT.Setoid.Base
 open import QIT.Setoid.Hom
-
-private
-  ℓ ℓ' ℓ'' ℓ''' ℓ'''' : Level
-  ℓ = lzero
-  ℓ' = lzero
-  ℓ'' = lzero
-  ℓ''' = lzero
-  ℓ'''' = lzero
-
 
 record Iso {ℓ} {ℓ'} (S T : Setoid ℓ ℓ') : Set (ℓ ⊔ ℓ') where
   module S = Setoid S
@@ -28,7 +18,7 @@ record Iso {ℓ} {ℓ'} (S T : Setoid ℓ ℓ') : Set (ℓ ⊔ ℓ') where
     linv : ∀ y → ⟦ ⟦ y ⟧⁻¹ ⟧ T.≈ y
     rinv : ∀ x → ⟦ ⟦ x ⟧ ⟧⁻¹ S.≈ x
 
-IsoFlip : {S T : Setoid ℓ ℓ'} → Iso S T → Iso T S
+IsoFlip : ∀ {ℓ ℓ'} → {S T : Setoid ℓ ℓ'} → Iso S T → Iso T S
 IsoFlip f = record
   { ⟦_⟧ = ⟦_⟧⁻¹
   ; ⟦_⟧⁻¹ = ⟦_⟧
@@ -39,7 +29,7 @@ IsoFlip f = record
   }
   where open Iso f
 
-Hom≈ : ∀ {S T : Setoid ℓ ℓ'} (f g : Hom S T) → Prop (ℓ ⊔ ℓ')
+Hom≈ : ∀ {ℓ ℓ'} → {S T : Setoid ℓ ℓ'} (f g : Hom S T) → Prop (ℓ ⊔ ℓ')
 Hom≈ {S = S} {T} f g = ∀ {x y} → x S.≈ y → f.to x T.≈ g.to y
   where
   module S = Setoid S
