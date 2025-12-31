@@ -13,11 +13,7 @@ open import Data.Unit
 open import Data.Sum
 open import QIT.Relation.Plump Branch
 open import QIT.Relation.Subset
-open import QIT.Diagram {ℓD} {ℓD'} ≤p hiding (_≤_)
-
-private
-  l0 : Level
-  l0 = lzero
+open import QIT.Diagram ≤p hiding (_≤_)
 
 data P₀ : (i : BTree) → Set where
   leaf : ∀ α → P₀ (sup (n , α))
@@ -81,7 +77,7 @@ data _≈ᴾ_ : ∀ {i j} → P₀ i → P₀ j → Prop where
 
 import QIT.Setoid.Indexed as Indexed
 
-P : (i : BTree) → Setoid l0 l0
+P : (i : BTree) → Setoid ℓ0 ℓ0
 P i = record
   { Carrier = P₀ i
   ; _≈_ = _≈ᴾ_
@@ -90,7 +86,7 @@ P i = record
     ; sym = λ {x} {y} → ≈psym {i} {i} {x} {y}
     ; trans = λ {x} {y} {z} → ≈ptrans {i} {i} {i} {x} {y} {z} } }
 
-Pᴵ : Indexed.Setoid l0 l0 l0
+Pᴵ : Indexed.Setoid ℓ0 ℓ0 ℓ0
 Pᴵ = record
   { I = BTree
   ; A = P₀
@@ -100,7 +96,7 @@ Pᴵ = record
     ; sym = ≈psym
     ; trans = ≈ptrans } }
 
-D : Diagram
+D : Diagram ℓ0 ℓ0
 D = record
   { D-ob = P
   ; D-mor = Hom

@@ -1,7 +1,7 @@
 module QIT.Prelude where
 
 open import Level public using (Level; _⊔_; Lift; lift)
-  renaming (suc to lsuc; zero to lzero)
+  renaming (suc to lsuc; zero to ℓ0)
 import Relation.Binary.PropositionalEquality
 module ≡ = Relation.Binary.PropositionalEquality
 open ≡ public using (_≡_; subst) public

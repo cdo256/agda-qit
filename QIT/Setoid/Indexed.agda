@@ -50,7 +50,7 @@ module _ where
 
   open import Data.Unit
 
-  UnindexedSetoid→IndexedSetoid : ∀ {ℓA ℓR} → Unindexed.Setoid ℓA ℓR → Setoid lzero ℓA ℓR
+  UnindexedSetoid→IndexedSetoid : ∀ {ℓA ℓR} → Unindexed.Setoid ℓA ℓR → Setoid ℓ0 ℓA ℓR
   UnindexedSetoid→IndexedSetoid S = record
       { I = ⊤
       ; A = λ _ → S.Carrier
@@ -61,7 +61,7 @@ module _ where
         ; trans = S.trans } }
     where module S = Unindexed.Setoid S
 
-  IndexedSetoid→UnindexedSetoid : ∀ {ℓA ℓR} → Setoid lzero ℓA ℓR → Unindexed.Setoid ℓA ℓR
+  IndexedSetoid→UnindexedSetoid : ∀ {ℓA ℓR} → Setoid ℓ0 ℓA ℓR → Unindexed.Setoid ℓA ℓR
   IndexedSetoid→UnindexedSetoid S = record
     { Carrier = Σ S.I S.A
     ; _≈_ = λ (i , x) (j , y) → S.R i j x y

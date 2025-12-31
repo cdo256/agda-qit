@@ -1,6 +1,7 @@
+open import QIT.Prelude
+
 module QIT.Mobile.Functor (B : Set) where
 
-open import QIT.Prelude
 open import QIT.Mobile.Base B
 open import QIT.Relation.Binary
 open import QIT.Setoid as ≈
@@ -9,16 +10,12 @@ open import Data.Empty renaming (⊥-elim to absurd)
 open import Data.W
 open import Data.Container hiding (_⇒_; identity; refl; sym; trans)
 
-private
-  l0 : Level
-  l0 = lzero
-
-module Ob (S : Setoid l0 l0) where
+module Ob (S : Setoid ℓ0 ℓ0) where
   private
     module S = Setoid S
-  F̃-ob₀ : Set
+  F̃-ob₀ : Set ℓ0
   F̃-ob₀ = ⟦ Branch ⟧ ⟨ S ⟩
-  data _≈ᵗ_ : F̃-ob₀ → F̃-ob₀ → Prop l0 where
+  data _≈ᵗ_ : F̃-ob₀ → F̃-ob₀ → Prop (ℓ0) where
     ≈leaf : ∀ {f g} → (l , f) ≈ᵗ (l , g)
     ≈node : ∀ {f g} → (c : ∀ b → f b S.≈ g b)
           → (n , f) ≈ᵗ (n , g)
@@ -38,7 +35,7 @@ module Ob (S : Setoid l0 l0) where
     where
     module π = _↔_ π
     π' = ↔.flip π
-    A : (B → B) → Prop l0
+    A : (B → B) → Prop (ℓ0)
     A = λ h → (n , λ b → f (π.to b)) ≈ᵗ (n , λ b → f (h b))
     p : (λ b → π.to (π.from b)) ≡ (λ b → b)
     p = funExt λ b → π.linv b
@@ -52,7 +49,7 @@ module Ob (S : Setoid l0 l0) where
     ; sym = ≈sym
     ; trans = ≈trans }
 
-  F̃-ob : Setoid l0 l0
+  F̃-ob : Setoid ℓ0 (ℓ0)
   F̃-ob = record
     { Carrier = F̃-ob₀
     ; _≈_ = _≈ᵗ_
@@ -67,7 +64,7 @@ module Ob (S : Setoid l0 l0) where
 
 open Ob public
 
-module Mor {S T : Setoid l0 l0} (f : ≈.Hom S T) where
+module Mor {S T : Setoid ℓ0 ℓ0} (f : ≈.Hom S T) where
   module f = ≈.Hom f
 
   ⟦_⟧h : ⟨ F̃-ob S ⟩ → ⟨ F̃-ob T ⟩
@@ -85,7 +82,7 @@ module Mor {S T : Setoid l0 l0} (f : ≈.Hom S T) where
 
 open Mor using (F̃-mor)
 
-module Comp {S T U : Setoid l0 l0} (f : ≈.Hom S T) (g : ≈.Hom T U) where
+module Comp {S T U : Setoid ℓ0 ℓ0} (f : ≈.Hom S T) (g : ≈.Hom T U) where
   module f = ≈.Hom f
   module g = ≈.Hom g
 
@@ -98,7 +95,7 @@ module Comp {S T U : Setoid l0 l0} (f : ≈.Hom S T) (g : ≈.Hom T U) where
 open Comp using (F̃-comp) public
 
 module Resp
-  {S T : Setoid l0 l0}
+  {S T : Setoid ℓ0 ℓ0}
   (f g : ≈.Hom S T)
   (f≈g : f ≈h g)
   where
@@ -128,7 +125,7 @@ module Resp
     open ≈.≈syntax {S = F̃-ob T}
 open Resp using (F̃-resp) public
 
-F̃ : ≈.Functor {!!} {!!} {!!} {!!}
+F̃ : ≈.Functor ℓ0 ℓ0 ℓ0 ℓ0
 F̃ = record
   { F-ob = F̃-ob
   ; F-mor = F̃-mor
