@@ -1,4 +1,4 @@
 name: agda-qit
 depend:  standard-library
 include: .
-flags: --with-K --prop --rewriting --backtracking-instance-search
+flags: --with-K --prop
