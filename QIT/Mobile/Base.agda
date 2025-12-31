@@ -8,10 +8,6 @@ open import Data.Empty renaming (⊥-elim to absurd)
 open import Data.W
 open import Data.Container hiding (_⇒_; identity; refl; sym; trans)
 
-private
-  l0 : Level
-  l0 = lzero
-
 data NodeType : Set where
   l : NodeType
   n : NodeType
@@ -19,7 +15,7 @@ data NodeType : Set where
 open import Data.Unit
 open import Data.Sum
 
-Branch : Container l0 l0
+Branch : Container ℓ0 ℓ0
 Branch .Shape = NodeType
 Branch .Position l = ⊥*
 Branch .Position n = B

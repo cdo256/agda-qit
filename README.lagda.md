@@ -246,7 +246,6 @@ The key insight is that QITs require both the inductive structure (via colimits)
 This is a literate Agda development. The core foundational modules imported in this README provide the basic infrastructure. The main mobile development in `Mobile/` should be imported separately as needed, parameterized by the appropriate branching type `B`.
 
 **Technical Requirements:**
-- Uses `--type-in-type` in several modules for universe polymorphism
 - Requires function extensionality and propositional extensionality postulates
 - Built with modern Agda (version 2.6+)
 

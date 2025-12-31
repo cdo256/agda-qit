@@ -3,7 +3,7 @@ open import QIT.Prelude
 
 module QIT.Mobile.Cocontinuity
   (B : Set) (inhabB : ∥ B ∥) (_≟_ : Discrete B)
-  (b₁ b₂ : B) (b₁≢b₂ : b₁ ≡.≢ b₂)  where 
+  (b₁ b₂ : B) (b₁≢b₂ : b₁ ≡.≢ b₂) where 
 
 open import QIT.Relation.Binary
 open import QIT.Mobile.Base B
@@ -16,12 +16,8 @@ open import Data.Unit hiding (_≟_)
 open import Data.Sum
 open import QIT.Relation.Plump Branch
 
-private
-  l0 : Level
-  l0 = lzero
-
 open import QIT.Diagram ≤p hiding (_≤_)
-open import QIT.Colimit ≤p
+open import QIT.Colimit ≤p ℓ0 ℓ0
 open import QIT.Cocontinuity ≤p
 open import QIT.Mobile.Functor B
 
