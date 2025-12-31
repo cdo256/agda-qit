@@ -3,7 +3,7 @@ open import QIT.Prelude
 
 module QIT.Mobile.Cocontinuity
   (B : Set) (inhabB : ∥ B ∥) (_≟_ : Discrete B)
-  (b₁ b₂ : B) (b₁≢b₂ : b₁ ≡.≢ b₂) where 
+  (b₁ b₂ : B) (b₁≢b₂ : b₁ ≡.≢ b₂) where
 
 open import QIT.Relation.Binary
 open import QIT.Mobile.Base B
@@ -23,6 +23,7 @@ open import QIT.Mobile.Functor B
 
 module F = ≈.Functor F̃
 module D = Diagram D
+module F∘D = Diagram (F̃ ∘ D)
 
 private
   L = Colim (F̃ ∘ D)
@@ -32,20 +33,20 @@ private
 ϕ₀ (i , (l , _)) = l , (λ ())
 ϕ₀ (i , (n , f)) = n , (λ b → i , f b)
 
-{-# TERMINATING #-}
-ϕ-cong : ∀ {x y} → Colim (F̃ ∘ D) [ x ≈ y ] → F.F-ob (Colim D) [ ϕ₀ x ≈ ϕ₀ y ]
-ϕ-cong (≈lstage i ≈leaf) = ≈leaf
-ϕ-cong (≈lstage i (≈node c)) = ≈node λ b → ≈lstage i (c b)
-ϕ-cong (≈lstage i (≈perm π)) = ≈perm π
-ϕ-cong (≈lstage i {u , x} {v , x'} (≈trans {t = w , z} p q)) =
-  ≈trans α β
-  where
-  α = ϕ-cong (≈lstage i p)
-  β = ϕ-cong (≈lstage i q)
-ϕ-cong (≈lstep {i} {j} p (l , _)) = ≈leaf
-ϕ-cong (≈lstep {i} {j} (sup≤ p) (n , f)) = ≈node λ b → ≈lstep (sup≤ p) (f b)
-ϕ-cong (≈lsym p) = ≈sym (Colim D) (ϕ-cong p)
-ϕ-cong (≈ltrans p q) = ≈trans (ϕ-cong p) (ϕ-cong q)
+mutual
+  ϕ-cong : ∀ {x y} → Colim (F̃ ∘ D) [ x ≈ y ] → F.F-ob (Colim D) [ ϕ₀ x ≈ ϕ₀ y ]
+  ϕ-cong (≈lstage i e) = ϕ-cong-inner i e
+  ϕ-cong (≈lstep {i} {j} p (l , _)) = ≈leaf
+  ϕ-cong (≈lstep {i} {j} (sup≤ p) (n , f)) = ≈node λ b → ≈lstep (sup≤ p) (f b)
+  ϕ-cong (≈lsym p) = ≈sym (Colim D) (ϕ-cong p)
+  ϕ-cong (≈ltrans p q) = ≈trans (ϕ-cong p) (ϕ-cong q)
+
+  ϕ-cong-inner : ∀ i {x y} → F∘D.D-ob i [ x ≈ y ] → F.F-ob (Colim D) [ ϕ₀ (i , x) ≈ ϕ₀ (i , y) ]
+  ϕ-cong-inner i ≈leaf = ≈leaf
+  ϕ-cong-inner i (≈node c) = ≈node λ b → ≈lstage i (c b)
+  ϕ-cong-inner i (≈perm π) = ≈perm π
+  ϕ-cong-inner i (≈trans p q) = ≈trans (ϕ-cong-inner i p) (ϕ-cong-inner i q)
+
 
 ψ₀ : ⟨ F.F-ob (Colim D) ⟩ → ⟨ Colim (F̃ ∘ D) ⟩
 ψ₀ (l , _) = 𝟘 , (l , λ ())
@@ -57,10 +58,10 @@ private
   f : ∀ b → P₀ (t b)
   f b = g b .proj₂
   t* : BTree
-  t* = sup (n , t) 
+  t* = sup (n , t)
   h : ∀ b → ⟨ D-ob t* ⟩
   h b = h'.to (f b)
-    where 
+    where
     tb≤t* : t b ≤ t*
     tb≤t* = <→≤ (<sup b (≤refl (t b)))
     h' : ≈.Hom (D-ob (t b)) (D-ob t*)
@@ -130,9 +131,9 @@ s ∨ᵗ t = sup (n , fork s t 𝟘)
   c' : ∀ b → P (nf ∨ᵗ ng) [ weaken nf (nf ∨ᵗ ng) _ (weaken (f1 b) nf _ (f2 b))
                           ≈ weaken ng (nf ∨ᵗ ng) _ (weaken (g1 b) ng _ (g2 b)) ]
   c' b = begin
-    weaken nf (nf ∨ᵗ ng) _ (weaken (f1 b) nf _ (f2 b)) 
+    weaken nf (nf ∨ᵗ ng) _ (weaken (f1 b) nf _ (f2 b))
       ≈⟨ ≈psym (≈pweaken (∨ᵗ-l nf ng) (weaken (f1 b) nf _ (f2 b))) ⟩
-    weaken (f1 b) nf _ (f2 b) 
+    weaken (f1 b) nf _ (f2 b)
       ≈⟨ ≈psym (≈pweaken (fi≤sup n f1 b) (f2 b)) ⟩
     f2 b
       ≈⟨ d b (c b) ⟩
@@ -147,7 +148,7 @@ s ∨ᵗ t = sup (n , fork s t 𝟘)
   open ≈.Hom
   open Setoid (Colim (F̃ ∘ D))
   open ≈.≈syntax {S = Colim (F̃ ∘ D)}
-  u : ⟨ Diagram.D-ob (F̃ ∘ D) nf ⟩
+  u : ⟨ F∘D.D-ob nf ⟩
   u = n , (λ b → weaken (f1 b) nf _ (f2 b))
 ψ-cong (≈perm {f} π) = u
   where
@@ -222,7 +223,7 @@ linv (n , g) =
   f : ∀ b → P₀ (t b)
   f b = g b .proj₂
   t* : BTree
-  t* = sup (n , t) 
+  t* = sup (n , t)
   --   open ≈.Hom
   open ≈.≈syntax {S = (F.F-ob (Colim D))}
 
@@ -268,4 +269,3 @@ cocontinuous = ∣ iso ∣
     ; linv = linv
     ; rinv = rinv
     }
-
