@@ -1,4 +1,3 @@
-{-# OPTIONS --type-in-type #-}
 open import QIT.Prelude
 open import QIT.Setoid
 open import QIT.Relation.Binary
@@ -6,15 +5,14 @@ open import Data.Product
 
 open import Data.Container as Cont hiding (refl; sym; trans)
 
-module QIT.ContainerFunctor (C : Container lzero lzero) where
+module QIT.ContainerFunctor {ℓs ℓp} (C : Container ℓs ℓp) (ℓA ℓA' : Level) where
 
 private
-  l0 = lzero
   Pos = C .Position
 
-module Ob (S : Setoid l0 l0) where
+module Ob (S : Setoid ℓA ℓA') where
   open ≈.Setoid S
-  record _≈ꟳ'_ (x y : ⟦ C ⟧ ⟨ S ⟩) : Set l0 where
+  record _≈ꟳ'_ (x y : ⟦ C ⟧ ⟨ S ⟩) : Set (ℓs ⊔ ℓp ⊔ ℓA') where
     constructor mk≈ꟳ'
     field
       fst≡ : x .proj₁ ≡ y .proj₁
@@ -54,7 +52,7 @@ module Ob (S : Setoid l0 l0) where
     v : ∀ p → x .proj₂ p ≈ z .proj₂ (subst Pos (≡.trans fst≡1 fst≡2) p)
     v p = substp (λ ○ → x .proj₂ p ≈ z .proj₂ ○) (≡.subst-subst fst≡1) (u p)
 
-  F̃-ob : Setoid l0 l0
+  F̃-ob : Setoid (ℓs ⊔ ℓp ⊔ ℓA) (ℓs ⊔ ℓp ⊔ ℓA')
   F̃-ob = record
     { Carrier = ⟦ C ⟧ ⟨ S ⟩
     ; _≈_ = _≈ꟳ_
@@ -65,7 +63,7 @@ module Ob (S : Setoid l0 l0) where
 
 open Ob using (F̃-ob; _≈ꟳ_; mk≈ꟳ; mk≈ꟳ') public
 
-module Mor {S T : Setoid l0 l0} (f : ≈.Hom S T) where
+module Mor {S T : Setoid ℓA ℓA'} (f : ≈.Hom S T) where
   module S = ≈.Setoid S
   module T = ≈.Setoid T
   module f = ≈.Hom f
@@ -82,7 +80,7 @@ module Mor {S T : Setoid l0 l0} (f : ≈.Hom S T) where
 
 open Mor using (F̃-mor) public
 
-module Comp {S T U : Setoid l0 l0} (f : ≈.Hom S T) (g : ≈.Hom T U) where
+module Comp {S T U : Setoid ℓA ℓA'} (f : ≈.Hom S T) (g : ≈.Hom T U) where
   module S = ≈.Setoid S
   module T = ≈.Setoid T
   module U = ≈.Setoid U
@@ -96,7 +94,7 @@ module Comp {S T U : Setoid l0 l0} (f : ≈.Hom S T) (g : ≈.Hom T U) where
 open Comp using (F̃-comp) public
 
 module Resp
-  {S T : Setoid l0 l0}
+  {S T : Setoid ℓA ℓA'}
   (f g : ≈.Hom S T)
   (f≈g : f ≈h g)
   where
@@ -113,7 +111,7 @@ module Resp
 
 open Resp using (F̃-resp) public
 
-F̃ : ≈.Functor l0 l0
+F̃ : ≈.Functor ℓA ℓA' (ℓs ⊔ ℓp ⊔ ℓA) (ℓs ⊔ ℓp ⊔ ℓA')
 F̃ = record
   { F-ob = F̃-ob
   ; F-mor = F̃-mor
