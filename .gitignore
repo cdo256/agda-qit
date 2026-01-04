@@ -174,3 +174,5 @@ TSWLatexianTemp*
 *.lpz
 *.xwm
 .direnv/bin
+.obsidian
+obsidian-latex-suite-snippets.json
