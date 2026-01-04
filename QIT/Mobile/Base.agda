@@ -1,31 +1,26 @@
-module QIT.Mobile.Base (B : Set) where
+module QIT.Mobile.Base (I : Set) where
 
 open import QIT.Prelude
-open import QIT.Relation.Binary
-open import QIT.Setoid as ≈
+open import QIT.Container
 open import Data.Product
-open import Data.Empty renaming (⊥-elim to absurd)
-open import Data.W
-open import Data.Container hiding (_⇒_; identity; refl; sym; trans)
 
-data NodeType : Set where
-  l : NodeType
-  n : NodeType
+data Sᵀ : Set where
+  l : Sᵀ
+  n : Sᵀ
 
-open import Data.Unit
-open import Data.Sum
+Pᵀ : Sᵀ → Set
+Pᵀ l = ⊥*
+Pᵀ n = I
 
-Branch : Container ℓ0 ℓ0
-Branch .Shape = NodeType
-Branch .Position l = ⊥*
-Branch .Position n = B
+T = W Sᵀ Pᵀ
 
-BTree = W Branch
+Fᵀ : Set → Set
+Fᵀ X = Σ Sᵀ λ s → Pᵀ s → X
 
-leaf≡leaf : ∀ (f g : ⊥* → BTree) → sup (l , f) ≡ sup (l , g)
+leaf≡leaf : ∀ (f g : ⊥* → T) → sup (l , f) ≡ sup (l , g)
 leaf≡leaf f g =
   ≡.cong (λ ○ → sup (l , ○)) (funExt λ ())
 
-_∘ᵗ_ : ∀ (α : B → BTree) (π : B ↔ B)
-     → B → BTree
+_∘ᵗ_ : ∀ (α : I → T) (π : I ↔ I)
+     → I → T
 (f ∘ᵗ π) = λ b → f (π .↔.to b)

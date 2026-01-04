@@ -1,8 +1,8 @@
 open import QIT.Prelude
 
-module QIT.Mobile.Functor (B : Set) where
+module QIT.Mobile.Functor (I : Set) where
 
-open import QIT.Mobile.Base B
+open import QIT.Mobile.Base I
 open import QIT.Relation.Binary
 open import QIT.Setoid as ≈
 open import Data.Product
@@ -14,12 +14,12 @@ module Ob (S : Setoid ℓ0 ℓ0) where
   private
     module S = Setoid S
   F̃-ob₀ : Set ℓ0
-  F̃-ob₀ = ⟦ Branch ⟧ ⟨ S ⟩
+  F̃-ob₀ = Fᵀ ⟨ S ⟩
   data _≈ᵗ_ : F̃-ob₀ → F̃-ob₀ → Prop (ℓ0) where
     ≈leaf : ∀ {f g} → (l , f) ≈ᵗ (l , g)
     ≈node : ∀ {f g} → (c : ∀ b → f b S.≈ g b)
           → (n , f) ≈ᵗ (n , g)
-    ≈perm : ∀ {f} → (π : B ↔ B)
+    ≈perm : ∀ {f} → (π : I ↔ I)
           → (n , f) ≈ᵗ (n , λ b → f (π .↔.to b))
     ≈trans : ∀ {s t u} → s ≈ᵗ t → t ≈ᵗ u → s ≈ᵗ u
 
@@ -35,7 +35,7 @@ module Ob (S : Setoid ℓ0 ℓ0) where
     where
     module π = _↔_ π
     π' = ↔.flip π
-    A : (B → B) → Prop (ℓ0)
+    A : (I → I) → Prop (ℓ0)
     A = λ h → (n , λ b → f (π.to b)) ≈ᵗ (n , λ b → f (h b))
     p : (λ b → π.to (π.from b)) ≡ (λ b → b)
     p = funExt λ b → π.linv b
