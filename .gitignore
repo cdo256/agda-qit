@@ -2,7 +2,7 @@
 _build
 result
 *~
-.#.*
+.#*
 latex/generated
 src/DissertationTex/
 
@@ -176,3 +176,4 @@ TSWLatexianTemp*
 .direnv/bin
 .obsidian
 obsidian-latex-suite-snippets.json
+QIT/Mobile/.#Diagram.agda
