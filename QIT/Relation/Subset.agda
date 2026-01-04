@@ -23,3 +23,6 @@ infixr 4 _,_
 ΣP≡ : ∀ {a b} {A : Set a} {B : A → Prop b}
     → (x y : ΣP A B) → x .fst ≡ y .fst → x ≡ y
 ΣP≡ x y p = ΣP≡' (x .fst) (y .fst) p (x .snd) (y .snd)
+
+∃ : ∀ {a b} {A : Set a} → (A → Prop b) → Prop (a ⊔ b)
+∃ {A = A} B = ∥ ΣP A B ∥

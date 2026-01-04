@@ -80,21 +80,20 @@ i ⊇ j = ∀ k → i < k → j < k
 ⊆→≤ {sup (s , f)} {sup (t , g)} p =
   sup≤ (λ x → p (f x) (<sup x (≤refl (f x))))
 
-≤→⊆ : ∀ i j → i ≤ j → i ⊆ j
-≤→⊆ (sup (s , f)) (sup (t , g)) sf≤tg =
+≤→⊆ : ∀ {i j} → i ≤ j → i ⊆ j
+≤→⊆ {sup (s , f)} {sup (t , g)} sf≤tg =
   λ k k<sf → ≤< sf≤tg k<sf
 
-≤→⊇ : ∀ i j → i ≤ j → j ⊇ i
-≤→⊇ i j i≤j k j<k = <≤ j<k i≤j
+≤→⊇ : ∀ {i j} → i ≤ j → j ⊇ i
+≤→⊇ i≤j _ j<k = <≤ j<k i≤j
 
 _≤≥_ : ∀ (x y : W C) → Prop (ℓs ⊔ ℓp)
 x ≤≥ y = (x ≤ y) ∧ (y ≤ x)
 _⊆⊇_ : ∀ (x y : W C) → Prop (ℓs ⊔ ℓp)
 x ⊆⊇ y = (x ⊆ y) ∧ (y ⊆ x)
 
-isWeaklyExtensional : Prop (ℓs ⊔ ℓp)
-isWeaklyExtensional = ∀ x y → x ⊆ y → y ⊆ x → x ≡p y
-
 isQuasiExtensional : Prop (ℓs ⊔ ℓp)
-isQuasiExtensional = ∀ x y → (x ≤≥ y) ⇔ (x ⊆⊇ y)
+isQuasiExtensional = ∀ {x y} → (x ≤≥ y) ⇔ (x ⊆⊇ y)
 
+isQuasiExtensionalSize : isQuasiExtensional
+isQuasiExtensionalSize = (λ (i≤j , j≤i) → ≤→⊆ i≤j , ≤→⊆ j≤i) , λ (i⊆j , j⊆i) → ⊆→≤ i⊆j , ⊆→≤ j⊆i

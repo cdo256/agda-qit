@@ -109,6 +109,7 @@ congp' f ≡.refl = ≡.refl
 ¬ X = X → ⊥
 
 record _∧_ {ℓ ℓ'} (A : Prop ℓ) (B : Prop ℓ') : Prop (ℓ ⊔ ℓ') where
+  constructor _,_
   field
     fst : A
     snd : B
