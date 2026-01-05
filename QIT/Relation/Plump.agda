@@ -26,7 +26,7 @@ Z = W Sᶻ Pᶻ
 ⊥ᶻ = sup (⊥ˢ , λ ())
 
 sucᶻ : Z → Z
-sucᶻ α = sup (⊥ˢ , λ _ → α)
+sucᶻ α = sup (∨ˢ , λ _ → α)
 
 ιᶻ : W S P → Z
 ιᶻ (sup (s , f)) = sup (ιˢ s , λ i → ιᶻ (f i))
@@ -68,8 +68,17 @@ mutual
 <→≤ : ∀{i j} → i < j → i ≤ j
 <→≤ (<sup x (sup≤ f<i)) = sup≤ (λ y → <sup x (<→≤ (f<i y)))
 
+<supᶻ : ∀ {s} x → ∥ P s ∥ → x < sup (ιˢ s , λ _ → x)
+<supᶻ x ∣ i ∣ = <sup i (≤refl x)
+
+<sucᶻ : ∀ α → α < sucᶻ α
+<sucᶻ = λ α → <sup (lift (inj₁ tt)) (≤refl α)
+
 _<ᵀ_ : (W S P) → Z → Prop (ℓS ⊔ ℓP)
 t <ᵀ α = ιᶻ t < α
+
+_≤ᵀ_ : (W S P) → Z → Prop (ℓS ⊔ ℓP)
+t ≤ᵀ α = ιᶻ t ≤ α
 
 << : ∀{i j k} → j < k → i < j → i < k
 << (<sup x i≤fx) i<j = <sup x (<→≤ (≤< i≤fx i<j))
@@ -119,3 +128,7 @@ x ⊆⊇ y = (x ⊆ y) ∧ (y ⊆ x)
 
 isQuasiExtensionalZ : ∀ {x y} → (x ≤≥ y) ⇔ (x ⊆⊇ y)
 isQuasiExtensionalZ = (λ (i≤j , j≤i) → ≤→⊆ i≤j , ≤→⊆ j≤i) , λ (i⊆j , j⊆i) → ⊆→≤ i⊆j , ⊆→≤ j⊆i
+
+≤cong : ∀ s (μ τ : Pᶻ s → Z) → (r : ∀ i → μ i ≤ τ i)
+      → sup (s , μ) ≤ sup (s , τ)
+≤cong s μ τ r = sup≤ λ i → <sup i (r i)

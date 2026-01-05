@@ -16,111 +16,73 @@ open import QIT.Relation.Subset
 open import QIT.Diagram ≤p hiding (_≤_)
 
 P₀ : (α : Z) → Set
-P₀ α = ΣP T (_<ᵀ α)
+P₀ α = ΣP T (_≤ᵀ α)
 
-n≰l : ∀ {f g} → ¬p (sup (n , f) ≤ sup (l , g))
-n≰l {f} {g} (sup≤ f<l) = r inhabB
+n≰l : ∀ {f g} → ¬p (sup (ιˢ n , f) ≤ sup (ιˢ l , g))
+n≰l {f} {g} (sup≤ f<l) = r inhabI
   where
-  r : ∥ B ∥ → ⊥p
+  r : ∥ I ∥ → ⊥p
   r ∣ b ∣ with f<l b
   ... | <sup () i≤fx
 
-𝟘 : BTree
-𝟘 = sup (l , λ())
-suc : BTree → BTree
-suc x = sup (n , λ _ → x)
+pnode : ∀ μ (f : ∀ i → P₀ (μ i)) → P₀ (sup (ιˢ n , μ))
+pnode μ f = sup (n , λ i → f i .fst) , sup≤ (λ i → <sup i (f i .snd))
 
-<suc : ∀ t → t < suc t
-<suc t = f inhabB
+⊥≤t : ∀ α → ⊥ᶻ ≤ α
+⊥≤t _ = sup≤ λ ()
+
+_∘ᴾ_ : ∀ {μ : I → Z} (f : (i : I) → P₀ (μ i)) (π : I ↔ I)
+     → (i : I) → P₀ (μ (π .↔.to i))
+_∘ᴾ_ {μ} f π = λ i → f (π .↔.to i)
+
+pperm : ∀ (μ : I → Z) (f : (i : I) → P₀ (μ i)) (π : I ↔ I)
+     → P₀ (sup (ιˢ n , μ))
+pperm μ f π = t , sup≤ (λ i → <sup (π' i) (f (π' i) .snd))
   where
-  f : ∥ B ∥ → t < suc t
-  f ∣ b ∣ = <sup b (≤refl t)
+  π' : I → I
+  π' = π .↔.to
+  g : (i : I) → W Sᵀ Pᵀ
+  g = λ i → f (π' i) .fst
+  t : T
+  t = sup (n , g)
 
-𝟘≤t : ∀ t → 𝟘 ≤ t
-𝟘≤t _ = sup≤ λ ()
+pweaken : ∀ {α β} → α ≤ β → P₀ α → P₀ β
+pweaken α≤β (t , t≤α) = t , ≤≤ α≤β t≤α
 
-weaken : ∀ {α β : Z} → α ≤ β → P₀ α → P₀ β
-weaken α≤β (t , t<α) = t , ≤< α≤β t<α
+data _⊢_≈ᴾ_ : (α : Z) → P₀ α → P₀ α → Prop where
+  ≈pnode : ∀ μ (f g : ∀ i → P₀ (μ i))
+         → (r : ∀ i → μ i ⊢ f i ≈ᴾ g i)
+         → sup (ιˢ n , μ) ⊢ pnode μ f ≈ᴾ pnode μ g
+  ≈pperm : ∀ μ (f : ∀ i → P₀ (μ i)) → (π : I ↔ I)
+         → sup (ιˢ n , μ) ⊢ pnode μ f ≈ᴾ pperm μ f π
+  ≈prefl : ∀ {α t̂} → α ⊢ t̂ ≈ᴾ t̂
+  ≈psym : ∀ {α ŝ t̂} → α ⊢ ŝ ≈ᴾ t̂ → α ⊢ t̂ ≈ᴾ ŝ
+  ≈ptrans : ∀ {α ŝ t̂ û} → α ⊢ ŝ ≈ᴾ t̂ → α ⊢ t̂ ≈ᴾ û → α ⊢ ŝ ≈ᴾ û
+  ≈pweaken : ∀ {α β} → (α≤β : α ≤ β) → {ŝ t̂ : P₀ α}
+          → α ⊢ ŝ ≈ᴾ t̂ → β ⊢ pweaken α≤β ŝ ≈ᴾ pweaken α≤β t̂
 
-_∘ᴾ_ : ∀ {μ : I → Z} (f : (b : I) → P₀ (μ b)) (π : I ↔ I)
-     → (b : I) → P₀ (μ (π .↔.to b))
-_∘ᴾ_ {μ} f π = λ b → f (π .↔.to b)
+P : (α : Z) → Setoid ℓ0 ℓ0
+P α = record
+  { Carrier = P₀ α
+  ; _≈_ = α ⊢_≈ᴾ_
+  ; isEquivalence = record
+    { refl = ≈prefl
+    ; sym = ≈psym
+    ; trans = ≈ptrans  } }
 
--- data _≈ᴾ_ : ∀ {i j} → P₀ i → P₀ j → Prop where
---   ≈pleaf : ∀ α β → leaf α ≈ᴾ leaf β
---   ≈pnode : ∀ α β {f g} → (∀ b → f b ≈ᴾ g b) → node α f ≈ᴾ node β g
---   ≈pperm : ∀ α {f} → (π : I ↔ I) → node α f ≈ᴾ node (α ∘ᵗ π) (f ∘ᴾ π)
---   ≈pweaken : ∀ {i j} (p : i ≤ j) (s : P₀ i) → s ≈ᴾ weaken i j p s
---   ≈psym : ∀ {i j} {s : P₀ i} {t : P₀ j} → s ≈ᴾ t → t ≈ᴾ s
---   ≈ptrans : ∀ {i j k} {s : P₀ i} {t : P₀ j} {u : P₀ k} → s ≈ᴾ t → t ≈ᴾ u → s ≈ᴾ u
-
--- For convenience
-postulate
-  j : I
-
-data _≈ᴾ_ : {α : Z} → P₀ α → P₀ α → Prop where
-  ≈prefl : ∀ t̂ → t̂ ≈ᴾ t̂ 
-  ≈pnode : ∀ s {α β : Z} (α≤β : α ≤ β) (f g : Pᵀ s → P₀ α)
-         → (r : ∀ i → f i ≈ᴾ g i)
-         →  (sup (s , λ i → f i .fst) , <sup j (sup≤ (λ x → f x .snd)))
-         ≈ᴾ (sup (s , λ i → g i .fst) , <sup {!!} {!!})
-         -- → _≈ᴾ_ {α = {!!}} (sup (s , λ i → f i .fst) , {!weaken!}) {!!}
-         -- _≈ᴾ_ {α = sup ((ιˢ s) , μ)} (sup (s , λ i → f i .fst) , {!!})
-         --   (sup (s , λ i → g i .fst) , {!!})
-
--- ≈pweaken-cong : ∀ i j p → {s t : P₀ i} → s ≈ᴾ t → weaken i j p s ≈ᴾ weaken i j p t
--- ≈pweaken-cong i j p s≈t =
---   ≈ptrans (≈psym (≈pweaken p _)) (≈ptrans s≈t (≈pweaken p _))
-
--- ≈prefl : ∀ {i} (s : P₀ i) → s ≈ᴾ s
--- ≈prefl (leaf α) = ≈pleaf α α
--- ≈prefl (node α f) = ≈pnode α α λ b → ≈prefl (f b)
--- ≈prefl (weaken j i p s) = ≈pweaken-cong j i p (≈prefl s)
-
--- import QIT.Setoid.Indexed as Indexed
-
--- P : (i : T) → Setoid ℓ0 ℓ0
--- P i = record
---   { Carrier = P₀ i
---   ; _≈_ = _≈ᴾ_
---   ; isEquivalence = record
---     { refl = λ {x} → ≈prefl x
---     ; sym = λ {x} {y} → ≈psym {i} {i} {x} {y}
---     ; trans = λ {x} {y} {z} → ≈ptrans {i} {i} {i} {x} {y} {z} } }
-
--- Pᴵ : Indexed.Setoid ℓ0 ℓ0 ℓ0
--- Pᴵ = record
---   { I = T
---   ; A = P₀
---   ; R = λ i j x y → x ≈ᴾ y
---   ; isEquivalence = record
---     { refl = λ {i} {x} → ≈prefl x
---     ; sym = ≈psym
---     ; trans = ≈ptrans } }
-
--- D : Diagram ℓ0 ℓ0
--- D = record
---   { D-ob = P
---   ; D-mor = Hom
---   ; D-id = Id
---   ; D-comp = Comp }
---   where
---   Hom : ∀ {i j} → i ≤ j → ≈.Hom (P i) (P j)
---   Hom {i} {j} i≤j = record
---     { to = weaken i j i≤j
---     ; cong = ≈pweaken-cong i j i≤j }
---   Id : ∀ {i} → (Hom (≤refl i)) ≈h ≈.idHom
---   Id {i} p = ≈ptrans (≈psym (≈pweaken (≤refl i) _)) p
---   Comp : ∀ {i j k} (p : i ≤ j) (q : j ≤ k) →
---       Hom (≤≤ q p) ≈h (Hom q ≈.∘ Hom p)
---   Comp {i} {j} {k} p q {x} {y} x≈y = begin
---     weaken i k (≤≤ q p) x
---       ≈⟨ ≈psym (≈pweaken (≤≤ q p) x) ⟩
---     x
---       ≈⟨ x≈y ⟩
---     y
---       ≈⟨ ≈pweaken p y ⟩
---     weaken i j p y
---       ≈⟨ ≈pweaken q (weaken i j _ y) ⟩
---     weaken j k q (weaken i j p y) ∎
---     where open Indexed.≈syntax Pᴵ
+D : Diagram ℓ0 ℓ0
+D = record
+  { D-ob = P
+  ; D-mor = Hom
+  ; D-id = Id
+  ; D-comp = Comp }
+  where
+  Hom : ∀ {α β} → α ≤ β → ≈.Hom (P α) (P β)
+  Hom {α} {β} α≤β = record
+    { to = pweaken α≤β
+    ; cong = ≈pweaken α≤β }
+  Id : ∀ {α} → (Hom (≤refl α)) ≈h ≈.idHom
+  Id {α} {ŝ} {t̂} p = p
+  Comp : ∀ {α β γ} (p : α ≤ β) (q : β ≤ γ) →
+      Hom (≤≤ q p) ≈h (Hom q ≈.∘ Hom p)
+  Comp {α} {β} {γ} p q {ŝ} {t̂} s≈t = ≈pweaken q (≈pweaken p s≈t)
