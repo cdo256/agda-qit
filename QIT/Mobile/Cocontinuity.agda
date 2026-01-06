@@ -75,37 +75,48 @@ mutual
 --   open Setoid (Colim (F̃ ∘ D))
 --   open ≈.≈syntax {S = Colim (F̃ ∘ D)}
 
-
 ψ-cong {x} {y} (≈perm π) = {!!}
 ψ-cong {x} {y} (≈trans x≈y x≈y₁) = {!!}
 
 -- ψ-cong ≈leaf = ≈lstage 𝟘 ≈leaf
-ψ-cong (≈node {f} {g} c) = {!begin
-  nf , (n , λ b → weaken (f1 b) nf (fi≤sup n f1 b) (f2 b))
-    ≈⟨ ≈lstep (∨ᵗ-l nf ng) u ⟩
-  nf ∨ᵗ ng , (n , λ b → weaken nf (nf ∨ᵗ ng) _ (weaken (f1 b) nf _ (f2 b)))
-    ≈⟨ ≈lstage (nf ∨ᵗ ng) (≈node c') ⟩
-  nf ∨ᵗ ng , (n , λ b → weaken ng (nf ∨ᵗ ng) _ (weaken (g1 b) ng _ (g2 b)))
-    ≈⟨ ≈lsym (≈lstep (∨ᵗ-r nf ng) (n , (λ b → weaken (g1 b) ng _ (g2 b)))) ⟩
-  ng , (n , λ b → weaken (g1 b) ng (fi≤sup n g1 b) (g2 b)) ∎!}
+-- ψ-cong (≈node {f} {g} c) = {!begin
+--   nf , (n , λ b → weaken (f1 b) nf (fi≤sup n f1 b) (f2 b))
+--     ≈⟨ ≈lstep (∨ᵗ-l nf ng) u ⟩
+--   nf ∨ᵗ ng , (n , λ b → weaken nf (nf ∨ᵗ ng) _ (weaken (f1 b) nf _ (f2 b)))
+--     ≈⟨ ≈lstage (nf ∨ᵗ ng) (≈node c') ⟩
+--   nf ∨ᵗ ng , (n , λ b → weaken ng (nf ∨ᵗ ng) _ (weaken (g1 b) ng _ (g2 b)))
+--     ≈⟨ ≈lsym (≈lstep (∨ᵗ-r nf ng) (n , (λ b → weaken (g1 b) ng _ (g2 b)))) ⟩
+--   ng , (n , λ b → weaken (g1 b) ng (fi≤sup n g1 b) (g2 b)) ∎!}
+ψ-cong (≈node {f} {g} c) = begin
+  α1 , n , h1
+    ≈⟨ ≈lstep {!!} (n , h1) ⟩
+  {!!} , n , {!!}
+    ≈⟨ {!!} ⟩
+  α2 , n , h2 ∎
   where
   open Diagram D
   f1 : I → Z
-  f1 b = f b .proj₁
-  f2 : ∀ b → P₀ (f1 b)
-  f2 b = f b .proj₂
-  nf : Z
-  nf = sup (ιˢ n , f1)
-  g1 : I → Z
-  g1 b = g b .proj₁
-  g2 : ∀ b → P₀ (g1 b)
-  g2 b = g b .proj₂
-  ng : Z
-  ng = sup (ιˢ n , g1)
-  ζ : I → Z
-  ζ i = f1 i ∨ᶻ g1 i
-  d : ∀ b → Colim D [ f b ≈ g b ] → (f2 b .fst) ≈ᴾᴵ (g2 b .fst)
-  d b r = recˡ D C c-stage c-step c-sym c-trans (c b)
+  f1 i = f i .proj₁
+  g1 : ∀ i → P₀ (f1 i)
+  g1 i = f i .proj₂
+  α1 : Z
+  α1 = sup (ιˢ n , f1)
+  h1 : I → P₀ α1
+  h1 i = pweaken (fi≤sup (ιˢ n) f1 i) (g1 i)
+  f2 : I → Z
+  f2 i = g i .proj₁
+  g2 : ∀ i → P₀ (f2 i)
+  g2 i = g i .proj₂
+  α2 : Z
+  α2 = sup (ιˢ n , f2)
+  h2 : I → P₀ α2
+  h2 i = pweaken (fi≤sup (ιˢ n) f2 i) (g2 i)
+  t1 : T
+  t1 = sup (n , (λ i → g1 i .fst))
+  t2 : T
+  t2 = sup (n , (λ i → g1 i .fst))
+  d : ∀ {s t} → Colim D [ s ≈ t ] → (s .proj₂ .fst) ≈ᴾᴵ (t .proj₂ .fst)
+  d r = recˡ D C c-stage c-step c-sym c-trans r
     where
     C : ∀ {s t} → Colim D [ s ≈ t ] → Prop
     C {_ , s , _} {_ , t , _} p = s  ≈ᴾᴵ t
@@ -116,7 +127,37 @@ mutual
     c-sym : ∀ {s t} (r : Colim D [ s ≈ t ]) → C r → C (≈lsym r)
     c-sym _ p = ≈pisym p
     c-trans : ∀ {s t u} (r₁ : Colim D [ s ≈ t ]) (r₂ : Colim D [ t ≈ u ]) → C r₁ → C r₂ → C (≈ltrans r₁ r₂)
-    c-trans _ _ p q = ≈pitrans p q 
+    c-trans _ _ p q = ≈pitrans p q
+  β : t1 ≈ᴾᴵ t2 → Colim (F̃ ∘ D) [ α1 , n , h1 ≈ α2 , n , h2 ]
+  β (mkPI α s≤α t≤α e) = begin
+    α1 , n , h1
+      ≈⟨ ≈lstep (≤≤ ∨ᶻ-r ∨ᶻ-l) (n , h1) ⟩
+    α ∨ᶻ (α1 ∨ᶻ α2) , n , (λ b → pweaken (≤≤ ∨ᶻ-r ∨ᶻ-l) (h1 b))
+      ≈⟨ ≈lstage _ u ⟩
+    α ∨ᶻ (α1 ∨ᶻ α2) , n , (λ b → pweaken (≤≤ ∨ᶻ-r ∨ᶻ-r) (h2 b))
+      ≈⟨ ≈lsym (≈lstep (≤≤ ∨ᶻ-r ∨ᶻ-r) (n , h2)) ⟩
+    α2 , n , h2 ∎
+    where
+    v : ∀ i → Colim D [ f i ≈ g i ]
+      → (α ∨ᶻ (α1 ∨ᶻ α2)) ⊢  pweaken (≤≤ (≤≤ ∨ᶻ-r ∨ᶻ-l) (fi≤sup _ f1 i)) (f i .proj₂)
+                          ≈ᴾ pweaken (≤≤ (≤≤ ∨ᶻ-r ∨ᶻ-r) (fi≤sup _ f2 i)) (g i .proj₂)
+    v i = recˡ D {!!} {!!} {!!} {!!} {!!}
+      where
+      C : ∀ {s t} (p : Colim D [ s ≈ t ]) → {!α ∨ᶻ (α1 ∨ᶻ α2) ⊢ ? ≈ᴾ ?!}
+    u : F∘D.D-ob (α ∨ᶻ (α1 ∨ᶻ α2)) [
+         n , (λ i → pweaken (≤≤ ∨ᶻ-r ∨ᶻ-l) (h1 i)) ≈
+         n , (λ i → pweaken (≤≤ ∨ᶻ-r ∨ᶻ-r) (h2 i)) ]
+    u = begin
+      n , (λ i → pweaken (≤≤ ∨ᶻ-r ∨ᶻ-l) (pweaken (fi≤sup _ f1 i) (f i .proj₂)))
+        ≈⟨ ≈node (λ i → v i (c i)) ⟩
+      n , (λ i → pweaken (≤≤ ∨ᶻ-r ∨ᶻ-r) (pweaken (fi≤sup _ f2 i) (g i .proj₂))) ∎
+      where
+      open Setoid (F∘D.D-ob (α ∨ᶻ (α1 ∨ᶻ α2)))
+      open ≈.≈syntax {S = F∘D.D-ob (α ∨ᶻ (α1 ∨ᶻ α2))}
+    open ≈.Hom
+    open Setoid (Colim (F̃ ∘ D))
+    open ≈.≈syntax {S = Colim (F̃ ∘ D)}
+    
 --   c' : ∀ b → P (nf ∨ᵗ ng) [ weaken nf (nf ∨ᵗ ng) _ (weaken (f1 b) nf _ (f2 b))
 --                           ≈ weaken ng (nf ∨ᵗ ng) _ (weaken (g1 b) ng _ (g2 b)) ]
 --   c' b = begin
@@ -134,9 +175,9 @@ mutual
 --     where
 --     import QIT.Setoid.Indexed as Indexed
 --     open Indexed.≈syntax Pᴵ
---   open ≈.Hom
---   open Setoid (Colim (F̃ ∘ D))
---   open ≈.≈syntax {S = Colim (F̃ ∘ D)}
+  open ≈.Hom
+  open Setoid (Colim (F̃ ∘ D))
+  open ≈.≈syntax {S = Colim (F̃ ∘ D)}
 --   u : ⟨ F∘D.D-ob nf ⟩
 --   u = n , (λ b → weaken (f1 b) nf _ (f2 b))
 -- -- ψ-cong (≈perm {f} π) = u

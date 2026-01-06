@@ -92,8 +92,8 @@ pattern mkPI α s≤α t≤α e = ∣ mkPI' α s≤α t≤α e ∣
   module p = ≈PI p
 
 ≈pitrans : ∀ {s t u} → s ≈ᴾᴵ t → t ≈ᴾᴵ u → s ≈ᴾᴵ u
-≈pitrans ∣ p ∣ ∣ q ∣ = mkPI (p.α ∨ᶻ q.α) (≤≤ (∨ᶻ-l _ _) p.s≤α) (≤≤ (∨ᶻ-r _ _) q.t≤α)
-  (≈ptrans (≈pweaken (∨ᶻ-l _ _) p.e) (≈pweaken (∨ᶻ-r _ _) q.e))
+≈pitrans ∣ p ∣ ∣ q ∣ = mkPI (p.α ∨ᶻ q.α) (≤≤ ∨ᶻ-l p.s≤α) (≤≤ ∨ᶻ-r q.t≤α)
+  (≈ptrans (≈pweaken ∨ᶻ-l p.e) (≈pweaken ∨ᶻ-r q.e))
   where
   module p = ≈PI p
   module q = ≈PI q

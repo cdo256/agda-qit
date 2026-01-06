@@ -140,20 +140,20 @@ isQuasiExtensionalZ = (λ (i≤j , j≤i) → ≤→⊆ i≤j , ≤→⊆ j≤i)
       → sup (s , μ) ≤ sup (s , τ)
 ≤cong s μ τ r = sup≤ λ i → <sup i (r i)
 
-∨ᶻ-l< : (α β : Z) → α < α ∨ᶻ β
-∨ᶻ-l< α β = <sup (lift (inj₁ tt)) (≤refl α)
+∨ᶻ-l< : {α β : Z} → α < α ∨ᶻ β
+∨ᶻ-l< {α} {β} = <sup (lift (inj₁ tt)) (≤refl α)
 
-∨ᶻ-r< : (α β : Z) → β < α ∨ᶻ β
-∨ᶻ-r< α β = <sup (lift (inj₂ tt)) (≤refl β)
+∨ᶻ-r< : {α β : Z} → β < α ∨ᶻ β
+∨ᶻ-r< {α} {β} = <sup (lift (inj₂ tt)) (≤refl β)
 
-∨ᶻ-l : (α β : Z) → α ≤ α ∨ᶻ β
-∨ᶻ-l α β = fi≤sup ∨ˢ _ (lift (inj₁ tt))
+∨ᶻ-l : {α β : Z} → α ≤ α ∨ᶻ β
+∨ᶻ-l = fi≤sup ∨ˢ _ (lift (inj₁ tt))
 
-∨ᶻ-r : (α β : Z) → β ≤ α ∨ᶻ β
-∨ᶻ-r α β = fi≤sup ∨ˢ _ (lift (inj₂ tt))
+∨ᶻ-r : {α β : Z} → β ≤ α ∨ᶻ β
+∨ᶻ-r = fi≤sup ∨ˢ _ (lift (inj₂ tt))
 
-∨ᶻ-flip : (α β : Z) → β ∨ᶻ α ≤ α ∨ᶻ β
-∨ᶻ-flip α β = sup≤ g
+∨ᶻ-flip : {α β : Z} → β ∨ᶻ α ≤ α ∨ᶻ β
+∨ᶻ-flip {α} {β} = sup≤ g
   where
   g : (i : Pᶻ ∨ˢ) → _ < (α ∨ᶻ β)
   g (lift (inj₁ tt)) = <sup (lift (inj₂ tt)) (≤refl β)
