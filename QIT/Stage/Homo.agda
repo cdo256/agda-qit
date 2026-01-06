@@ -1,7 +1,8 @@
 open import QIT.Prelude
 open import QIT.QW
+import QIT.Relation.Plump as Plump
 
-module QIT.Stage.Homo {ℓS ℓP ℓE ℓV} (qw : QW ℓS ℓP ℓE ℓV) where
+module QIT.Stage.Homo {ℓS ℓP ℓE ℓV} (qw : QW ℓS ℓP ℓE ℓV) (α : Plump.Z (qw .QW.S) (qw .QW.P)) where 
 
 open QW qw
 
@@ -13,27 +14,34 @@ open import Data.Empty renaming (⊥-elim to absurd)
 open import Data.Unit
 open import Data.Sum
 open import QIT.Relation.Subset
-open import QIT.Relation.Plump S P
+open Plump S P
 open import QIT.Diagram ≤p
 open import QIT.Stage.Base S P
 
 private
   T = W S P
 
-open import QIT.SystemOfEquations S P
+open import QIT.SystemOfEquations S P hiding (_[_])
 
-data _⊢_≈ᴾ_ : (α : Z) → P₀ α → P₀ α → Prop (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV) where
+Exprᵇ : ∀ {ℓV} (V : Set ℓV) → Set (ℓS ⊔ ℓP ⊔ ℓV)
+Exprᵇ {ℓV} V = W Sʰ Pʰ
+  where
+  Sʰ : Set (ℓS ⊔ ℓV)
+  Sʰ = V ⊎ S
+  Pʰ : Sʰ → Set ℓP
+  Pʰ = [ (λ _ → ⊥*) , P ]
+
+-- Φ : ∀ α → Exprᵇ V
+
+data _≈ᵇ_ : P₀ α → P₀ α → Prop (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV) where
   ≈pcong : ∀ a μ (f g : ∀ i → P₀ (μ i))
-         → (r : ∀ i → μ i ⊢ f i ≈ᴾ g i)
+         → (r : ∀ i → f i ≈ᴾ g i)
          → sup (ιˢ a , μ) ⊢ psup a μ f ≈ᴾ psup a μ g
-  ≈peq : ∀ α s t → (u : ⟦ Ξ ⟧[ s .fst ≈ t .fst ]) → α ⊢ s ≈ᴾ t
+  ≈peq : ∀ α e s t → (u : {!!}) → α ⊢ s ≈ᴾ t
   ≈psym : ∀ {α ŝ t̂} → α ⊢ ŝ ≈ᴾ t̂ → α ⊢ t̂ ≈ᴾ ŝ
   ≈ptrans : ∀ {α ŝ t̂ û} → α ⊢ ŝ ≈ᴾ t̂ → α ⊢ t̂ ≈ᴾ û → α ⊢ ŝ ≈ᴾ û
   ≈pweaken : ∀ {α β} → (α≤β : α ≤ β) → {ŝ t̂ : P₀ α}
           → α ⊢ ŝ ≈ᴾ t̂ → β ⊢ pweaken α≤β ŝ ≈ᴾ pweaken α≤β t̂
-
-≈prefl : ∀ {α ŝ} → α ⊢ ŝ ≈ᴾ ŝ
-≈prefl {α} {ŝ} = ≈peq α ŝ ŝ ≈ξrefl
 
 -- P : (α : Z) → Setoid ℓ0 ℓ0
 -- P α = record
