@@ -138,6 +138,13 @@ mutual
       ≈⟨ ≈lsym (≈lstep (≤≤ ∨ᶻ-r ∨ᶻ-r) (n , h2)) ⟩
     α2 , n , h2 ∎
     where
+    v' : ∀ γ1 γ2 γ (p : γ1 ≤ γ) (q : γ2 ≤ γ) {s : P₀ γ1} {t : P₀ γ2}
+       → Colim D [ γ1 , s ≈ γ2 , t ]
+       → γ ⊢ pweaken p s ≈ᴾ pweaken q t
+    v' γ1 .γ1 γ p .p (≈lstage .γ1 r) = ≈pweaken p r
+    v' γ1 γ2 γ p q (≈lstep γ1≤γ2 x) = ≈prefl
+    v' γ1 γ2 γ p q (≈lsym r) = ≈psym (v' γ2 γ1 γ q p r)
+    v' γ1 γ2 γ p q (≈ltrans {t = t} r s) = ≈ptrans {!!} {!!}
     v : ∀ i → Colim D [ f i ≈ g i ]
       → (α ∨ᶻ (α1 ∨ᶻ α2)) ⊢  pweaken (≤≤ (≤≤ ∨ᶻ-r ∨ᶻ-l) (fi≤sup _ f1 i)) (f i .proj₂)
                           ≈ᴾ pweaken (≤≤ (≤≤ ∨ᶻ-r ∨ᶻ-r) (fi≤sup _ f2 i)) (g i .proj₂)
