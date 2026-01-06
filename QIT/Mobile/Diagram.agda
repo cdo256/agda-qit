@@ -7,7 +7,7 @@ open import QIT.Container
 open import QIT.Mobile.Base I
 open import QIT.Mobile.Functor I
 open import QIT.Setoid as ≈
-open import Data.Product
+open import Data.Product hiding (∃)
 open import Data.Empty renaming (⊥-elim to absurd)
 open import Data.Unit
 open import Data.Sum
@@ -69,6 +69,43 @@ P α = record
     { refl = ≈prefl
     ; sym = ≈psym
     ; trans = ≈ptrans  } }
+
+record ≈PI (s t : T) : Set where
+  constructor mkPI'
+  field
+    α : Z
+    s≤α : s ≤ᵀ α
+    t≤α : t ≤ᵀ α
+    e : α ⊢ (s , s≤α) ≈ᴾ (t , t≤α)
+
+_≈ᴾᴵ_ : (s t : T) → Prop
+s ≈ᴾᴵ t = ∥ ≈PI s t ∥ 
+
+pattern mkPI α s≤α t≤α e = ∣ mkPI' α s≤α t≤α e ∣
+
+≈pirefl : ∀ {s} → s ≈ᴾᴵ s
+≈pirefl {s} = mkPI (ιᶻ s) (≤refl (ιᶻ s)) (≤refl (ιᶻ s)) ≈prefl
+
+≈pisym : ∀ {s t} → s ≈ᴾᴵ t → t ≈ᴾᴵ s
+≈pisym ∣ p ∣ = mkPI p.α p.t≤α p.s≤α (≈psym p.e)
+  where
+  module p = ≈PI p
+
+≈pitrans : ∀ {s t u} → s ≈ᴾᴵ t → t ≈ᴾᴵ u → s ≈ᴾᴵ u
+≈pitrans ∣ p ∣ ∣ q ∣ = mkPI (p.α ∨ᶻ q.α) (≤≤ (∨ᶻ-l _ _) p.s≤α) (≤≤ (∨ᶻ-r _ _) q.t≤α)
+  (≈ptrans (≈pweaken (∨ᶻ-l _ _) p.e) (≈pweaken (∨ᶻ-r _ _) q.e))
+  where
+  module p = ≈PI p
+  module q = ≈PI q
+
+Pᴵ : Setoid ℓ0 ℓ0
+Pᴵ = record
+  { Carrier = T
+  ; _≈_ = _≈ᴾᴵ_
+  ; isEquivalence = record
+    { refl = ≈pirefl
+    ; sym = ≈pisym
+    ; trans = ≈pitrans  } }
 
 D : Diagram ℓ0 ℓ0
 D = record

@@ -104,26 +104,19 @@ mutual
   ng = sup (ιˢ n , g1)
   ζ : I → Z
   ζ i = f1 i ∨ᶻ g1 i
-  d : ∀ b → Colim D [ f b ≈ g b ] → ζ b ⊢ pweaken (∨ᶻ-l _ _) (f2 b) ≈ᴾ pweaken (∨ᶻ-r _ _) (g2 b)
-  d b r = recˡ D C c-stage {!c-step!} {!c-sym!} {!c-trans!} {!!}
+  d : ∀ b → Colim D [ f b ≈ g b ] → (f2 b .fst) ≈ᴾᴵ (g2 b .fst)
+  d b r = recˡ D C c-stage c-step c-sym c-trans (c b)
     where
     C : ∀ {s t} → Colim D [ s ≈ t ] → Prop
-    C {s} {t} p = (s .proj₁ ∨ᶻ t .proj₁)
-                ⊢  pweaken (∨ᶻ-l _ _) (s .proj₂)
-                ≈ᴾ pweaken (∨ᶻ-r _ _) (t .proj₂)
-    c-stage : ∀ i {x x'} (e : P i [ x ≈ x' ]) → C (≈lstage i e)
-    c-stage i {x} {x'} e = ≈pweaken (∨ᶻ-l _ _) e
-    c-step : ∀ {i j} (p : i ≤ j) (x : ⟨ P i ⟩) → C (≈lstep p x)
-    c-step _ _ = ≈prefl
+    C {_ , s , _} {_ , t , _} p = s  ≈ᴾᴵ t
+    c-stage : ∀ α {x x'} (e : P α [ x ≈ x' ]) → C (≈lstage α e)
+    c-stage α {x} {x'} e = mkPI α (x .snd) (x' .snd) e
+    c-step : ∀ {α β} (p : α ≤ β) (x : ⟨ P α ⟩) → C (≈lstep p x)
+    c-step {α} {β} α≤β (s , s≤α) = mkPI β (≤≤ α≤β s≤α) (≤≤ α≤β s≤α) ≈prefl
     c-sym : ∀ {s t} (r : Colim D [ s ≈ t ]) → C r → C (≈lsym r)
-    c-sym {s} {t} r c = ≈psym (≈pweaken (∨ᶻ-flip (t .proj₁) (s .proj₁)) c)
+    c-sym _ p = ≈pisym p
     c-trans : ∀ {s t u} (r₁ : Colim D [ s ≈ t ]) (r₂ : Colim D [ t ≈ u ]) → C r₁ → C r₂ → C (≈ltrans r₁ r₂)
-    c-trans {s} {t} {u} r₁ r₂ c₁ c₂ = ≈pweaken {!!} {!!}
-  -- d b = recˡ D (λ {s} {t} p → s .proj₂ ≈ᴾ t .proj₂)
-  --            (λ i e → e)
-  --            ≈pweaken
-  --            (λ _ → ≈psym)
-  --            (λ _ _ → ≈ptrans)
+    c-trans _ _ p q = ≈pitrans p q 
 --   c' : ∀ b → P (nf ∨ᵗ ng) [ weaken nf (nf ∨ᵗ ng) _ (weaken (f1 b) nf _ (f2 b))
 --                           ≈ weaken ng (nf ∨ᵗ ng) _ (weaken (g1 b) ng _ (g2 b)) ]
 --   c' b = begin
