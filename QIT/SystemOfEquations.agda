@@ -56,14 +56,17 @@ record SysEq ℓE ℓV : Set (lsuc ℓE ⊔ lsuc ℓV ⊔ ℓS ⊔ ℓP) where
     ; lhs = lhs e
     ; rhs = rhs e }
 
-module _ {ℓE ℓV} (Ξ : SysEq ℓE ℓV) where
-  open SysEq Ξ
-  data ⟦_⟧[_≈_] : T → T → Prop (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV) where
-    ≈ξrefl : ∀ {x} → ⟦_⟧[_≈_] x x
-    ≈ξsym : ∀ {x y} → ⟦_⟧[_≈_] x y → ⟦_⟧[_≈_] y x
-    ≈ξtrans : ∀ {x y z} → ⟦_⟧[_≈_] x y → ⟦_⟧[_≈_] y z → ⟦_⟧[_≈_] x z
-    ≈ξeq : ∀ e (ϕ : V e → T) → ⟦_⟧[_≈_] (ϕ [ lhs e ]) (ϕ [ rhs e ])
-    --TODO: Should we omit ≈ξcong?
-    ≈ξcong : ∀ s (f g : P s → T) → (∀ i → ⟦_⟧[_≈_] (f i) (g i))
-           → ⟦_⟧[_≈_] (sup (s , f)) (sup (s , g))
-  
+assign : ∀ {ℓV} → {V : Set ℓV} (ϕ : V → T) (e : Expr V) → T
+assign ϕ (sup (inj₁ v , _)) = ϕ v
+assign ϕ (sup (inj₂ s , f)) = sup (s , λ i → assign ϕ (f i))
+
+SatEq : ∀ {ℓV ℓ≈} → Equation ℓV → (_≈_ : T → T → Prop ℓ≈)
+      → Prop (ℓS ⊔ ℓP ⊔ ℓV ⊔ ℓ≈)
+SatEq e _≈_ = ∀ (ϕ : V → T) → assign ϕ lhs ≈ assign ϕ rhs
+  where open Equation e
+
+Sat : ∀ {ℓE ℓV ℓ≈} → SysEq ℓE ℓV → (_≈_ : T → T → Prop ℓ≈)
+    → Prop (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV ⊔ ℓ≈)
+Sat Ξ _≈_ = ∀ e → SatEq (getEq e) _≈_
+  where open SysEq Ξ
+

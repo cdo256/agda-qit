@@ -2,9 +2,7 @@
 open import QIT.Prelude
 open import QIT.QW
 
-module QIT.Stage.Homo {ℓS ℓP ℓE ℓV} (qw : QW ℓS ℓP ℓE ℓV) where
-
-open QW qw
+module QIT.Stage.SysEq where
 
 open import QIT.Relation.Binary
 open import QIT.Container
@@ -14,13 +12,10 @@ open import Data.Empty renaming (⊥-elim to absurd)
 open import Data.Unit
 open import Data.Sum
 open import QIT.Relation.Subset
-open import QIT.Relation.Plump S P
+open import QIT.Relation.Plump
 open import QIT.Diagram ≤p
-open import QIT.Stage.Base S P
+open import QIT.Stage.Base
 open import Data.Maybe
-
-private
-  T = W S P
 
 open import QIT.SystemOfEquations S P
 
@@ -33,6 +28,22 @@ open import QIT.SystemOfEquations S P
 _≤ᴱ_ : ∀ {ℓV} {V : Set ℓV} → Expr V → Z → Prop ℓ0
 t ≤ᴱ α = ιᴱ t ≤ α
 
+Exprᵇ : ∀ {ℓV} (V : Set ℓV) → Z → Set (ℓS ⊔ ℓP ⊔ ℓV)
+Exprᵇ V α = ΣP (Expr V) (_≤ᴱ α)
+
+assignᵇ : ∀ {ℓV} → {V : Set ℓV} (α : Z) (ϕ : V → T) (e : Exprᵇ V α) → T
+assignᵇ α ϕ (sup (inj₁ v , _)) = ϕ v
+assignᵇ α ϕ (sup (inj₂ s , f)) = sup (s , λ i → assignᵇ ϕ (f i))
+
+SatEqᵇ : ∀ {ℓV ℓ≈} → Equation ℓV → (_≈_ : T → T → Prop ℓ≈)
+      → Prop (ℓS ⊔ ℓP ⊔ ℓV ⊔ ℓ≈)
+SatEqᵇ e _≈_ = ∀ (ϕ : V → T) → assign ϕ lhs ≈ assign ϕ rhs
+  where open Equation e
+
+Satᵇ : ∀ {ℓE ℓV ℓ≈ ℓX} {X : T → Prop ℓX} → SysEq ℓE ℓV → (_≈_ : ΣP T X → ΣP T X → Prop ℓ≈)
+    → Prop (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV ⊔ ℓ≈)
+Satᵇ Ξ _≈_ = ∀ e → SatEq (getEq e) _≈_
+  where open SysEq Ξ
 
 
 data _⊢_≈ᵇ_ : (α : Z) → P₀ α → P₀ α → Prop (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV) where
