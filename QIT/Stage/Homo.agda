@@ -1,8 +1,7 @@
 open import QIT.Prelude
 open import QIT.QW
-import QIT.Relation.Plump as Plump
 
-module QIT.Stage.Homo {ℓS ℓP ℓE ℓV} (qw : QW ℓS ℓP ℓE ℓV) (α : Plump.Z (qw .QW.S) (qw .QW.P)) where 
+module QIT.Stage.Homo {ℓS ℓP ℓE ℓV} (qw : QW ℓS ℓP ℓE ℓV) where
 
 open QW qw
 
@@ -14,14 +13,14 @@ open import Data.Empty renaming (⊥-elim to absurd)
 open import Data.Unit
 open import Data.Sum
 open import QIT.Relation.Subset
-open Plump S P
+open import QIT.Relation.Plump S P
 open import QIT.Diagram ≤p
 open import QIT.Stage.Base S P
 
 private
   T = W S P
 
-open import QIT.SystemOfEquations S P hiding (_[_])
+open import QIT.SystemOfEquations S P
 
 Exprᵇ : ∀ {ℓV} (V : Set ℓV) → Set (ℓS ⊔ ℓP ⊔ ℓV)
 Exprᵇ {ℓV} V = W Sʰ Pʰ

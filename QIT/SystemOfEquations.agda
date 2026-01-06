@@ -40,3 +40,4 @@ module _ {ℓE ℓV} (Ξ : SysEq ℓE ℓV) where
     --TODO: Should we omit ≈ξcong?
     ≈ξcong : ∀ s (f g : P s → T) → (∀ i → ⟦_⟧[_≈_] (f i) (g i))
            → ⟦_⟧[_≈_] (sup (s , f)) (sup (s , g))
+  
