@@ -13,7 +13,7 @@ open import Data.Unit
 open import Data.Sum
 open import QIT.Relation.Plump Branch
 open import QIT.Relation.Subset
-open import QIT.Diagram ≤p hiding (_≤_)
+open import QIT.Diagram ≤p
 
 data P₀ : (i : BTree) → Set where
   leaf : ∀ α → P₀ (sup (n , α))

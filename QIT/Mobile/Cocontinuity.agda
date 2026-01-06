@@ -15,7 +15,7 @@ open import Data.Unit hiding (_≟_)
 open import Data.Sum
 open import QIT.Relation.Plump Sᵀ Pᵀ
 
-open import QIT.Diagram ≤p hiding (_≤_)
+open import QIT.Diagram ≤p
 open import QIT.Colimit ≤p ℓ0 ℓ0
 open import QIT.Cocontinuity ≤p
 open import QIT.Mobile.Functor I

@@ -1,6 +1,9 @@
 open import QIT.Prelude
+open import QIT.QW
 
-module QIT.Stage.Homo {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
+module QIT.Stage.Homo {ℓS ℓP ℓE ℓV} (qw : QW ℓS ℓP ℓE ℓV) where
+
+open QW qw
 
 open import QIT.Relation.Binary
 open import QIT.Container
@@ -9,34 +12,28 @@ open import Data.Product hiding (∃)
 open import Data.Empty renaming (⊥-elim to absurd)
 open import Data.Unit
 open import Data.Sum
-open import QIT.Relation.Plump S P
 open import QIT.Relation.Subset
-open import QIT.Diagram ≤p hiding (_≤_)
+open import QIT.Relation.Plump S P
+open import QIT.Diagram ≤p
+open import QIT.Stage.Base S P
 
 private
   T = W S P
 
-P₀ : (α : Z) → Set (ℓS ⊔ ℓP)
-P₀ α = ΣP T (_≤ᵀ α)
+open import QIT.SystemOfEquations S P
 
-psup : ∀ s μ (f : ∀ i → P₀ (μ i)) → P₀ (sup (ιˢ s , μ))
-psup s μ f = sup (s , λ i → f i .fst) , sup≤ (λ i → <sup i (f i .snd))
-
-⊥≤t : ∀ α → ⊥ᶻ ≤ α
-⊥≤t _ = sup≤ λ ()
-
-pweaken : ∀ {α β} → α ≤ β → P₀ α → P₀ β
-pweaken α≤β (t , t≤α) = t , ≤≤ α≤β t≤α
-
-data _⊢_≈ᴾ_ : (α : Z) → P₀ α → P₀ α → Prop {!!} where
+data _⊢_≈ᴾ_ : (α : Z) → P₀ α → P₀ α → Prop (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV) where
   ≈pcong : ∀ a μ (f g : ∀ i → P₀ (μ i))
          → (r : ∀ i → μ i ⊢ f i ≈ᴾ g i)
          → sup (ιˢ a , μ) ⊢ psup a μ f ≈ᴾ psup a μ g
-  ≈pquot : {!!}
+  ≈peq : ∀ α s t → (u : ⟦ Ξ ⟧[ s .fst ≈ t .fst ]) → α ⊢ s ≈ᴾ t
   ≈psym : ∀ {α ŝ t̂} → α ⊢ ŝ ≈ᴾ t̂ → α ⊢ t̂ ≈ᴾ ŝ
   ≈ptrans : ∀ {α ŝ t̂ û} → α ⊢ ŝ ≈ᴾ t̂ → α ⊢ t̂ ≈ᴾ û → α ⊢ ŝ ≈ᴾ û
   ≈pweaken : ∀ {α β} → (α≤β : α ≤ β) → {ŝ t̂ : P₀ α}
           → α ⊢ ŝ ≈ᴾ t̂ → β ⊢ pweaken α≤β ŝ ≈ᴾ pweaken α≤β t̂
+
+≈prefl : ∀ {α ŝ} → α ⊢ ŝ ≈ᴾ ŝ
+≈prefl {α} {ŝ} = ≈peq α ŝ ŝ ≈ξrefl
 
 -- P : (α : Z) → Setoid ℓ0 ℓ0
 -- P α = record

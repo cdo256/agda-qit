@@ -13,7 +13,7 @@ open import Data.Unit
 open import Data.Sum
 open import QIT.Relation.Plump Sᵀ Pᵀ
 open import QIT.Relation.Subset
-open import QIT.Diagram ≤p hiding (_≤_)
+open import QIT.Diagram ≤p
 
 P₀ : (α : Z) → Set
 P₀ α = ΣP T (_≤ᵀ α)

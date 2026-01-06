@@ -158,3 +158,6 @@ isQuasiExtensionalZ = (λ (i≤j , j≤i) → ≤→⊆ i≤j , ≤→⊆ j≤i)
   g : (i : Pᶻ ∨ˢ) → _ < (α ∨ᶻ β)
   g (lift (inj₁ tt)) = <sup (lift (inj₂ tt)) (≤refl β)
   g (lift (inj₂ tt)) = <sup (lift (inj₁ tt)) (≤refl α)
+
+⊥≤t : ∀ α → ⊥ᶻ ≤ α
+⊥≤t _ = sup≤ λ ()

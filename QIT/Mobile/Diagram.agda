@@ -13,7 +13,7 @@ open import Data.Unit
 open import Data.Sum
 open import QIT.Relation.Plump Sᵀ Pᵀ
 open import QIT.Relation.Subset
-open import QIT.Diagram ≤p hiding (_≤_)
+open import QIT.Diagram ≤p
 
 P₀ : (α : Z) → Set
 P₀ α = ΣP T (_≤ᵀ α)
@@ -27,9 +27,6 @@ n≰l {f} {g} (sup≤ f<l) = r inhabI
 
 pnode : ∀ μ (f : ∀ i → P₀ (μ i)) → P₀ (sup (ιˢ n , μ))
 pnode μ f = sup (n , λ i → f i .fst) , sup≤ (λ i → <sup i (f i .snd))
-
-⊥≤t : ∀ α → ⊥ᶻ ≤ α
-⊥≤t _ = sup≤ λ ()
 
 _∘ᴾ_ : ∀ {μ : I → Z} (f : (i : I) → P₀ (μ i)) (π : I ↔ I)
      → (i : I) → P₀ (μ (π .↔.to i))
