@@ -19,9 +19,29 @@ Expr {ℓV} V = W Sʰ Pʰ
   Pʰ : Sʰ → Set ℓP
   Pʰ = [ (λ _ → ⊥*) , P ]
 
-_[_] : ∀ {ℓV} {V : Set ℓV} → (V → T) → Expr V → T
-ϕ [ (sup (inj₁ v , _)) ] = ϕ v
-ϕ [ (sup (inj₂ s , f)) ] = sup (s , λ i → ϕ [ f i ])
+module _ {ℓV} {V : Set ℓV} where
+  data EqPath : (e : Expr V) → Set (ℓS ⊔ ℓP ⊔ ℓV) where
+    epleaf : ∀ e → EqPath e
+    epstep : ∀ s f i → EqPath (f i) → EqPath (sup (inj₂ s , f))
+
+  ⟦_⟧ᴱᴾ : {e : Expr V} (p : EqPath e) → Expr V
+  ⟦ epleaf e ⟧ᴱᴾ = e
+  ⟦ epstep s f i p ⟧ᴱᴾ = ⟦ p ⟧ᴱᴾ
+
+  _[_] : (V → T) → Expr V → T
+  ϕ [ (sup (inj₁ v , _)) ] = ϕ v
+  ϕ [ (sup (inj₂ s , f)) ] = sup (s , λ i → ϕ [ f i ])
+
+  record ExprMatch (e : Expr V) (t : T) : Set (ℓS ⊔ ℓP ⊔ ℓV) where
+    field
+      ϕ : V → T
+      match : ϕ [ e ] ≡ t
+
+record Equation ℓV : Set (lsuc ℓV ⊔ ℓS ⊔ ℓP) where
+  field
+    V : Set ℓV
+    lhs : Expr V
+    rhs : Expr V
 
 record SysEq ℓE ℓV : Set (lsuc ℓE ⊔ lsuc ℓV ⊔ ℓS ⊔ ℓP) where
   field
@@ -29,6 +49,12 @@ record SysEq ℓE ℓV : Set (lsuc ℓE ⊔ lsuc ℓV ⊔ ℓS ⊔ ℓP) where
     V : E → Set ℓV
     lhs : (e : E) → Expr (V e)
     rhs : (e : E) → Expr (V e)
+
+  getEq : E → Equation ℓV
+  getEq e = record
+    { V = V e
+    ; lhs = lhs e
+    ; rhs = rhs e }
 
 module _ {ℓE ℓV} (Ξ : SysEq ℓE ℓV) where
   open SysEq Ξ
