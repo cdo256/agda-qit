@@ -29,6 +29,8 @@ import QIT.Container.Functor
 
 -- QW type definition
 import QIT.QW.Equation
+import QIT.QW.Signature
+import QIT.QW.Algebra
 import QIT.QW.Diagram
 import QIT.QW.Colimit
 import QIT.QW.Cocontinuity
