@@ -41,7 +41,7 @@ _≡ᴾ_ : ∀ {ℓ} {A : Prop ℓ} (x y : A) → Set ℓ
 x ≡ᴾ y = box x ≡ box y
 
 substp : ∀ {A : Set ℓ} (B : A → Prop ℓ') {a1 a2 : A} (p : a1 ≡ a2) → B a1 → B a2
-substp B _≡_.refl x = x
+substp B ≡.refl x = x
 
 substp' : ∀ {A : Set ℓ} (B : A → Prop ℓ') {a1 a2 : A} (p : a1 ≡p a2) → B a1 → B a2
 substp' B ∣ _≡_.refl ∣ x = x
@@ -97,6 +97,10 @@ absurd* ()
 congp : ∀ {a b} {A : Set a} {B : Prop b} (f : A → B)
       → ∀ {x y} → x ≡ y → f x ≡ᴾ f y
 congp f ≡.refl = ≡.refl
+
+congp'' : ∀ {a b} {A : Set a} {B : Set b} (f : A → B)
+      → ∀ {x y} → x ≡p y → f x ≡p f y
+congp'' f ∣ ≡.refl ∣ = ∣ ≡.refl ∣
 
 congp' : ∀ {a b} {A : Prop a} {B : Set b} (f : A → B)
       → ∀ {x y : A} → x ≡ᴾ y → f x ≡ f y

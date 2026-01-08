@@ -58,7 +58,7 @@ module Ob (A : Setoid ℓA ℓA') where
       ; sym = isSymmetric
       ; trans = isTransitive } }
 
-open Ob using (F-ob; _≈ꟳ_; mk≈ꟳ; mk≈ꟳ') public
+open Ob using (F-ob) public
 
 module Mor {A B : Setoid ℓA ℓA'} (f : ≈.Hom A B) where
   module A = ≈.Setoid A
