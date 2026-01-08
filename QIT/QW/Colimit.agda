@@ -12,6 +12,11 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
   (P : QIT.QW.Diagram.Diagram ≤p ℓD ℓD')
   where
 
+  private
+    module ≤ = IsPreorder (≤p .proj₂)
+    _≤_ : BinaryRel I ℓ≤
+    _≤_ = ≤p .proj₁
+
   open QIT.QW.Diagram ≤p
   open Diagram P renaming (D-ob to P̂)
 

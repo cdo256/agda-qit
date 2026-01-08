@@ -1,3 +1,4 @@
+{-# OPTIONS --type-in-type #-}
 open import QIT.Prelude
 
 module QIT.QW.Equation {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
@@ -6,7 +7,9 @@ open import Data.Sum
 open import Data.Empty
 open import Data.Product hiding (∃)
 open import QIT.Container.Base
+open import QIT.Container.Functor S P
 open import QIT.Relation.Subset
+open import QIT.Setoid
 
 private
   T = W S P
@@ -32,27 +35,25 @@ module _ {ℓV} {V : Set ℓV} where
   ϕ [ (sup (inj₁ v , _)) ] = ϕ v
   ϕ [ (sup (inj₂ s , f)) ] = sup (s , λ i → ϕ [ f i ])
 
-  record ExprMatch (e : Expr V) (t : T) : Set (ℓS ⊔ ℓP ⊔ ℓV) where
-    field
-      ϕ : V → T
-      match : ϕ [ e ] ≡ t
-
 record Equation ℓV : Set (lsuc ℓV ⊔ ℓS ⊔ ℓP) where
   field
     V : Set ℓV
     lhs : Expr V
     rhs : Expr V
 
-assign : ∀ {ℓV} → {V : Set ℓV} (ϕ : V → T) (e : Expr V) → T
-assign ϕ (sup (inj₁ v , _)) = ϕ v
-assign ϕ (sup (inj₂ s , f)) = sup (s , λ i → assign ϕ (f i))
+module _ {ℓX ℓ≈} (Xα : ≈.Algebra (F ℓX ℓ≈)) where
+  open ≈.Algebra Xα
+  module X = Setoid X
+  assign : ∀ {ℓV} → {V : Set ℓV} (ϕ : V → ⟨ X ⟩) (e : Expr V) → ⟨ X ⟩
+  assign ϕ (sup (inj₁ v , _)) = ϕ v
+  assign ϕ (sup (inj₂ s , f)) = α .≈.Hom.to (s , λ i → assign ϕ (f i))
 
-SatEq : ∀ {ℓV ℓ≈} → Equation ℓV → (_≈_ : T → T → Prop ℓ≈)
-      → Prop (ℓS ⊔ ℓP ⊔ ℓV ⊔ ℓ≈)
-SatEq e _≈_ = ∀ (ϕ : V → T) → assign ϕ lhs ≈ assign ϕ rhs
-  where open Equation e
+  SatEq : ∀ {ℓV} → Equation ℓV
+        → Prop (ℓS ⊔ ℓP ⊔ ℓV)
+  SatEq e = ∀ (ϕ : V → ⟨ X ⟩) → assign ϕ lhs X.≈ assign ϕ rhs
+    where open Equation e
 
-Sat : ∀ {ℓE ℓV ℓ≈} → {E : Set ℓE}
-    → (E → Equation ℓV) → (_≈_ : T → T → Prop ℓ≈)
-    → Prop (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV ⊔ ℓ≈)
-Sat Ξ _≈_ = ∀ e → SatEq (Ξ e) _≈_
+  Sat : ∀ {ℓE ℓV} → {E : Set ℓE}
+      → (E → Equation ℓV)
+      → Prop (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV ⊔ ℓ≈)
+  Sat Ξ = ∀ e → SatEq (Ξ e)

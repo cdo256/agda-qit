@@ -1,12 +1,12 @@
 open import QIT.Prelude
 
-module QIT.Mobile.Diagram (I : Set) (inhabI : ∥ I ∥) where
+module QIT.Mobile.Stage.Homo (I : Set) (inhabI : ∥ I ∥) where
 
 open import QIT.Relation.Binary
 open import QIT.Container.Base
 open import QIT.Mobile.Base I
 open import QIT.Mobile.Functor I
-open import QIT.Setoid
+open import QIT.Setoid as ≈
 open import Data.Product hiding (∃)
 open import Data.Empty renaming (⊥-elim to absurd)
 open import Data.Unit

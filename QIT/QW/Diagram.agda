@@ -9,9 +9,10 @@ module QIT.QW.Diagram {ℓI} {ℓ≤}
   (≤p : Preorder I ℓ≤)
   where
 
-module ≤ = IsPreorder (≤p .proj₂)
-_≤_ : BinaryRel I ℓ≤
-_≤_ = ≤p .proj₁
+private
+  module ≤ = IsPreorder (≤p .proj₂)
+  _≤_ : BinaryRel I ℓ≤
+  _≤_ = ≤p .proj₁
 
 record Diagram ℓD ℓD' : Set (ℓ≤ ⊔ ℓI ⊔ lsuc ℓD ⊔ lsuc ℓD') where
   field

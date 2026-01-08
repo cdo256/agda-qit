@@ -13,7 +13,7 @@ import QIT.Relation.Plump
 import QIT.Relation.Tests
 import QIT.Relation
 
--- Category of Setoid
+-- Category of Setoids
 import QIT.Setoid.Base
 import QIT.Setoid.Indexed
 import QIT.Setoid.Hom
@@ -33,11 +33,15 @@ import QIT.QW.Diagram
 import QIT.QW.Colimit
 import QIT.QW.Cocontinuity
 
+-- Stage Sets
+import QIT.Stage.Base
+import QIT.Stage.Homo
+-- import QIT.Stage.Hetero
+
 -- Mobile construction 
 import QIT.Mobile.Base
+-- import QIT.Mobile.Stage.Hetero
+import QIT.Mobile.Stage.Homo
 import QIT.Mobile.Diagram
 import QIT.Mobile.Functor
-
--- Examples
--- import QIT.Examples.BoundedRational
-import QIT.Examples.HoleList
+-- import QIT.Mobile.Cocontinuity
