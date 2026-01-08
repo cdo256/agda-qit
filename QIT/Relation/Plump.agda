@@ -28,6 +28,13 @@ Z = W Sᶻ Pᶻ
 sucᶻ : Z → Z
 sucᶻ α = sup (∨ˢ , λ _ → α)
 
+_∨ᶻ_ : Z → Z → Z
+_∨ᶻ_ α β = sup (∨ˢ , f)
+  where
+  f : Pᶻ ∨ˢ → W Sᶻ Pᶻ
+  f (lift (inj₁ tt)) = α
+  f (lift (inj₂ tt)) = β
+
 ιᶻ : W S P → Z
 ιᶻ (sup (s , f)) = sup (ιˢ s , λ i → ιᶻ (f i))
 
@@ -132,3 +139,25 @@ isQuasiExtensionalZ = (λ (i≤j , j≤i) → ≤→⊆ i≤j , ≤→⊆ j≤i)
 ≤cong : ∀ s (μ τ : Pᶻ s → Z) → (r : ∀ i → μ i ≤ τ i)
       → sup (s , μ) ≤ sup (s , τ)
 ≤cong s μ τ r = sup≤ λ i → <sup i (r i)
+
+∨ᶻ-l< : {α β : Z} → α < α ∨ᶻ β
+∨ᶻ-l< {α} {β} = <sup (lift (inj₁ tt)) (≤refl α)
+
+∨ᶻ-r< : {α β : Z} → β < α ∨ᶻ β
+∨ᶻ-r< {α} {β} = <sup (lift (inj₂ tt)) (≤refl β)
+
+∨ᶻ-l : {α β : Z} → α ≤ α ∨ᶻ β
+∨ᶻ-l = fi≤sup ∨ˢ _ (lift (inj₁ tt))
+
+∨ᶻ-r : {α β : Z} → β ≤ α ∨ᶻ β
+∨ᶻ-r = fi≤sup ∨ˢ _ (lift (inj₂ tt))
+
+∨ᶻ-flip : {α β : Z} → β ∨ᶻ α ≤ α ∨ᶻ β
+∨ᶻ-flip {α} {β} = sup≤ g
+  where
+  g : (i : Pᶻ ∨ˢ) → _ < (α ∨ᶻ β)
+  g (lift (inj₁ tt)) = <sup (lift (inj₂ tt)) (≤refl β)
+  g (lift (inj₂ tt)) = <sup (lift (inj₁ tt)) (≤refl α)
+
+⊥≤t : ∀ α → ⊥ᶻ ≤ α
+⊥≤t _ = sup≤ λ ()
