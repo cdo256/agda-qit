@@ -3,16 +3,16 @@ open import QIT.Relation.Base
 open import QIT.Relation.Binary
 open import QIT.Setoid
 open import Data.Product
-import QIT.Diagram
+import QIT.QW.Diagram
 
-module QIT.Colimit {ℓI} {ℓ≤} 
+module QIT.QW.Colimit {ℓI} {ℓ≤} 
   {I : Set ℓI}
   (≤p : Preorder I ℓ≤)
   (ℓD ℓD' : Level)
-  (P : QIT.Diagram.Diagram ≤p ℓD ℓD')
+  (P : QIT.QW.Diagram.Diagram ≤p ℓD ℓD')
   where
 
-  open QIT.Diagram ≤p
+  open QIT.QW.Diagram ≤p
   open Diagram P renaming (D-ob to P̂)
 
   Pf : ∀ {i j} (p : i ≤ j) → (⟨ P̂ i ⟩ → ⟨ P̂ j ⟩)

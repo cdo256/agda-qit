@@ -4,7 +4,7 @@ open import QIT.Relation.Base
 open import QIT.Relation.Binary
 open import Data.Product
 
-module QIT.Cocontinuity {ℓI} {ℓ≤}
+module QIT.QW.Cocontinuity {ℓI} {ℓ≤}
   {I : Set ℓI}
   (≤p : Preorder I ℓ≤) where
 
@@ -13,8 +13,8 @@ module _ {ℓD ℓD' : Level} where
     ℓc = ℓI ⊔ ℓD
     ℓc' = ℓI ⊔ ℓ≤ ⊔ ℓD ⊔ ℓD'
 
-  open import QIT.Diagram ≤p
-  open import QIT.Colimit ≤p ℓc ℓc'
+  open import QIT.QW.Diagram ≤p
+  open import QIT.QW.Colimit ≤p ℓc ℓc'
 
   Cocontinuous : (F : ≈.Functor ℓc ℓc' ℓc ℓc') (P : Diagram ℓc ℓc') → Prop ℓc'
   Cocontinuous F P =

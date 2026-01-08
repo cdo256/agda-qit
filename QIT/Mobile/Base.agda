@@ -1,7 +1,7 @@
 module QIT.Mobile.Base (I : Set) where
 
 open import QIT.Prelude
-open import QIT.Container
+open import QIT.Container.Base
 open import Data.Product
 
 data Sᵀ : Set where

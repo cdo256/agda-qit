@@ -4,7 +4,7 @@ open import QIT.Relation.Binary
 open import QIT.Setoid
 open import Data.Product
 
-module QIT.Diagram {ℓI} {ℓ≤}
+module QIT.QW.Diagram {ℓI} {ℓ≤}
   {I : Set ℓI}
   (≤p : Preorder I ℓ≤)
   where

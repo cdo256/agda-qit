@@ -1,4 +1,4 @@
-module QIT.Container where
+module QIT.Container.Base where
 
 open import QIT.Prelude
 open import Data.Product hiding (map)

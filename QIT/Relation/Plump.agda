@@ -1,6 +1,6 @@
 open import QIT.Prelude
 open import QIT.Relation.Binary
-open import QIT.Container
+open import QIT.Container.Base
 
 open import Data.Product
 open import Data.Sum

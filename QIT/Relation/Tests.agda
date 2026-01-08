@@ -5,7 +5,8 @@ module Test1 where
   open import Data.Unit as ⊤
   open import Data.Empty as ⊥
   open import Data.Product as ×
-  open import QIT.Container
+
+  open import QIT.Container.Base
   data S : Set where
     zero : S
     suc : S
