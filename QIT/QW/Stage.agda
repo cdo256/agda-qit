@@ -76,7 +76,8 @@ D = record
     { to = pweaken α≤β
     ; cong = ≈pweaken α≤β }
   Id : ∀ {α} → (Hom (≤refl α)) ≈h ≈.idHom
-  Id {α} {ŝ} {t̂} p = p
+  Id {α} {ŝ} = ≈prefl
   Comp : ∀ {α β γ} (p : α ≤ β) (q : β ≤ γ) →
       Hom (≤≤ q p) ≈h (Hom q ≈.∘ Hom p)
-  Comp {α} {β} {γ} p q {ŝ} {t̂} s≈t = ≈pweaken q (≈pweaken p s≈t)
+  Comp {α} {β} {γ} p q {ŝ} =
+    ≈pweaken q (≈pweaken p (≈prefl {t̂ = ŝ}))

@@ -3,6 +3,8 @@ module QIT.Setoid.Hom where
 open import QIT.Prelude
 open import QIT.Setoid.Base
 
+-- Homomorphism for setoids are just functions that preserve
+-- equivalence between maps.
 record Hom {ℓS ℓS' ℓT ℓT'}
        (S : Setoid ℓS ℓS') (T : Setoid ℓT ℓT') : Set (ℓS ⊔ ℓS' ⊔ ℓT ⊔ ℓT')
        where
@@ -12,16 +14,17 @@ record Hom {ℓS ℓS' ℓT ℓT'}
     to : S.Carrier → T.Carrier
     cong : ∀ {x y} → x S.≈ y → to x T.≈ to y
 
+-- The identity homomorphism
 idHom : ∀ {ℓ ℓ'} → {S : Setoid ℓ ℓ'} → Hom S S
 idHom {S} = record
   { to = λ x → x
   ; cong = λ p → p }
 
+-- Equation
 _≈h_ : ∀ {ℓS ℓS' ℓT ℓT'} → {S : Setoid ℓS ℓS'} {T : Setoid ℓT ℓT'}
-     → (f g : Hom S T) → Prop (ℓS ⊔ ℓS' ⊔ ℓT')
-_≈h_ {S = S} {T} f g = ∀ {x y} → x S.≈ y → f.to x T.≈ g.to y
+     → (f g : Hom S T) → Prop (ℓS ⊔ ℓT')
+_≈h_ {T = T} f g = ∀ {x} → f.to x T.≈ g.to x
   where
-  module S = Setoid S
   module T = Setoid T
   module f = Hom f
   module g = Hom g

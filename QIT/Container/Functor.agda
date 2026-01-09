@@ -76,6 +76,12 @@ module F-Mor {A B : Setoid ℓA ℓA'} (f : ≈.Hom A B) where
 
 open F-Mor using (F-mor) public
 
+F-id : {S : Setoid ℓA ℓA'} → F-mor {A = S} ≈.idHom ≈h ≈.idHom
+F-id {S} {s , f} = F-Ob.mk≈ꟳ ≡.refl λ p → S.refl {f p}
+  where
+  module S = ≈.Setoid S
+
+
 module F-Comp {S T U : Setoid ℓA ℓA'} (f : ≈.Hom S T) (g : ≈.Hom T U) where
   module S = ≈.Setoid S
   module T = ≈.Setoid T
@@ -85,8 +91,8 @@ module F-Comp {S T U : Setoid ℓA ℓA'} (f : ≈.Hom S T) (g : ≈.Hom T U) wh
   open F-Ob
 
   F-comp : F-mor (g ≈.∘ f) ≈h (F-mor g ≈.∘ F-mor f)
-  F-comp (mk≈ꟳ fst≡ snd≈) =
-    mk≈ꟳ fst≡ λ p → (≈.Hom.cong g) ((≈.Hom.cong f) (snd≈ p))
+  F-comp =
+    mk≈ꟳ ≡.refl λ p → (≈.Hom.cong g) (≈.Hom.cong f f.S.refl)
 
 open F-Comp using (F-comp) public
 
@@ -103,8 +109,7 @@ module F-Resp
   open F-Mor hiding (F-mor)
 
   F-resp : F-mor f ≈h F-mor g
-  F-resp (mk≈ꟳ fst≡ snd≈) =
-    mk≈ꟳ fst≡ λ p → f≈g (snd≈ p)
+  F-resp = mk≈ꟳ ≡.refl λ _ → f≈g
 
 open F-Resp using (F-resp) public
 
@@ -112,6 +117,7 @@ F : ≈.Functor ℓA ℓA' (ℓS ⊔ ℓP ⊔ ℓA) (ℓS ⊔ ℓP ⊔ ℓA')
 F = record
   { F-ob = F-ob
   ; F-mor = F-mor
-  ; F-id = λ p → p
+  ; F-id = F-id
   ; F-comp = F-comp
   ; F-resp = F-resp }
+

@@ -41,31 +41,28 @@ _∘_ {ℓD} {ℓD'} {ℓF} {ℓF'} F P = record
   D-mor p = record
     { to = F.F-mor (P.D-mor p) .≈.Hom.to
     ; cong = F.F-mor (P.D-mor _) .≈.Hom.cong }
-  D-id : ∀ {i} → {x y : ⟨ D-ob i ⟩}
-       → D-ob i ⊢ x ≈ y
-       → D-ob i ⊢ F.F-mor (P.D-mor ≤.refl) .≈.Hom.to x ≈ y
-  D-id {i} {x} {y} x≈y = D-ob i .trans u (F.F-id x≈y)
+  D-id : ∀ {i} → {x : ⟨ D-ob i ⟩}
+       → D-ob i ⊢ F.F-mor (P.D-mor ≤.refl) .≈.Hom.to x ≈ x
+  D-id {i} {x} = D-ob i .trans u F.F-id 
     where
     open ≈.Setoid
     open ≈.Hom
     open import QIT.Relation.Binary
-    u : D-ob i ⊢ (F.F-mor (P.D-mor ≤.refl ) .to x)
+    u : D-ob i ⊢ (F.F-mor (P.D-mor ≤.refl) .to x)
                ≈ (F.F-mor ≈.idHom) .to x
-    u = F.F-resp (P.D-mor _) ≈.idHom P.D-id (F.F-ob (P.D-ob i) .refl)
+    u = F.F-resp (P.D-mor _) ≈.idHom P.D-id
   D-comp : ∀ {i j k} → (p : i ≤ j) (q : j ≤ k)
          → D-mor (≤.trans p q) ≈h (D-mor q ≈.∘ D-mor p)
-  D-comp {i} {j} {k} p q {x} {y} x≈y =
+  D-comp {i} {j} {k} p q {x} =
     begin
       to (D-mor (≤.trans p q)) x
         ≈⟨ D-ob _ .refl ⟩
       to (F.F-mor (P.D-mor (≤.trans p q))) x
         ≈⟨ F.F-resp (P.D-mor _) (P.D-mor _ ≈.∘ P.D-mor _)
-                    (P.D-comp p q) (D-ob _ .refl) ⟩
+                    (P.D-comp p q) ⟩
       to (F.F-mor (P.D-mor q ≈.∘ P.D-mor p )) x
-        ≈⟨ F.F-comp _ _ x≈y ⟩
-      to (F.F-mor (P.D-mor q) ≈.∘ F.F-mor (P.D-mor p)) y
-        ≈⟨ D-ob _ .refl ⟩
-      to (D-mor q ≈.∘ D-mor p) y ∎
+        ≈⟨ F.F-comp (P.D-mor _) (P.D-mor _) ⟩
+      to (D-mor q ≈.∘ D-mor p) x ∎
     where
     open ≈.≈syntax {S = D-ob k}
     open ≈.Setoid

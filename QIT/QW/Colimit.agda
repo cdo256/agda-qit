@@ -85,7 +85,7 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
   LimitCocone = record
     { Apex     = Colim
     ; inj      = λ i → record { to = λ x → i , x ; cong = ≈lstage i }
-    ; commutes = λ p {x = x} {y = y} q → ≈ltrans (≈lstage _ q) (≈lstep p y)
+    ; commutes = λ p {x = x} → ≈lstep p x
     }
 
   -- Morphisms of cocones
@@ -119,7 +119,7 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
     isRespecting : ∀ {i j x y} → (i , x) ≈ˡ (j , y) →
                    f (i , x) ApexSetoid.≈ f (j , y)
     isRespecting (≈lstage i x≈y) = C' .inj i .cong x≈y
-    isRespecting (≈lstep p x)    = C'.commutes p (P̂ _ .Setoid.refl)
+    isRespecting (≈lstep p x)    = C'.commutes p
     isRespecting (≈lsym r)       = ApexSetoid.sym (isRespecting r)
     isRespecting (≈ltrans r s)   =
       ApexSetoid.trans (isRespecting r) (isRespecting s)
@@ -127,19 +127,19 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
     F : ColimMorphism LimitCocone C'
     F .apexHom .to  = f
     F .apexHom .cong = isRespecting
-    F .commutes i {x} {y} p =
-      (C'.inj (LimitCocone .inj i .to x .proj₁)) .cong p
+    F .commutes i {x} =
+      C'.inj (LimitCocone .inj i .to x .proj₁)
+        .cong (P̂ i .≈.Setoid.refl)
 
     unq : (G : ColimMorphism LimitCocone C') →
           ∀ x → G .apexHom .to x ApexSetoid.≈ f x
-    unq G (i , x) = G .commutes i ((P̂ _) .Setoid.refl)
+    unq G (i , x) = G .commutes i
 
   isLimitingCoconeLimitCocone : isLimitingCocone LimitCocone
   isLimitingCoconeLimitCocone = record
     { mor    = F
-    ; unique = λ C' G x →
-        C' .ApexSetoid.trans
-          (≈.Hom.cong (G .apexHom) x)
-          (G .commutes _ (P̂ _ .Setoid.refl))
+    ; unique = λ C' G → G .commutes _
     }
-    where open IsLimitingCocone
+    where
+    open IsLimitingCocone
+
