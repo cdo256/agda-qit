@@ -2,9 +2,9 @@
 open import QIT.Prelude
 open import QIT.QW.Signature
 
-module QIT.Stage.Homo {ℓS ℓP ℓE ℓV} (qw : Sig ℓS ℓP ℓE ℓV) where
+module QIT.Stage.Homo {ℓS ℓP ℓE ℓV} (sig : Sig ℓS ℓP ℓE ℓV) where
 
-open Sig qw
+open Sig sig
 
 open import QIT.Relation.Binary
 open import QIT.Container.Base
@@ -17,27 +17,10 @@ open import Data.Sum
 open import QIT.Relation.Subset
 open import QIT.Relation.Plump S P
 open import QIT.QW.Diagram ≤p
+open import QIT.QW.W sig
 open import QIT.Stage.Base S P
 open import Data.Maybe
 open import Data.Product.Properties
-
-private
-  T = W S P
-
-T-alg : ≈.Algebra (F ℓ0 ℓ0)
-T-alg = record
-  { X = ≡setoid T
-  ; α = record
-    { to = sup
-    ; cong = α-cong } }
-  where
-  open ≈.Functor (F ℓ0 ℓ0)
-  open Ob ℓ0 ℓ0 (≡setoid T)
-  α-cong : ∀ {sf} {tg} → sf ≈ꟳ tg → sup sf ≡p sup tg
-  α-cong {s , f} {s , g} (mk≈ꟳ ≡.refl snd≈) = q (funExtp snd≈)
-    where
-    q : f ≡p g → sup (s , f) ≡p sup (s , g)
-    q ∣ ≡.refl ∣ = ∣ ≡.refl ∣
 
 
 open import QIT.QW.Equation S P
@@ -57,8 +40,8 @@ lhs' e ϕ = assign T-alg ϕ (lhs e)
 rhs' : ∀ e (ϕ : V e → T) → T
 rhs' e ϕ = assign T-alg ϕ (rhs e)
 
-data _⊢_≈ᵇ_ : (α : Z) → P₀ α → P₀ α → Prop (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV) where
-  ≈pcong : ∀ a μ (f g : ∀ i → P₀ (μ i))
+data _⊢_≈ᵇ_ : (α : Z) → D₀ α → D₀ α → Prop (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV) where
+  ≈pcong : ∀ a μ (f g : ∀ i → D₀ (μ i))
         → (r : ∀ i → μ i ⊢ f i ≈ᵇ g i)
         → sup (ιˢ a , μ) ⊢ psup a μ f ≈ᵇ psup a μ g
   ≈psat : ∀ {α} e (ϕ : V e → T)
@@ -69,26 +52,26 @@ data _⊢_≈ᵇ_ : (α : Z) → P₀ α → P₀ α → Prop (ℓS ⊔ ℓP ⊔
   ≈prefl : ∀ {α t̂} → α ⊢ t̂ ≈ᵇ t̂
   ≈psym : ∀ {α ŝ t̂} → α ⊢ ŝ ≈ᵇ t̂ → α ⊢ t̂ ≈ᵇ ŝ
   ≈ptrans : ∀ {α ŝ t̂ û} → α ⊢ ŝ ≈ᵇ t̂ → α ⊢ t̂ ≈ᵇ û → α ⊢ ŝ ≈ᵇ û
-  ≈pweaken : ∀ {α β} → (α≤β : α ≤ β) → {ŝ t̂ : P₀ α}
+  ≈pweaken : ∀ {α β} → (α≤β : α ≤ β) → {ŝ t̂ : D₀ α}
           → α ⊢ ŝ ≈ᵇ t̂ → β ⊢ pweaken α≤β ŝ ≈ᵇ pweaken α≤β t̂
 
-G : (α : Z) → Setoid ℓ0 ℓ0
-G α = record
-  { Carrier = P₀ α
+D̃ : (α : Z) → Setoid ℓ0 ℓ0
+D̃ α = record
+  { Carrier = D₀ α
   ; _≈_ = α ⊢_≈ᵇ_
   ; isEquivalence = record
     { refl = ≈prefl
     ; sym = ≈psym
-    ; trans = ≈ptrans  } }
+    ; trans = ≈ptrans } }
 
 D : Diagram ℓ0 ℓ0
 D = record
-  { D-ob = G
+  { D-ob = D̃ 
   ; D-mor = Hom
   ; D-id = Id
   ; D-comp = Comp }
   where
-  Hom : ∀ {α β} → α ≤ β → ≈.Hom (G α) (G β)
+  Hom : ∀ {α β} → α ≤ β → ≈.Hom (D̃ α) (D̃ β)
   Hom {α} {β} α≤β = record
     { to = pweaken α≤β
     ; cong = ≈pweaken α≤β }

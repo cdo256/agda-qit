@@ -11,11 +11,11 @@ open import QIT.Relation.Subset
 private
   T = W S P
 
-P₀ : (α : Z) → Set (ℓS ⊔ ℓP)
-P₀ α = ΣP T (_≤ᵀ α)
+D₀ : (α : Z) → Set (ℓS ⊔ ℓP)
+D₀ α = ΣP T (_≤ᵀ α)
 
-psup : ∀ a μ (f : ∀ i → P₀ (μ i)) → P₀ (sup (ιˢ a , μ))
+psup : ∀ a μ (f : ∀ i → D₀ (μ i)) → D₀ (sup (ιˢ a , μ))
 psup a μ f = sup (a , λ i → f i .fst) , sup≤ (λ i → <sup i (f i .snd))
 
-pweaken : ∀ {α β} → α ≤ β → P₀ α → P₀ β
+pweaken : ∀ {α β} → α ≤ β → D₀ α → D₀ β
 pweaken α≤β (t , t≤α) = t , ≤≤ α≤β t≤α

@@ -43,7 +43,4 @@ import QIT.Stage.Homo
 -- Mobile construction 
 import QIT.Mobile.Base
 -- import QIT.Mobile.Stage.Hetero
-import QIT.Mobile.Stage.Homo
-import QIT.Mobile.Diagram
-import QIT.Mobile.Functor
--- import QIT.Mobile.Cocontinuity
+import QIT.Mobile.Cocontinuity
