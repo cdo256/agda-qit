@@ -33,29 +33,28 @@ private
   R = F.F-ob (Colim D)
 
 ϕ₀ : ⟨ Colim (F ∘ D) ⟩ → ⟨ F.F-ob (Colim D) ⟩
-ϕ₀ (i , (l , _)) = l , (λ ())
-ϕ₀ (i , (n , f)) = n , (λ b → i , f b)
+ϕ₀ (α , (l , _)) = l , (λ ())
+ϕ₀ (α , (n , f)) = n , (λ b → α , f b)
 
-mutual
-  ϕ-cong : ∀ {x y} → Colim (F ∘ D) [ x ≈ y ] → F.F-ob (Colim D) [ ϕ₀ x ≈ ϕ₀ y ]
-  ϕ-cong (≈lstage i e) = ϕ-cong-inner i e
-  ϕ-cong (≈lstep {i} {j} p (l , _)) = mk≈ꟳ ≡.refl λ()
-  ϕ-cong (≈lstep {i} {j} (sup≤ p) (n , f)) =
-    mk≈ꟳ ≡.refl λ k → ≈lstep (sup≤ p) (f k)
-  ϕ-cong (≈lsym p) = ≈fsym (Colim D) (ϕ-cong p)
-  ϕ-cong (≈ltrans p q) = ≈ftrans (Colim D) (ϕ-cong p) (ϕ-cong q)
-
-  ϕ-cong-inner : ∀ i {x y} → F∘D.D-ob i [ x ≈ y ] → F.F-ob (Colim D) [ ϕ₀ (i , x) ≈ ϕ₀ (i , y) ]
-  ϕ-cong-inner i {l , f} {l , g} (mk≈ꟳ ≡.refl snd≈) = {!!}
-  ϕ-cong-inner i {n , f} {n , g} (mk≈ꟳ ≡.refl snd≈) =
-    mk≈ꟳ ≡.refl q
+ϕ-cong-stage : ∀ α {x y} → F∘D.D-ob α [ x ≈ y ] → F.F-ob (Colim D) [ ϕ₀ (α , x) ≈ ϕ₀ (α , y) ]
+ϕ-cong-stage α {l , f} {l , g} (mk≈ꟳ ≡.refl snd≈) =
+  mk≈ꟳ ≡.refl λ()
+ϕ-cong-stage α {n , f} {n , g} (mk≈ꟳ ≡.refl snd≈) =
+  mk≈ꟳ ≡.refl q
+  where
+  q : (i : I) → Colim D [ α , f i ≈ α , g i ]
+  q i = ≈lstage α u
     where
-    q : (x : Pᵀ (ϕ₀ (i , n , f) .proj₁)) →
-         (Colim D Setoid.≈ ϕ₀ (i , n , f) .proj₂ x)
-         (ϕ₀ (i , n , g) .proj₂ x)
-  -- ϕ-cong-inner i (≈node c) = ≈node λ b → ≈lstage i (c b)
-  -- ϕ-cong-inner i (≈perm π) = ≈perm π
-  -- ϕ-cong-inner i (≈trans p q) = ≈trans (ϕ-cong-inner i p) (ϕ-cong-inner i q)
+    u :  α ⊢ f i ≈ᵇ g i
+    u = snd≈ i
+
+ϕ-cong : ∀ {x y} → Colim (F ∘ D) [ x ≈ y ] → F.F-ob (Colim D) [ ϕ₀ x ≈ ϕ₀ y ]
+ϕ-cong (≈lstage α e) = ϕ-cong-stage α e
+ϕ-cong (≈lstep {α} {j} p (l , _)) = mk≈ꟳ ≡.refl λ()
+ϕ-cong (≈lstep {α} {j} (sup≤ p) (n , f)) =
+  mk≈ꟳ ≡.refl λ k → ≈lstep (sup≤ p) (f k)
+ϕ-cong (≈lsym p) = ≈fsym (Colim D) (ϕ-cong p)
+ϕ-cong (≈ltrans p q) = ≈ftrans (Colim D) (ϕ-cong p) (ϕ-cong q)
 
 
 -- ψ₀ : ⟨ F.F-ob (Colim D) ⟩ → ⟨ Colim (F ∘ D) ⟩
