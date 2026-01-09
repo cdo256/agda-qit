@@ -52,46 +52,124 @@ private
 ϕ-cong (≈ltrans p q) = ≈ftrans (Colim D) (ϕ-cong p) (ϕ-cong q)
 
 
--- ψ₀ : ⟨ F.F-ob (Colim D) ⟩ → ⟨ Colim (F ∘ D) ⟩
--- ψ₀ (l , _) = ⊥ᶻ , l , λ()
--- ψ₀ (n , f) = α , n , g
---   where
---   μ : I → Z
---   μ i = f i .proj₁
---   α : Z
---   α = sup (ιˢ n , μ)
---   h : (i : I) → P₀ (μ i)
---   h i = f i .proj₂
---   g : I → P₀ α
---   g i = pweaken (child≤ (ιˢ n) μ i) (h i)
+ψ₀ : ⟨ F.F-ob (Colim D) ⟩ → ⟨ Colim (F ∘ᴰ D) ⟩
+ψ₀ (l , _) = ⊥ᶻ , l , λ()
+ψ₀ (n , f) = α , n , g
+  where
+  μ : I → Z
+  μ i = f i .proj₁
+  α : Z
+  α = sup (ιˢ n , μ)
+  h : (i : I) → D₀ (μ i)
+  h i = f i .proj₂
+  g : I → D₀ α
+  g i = pweaken (child≤ (ιˢ n) μ i) (h i)
 
--- ψ-cong : ∀ {x y} → F.F-ob (Colim D) [ x ≈ y ] → Colim (F ∘ D) [ ψ₀ x ≈ ψ₀ y ]
--- -- ψ-cong ≈leaf = ≈lstage ⊥ᶻ ≈leaf
--- -- ψ-cong (≈node {f} {g} c) = begin
--- --   nf , n , (λ i → pweaken (sup≤ (λ x → <sup x (f x .proj₂ .snd))) {!!})
--- --     ≈⟨ {!!} ⟩
--- --   ng , {!!} ∎
--- --   where
--- --   nf : Z
--- --   nf = sup (ιˢ n , λ i → f i .proj₁)
--- --   ng : Z
--- --   ng = sup (ιˢ n , λ i → g i .proj₁)
--- --   open ≈.Hom
--- --   open Setoid (Colim (F ∘ D))
--- --   open ≈.≈syntax {S = Colim (F ∘ D)}
+record Bounded≈ (s t : T) : Set (lsuc ℓ0) where
+  constructor mkBounded≈
+  field
+    γ : Z
+    s≤γ : s ≤ᵀ γ
+    t≤γ : t ≤ᵀ γ
+    s≈t : γ ⊢ (s , s≤γ) ≈ᵇ (t , t≤γ)
+
+ψ-cong : ∀ {x y} → F.F-ob (Colim D) [ x ≈ y ] → Colim (F ∘ᴰ D) [ ψ₀ x ≈ ψ₀ y ]
+ψ-cong {l , f} {l , g} (mk≈ꟳ ≡.refl snd≈) = begin
+  ψ₀ (l , f)
+    ≈⟨ ≈lrefl (F ∘ᴰ D) ⟩
+  (⊥ᶻ , l , λ())
+    ≈⟨ ≈lrefl (F ∘ᴰ D) ⟩
+  ψ₀ (l , g) ∎
+  where
+  open ≈.Hom
+  open Setoid (Colim (F ∘ᴰ D))
+  open ≈.≈syntax {S = Colim (F ∘ᴰ D)}
+ψ-cong {n , f} {n , g} (mk≈ꟳ ≡.refl snd≈) = begin
+  ψ₀ (n , f)
+    ≈⟨ ≈lrefl (F ∘ᴰ D) ⟩
+  (αf , n , λ i → tf i , _)
+    ≈⟨ ≈lstep ∨ᶻ-l (n , _) ⟩
+  (αf ∨ᶻ αg , n , λ i → tf i , ≤≤ ∨ᶻ-l (≤≤ (child≤ _ _ _) (fi≤μi i)))
+    ≈⟨ ≈lstage (αf ∨ᶻ αg) inner ⟩
+  (αf ∨ᶻ αg , n , λ i → tg i , ≤≤ ∨ᶻ-r (≤≤ (child≤ _ _ _) (gi≤μi i)))
+    ≈⟨ ≈lsym (≈lstep ∨ᶻ-r (n , _)) ⟩
+  (αg , n , λ i → tg i , _)
+    ≈⟨ ≈lrefl (F ∘ᴰ D) ⟩
+  ψ₀ (n , g) ∎
+  where
+  μf : I → Z
+  μf i = f i .proj₁
+  μg : I → Z
+  μg i = g i .proj₁
+  αf = sup (ιˢ n , μf)
+  αg = sup (ιˢ n , μg)
+  α = αf ∨ᶻ αg
+  tf : I → T
+  tf i = f i .proj₂ .fst
+  tg : I → T
+  tg i = g i .proj₂ .fst
+  fi≤μi : ∀ i → tf i ≤ᵀ μf i
+  fi≤μi i = f i .proj₂ .snd
+  gi≤μi : ∀ i → tg i ≤ᵀ μg i
+  gi≤μi i = g i .proj₂ .snd
+  inner : F.F-ob (D.D-ob α) [ n , (λ i → tf i , _) ≈ n , (λ i → tg i , _) ]
+  inner = mk≈ꟳ ≡.refl λ i → v i 
+    where
+    v : ∀ i → α ⊢ (tf i , _) ≈ᵇ (tg i , _)
+    v i = {!!}
+    u : ∀ i → Colim D [ f i ≈ g i ]
+      → ∀ α → (f i .proj₂ .fst ≤ᵀ α) → (g i .proj₂ .fst ≤ᵀ α) → α ⊢ (tf i , _) ≈ᵇ (tg i , _)
+    u i = {! !}
+      where
+      C : ∀ {s t} → Colim D [ s ≈ t ] → Prop (lsuc ℓ0)
+      C {α , s , s≤α} {β , t , t≤β} p = ∥ Bounded≈ s t ∥
+      c-stage : ∀ α {s t} (e : α ⊢ s ≈ᵇ t) → C (≈lstage α e)
+      c-stage α {s} {t} e = ∣ record { γ = α ; s≤γ = s .snd ; t≤γ = t .snd ; s≈t = e } ∣
+      c-step : ∀ {α β} (p : α ≤ β) (x : D₀ α) → C (≈lstep p x)
+      c-step = {!!}
+      c-sym : ∀ {s t} → (p : Colim D [ s ≈ t ]) → C p → C (≈lsym p)
+      c-sym _ ∣ mkBounded≈ γ s≤γ t≤γ s≈t ∣ =
+        ∣ (mkBounded≈ γ t≤γ s≤γ (≈psym s≈t)) ∣
+      c-trans : ∀ {s t u} → (p : Colim D [ s ≈ t ]) → (q : Colim D [ t ≈ u ])
+              → C p → C q → C (≈ltrans p q)
+      c-trans {_ , s} {_ , t} {_ , u} _ _
+        ∣ mkBounded≈ α s≤α t≤α s≈t ∣
+        ∣ mkBounded≈ β t≤β u≤β t≈u ∣ =
+          ∣ (mkBounded≈ (α ∨ᶻ β) (≤≤ ∨ᶻ-l s≤α) (≤≤ ∨ᶻ-r u≤β) q) ∣
+        where
+        q : (α ∨ᶻ β) ⊢ (s .fst , ≤≤ ∨ᶻ-l s≤α) ≈ᵇ (u .fst , ≤≤ ∨ᶻ-r u≤β)
+        q = {!!}
+      r = recˡ D C c-stage c-step {!!} {!!}
+  open ≈.Hom
+  open Setoid (Colim (F ∘ᴰ D))
+  open ≈.≈syntax {S = Colim (F ∘ᴰ D)}
+
+-- ψ-cong ≈leaf = ≈lstage ⊥ᶻ ≈leaf
+-- ψ-cong (≈node {f} {g} c) = begin
+--   nf , n , (λ i → pweaken (sup≤ (λ x → <sup x (f x .proj₂ .snd))) {!!})
+--     ≈⟨ {!!} ⟩
+--   ng , {!!} ∎
+--   where
+--   nf : Z
+--   nf = sup (ιˢ n , λ i → f i .proj₁)
+--   ng : Z
+--   ng = sup (ιˢ n , λ i → g i .proj₁)
+--   open ≈.Hom
+--   open Setoid (Colim (F ∘ᴰ D))
+--   open ≈.≈syntax {S = Colim (F ∘ᴰ D)}
 
 -- ψ-cong {x} {y} (≈perm π) = {!!}
 -- ψ-cong {x} {y} (≈trans x≈y x≈y₁) = {!!}
 
--- -- ψ-cong ≈leaf = ≈lstage 𝟘 ≈leaf
--- -- ψ-cong (≈node {f} {g} c) = {!begin
--- --   nf , (n , λ b → weaken (f1 b) nf (child≤ n f1 b) (f2 b))
--- --     ≈⟨ ≈lstep (∨ᵗ-l nf ng) u ⟩
--- --   nf ∨ᵗ ng , (n , λ b → weaken nf (nf ∨ᵗ ng) _ (weaken (f1 b) nf _ (f2 b)))
--- --     ≈⟨ ≈lstage (nf ∨ᵗ ng) (≈node c') ⟩
--- --   nf ∨ᵗ ng , (n , λ b → weaken ng (nf ∨ᵗ ng) _ (weaken (g1 b) ng _ (g2 b)))
--- --     ≈⟨ ≈lsym (≈lstep (∨ᵗ-r nf ng) (n , (λ b → weaken (g1 b) ng _ (g2 b)))) ⟩
--- --   ng , (n , λ b → weaken (g1 b) ng (child≤ n g1 b) (g2 b)) ∎!}
+-- ψ-cong ≈leaf = ≈lstage 𝟘 ≈leaf
+-- ψ-cong (≈node {f} {g} c) = {!begin
+--   nf , (n , λ b → weaken (f1 b) nf (fi≤sup n f1 b) (f2 b))
+--     ≈⟨ ≈lstep (∨ᵗ-l nf ng) u ⟩
+--   nf ∨ᵗ ng , (n , λ b → weaken nf (nf ∨ᵗ ng) _ (weaken (f1 b) nf _ (f2 b)))
+--     ≈⟨ ≈lstage (nf ∨ᵗ ng) (≈node c') ⟩
+--   nf ∨ᵗ ng , (n , λ b → weaken ng (nf ∨ᵗ ng) _ (weaken (g1 b) ng _ (g2 b)))
+--     ≈⟨ ≈lsym (≈lstep (∨ᵗ-r nf ng) (n , (λ b → weaken (g1 b) ng _ (g2 b)))) ⟩
+--   ng , (n , λ b → weaken (g1 b) ng (fi≤sup n g1 b) (g2 b)) ∎!}
 -- ψ-cong (≈node {f} {g} c) = begin
 --   α1 , n , h1
 --     ≈⟨ ≈lstep {!!} (n , h1) ⟩
@@ -133,7 +211,7 @@ private
 --     c-sym _ p = ≈pisym p
 --     c-trans : ∀ {s t u} (r₁ : Colim D [ s ≈ t ]) (r₂ : Colim D [ t ≈ u ]) → C r₁ → C r₂ → C (≈ltrans r₁ r₂)
 --     c-trans _ _ p q = ≈pitrans p q
---   β : t1 ≈ᴾᴵ t2 → Colim (F ∘ D) [ α1 , n , h1 ≈ α2 , n , h2 ]
+--   β : t1 ≈ᴾᴵ t2 → Colim (F ∘ᴰ D) [ α1 , n , h1 ≈ α2 , n , h2 ]
 --   β (mkPI α s≤α t≤α e) = begin
 --     α1 , n , h1
 --       ≈⟨ ≈lstep (≤≤ ∨ᶻ-r ∨ᶻ-l) (n , h1) ⟩
@@ -167,8 +245,8 @@ private
 --       open Setoid (F∘D.D-ob (α ∨ᶻ (α1 ∨ᶻ α2)))
 --       open ≈.≈syntax {S = F∘D.D-ob (α ∨ᶻ (α1 ∨ᶻ α2))}
 --     open ≈.Hom
---     open Setoid (Colim (F ∘ D))
---     open ≈.≈syntax {S = Colim (F ∘ D)}
+--     open Setoid (Colim (F ∘ᴰ D))
+--     open ≈.≈syntax {S = Colim (F ∘ᴰ D)}
     
 -- --   c' : ∀ b → P (nf ∨ᵗ ng) [ weaken nf (nf ∨ᵗ ng) _ (weaken (f1 b) nf _ (f2 b))
 -- --                           ≈ weaken ng (nf ∨ᵗ ng) _ (weaken (g1 b) ng _ (g2 b)) ]
@@ -188,9 +266,9 @@ private
 -- --     import QIT.Setoid.Indexed as Indexed
 -- --     open Indexed.≈syntax Pᴵ
 --   open ≈.Hom
---   open Setoid (Colim (F ∘ D))
---   open ≈.≈syntax {S = Colim (F ∘ D)}
--- --   u : ⟨ F∘D.D-ob nf ⟩
+--   open Setoid (Colim (F ∘ᴰ D))
+--   open ≈.≈syntax {S = Colim (F ∘ᴰ D)}
+-- --   u : ⟨ F∘ᴰD.D-ob nf ⟩
 -- --   u = n , (λ b → weaken (f1 b) nf _ (f2 b))
 -- -- -- ψ-cong (≈perm {f} π) = u
 -- -- --   where
@@ -208,7 +286,7 @@ private
 -- -- --   le : sup (n , λ b → f b .proj₁) ≤ sup (n , λ b → f (π' b) .proj₁)
 -- -- --   le = sup≤ λ b → <sup (π .↔.from b)
 -- -- --     (substp (λ ○ → f b .proj₁ ≤ f ○ .proj₁) (≡.sym (↔.linv π b)) (≤refl (f b .proj₁)))
--- -- --   u : Colim (F ∘ D)
+-- -- --   u : Colim (F ∘ᴰ D)
 -- -- --     [ sup (n , λ b → f b .proj₁) , (n , g)
 -- -- --     ≈ sup (n , λ b → f (π' b) .proj₁) , (n , h) ]
 -- -- --   u = begin
@@ -232,11 +310,11 @@ private
 -- -- --       where
 -- -- --       import QIT.Setoid.Indexed as Indexed
 -- -- --       open Indexed.≈syntax Pᴵ
--- -- --     open Setoid (Colim (F ∘ D))
--- -- --     open ≈.≈syntax {S = Colim (F ∘ D)}
+-- -- --     open Setoid (Colim (F ∘ᴰ D))
+-- -- --     open ≈.≈syntax {S = Colim (F ∘ᴰ D)}
 -- -- --   open ≈.Hom
--- -- --   open Setoid (Colim (F ∘ D))
--- -- --   open ≈.≈syntax {S = Colim (F ∘ D)}
+-- -- --   open Setoid (Colim (F ∘ᴰ D))
+-- -- --   open ≈.≈syntax {S = Colim (F ∘ᴰ D)}
 -- -- -- ψ-cong (≈trans p q) = ≈ltrans (ψ-cong p) (ψ-cong q)
 
 -- -- -- linv : ∀ y → F.F-ob (Colim D) [ (ϕ₀ (ψ₀ y)) ≈ y ]
@@ -269,7 +347,7 @@ private
 -- -- --   --   open ≈.Hom
 -- -- --   open ≈.≈syntax {S = (F.F-ob (Colim D))}
 
--- -- -- rinv : ∀ x → Colim (F ∘ D) [ (ψ₀ (ϕ₀ x)) ≈ x ]
+-- -- -- rinv : ∀ x → Colim (F ∘ᴰ D) [ (ψ₀ (ϕ₀ x)) ≈ x ]
 -- -- -- rinv (i , (l , f)) = begin
 -- -- --   ψ₀ (ϕ₀ (i , (l , f)))
 -- -- --     ≈⟨ refl ⟩
@@ -278,11 +356,11 @@ private
 -- -- --   𝟘 , (l , h)
 -- -- --     ≈⟨ ≈lstep (𝟘≤t i) (l , h) ⟩
 -- -- --   i , (l , λ b → weaken 𝟘 i (𝟘≤t i) (h b))
--- -- --     ≈⟨ ≡→≈ (Colim (F ∘ D)) (≡.cong (λ ○ → i , (l , ○)) (funExt (λ ()))) ⟩
+-- -- --     ≈⟨ ≡→≈ (Colim (F ∘ᴰ D)) (≡.cong (λ ○ → i , (l , ○)) (funExt (λ ()))) ⟩
 -- -- --   i , (l , f) ∎
 -- -- --   where
--- -- --   open Setoid (Colim (F ∘ D))
--- -- --   open ≈.≈syntax {S = Colim (F ∘ D)}
+-- -- --   open Setoid (Colim (F ∘ᴰ D))
+-- -- --   open ≈.≈syntax {S = Colim (F ∘ᴰ D)}
 -- -- --   g : ⊥* → ⟨ Colim D ⟩
 -- -- --   g ()
 -- -- --   h : ⊥* → ⟨ D.D-ob 𝟘 ⟩
@@ -296,13 +374,13 @@ private
 -- -- --     ≈⟨ ≈lsym (≈lstep (<→≤ (<suc i)) (n , g)) ⟩
 -- -- --   i , (n , g) ∎
 -- -- --   where
--- -- --   open Setoid (Colim (F ∘ D))
--- -- --   open ≈.≈syntax {S = Colim (F ∘ D)}
+-- -- --   open Setoid (Colim (F ∘ᴰ D))
+-- -- --   open ≈.≈syntax {S = Colim (F ∘ᴰ D)}
 
 -- -- -- cocontinuous : Cocontinuous F D
 -- -- -- cocontinuous = ∣ iso ∣
 -- -- --   where
--- -- --   iso : ≈.Iso (Colim (F ∘ D)) (F.F-ob (Colim D))
+-- -- --   iso : ≈.Iso (Colim (F ∘ᴰ D)) (F.F-ob (Colim D))
 -- -- --   iso = record
 -- -- --     { ⟦_⟧ = ϕ₀
 -- -- --     ; ⟦_⟧⁻¹ = ψ₀
