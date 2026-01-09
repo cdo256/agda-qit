@@ -63,7 +63,7 @@ private
 --   h : (i : I) → P₀ (μ i)
 --   h i = f i .proj₂
 --   g : I → P₀ α
---   g i = pweaken (fi≤sup (ιˢ n) μ i) (h i)
+--   g i = pweaken (child≤ (ιˢ n) μ i) (h i)
 
 -- ψ-cong : ∀ {x y} → F.F-ob (Colim D) [ x ≈ y ] → Colim (F ∘ D) [ ψ₀ x ≈ ψ₀ y ]
 -- -- ψ-cong ≈leaf = ≈lstage ⊥ᶻ ≈leaf
@@ -85,13 +85,13 @@ private
 
 -- -- ψ-cong ≈leaf = ≈lstage 𝟘 ≈leaf
 -- -- ψ-cong (≈node {f} {g} c) = {!begin
--- --   nf , (n , λ b → weaken (f1 b) nf (fi≤sup n f1 b) (f2 b))
+-- --   nf , (n , λ b → weaken (f1 b) nf (child≤ n f1 b) (f2 b))
 -- --     ≈⟨ ≈lstep (∨ᵗ-l nf ng) u ⟩
 -- --   nf ∨ᵗ ng , (n , λ b → weaken nf (nf ∨ᵗ ng) _ (weaken (f1 b) nf _ (f2 b)))
 -- --     ≈⟨ ≈lstage (nf ∨ᵗ ng) (≈node c') ⟩
 -- --   nf ∨ᵗ ng , (n , λ b → weaken ng (nf ∨ᵗ ng) _ (weaken (g1 b) ng _ (g2 b)))
 -- --     ≈⟨ ≈lsym (≈lstep (∨ᵗ-r nf ng) (n , (λ b → weaken (g1 b) ng _ (g2 b)))) ⟩
--- --   ng , (n , λ b → weaken (g1 b) ng (fi≤sup n g1 b) (g2 b)) ∎!}
+-- --   ng , (n , λ b → weaken (g1 b) ng (child≤ n g1 b) (g2 b)) ∎!}
 -- ψ-cong (≈node {f} {g} c) = begin
 --   α1 , n , h1
 --     ≈⟨ ≈lstep {!!} (n , h1) ⟩
@@ -107,7 +107,7 @@ private
 --   α1 : Z
 --   α1 = sup (ιˢ n , f1)
 --   h1 : I → P₀ α1
---   h1 i = pweaken (fi≤sup (ιˢ n) f1 i) (g1 i)
+--   h1 i = pweaken (child≤ (ιˢ n) f1 i) (g1 i)
 --   f2 : I → Z
 --   f2 i = g i .proj₁
 --   g2 : ∀ i → P₀ (f2 i)
@@ -115,7 +115,7 @@ private
 --   α2 : Z
 --   α2 = sup (ιˢ n , f2)
 --   h2 : I → P₀ α2
---   h2 i = pweaken (fi≤sup (ιˢ n) f2 i) (g2 i)
+--   h2 i = pweaken (child≤ (ιˢ n) f2 i) (g2 i)
 --   t1 : T
 --   t1 = sup (n , (λ i → g1 i .fst))
 --   t2 : T
@@ -151,8 +151,8 @@ private
 --     v' γ1 γ2 γ p q (≈lsym r) = ≈psym (v' γ2 γ1 γ q p r)
 --     v' γ1 γ2 γ p q (≈ltrans {t = t} r s) = ≈ptrans {!!} {!!}
 --     v : ∀ i → Colim D [ f i ≈ g i ]
---       → (α ∨ᶻ (α1 ∨ᶻ α2)) ⊢  pweaken (≤≤ (≤≤ ∨ᶻ-r ∨ᶻ-l) (fi≤sup _ f1 i)) (f i .proj₂)
---                           ≈ᴾ pweaken (≤≤ (≤≤ ∨ᶻ-r ∨ᶻ-r) (fi≤sup _ f2 i)) (g i .proj₂)
+--       → (α ∨ᶻ (α1 ∨ᶻ α2)) ⊢  pweaken (≤≤ (≤≤ ∨ᶻ-r ∨ᶻ-l) (child≤ _ f1 i)) (f i .proj₂)
+--                           ≈ᴾ pweaken (≤≤ (≤≤ ∨ᶻ-r ∨ᶻ-r) (child≤ _ f2 i)) (g i .proj₂)
 --     v i = recˡ D {!!} {!!} {!!} {!!} {!!}
 --       where
 --       C : ∀ {s t} (p : Colim D [ s ≈ t ]) → {!α ∨ᶻ (α1 ∨ᶻ α2) ⊢ ? ≈ᴾ ?!}
@@ -160,9 +160,9 @@ private
 --          n , (λ i → pweaken (≤≤ ∨ᶻ-r ∨ᶻ-l) (h1 i)) ≈
 --          n , (λ i → pweaken (≤≤ ∨ᶻ-r ∨ᶻ-r) (h2 i)) ]
 --     u = begin
---       n , (λ i → pweaken (≤≤ ∨ᶻ-r ∨ᶻ-l) (pweaken (fi≤sup _ f1 i) (f i .proj₂)))
+--       n , (λ i → pweaken (≤≤ ∨ᶻ-r ∨ᶻ-l) (pweaken (child≤ _ f1 i) (f i .proj₂)))
 --         ≈⟨ ≈node (λ i → v i (c i)) ⟩
---       n , (λ i → pweaken (≤≤ ∨ᶻ-r ∨ᶻ-r) (pweaken (fi≤sup _ f2 i) (g i .proj₂))) ∎
+--       n , (λ i → pweaken (≤≤ ∨ᶻ-r ∨ᶻ-r) (pweaken (child≤ _ f2 i) (g i .proj₂))) ∎
 --       where
 --       open Setoid (F∘D.D-ob (α ∨ᶻ (α1 ∨ᶻ α2)))
 --       open ≈.≈syntax {S = F∘D.D-ob (α ∨ᶻ (α1 ∨ᶻ α2))}
@@ -176,11 +176,11 @@ private
 -- --     weaken nf (nf ∨ᵗ ng) _ (weaken (f1 b) nf _ (f2 b))
 -- --       ≈⟨ ≈psym (≈pweaken (∨ᵗ-l nf ng) (weaken (f1 b) nf _ (f2 b))) ⟩
 -- --     weaken (f1 b) nf _ (f2 b)
--- --       ≈⟨ ≈psym (≈pweaken (fi≤sup n f1 b) (f2 b)) ⟩
+-- --       ≈⟨ ≈psym (≈pweaken (child≤ n f1 b) (f2 b)) ⟩
 -- --     f2 b
 -- --       ≈⟨ d b (c b) ⟩
 -- --     g2 b
--- --       ≈⟨ ≈pweaken (fi≤sup n g1 b) (g2 b) ⟩
+-- --       ≈⟨ ≈pweaken (child≤ n g1 b) (g2 b) ⟩
 -- --     weaken (g1 b) ng _ (g2 b)
 -- --       ≈⟨ ≈pweaken (∨ᵗ-r nf ng) (weaken (g1 b) ng _ (g2 b)) ⟩
 -- --     weaken ng (nf ∨ᵗ ng) _ (weaken (g1 b) ng _ (g2 b)) ∎
@@ -198,13 +198,13 @@ private
 -- -- --   π' = π .↔.to
 -- -- --   g : I → P₀ (sup (n , (λ b → f b .proj₁)))
 -- -- --   g b = weaken (f b .proj₁) (sup (n , (λ b → f b .proj₁)))
--- -- --                (fi≤sup n _ b) (f b .proj₂)
+-- -- --                (child≤ n _ b) (f b .proj₂)
 -- -- --   h : I → P₀ (sup (n , (λ b → f (π' b) .proj₁)))
 -- -- --   h b = weaken (f (π' b) .proj₁) (sup (n , (λ b → f (π' b) .proj₁)))
--- -- --                 (fi≤sup n _ b) (f (π' b) .proj₂)
+-- -- --                 (child≤ n _ b) (f (π' b) .proj₂)
 -- -- --   g' : I → P₀ (sup (n , (λ b → f b .proj₁)))
 -- -- --   g' b = weaken (f (π' b) .proj₁) (sup (n , (λ b → f b .proj₁)))
--- -- --                 (fi≤sup n _ (π' b)) (f (π' b) .proj₂)
+-- -- --                 (child≤ n _ (π' b)) (f (π' b) .proj₂)
 -- -- --   le : sup (n , λ b → f b .proj₁) ≤ sup (n , λ b → f (π' b) .proj₁)
 -- -- --   le = sup≤ λ b → <sup (π .↔.from b)
 -- -- --     (substp (λ ○ → f b .proj₁ ≤ f ○ .proj₁) (≡.sym (↔.linv π b)) (≤refl (f b .proj₁)))
@@ -225,9 +225,9 @@ private
 -- -- --       weaken _ _ le (g' b)
 -- -- --         ≈⟨ ≈psym (≈pweaken le (g' b)) ⟩
 -- -- --       g' b
--- -- --         ≈⟨ ≈psym (≈pweaken (fi≤sup n (λ b₃ → f b₃ .proj₁) (π' b)) (f (π' b) .proj₂)) ⟩
+-- -- --         ≈⟨ ≈psym (≈pweaken (child≤ n (λ b₃ → f b₃ .proj₁) (π' b)) (f (π' b) .proj₂)) ⟩
 -- -- --       f (π' b) .proj₂
--- -- --         ≈⟨ (≈pweaken (fi≤sup n (λ b₃ → f (π' b₃) .proj₁) b) (f (π' b) .proj₂)) ⟩
+-- -- --         ≈⟨ (≈pweaken (child≤ n (λ b₃ → f (π' b₃) .proj₁) b) (f (π' b) .proj₂)) ⟩
 -- -- --       h b ∎
 -- -- --       where
 -- -- --       import QIT.Setoid.Indexed as Indexed
@@ -253,7 +253,7 @@ private
 -- -- --   ϕ₀ (ψ₀ (n , g))
 -- -- --     ≈⟨ refl ⟩
 -- -- --   (n , λ b → t* , weaken (t b) t* _ (f b))
--- -- --     ≈⟨ ≈node (λ b → ≈lsym (≈lstep (fi≤sup n t b) (f b))) ⟩
+-- -- --     ≈⟨ ≈node (λ b → ≈lsym (≈lstep (child≤ n t b) (f b))) ⟩
 -- -- --   (n , λ b → t b , f b)
 -- -- --     ≈⟨ refl ⟩
 -- -- --   (n , g) ∎
