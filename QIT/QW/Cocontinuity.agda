@@ -2,7 +2,6 @@ open import QIT.Prelude
 open import QIT.Setoid
 open import QIT.Relation.Base
 open import QIT.Relation.Binary
-open import Data.Product
 
 module QIT.QW.Cocontinuity {ℓI} {ℓ≤}
   {I : Set ℓI}

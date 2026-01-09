@@ -1,7 +1,6 @@
 module QIT.Setoid.Base where
 
 open import QIT.Prelude
-open import Data.Product
 open import QIT.Relation.Base
 open import QIT.Relation.Binary
 

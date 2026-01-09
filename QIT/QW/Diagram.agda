@@ -2,7 +2,6 @@ open import QIT.Prelude
 open import QIT.Relation.Base
 open import QIT.Relation.Binary
 open import QIT.Setoid
-open import Data.Product
 
 module QIT.QW.Diagram {ℓI} {ℓ≤}
   {I : Set ℓI}

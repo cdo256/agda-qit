@@ -2,8 +2,6 @@ module QIT.Mobile.Base (I : Set) where
 
 open import QIT.Prelude
 open import QIT.Container.Base
-open import Data.Product
-open import Data.Sum
 open import QIT.QW
 
 data Sᵀ : Set where

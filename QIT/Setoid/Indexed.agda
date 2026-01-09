@@ -1,7 +1,6 @@
 module QIT.Setoid.Indexed where
 
 open import QIT.Prelude
-open import Data.Product
 open import QIT.Relation.Base
 import QIT.Relation.IndexedBinary as IndexedBinary
 
@@ -47,8 +46,6 @@ module _ {ℓI ℓA ℓR} (S : Setoid ℓI ℓA ℓR) where
 
 module _ where
   import QIT.Setoid.Base as Unindexed
-
-  open import Data.Unit
 
   UnindexedSetoid→IndexedSetoid : ∀ {ℓA ℓR} → Unindexed.Setoid ℓA ℓR → Setoid ℓ0 ℓA ℓR
   UnindexedSetoid→IndexedSetoid S = record

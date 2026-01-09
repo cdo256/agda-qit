@@ -1,10 +1,8 @@
 module QIT.Relation.Tests where
 
 module Test1 where
+  open import QIT.Prelude
   open import Data.Nat as ℕ hiding (_≤_; _<_)
-  open import Data.Unit as ⊤
-  open import Data.Empty as ⊥
-  open import Data.Product as ×
 
   open import QIT.Container.Base
   data S : Set where

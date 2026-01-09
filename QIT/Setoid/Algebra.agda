@@ -5,7 +5,6 @@ module QIT.Setoid.Algebra where
 open import QIT.Setoid.Base
 open import QIT.Setoid.Hom renaming (Hom to ≈Hom)
 open import QIT.Setoid.Functor
-open import Data.Product
 
 module Alg {ℓX ℓX'} (F : Functor ℓX ℓX' ℓX ℓX') where
   open Functor F

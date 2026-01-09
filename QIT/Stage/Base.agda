@@ -2,8 +2,6 @@ open import QIT.Prelude
 
 module QIT.Stage.Base {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
 
-open import Data.Product hiding (∃)
-
 open import QIT.Container.Base
 open import QIT.Relation.Plump S P
 open import QIT.Relation.Subset

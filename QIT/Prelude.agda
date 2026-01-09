@@ -5,6 +5,19 @@ open import Level public using (Level; _⊔_; Lift; lift)
 import Relation.Binary.PropositionalEquality
 module ≡ = Relation.Binary.PropositionalEquality
 open ≡ public using (_≡_; subst) public
+import Data.Empty
+module ⊥ = Data.Empty
+open ⊥ using (⊥) public
+
+import Data.Product
+module × = Data.Product
+open × using (_×_; Σ; Σ-syntax; _,_; proj₁; proj₂) public
+
+import Data.Sum
+module ⊎ = Data.Sum
+open ⊎ using (_⊎_; inj₁; inj₂) public
+
+open import Data.Unit public
 
 private
   variable
@@ -32,13 +45,12 @@ Trunc₁ R x = ∥ R x ∥
 Trunc₂ : {A : Set ℓ} {ℓ' : Level} → (A → A → Set ℓ') → (A → A → Prop ℓ')
 Trunc₂ R x y = ∥ R x y ∥
 
+-- These are quite differnet concepts, with confusingly similar names.
+-- ≡p is trunctated equality down to a path.
+-- ≡ᴾ is an (untruncated) path over propositions
 infix 4 _≡p_
 _≡p_ : ∀ {ℓ} {A : Set ℓ} (x y : A) → Prop ℓ
 x ≡p y = ∥ x ≡ y ∥
-
-infix 4 _≡ᴾ_
-_≡ᴾ_ : ∀ {ℓ} {A : Prop ℓ} (x y : A) → Set ℓ
-x ≡ᴾ y = box x ≡ box y
 
 substp : ∀ {A : Set ℓ} (B : A → Prop ℓ') {a1 a2 : A} (p : a1 ≡ a2) → B a1 → B a2
 substp B ≡.refl x = x
@@ -48,18 +60,16 @@ substp' B ∣ _≡_.refl ∣ x = x
 
 postulate
   -- Cannot be proven from funExt
-  funExtp : ∀ {ℓ ℓ'} → {A : Set ℓ} {B : Set ℓ'} {f g : A → B} → (∀ x → f x ≡p g x) → f ≡p g
+  funExt : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB} {f g : ∀ x → B x}
+         → (∀ x → f x ≡ g x) → f ≡ g
+  funExtp : ∀ {ℓA ℓB} → {A : Set ℓA} {B : A → Set ℓB} {f g : ∀ x → B x}
+          → (∀ x → f x ≡p g x) → f ≡p g
 
-open import Axiom.Extensionality.Propositional
-
-postulate
-  funExt : ∀ {ℓ ℓ'} → Extensionality ℓ ℓ'
 
 subst-id : {A : Set} {P : A → Set} {x : A} (p : x ≡ x) (b : P x)
          → subst P p b ≡ b
 subst-id ≡.refl b = ≡.refl
 
-open import Data.Empty
 
 data ⊥p : Prop where
 absurdp : {A : Prop} → ⊥p → A
@@ -68,6 +78,7 @@ absurdp ()
 ⊥→⊥p : ⊥ → ⊥p
 ⊥→⊥p ()
 
+-- Bijections
 module ↔ where
   record _↔_ (X Y : Set) : Set where
     field
@@ -94,23 +105,12 @@ open ↔ using (_↔_) public
 absurd* : ∀ {ℓ ℓ'} {A : Set ℓ} → ⊥* {ℓ = ℓ'} → A
 absurd* ()
 
-congp : ∀ {a b} {A : Set a} {B : Prop b} (f : A → B)
-      → ∀ {x y} → x ≡ y → f x ≡ᴾ f y
-congp f ≡.refl = ≡.refl
-
-congp'' : ∀ {a b} {A : Set a} {B : Set b} (f : A → B)
+congp : ∀ {a b} {A : Set a} {B : Set b} (f : A → B)
       → ∀ {x y} → x ≡p y → f x ≡p f y
-congp'' f ∣ ≡.refl ∣ = ∣ ≡.refl ∣
+congp f ∣ ≡.refl ∣ = ∣ ≡.refl ∣
 
-congp' : ∀ {a b} {A : Prop a} {B : Set b} (f : A → B)
-      → ∀ {x y : A} → x ≡ᴾ y → f x ≡ f y
-congp' f ≡.refl = ≡.refl
-
-¬p_ : ∀ {ℓ} (X : Prop ℓ) → Prop ℓ
-¬p X = X → ⊥p
-
-¬_ : ∀ {ℓ} (X : Set ℓ) → Set ℓ
-¬ X = X → ⊥
+¬_ : ∀ {ℓ} (X : Prop ℓ) → Prop ℓ
+¬ X = X → ⊥p
 
 record _∧_ {ℓ ℓ'} (A : Prop ℓ) (B : Prop ℓ') : Prop (ℓ ⊔ ℓ') where
   constructor _,_
@@ -127,7 +127,7 @@ A ⇔ B = (A → B) ∧ (B → A)
 
 data Dec {ℓA} (A : Set ℓA) : Set ℓA where
   yes : A → Dec A
-  no : ¬ A → Dec A
+  no : (A → ⊥) → Dec A
 
 Discrete : ∀ {ℓA} (A : Set ℓA) → Set ℓA
 Discrete A = ∀ (x y : A) → Dec (x ≡ y)

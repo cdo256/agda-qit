@@ -1,7 +1,6 @@
 module QIT.Container.Base where
 
 open import QIT.Prelude
-open import Data.Product hiding (map)
 
 ⟦_◁_⟧ : ∀ {ℓS ℓP ℓX} → (S : Set ℓS) (P : S → Set ℓP) → Set ℓX → Set (ℓS ⊔ ℓP ⊔ ℓX)
 ⟦ S ◁ P ⟧ X = Σ[ s ∈ S ] (P s → X)

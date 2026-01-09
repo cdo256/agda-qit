@@ -2,7 +2,6 @@ open import QIT.Prelude
 open import QIT.Setoid
 open import QIT.Container.Base
 open import QIT.QW.Signature
-open import Data.Product
 
 module QIT.QW.W {ℓS ℓP ℓE ℓV} (sig : Sig ℓS ℓP ℓE ℓV) where
 

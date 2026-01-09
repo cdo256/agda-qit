@@ -7,11 +7,7 @@ open import QIT.Relation.Binary
 open import QIT.Relation.Subset
 open import QIT.Mobile.Base I
 open import QIT.Setoid as ≈
-open import Data.Product
-open import Data.Empty renaming (⊥-elim to absurd)
 open import QIT.Container.Base
-open import Data.Unit hiding (_≟_)
-open import Data.Sum
 open import QIT.Relation.Plump Sᵀ Pᵀ
 
 open import QIT.QW.Diagram ≤p

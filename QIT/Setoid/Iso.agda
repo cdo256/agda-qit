@@ -3,7 +3,6 @@ module QIT.Setoid.Iso where
 open import QIT.Prelude
 open import QIT.Relation.Base
 open import QIT.Relation.Binary
-open import Data.Product
 open import QIT.Setoid.Base
 open import QIT.Setoid.Hom
 

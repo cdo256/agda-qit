@@ -3,7 +3,6 @@ module QIT.Setoid.Functor where
 open import QIT.Prelude
 open import QIT.Setoid.Base
 open import QIT.Setoid.Hom
-open import Data.Product
 
 record Functor ℓd ℓd' ℓc ℓc' : Set (lsuc ℓd ⊔ lsuc ℓd' ⊔ lsuc ℓc ⊔ lsuc ℓc') where
   private

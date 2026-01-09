@@ -1,7 +1,6 @@
 open import QIT.Prelude
 open import QIT.Setoid.Base
 open import QIT.Setoid.Hom
-open import Data.Product
 
 module QIT.Setoid.Sigma
   {ℓI} {ℓS} {ℓS'}

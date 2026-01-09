@@ -3,8 +3,6 @@ module QIT.Examples.BoundedRational where
 open import QIT.Prelude
 open import QIT.Relation.Subset
 open import Data.Nat as ℕ
-open import Data.Empty as ⊥
-open import Data.Product hiding (∃)
 
 IsMonotone : {A : Set} (_<_ : A → A → Prop) (f : ℕ → A) → Prop
 IsMonotone _<_ f = ∀ i j → i ℕ.< j → f i < f j

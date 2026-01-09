@@ -2,8 +2,6 @@ open import QIT.Prelude
 
 module QIT.QW.Equation {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
 
-open import Data.Sum
-open import Data.Product hiding (∃)
 open import QIT.Container.Base
 open import QIT.Container.Functor S P
 open import QIT.Setoid
@@ -14,7 +12,7 @@ Expr {ℓV} V = W Sʰ Pʰ
   Sʰ : Set (ℓS ⊔ ℓV)
   Sʰ = V ⊎ S
   Pʰ : Sʰ → Set ℓP
-  Pʰ = [ (λ _ → ⊥*) , P ]
+  Pʰ = ⊎.[ (λ _ → ⊥*) , P ]
 
 record Equation ℓV : Set (lsuc ℓV ⊔ ℓS ⊔ ℓP) where
   field

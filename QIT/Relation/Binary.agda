@@ -2,7 +2,6 @@ module QIT.Relation.Binary where
 
 open import QIT.Prelude
 open import QIT.Relation.Base
-open import Data.Product
 
 module _ {ℓA ℓR} {A : Set ℓA} (R : BinaryRel A ℓR) where
   Reflexive : Prop (ℓA ⊔ ℓR)

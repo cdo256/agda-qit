@@ -1,7 +1,6 @@
 open import QIT.Prelude
 open import QIT.Setoid
 open import QIT.Relation.Binary
-open import Data.Product
 
 open import QIT.Container.Base
 

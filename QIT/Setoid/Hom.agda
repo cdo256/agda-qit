@@ -2,7 +2,6 @@ module QIT.Setoid.Hom where
 
 open import QIT.Prelude
 open import QIT.Setoid.Base
-open import Data.Product
 
 record Hom {ℓS ℓS' ℓT ℓT'}
        (S : Setoid ℓS ℓS') (T : Setoid ℓT ℓT') : Set (ℓS ⊔ ℓS' ⊔ ℓT ⊔ ℓT')

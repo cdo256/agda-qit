@@ -2,10 +2,6 @@ open import QIT.Prelude
 open import QIT.Relation.Binary
 open import QIT.Container.Base
 
-open import Data.Product
-open import Data.Sum
-open import Data.Unit
-
 module QIT.Relation.Plump {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
 
 data Sᶻ : Set ℓS where

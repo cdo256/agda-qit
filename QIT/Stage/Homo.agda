@@ -10,17 +10,12 @@ open import QIT.Relation.Binary
 open import QIT.Container.Base
 open import QIT.Container.Functor S P
 open import QIT.Setoid as ≈
-open import Data.Product hiding (∃)
-open import Data.Empty renaming (⊥-elim to absurd)
-open import Data.Unit
-open import Data.Sum
 open import QIT.Relation.Subset
 open import QIT.Relation.Plump S P
 open import QIT.QW.Diagram ≤p
 open import QIT.QW.W sig
 open import QIT.Stage.Base S P
 open import Data.Maybe
-open import Data.Product.Properties
 
 
 open import QIT.QW.Equation S P
