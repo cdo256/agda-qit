@@ -2,19 +2,43 @@ open import QIT.Prelude
 open import QIT.Relation.Binary
 open import QIT.Container.Base
 
+-- Define plump ordinals Z of a given shape. They are used as size
+-- bounds on trees for constructing diagrams, and then colimits.
+-- This definition was copied from Fiore et al. 2022, and their earlier work (Pitts et al. 2021).
+-- Start with an shape and position. This represents the 'shape' of
+-- the underlying W-type being constructed.
 module QIT.Relation.Plump {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
 
+private
+  T = W S P
+
+-- We extend it to have 'enough' points:
+--  - ⊥ˢ is the shape for a global minimum (P ⊥ˢ ≅ ⊥).
+--  - ∨ˢ is the shape for a join operation (P ∨ˢ ≅ 𝟚).
+--  - ιˢ s is the shape inlcusion for any shape S.
+
+-- ⊥ˢ is required because we need to know that the tree isn't empty,
+-- and we can't determine that for an arbitrary W type. It is an
+-- algebraic convenience, and not strictly necessary.
+-- ∨ˢ is required for congruence on ψ in cocontinuity, since we need
+-- to be able to join two ordinals to a greater ordinal.
+
+-- It is not required that the set of ordinals exactly follow the
+-- shape of the W type, they just have to have 'enough' brancing
+-- structure to have a natural injection from T to allow for
+-- bounding and construction of stage sets.
 data Sᶻ : Set ℓS where
   ⊥ˢ : Sᶻ
   ∨ˢ : Sᶻ
   ιˢ : S → Sᶻ
 
+-- Lifting is required, since we want all positions to be at the same
+-- level.
 Pᶻ : Sᶻ → Set ℓP
-Pᶻ ⊥ˢ = ⊥*
-Pᶻ ∨ˢ = Lift ℓP (⊤ ⊎ ⊤)
+Pᶻ ⊥ˢ = Lift _ ⊥
+Pᶻ ∨ˢ = Lift _ (⊤ ⊎ ⊤)
 Pᶻ (ιˢ s) = P s
 
--- From Fiore et al. 2022
 Z : Set (ℓS ⊔ ℓP)
 Z = W Sᶻ Pᶻ
 
@@ -24,6 +48,9 @@ Z = W Sᶻ Pᶻ
 sucᶻ : Z → Z
 sucᶻ α = sup (∨ˢ , λ _ → α)
 
+-- Define branching.
+-- Note that both α and β are strictly less than α ∨ᶻ β, not less or
+-- equal, so this is not strictly a least upper bound.
 _∨ᶻ_ : Z → Z → Z
 _∨ᶻ_ α β = sup (∨ˢ , f)
   where
@@ -31,48 +58,54 @@ _∨ᶻ_ α β = sup (∨ˢ , f)
   f (lift (inj₁ tt)) = α
   f (lift (inj₂ tt)) = β
 
-ιᶻ : W S P → Z
-ιᶻ (sup (s , f)) = sup (ιˢ s , λ i → ιᶻ (f i))
+-- Inclusion from the base W type, T, to plump ordinals Z
+-- We just recurse over the tree and map each shape s to ιˢ s.
+ιᶻ : T → Z
+ιᶻ (sup (s , f)) = sup (ιˢ s , λ α → ιᶻ (f α))
 
--- The well-founded order (<) on Z
+-- Define a well-founded order (≤, <) on Z to be 'quasi-extensional'
+-- (defined later in this file). We defile ≤ and < mutually
+-- inductively using two rules defined below:
 mutual
   infix 4 _≤_ _<_
+  -- sup≤ states that whenever ∀ α. f α < β, then sup f ≤ β
+  -- This gives us 'one-step quasi-extensionality'.
   data _≤_ : Z → Z → Prop (ℓS ⊔ ℓP) where
-    sup≤ :
-      {s   : Sᶻ}
-      {f   : Pᶻ s → Z}
-      {i   : Z}
-      (f<i : ∀ x → f x < i)
-      → ---------------------
-      sup (s , f) ≤ i
+    sup≤ : {s : Sᶻ} {f : Pᶻ s → Z}
+         → {α : Z} (f<α : ∀ β → f β < α)
+         → sup (s , f) ≤ α
+  -- <sup states that if ∃ α. β ≤ f α, then β < sup f
+  -- This means that if any child is at least as large as some ordinal
+  -- then the supremum is strictly larger.
   data _<_ : Z → Z → Prop (ℓS ⊔ ℓP) where
-    <sup :
-      {a    : Sᶻ}
-      {f    : Pᶻ a → Z}
-      (x    : Pᶻ a)
-      {i    : Z}
-      (i≤fx : i ≤ f x)
-      → ----------------------
-      i < sup (a , f)
+    <sup : {s : Sᶻ} {f : Pᶻ s → Z}
+         → (β : Pᶻ s) {α : Z}
+         → (α≤fi : α ≤ f β)
+         → α < sup (s , f)
 
-≤refl : ∀ i → i ≤ i
-≤refl (sup (_ , f)) = sup≤ (λ x → <sup x (≤refl (f x)))
+-- Reflexivity is obtained recursively using <sup followed by sup≤, a
+-- common pattern reused several times.
+≤refl : ∀ α → α ≤ α
+≤refl (sup (_ , f)) = sup≤ (λ i → <sup i (≤refl (f i)))
 
+-- Mutually define three notions of transitivity.
+-- These must be mutual as each transitivity statement must either
+-- expand a branch...
 mutual
-  ≤≤ : {i j k : Z} → j ≤ k → i ≤ j → i ≤ k
-  ≤≤ j≤k (sup≤ f<i) = sup≤ λ x → ≤< j≤k (f<i x)
+  ≤≤ : {α β γ : Z} → β ≤ γ → α ≤ β → α ≤ γ
+  ≤≤ β≤γ (sup≤ f<α) = sup≤ λ i → ≤< β≤γ (f<α i)
 
-  ≤< : {i j k : Z} → j ≤ k → i < j → i < k
-  ≤< (sup≤ f<i) (<sup x i≤fx) = <≤ (f<i x) i≤fx
+  ≤< : {α β γ : Z} → β ≤ γ → α < β → α < γ
+  ≤< (sup≤ f<α) (<sup i α≤fi) = <≤ (f<α i) α≤fi
 
-  <≤ : {i j k : Z} → j < k → i ≤ j → i < k
-  <≤ (<sup x i≤fx) i≤j = <sup x (≤≤ i≤fx i≤j)
+  <≤ : {α β γ : Z} → β < γ → α ≤ β → α < γ
+  <≤ (<sup i α≤fi) α≤β = <sup i (≤≤ α≤fi α≤β)
 
-<→≤ : ∀{i j} → i < j → i ≤ j
-<→≤ (<sup x (sup≤ f<i)) = sup≤ (λ y → <sup x (<→≤ (f<i y)))
+<→≤ : ∀{α β} → α < β → α ≤ β
+<→≤ (<sup i (sup≤ f<β)) = sup≤ (λ j → <sup i (<→≤ (f<β j)))
 
 <supᶻ : ∀ {s} x → ∥ P s ∥ → x < sup (ιˢ s , λ _ → x)
-<supᶻ x ∣ i ∣ = <sup i (≤refl x)
+<supᶻ x ∣ α ∣ = <sup α (≤refl x)
 
 <sucᶻ : ∀ α → α < sucᶻ α
 <sucᶻ = λ α → <sup (lift (inj₁ tt)) (≤refl α)
@@ -83,21 +116,21 @@ t <ᵀ α = ιᶻ t < α
 _≤ᵀ_ : (W S P) → Z → Prop (ℓS ⊔ ℓP)
 t ≤ᵀ α = ιᶻ t ≤ α
 
-<< : ∀{i j k} → j < k → i < j → i < k
-<< (<sup x i≤fx) i<j = <sup x (<→≤ (≤< i≤fx i<j))
+<< : ∀{α β γ} → β < γ → α < β → α < γ
+<< (<sup i β≤fi) β<γ = <sup i (<→≤ (≤< β≤fi β<γ))
 
 fi≤sup : ∀ s f i → f i ≤ sup (s , f)
 fi≤sup s f i = <→≤ (<sup i (≤refl (f i)))
 
 iswf< : WellFounded _<_
-iswf< i = acc λ j j<i → α i j (<→≤ j<i)
+iswf< α = acc λ β β<α → p α β (<→≤ β<α)
   where
-  α : ∀ i j → j ≤ i → Acc _<_ j
-  α (sup (_ , f)) j j≤i = acc α'
+  p : ∀ α β → β ≤ α → Acc _<_ β
+  p (sup (_ , f)) β β≤α = acc q
     where
-    α' : WfRec _<_ (Acc _<_) j
-    α' k k<j with ≤< j≤i k<j
-    ... | <sup x k≤fx = α (f x) k k≤fx
+    q : WfRec _<_ (Acc _<_) β
+    q γ γ<β with ≤< β≤α γ<β
+    ... | <sup i γ≤fi = p (f i) γ γ≤fi
 
 isPreorder-≤ : IsPreorder _≤_
 isPreorder-≤ = record
@@ -108,21 +141,21 @@ isPreorder-≤ = record
 ≤p = _≤_ , isPreorder-≤
 
 _⊆_ : Z → Z → Prop (ℓS ⊔ ℓP)
-i ⊆ j = ∀ k → k < i → k < j
+α ⊆ β = ∀ γ → γ < α → γ < β
 
 _⊇_ : Z → Z → Prop (ℓS ⊔ ℓP)
-i ⊇ j = ∀ k → i < k → j < k
+α ⊇ β = ∀ γ → α < γ → β < γ
 
-⊆→≤ : ∀ {i j} → i ⊆ j → i ≤ j
+⊆→≤ : ∀ {α β} → α ⊆ β → α ≤ β
 ⊆→≤ {sup (s , f)} {sup (t , g)} p =
   sup≤ (λ x → p (f x) (<sup x (≤refl (f x))))
 
-≤→⊆ : ∀ {i j} → i ≤ j → i ⊆ j
+≤→⊆ : ∀ {α β} → α ≤ β → α ⊆ β
 ≤→⊆ {sup (s , f)} {sup (t , g)} sf≤tg =
-  λ k k<sf → ≤< sf≤tg k<sf
+  λ γ γ<sf → ≤< sf≤tg γ<sf
 
-≤→⊇ : ∀ {i j} → i ≤ j → j ⊇ i
-≤→⊇ i≤j _ j<k = <≤ j<k i≤j
+≤→⊇ : ∀ {α β} → α ≤ β → β ⊇ α
+≤→⊇ α≤β _ β<γ = <≤ β<γ α≤β
 
 _≤≥_ : ∀ (x y : W Sᶻ Pᶻ) → Prop (ℓS ⊔ ℓP)
 x ≤≥ y = (x ≤ y) ∧ (y ≤ x)
@@ -130,7 +163,7 @@ _⊆⊇_ : ∀ (x y : W Sᶻ Pᶻ) → Prop (ℓS ⊔ ℓP)
 x ⊆⊇ y = (x ⊆ y) ∧ (y ⊆ x)
 
 isQuasiExtensionalZ : ∀ {x y} → (x ≤≥ y) ⇔ (x ⊆⊇ y)
-isQuasiExtensionalZ = (λ (i≤j , j≤i) → ≤→⊆ i≤j , ≤→⊆ j≤i) , λ (i⊆j , j⊆i) → ⊆→≤ i⊆j , ⊆→≤ j⊆i
+isQuasiExtensionalZ = (λ (α≤β , β≤α) → ≤→⊆ α≤β , ≤→⊆ β≤α) , λ (α⊆β , β⊆α) → ⊆→≤ α⊆β , ⊆→≤ β⊆α
 
 ≤cong : ∀ s (μ τ : Pᶻ s → Z) → (r : ∀ i → μ i ≤ τ i)
       → sup (s , μ) ≤ sup (s , τ)
@@ -154,6 +187,3 @@ isQuasiExtensionalZ = (λ (i≤j , j≤i) → ≤→⊆ i≤j , ≤→⊆ j≤i)
   g : (i : Pᶻ ∨ˢ) → _ < (α ∨ᶻ β)
   g (lift (inj₁ tt)) = <sup (lift (inj₂ tt)) (≤refl β)
   g (lift (inj₂ tt)) = <sup (lift (inj₁ tt)) (≤refl α)
-
-⊥≤t : ∀ α → ⊥ᶻ ≤ α
-⊥≤t _ = sup≤ λ ()
