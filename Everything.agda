@@ -19,6 +19,7 @@ import QIT.Setoid.Indexed
 import QIT.Setoid.Hom
 import QIT.Setoid.Iso
 import QIT.Setoid.Sigma
+import QIT.Setoid.Diagram
 import QIT.Setoid.Functor
 import QIT.Setoid.Algebra
 import QIT.Setoid
@@ -28,14 +29,13 @@ import QIT.Container.Base
 import QIT.Container.Functor
 
 -- QW type definition
+import QIT.QW.W
 import QIT.QW.Equation
 import QIT.QW.Signature
 import QIT.QW.Algebra
 import QIT.QW.Stage
-import QIT.QW.Diagram
 import QIT.QW.Colimit
 import QIT.QW.Cocontinuity
-import QIT.QW.W
 import QIT.QW
 
 -- Mobile construction

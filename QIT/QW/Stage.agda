@@ -1,6 +1,10 @@
 open import QIT.Prelude
 open import QIT.QW.Signature
 
+-- Define staged construction of quotient W-types using plump ordinals.
+-- This builds the quotient in stages indexed by ordinals, ensuring that
+-- equations are satisfied at each stage. The construction uses diagrams
+-- indexed by the plump ordinal order to control the complexity of terms.
 module QIT.QW.Stage {ℓS ℓP ℓE ℓV} (sig : Sig ℓS ℓP ℓE ℓV) where
 open Sig sig
 
@@ -11,50 +15,76 @@ open import QIT.Container.Functor S P
 open import QIT.Setoid as ≈
 open import QIT.Relation.Subset
 open import QIT.Relation.Plump S P
-open import QIT.QW.Diagram ≤p
+open import QIT.Setoid.Diagram ≤p
 open import QIT.QW.W sig
 open import Data.Maybe
 open import QIT.QW.Equation S P
 
+-- Stage α: elements of the underlying W-type bounded by ordinal α.
+-- This gives us size-bounded approximations to the final quotient.
 D₀ : (α : Z) → Set (ℓS ⊔ ℓP)
 D₀ α = ΣP T (_≤ᵀ α)
 
+-- Constructor for stage elements: build a tree with given shape and children.
+-- The ordinal bound is computed from the children's bounds using plump structure.
 psup : ∀ a μ (f : ∀ i → D₀ (μ i)) → D₀ (sup (ιˢ a , μ))
 psup a μ f = sup (a , λ i → f i .fst) , sup≤ (λ i → <sup i (f i .snd))
 
+-- Weakening: if α ≤ β then stage α embeds into stage β.
+-- This gives the morphisms in our diagram of stages.
 pweaken : ∀ {α β} → α ≤ β → D₀ α → D₀ β
 pweaken α≤β (t , t≤α) = t , ≤≤ α≤β t≤α
 
--- We only need to expand up to the depth of some ordinal.
-
+-- Ordinal complexity of expressions: measures the "depth" needed to satisfy equations.
+-- Variables have minimal complexity ⊥ᶻ, constructors have complexity based on arguments.
 ιᴱ : ∀ {ℓV} {V : Set ℓV} → Expr V → Z
 ιᴱ (sup (inj₁ v , f)) = ⊥ᶻ
 ιᴱ (sup (inj₂ s , f)) = sup (ιˢ s , λ i → ιᴱ (f i))
 
+-- Expression-ordinal comparison: when an expression fits within a stage.
 _≤ᴱ_ : ∀ {ℓV} {V : Set ℓV} → Expr V → Z → Prop (ℓS ⊔ ℓP)
 t ≤ᴱ α = ιᴱ t ≤ α
 
+-- Interpretation of equation sides as W-type elements.
+-- These functions evaluate expressions in the underlying W-type T.
+-- We work in T, requiring proof that the left and right substituted expressions
+-- are under the bound α. This is because stage sets are not
+-- algebras (not closed under sup), so it doesn't make sense to use
+-- as an assignment. Instead we use T-alg and require explicit proof
+-- on the ≈psat case.
 lhs' : ∀ e (ϕ : V {ℓV = ℓV} e → T) → T
 lhs' e ϕ = assign T-alg ϕ (lhs e)
 
 rhs' : ∀ e (ϕ : V {ℓV = ℓV} e → T) → T
 rhs' e ϕ = assign T-alg ϕ (rhs e)
 
+-- Stage-indexed equivalence relation: the quotient relation at each stage.
+-- This is built inductively using congruence, equation satisfaction,
+-- equivalence relation properties, and weakening.
 data _⊢_≈ᵇ_ : (α : Z) → D₀ α → D₀ α → Prop (ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV) where
+  -- Congruence: constructor applications respect equivalence
   ≈pcong : ∀ a μ (f g : ∀ i → D₀ (μ i))
         → (r : ∀ i → μ i ⊢ f i ≈ᵇ g i)
         → sup (ιˢ a , μ) ⊢ psup a μ f ≈ᵇ psup a μ g
+
+  -- Equation satisfaction: enforce the equations from the signature
   ≈psat : ∀ {α} e (ϕ : V e → T)
         → (l≤α : lhs' e ϕ ≤ᵀ α)
         → (r≤α : rhs' e ϕ ≤ᵀ α)
         → α ⊢  (lhs' e ϕ , l≤α)
             ≈ᵇ (rhs' e ϕ , r≤α)
-  ≈prefl : ∀ {α t̂} → α ⊢ t̂ ≈ᵇ t̂
-  ≈psym : ∀ {α ŝ t̂} → α ⊢ ŝ ≈ᵇ t̂ → α ⊢ t̂ ≈ᵇ ŝ
-  ≈ptrans : ∀ {α ŝ t̂ û} → α ⊢ ŝ ≈ᵇ t̂ → α ⊢ t̂ ≈ᵇ û → α ⊢ ŝ ≈ᵇ û
-  ≈pweaken : ∀ {α β} → (α≤β : α ≤ β) → {ŝ t̂ : D₀ α}
-          → α ⊢ ŝ ≈ᵇ t̂ → β ⊢ pweaken α≤β ŝ ≈ᵇ pweaken α≤β t̂
 
+  -- Equivalence relation structure
+  ≈prefl : ∀ {α t̂} → α ⊢ t̂ ≈ᵇ t̂
+  ≈psym : ∀ {α ŝ t̂} → α ⊢ ŝ ≈ᵇ t̂ → α ⊢ t̂ ≈ᵇ ŝ
+  ≈ptrans : ∀ {α ŝ t̂ û} → α ⊢ ŝ ≈ᵇ t̂ → α ⊢ t̂ ≈ᵇ û → α ⊢ ŝ ≈ᵇ û
+
+  -- Weakening: equivalences persist across stage inclusions
+  ≈pweaken : ∀ {α β} → (α≤β : α ≤ β) → {ŝ t̂ : D₀ α}
+          → α ⊢ ŝ ≈ᵇ t̂ → β ⊢ pweaken α≤β ŝ ≈ᵇ pweaken α≤β t̂
+
+-- Each stage forms a setoid with the stage-indexed equivalence.
+-- This gives us a sequence of quotient approximations.
 D̃ : (α : Z) → Setoid (ℓS ⊔ ℓP) (ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV)
 D̃ α = record
   { Carrier = D₀ α
@@ -64,20 +94,28 @@ D̃ α = record
     ; sym = ≈psym
     ; trans = ≈ptrans } }
 
+-- The complete diagram: stages connected by weakening morphisms.
+-- This forms a cocone over the plump ordinal preorder, and the colimit
+-- will give us the final quotient inductive type.
 D : Diagram (ℓS ⊔ ℓP) (ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV)
 D = record
-  { D-ob = D̃ 
+  { D-ob = D̃
   ; D-mor = Hom
   ; D-id = Id
   ; D-comp = Comp }
   where
+  -- Morphisms are weakening maps preserving equivalence
   Hom : ∀ {α β} → α ≤ β → ≈.Hom (D̃ α) (D̃ β)
   Hom {α} {β} α≤β = record
     { to = pweaken α≤β
     ; cong = ≈pweaken α≤β }
+
+  -- Identity law: weakening by reflexivity is the identity
   Id : ∀ {α} → (Hom (≤refl α)) ≈h ≈.idHom
-  Id {α} {ŝ} = ≈prefl
+  Id {α} {ŝ} = ≈prefl
+
+  -- Composition law: weakening composes correctly
   Comp : ∀ {α β γ} (p : α ≤ β) (q : β ≤ γ) →
       Hom (≤≤ q p) ≈h (Hom q ≈.∘ Hom p)
-  Comp {α} {β} {γ} p q {ŝ} =
-    ≈pweaken q (≈pweaken p (≈prefl {t̂ = ŝ}))
+  Comp {α} {β} {γ} p q {ŝ} =
+    ≈pweaken q (≈pweaken p (≈prefl {t̂ = ŝ}))

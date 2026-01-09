@@ -9,8 +9,8 @@ open import QIT.Mobile.Base I
 open import QIT.Setoid as ≈
 open import QIT.Container.Base
 open import QIT.Relation.Plump Sᵀ Pᵀ
+open import QIT.Setoid.Diagram ≤p
 
-open import QIT.QW.Diagram ≤p
 open import QIT.QW.Colimit ≤p ℓ0 (lsuc ℓ0)
 open import QIT.QW.Cocontinuity ≤p
 open import QIT.QW.Stage sig
@@ -21,13 +21,13 @@ open F-Ob
 
 module F = ≈.Functor F
 module D = Diagram D
-module F∘D = Diagram (F ∘ D)
+module F∘D = Diagram (F ∘ᴰ D)
 
 private
-  L = Colim (F ∘ D)
+  L = Colim (F ∘ᴰ D)
   R = F.F-ob (Colim D)
 
-ϕ₀ : ⟨ Colim (F ∘ D) ⟩ → ⟨ F.F-ob (Colim D) ⟩
+ϕ₀ : ⟨ Colim (F ∘ᴰ D) ⟩ → ⟨ F.F-ob (Colim D) ⟩
 ϕ₀ (α , (l , _)) = l , (λ ())
 ϕ₀ (α , (n , f)) = n , (λ b → α , f b)
 
@@ -43,7 +43,7 @@ private
     u :  α ⊢ f i ≈ᵇ g i
     u = snd≈ i
 
-ϕ-cong : ∀ {x y} → Colim (F ∘ D) [ x ≈ y ] → F.F-ob (Colim D) [ ϕ₀ x ≈ ϕ₀ y ]
+ϕ-cong : ∀ {x y} → Colim (F ∘ᴰ D) [ x ≈ y ] → F.F-ob (Colim D) [ ϕ₀ x ≈ ϕ₀ y ]
 ϕ-cong (≈lstage α e) = ϕ-cong-stage α e
 ϕ-cong (≈lstep {α} {j} p (l , _)) = mk≈ꟳ ≡.refl λ()
 ϕ-cong (≈lstep {α} {j} (sup≤ p) (n , f)) =

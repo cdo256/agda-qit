@@ -2,13 +2,16 @@ open import QIT.Prelude
 open import QIT.Relation.Base
 open import QIT.Relation.Binary
 open import QIT.Setoid
-import QIT.QW.Diagram
 
-module QIT.QW.Colimit {ℓI} {ℓ≤} 
+-- Define colimits of diagrams indexed by preorders.
+-- A colimit is the "union" of all objects in a diagram, identifying elements
+-- that become equal under the diagram's morphisms. This provides the categorical
+-- construction used to build quotient types from staged approximations.
+module QIT.QW.Colimit {ℓI} {ℓ≤}
   {I : Set ℓI}
   (≤p : Preorder I ℓ≤)
   (ℓD ℓD' : Level)
-  (P : QIT.QW.Diagram.Diagram ≤p ℓD ℓD')
+  (P : ≈.Diagram ≤p ℓD ℓD')
   where
 
   private
@@ -16,25 +19,32 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
     _≤_ : BinaryRel I ℓ≤
     _≤_ = ≤p .proj₁
 
-  open QIT.QW.Diagram ≤p
-  open Diagram P renaming (D-ob to P̂)
+  open ≈.Diagram P renaming (D-ob to P̂)
 
+  -- Extract underlying function from diagram morphism
   Pf : ∀ {i j} (p : i ≤ j) → (⟨ P̂ i ⟩ → ⟨ P̂ j ⟩)
   Pf p = to
     where open ≈.Hom (D-mor p)
 
-  -- The carrier of the colimit (Sigma type)
+  -- Carrier of the colimit: disjoint union of all objects in the diagram.
+  -- Elements are tagged by their stage index i and contain a value from P̂ i.
   Colim₀ : Set (ℓI ⊔ ℓD)
   Colim₀ = Σ[ i ∈ I ] ⟨ P̂ i ⟩
 
-  -- The equivalence relation generating the colimit
+  -- Colimit equivalence relation: identifies elements across diagram morphisms.
+  -- This is the minimal equivalence relation that makes diagram morphisms
+  -- into equivalences in the colimit.
   data _≈ˡ_ : Colim₀ → Colim₀ → Prop (ℓ≤ ⊔ ℓI ⊔ ℓD ⊔ ℓD') where
+    -- Respect equivalence within each stage
     ≈lstage : ∀ i → {x x' : ⟨ P̂ i ⟩} → P̂ i [ x ≈ x' ]
             → (i , x) ≈ˡ (i , x')
+    -- Diagram morphisms become equivalences: x ≈ Pf p x
     ≈lstep  : ∀ {i j} (p : i ≤ j) (x : ⟨ P̂ i ⟩) → (i , x) ≈ˡ (j , Pf p x)
+    -- Equivalence relation structure
     ≈lsym   : ∀ {s t} → s ≈ˡ t → t ≈ˡ s
     ≈ltrans : ∀ {s t u} → s ≈ˡ t → t ≈ˡ u → s ≈ˡ u
 
+  -- Eliminator for colimit equivalence relation
   recˡ : ∀ {ℓ} (C : ∀ {s t} → s ≈ˡ t → Prop ℓ)
        → (c-stage : ∀ i {x x'} (e : P̂ i [ x ≈ x' ]) → C (≈lstage i e))
        → (c-step  : ∀ {i j} (p : i ≤ j) (x : ⟨ P̂ i ⟩) → C (≈lstep p x))
@@ -49,10 +59,12 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
       go (≈lsym r)        = c-sym r (go r)
       go (≈ltrans r₁ r₂)  = c-trans r₁ r₂ (go r₁) (go r₂)
 
+  -- Reflexivity follows from stage reflexivity
   ≈lrefl : ∀ {t} → t ≈ˡ t
   ≈lrefl {i , x} = ≈lstage i (P̂ i .refl)
     where open ≈.Setoid
 
+  -- Prove that ≈ˡ is an equivalence relation
   equiv : IsEquivalence _≈ˡ_
   equiv = record
     { refl  = ≈lrefl
@@ -61,7 +73,7 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
     }
     where open ≈.Setoid
 
-  -- The Colimit Setoid
+  -- The colimit setoid: disjoint union quotiented by the colimit relation
   Colim : Setoid (ℓI ⊔ ℓD) (ℓI ⊔ ℓ≤ ⊔ ℓD ⊔ ℓD')
   Colim = record
     { Carrier       = Colim₀
@@ -69,18 +81,23 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
     ; isEquivalence = equiv
     }
 
-  -- Cocones for this diagram
-  -- Note: Apex lives in the same universe as the Colimit for simplicity here
+  -- Cocones: setoids equipped with morphisms from each diagram object
+  -- that commute with diagram morphisms. These are the "candidates" for
+  -- being colimits - they represent ways to "collect" the diagram.
   record Cocone : Set (lsuc (ℓ≤ ⊔ ℓD' ⊔ ℓD ⊔ ℓI)) where
     field
+      -- Target setoid
       Apex     : Setoid (ℓI ⊔ ℓD) (ℓI ⊔ ℓ≤ ⊔ ℓD ⊔ ℓD')
+      -- Injection from each diagram object
       inj      : ∀ i → ≈.Hom (P̂ i) Apex
+      -- Commutativity: injections respect diagram morphisms
       commutes : ∀ {i j} (p : i ≤ j)
                → (inj i) ≈h (inj j ≈.∘ D-mor p)
 
   open Cocone
 
-  -- The canonical cocone into the colimit
+  -- The canonical cocone into our colimit construction.
+  -- This includes each P̂ i into the disjoint union Colim.
   LimitCocone : Cocone
   LimitCocone = record
     { Apex     = Colim
@@ -88,7 +105,7 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
     ; commutes = λ p {x = x} → ≈lstep p x
     }
 
-  -- Morphisms of cocones
+  -- Morphisms between cocones: homomorphisms of apexes that preserve injections
   record ColimMorphism (C C' : Cocone) : Set (ℓI ⊔ ℓ≤ ⊔ ℓD ⊔ ℓD') where
     field
       apexHom  : ≈.Hom (C .Apex) (C' .Apex)
@@ -96,10 +113,13 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
 
   open ColimMorphism
 
-  -- Universal Property Definition
+  -- Universal property of colimits: there's a unique morphism to any other cocone.
+  -- This characterizes the colimit as the "most efficient" way to collect the diagram.
   record isLimitingCocone (C : Cocone) : Set (lsuc ℓI ⊔ lsuc ℓ≤ ⊔ lsuc ℓD ⊔ lsuc ℓD') where
     field
+      -- Mediating morphism to any cocone
       mor    : ∀ C' → ColimMorphism C C'
+      -- Uniqueness of the mediating morphism
       unique : ∀ C' → (F : ColimMorphism C C')
              → F .apexHom ≈h mor C' .apexHom
 
@@ -107,15 +127,17 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
 
   open ≈.Hom
 
-  -- Proof that LimitCocone is limiting
+  -- Proof that our construction satisfies the universal property
   module IsLimitingCocone (C' : Cocone) where
     module C' = Cocone C'
     module ApexSetoid = ≈.Setoid C'.Apex
 
     private
+      -- The mediating function: send (i,x) to inj_i(x) in C'
       f : ⟨ Colim ⟩ → ⟨ C'.Apex ⟩
       f (i , x) = C'.inj i .to x
 
+    -- Prove f respects the colimit equivalence relation
     isRespecting : ∀ {i j x y} → (i , x) ≈ˡ (j , y) →
                    f (i , x) ApexSetoid.≈ f (j , y)
     isRespecting (≈lstage i x≈y) = C' .inj i .cong x≈y
@@ -124,6 +146,7 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
     isRespecting (≈ltrans r s)   =
       ApexSetoid.trans (isRespecting r) (isRespecting s)
 
+    -- The mediating morphism and proof it makes diagrams commute
     F : ColimMorphism LimitCocone C'
     F .apexHom .to  = f
     F .apexHom .cong = isRespecting
@@ -131,10 +154,12 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
       C'.inj (LimitCocone .inj i .to x .proj₁)
         .cong (P̂ i .≈.Setoid.refl)
 
+    -- Uniqueness: any morphism must agree with f
     unq : (G : ColimMorphism LimitCocone C') →
           ∀ x → G .apexHom .to x ApexSetoid.≈ f x
     unq G (i , x) = G .commutes i
 
+  -- Main theorem: our construction is the colimit
   isLimitingCoconeLimitCocone : isLimitingCocone LimitCocone
   isLimitingCoconeLimitCocone = record
     { mor    = F
@@ -142,4 +167,3 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
     }
     where
     open IsLimitingCocone
-
