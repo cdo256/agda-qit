@@ -11,12 +11,11 @@ open import QIT.Container.Base
 open import QIT.Relation.Plump Sᵀ Pᵀ
 
 open import QIT.QW.Diagram ≤p
-open import QIT.QW.Colimit ≤p ℓ0 ℓ0
+open import QIT.QW.Colimit ≤p ℓ0 (lsuc ℓ0)
 open import QIT.QW.Cocontinuity ≤p
+open import QIT.QW.Stage sig
 
-open import QIT.Stage.Homo sig
-
-open import QIT.Container.Functor Sᵀ Pᵀ ℓ0 ℓ0
+open import QIT.Container.Functor Sᵀ Pᵀ ℓ0 (lsuc ℓ0)
 
 open F-Ob
 

@@ -23,13 +23,19 @@ record Equation ℓV : Set (lsuc ℓV ⊔ ℓS ⊔ ℓP) where
 module _ (Xα : ≈.Algebra (F (ℓS ⊔ ℓP) (ℓS ⊔ ℓP))) where
   open ≈.Algebra Xα
   module X = Setoid X
+
   assign : ∀ {ℓV} → {V : Set ℓV} (ϕ : V → ⟨ X ⟩) (e : Expr V) → ⟨ X ⟩
   assign ϕ (sup (inj₁ v , _)) = ϕ v
   assign ϕ (sup (inj₂ s , f)) = α .≈.Hom.to (s , λ i → assign ϕ (f i))
 
+  Assignment : ∀ {ℓV} → Equation ℓV → Set (ℓS ⊔ ℓP ⊔ ℓV)
+  Assignment e = V → ⟨ X ⟩
+    where open Equation e
+
+
   SatEq : ∀ {ℓV} → Equation ℓV
         → Prop (ℓS ⊔ ℓP ⊔ ℓV)
-  SatEq e = ∀ (ϕ : V → ⟨ X ⟩) → assign ϕ lhs X.≈ assign ϕ rhs
+  SatEq e = ∀ (ϕ : Assignment e) → assign ϕ lhs X.≈ assign ϕ rhs
     where open Equation e
 
   Sat : ∀ {ℓE ℓV} → {E : Set ℓE}

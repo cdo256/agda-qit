@@ -31,16 +31,17 @@ import QIT.Container.Functor
 import QIT.QW.Equation
 import QIT.QW.Signature
 import QIT.QW.Algebra
+import QIT.QW.Stage
 import QIT.QW.Diagram
 import QIT.QW.Colimit
 import QIT.QW.Cocontinuity
+import QIT.QW.W
+import QIT.QW
 
--- Stage Sets
-import QIT.Stage.Base
-import QIT.Stage.Homo
--- import QIT.Stage.Hetero
-
--- Mobile construction 
+-- Mobile construction
 import QIT.Mobile.Base
--- import QIT.Mobile.Stage.Hetero
 import QIT.Mobile.Cocontinuity
+
+-- Examples
+-- import QIT.Examples.BoundedRational
+import QIT.Examples.HoleList
