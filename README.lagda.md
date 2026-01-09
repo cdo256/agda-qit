@@ -8,9 +8,18 @@ module README where
 
 This repository develops mathematical foundations for Quotient Inductive Types (QITs) using setoid-based category theory, building toward proving cocontinuity for specific classes of QITs without choice principles.
 
-## Key Innovation: Choice-Free Construction
+## The Ambient Type Theory 
 
-This work aims to identify a class of QW-type signatures where cocontinuity can be proved without WISC (Weak Infinite Set of Choices). While Blass (1983) shows that, in general, cocontinuity-type statements for polynomial-like functors can require choice principles, and Fiore et al. (2022) use WISC to obtain cocontinuity for general QW-type signatures, we investigate whether mobiles might satisfy a locality/compactness property that sidesteps these barriers.
+We work in standard intentional type theory with the following axioms:
+ - Uniqueness of Equality Proofs (UIP, --with-k): `Set`.
+ - Propositional erasure types (--prop): `Prop`.
+ - Function extensionality for Prop and Set.
+
+Note that we do not use rewriting, or any other postulates, but to actually perform the quotienting, quotient postulates would need to be employed.
+
+## Key Innovation: WISC-Free Construction
+
+This work aims to identify a class of QW-type signatures where cocontinuity can be proved without WISC (Weak Infinite Set of Choices). While Blass (1983) shows that, there are classical obstructions showing some colimit preservation statements imply choice principles in broad settings. Fiore et al. (2022) use WISC to obtain cocontinuity for general QW-type signatures, we investigate whether mobiles might satisfy a locality/compactness property that sidesteps these barriers.
 
 Our hypothesis is that mobiles exhibit sufficient structural constraints to avoid the choice-theoretic obstacles. We aim to work without WISC or global choice principles, avoiding assumptions beyond what is derivable from the ambient type theory.
 
@@ -37,7 +46,7 @@ Rather than relying solely on Agda's built-in propositional equality, we work wi
 
 ## Size Control: Plump Ordinals
 
-One of the key insights from Fiore et al. (2022) is that QIT constructions require careful size management to ensure termination. We follow their approach using plump ordinals: well-founded ordinals with join operations that provide size bounds for controlling the depth of potentially infinite constructions:
+One of the key insights from Fiore et al. (2022) is that QIT constructions require careful size management to ensure termination. We follow their approach using plump ordinals: W-types with a well-founded order that provide size bounds for controlling the depth of potentially infinite constructions:
 
 ```agda
 open import QIT.Relation.Plump
@@ -139,12 +148,7 @@ The mobile signature captures a simple idea: tree structures where the ordering 
 open import QIT.Mobile.Base
 ```
 
-Mobiles provide the mathematical foundation that makes choice-free cocontinuity possible. They capture essential symmetries through:
-
-- Permutation symmetry: QIT equivalences respect reordering of branching structures
-- Structural irrelevance: Leaf nodes are equivalent regardless of content
-- Binding-aware equivalences: Proper handling of variable binding and renaming
-- Constructive equivalences: All equivalence relations are defined constructively
+Mobiles provide the mathematical foundation that makes choice-free cocontinuity possible. They preserve permutation symmetry: QIT equivalences respect reordering of branching structures.
 
 The mobile cocontinuity proof represents the current frontier of the research program:
 
@@ -156,10 +160,9 @@ The module `QIT.Mobile.Cocontinuity` attempts to constructively establish the cr
 
 ## Technical Foundation
 
-The choice-free approach relies on several key technical innovations:
+The WISC-free approach relies on several key technical innovations:
 
-- Setoid-based categorical semantics: Working in setoid categories provides better extensionality without requiring choice
-- Size-based termination: Following Fiore et al. (2022), uses plump ordinals for well-founded recursion without choice axioms
+- Size-based termination: Following Fiore et al. (2022), uses plump ordinals for well-founded recursion without any choice axioms
 - Constructive mobile equivalences: All equivalence relations are defined constructively
 - Explicit isomorphism construction: Direct construction of cocontinuity isomorphisms without existential quantification
 
@@ -167,24 +170,24 @@ The choice-free approach relies on several key technical innovations:
 
 This formalization directly addresses fundamental limitations in QW-type theory:
 
-- **Blass (1983) limitation**: Shows that, in general, cocontinuity-type statements for polynomial-like functors can require choice principles
-- **Fiore et al. (2022) approach**: "Quotient inductive-inductive types" uses WISC for general QW-type cocontinuity
-- **This work's contribution**: Investigates whether the mobile signature represents a specific class achieving choice-free cocontinuity
-- **Theoretical significance**: Would demonstrate that choice-theoretic barriers are not universal
+- *Blass (1983) limitation*: Shows that, in general, cocontinuity-type statements for polynomial-like functors can require choice principles
+- *Fiore et al. (2022) approach*: "Quotient inductive-inductive types" uses WISC for general QW-type cocontinuity
+- *This work's contribution*: Investigates whether the mobile signature represents a specific class achieving choice-free cocontinuity
+- *Theoretical significance*: Would demonstrate that choice-theoretic barriers are not universal
 
-## Current Status and Research Challenges
+## Current Status
 
-### What Works
+### Done
 - Complete setoid-based categorical foundation
 - Container theory with functorial properties
 - Plump ordinal framework for size bounds
 - Staged QW construction with colimits
 - Mobile signature and forward cocontinuity direction
 
-### Major Open Problems
-- **Mobile cocontinuity reverse direction**: Construction of the backward isomorphism encounters substantial technical obstacles
-- **Ordinal bound management**: Complex interactions between stage ordinals and permutation equations
-- **Choice-freedom question**: Even if completed, whether this truly avoids all choice principles remains unclear
+### In Progress
+- *Mobile cocontinuity reverse direction*: Construction of the backward isomorphism encounters substantial technical obstacles.
+
+
 
 ## Research Significance
 
@@ -193,3 +196,19 @@ Blass (1983) shows that, in general, cocontinuity for polynomial-like functors c
 The forward direction of the cocontinuity isomorphism $F(\text{Colim } D) \to \text{Colim}(F \circ D)$ is successfully implemented. However, the reverse direction encounters substantial technical challenges involving ordinal bound management and permutation equivalence construction across different stages.
 
 If successful, this would demonstrate that specific QW-types achieve cocontinuity without choice principles, potentially opening new directions in constructive type theory. The mobile example serves as a crucial test case for understanding the true boundaries of choice-free QIT theory.
+
+## Technical Requirements and Usage
+
+Dependencies: 
+- Agda 2.8.
+- Agda standard library 2.3.
+
+Build System:
+- A Nix development environment is available (provided via `flake.nix`)
+- Standard Agda library compilation via `agda-qit.agda-lib`
+
+To typecheck, run,
+
+```bash
+agda Everything.agda
+```
