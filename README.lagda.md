@@ -37,17 +37,17 @@ Rather than relying solely on Agda's built-in propositional equality, we work wi
 
 ## Size Control: Plump Ordinals
 
-One of the key insights from Fiore et al. (2022) is that QIT constructions require careful size management to ensure termination. We follow their approach using plump ordinals—well-founded ordinals with join operations that provide size bounds for controlling the depth of potentially infinite constructions:
+One of the key insights from Fiore et al. (2022) is that QIT constructions require careful size management to ensure termination. We follow their approach using plump ordinals: well-founded ordinals with join operations that provide size bounds for controlling the depth of potentially infinite constructions:
 
 ```agda
 open import QIT.Relation.Plump
 ```
 
-Plump ordinals are not just any ordinals—they're specifically designed ordinals with join operations that provide the size bounds needed to build QITs in stages.
+Plump ordinals are not just any ordinals: they're specifically designed ordinals with join operations that provide the size bounds needed to build QITs in stages.
 
 ## Setoid-Based Category Theory
 
-Instead of working with strict equality, we embrace the world of setoids—sets equipped with equivalence relations. Why setoids? Because QITs are fundamentally about quotients—identifying elements that should be considered the same even if they're not strictly equal.
+Instead of working with strict equality, we embrace the world of setoids: sets equipped with equivalence relations. Why setoids? Because QITs are fundamentally about quotients, identifying elements that should be considered the same even if they're not strictly equal.
 
 We start with core setoid definitions that provide carriers with user-defined equivalence relations, then build homomorphisms that preserve equivalence relations between setoids:
 
@@ -74,7 +74,7 @@ Diagrams are crucial for organizing our staged constructions. They provide diagr
 open import QIT.Setoid.Diagram
 ```
 
-Diagrams let us organize families of setoids with transition maps between them—exactly what we need for building QITs stage by stage.
+Diagrams let us organize families of setoids with transition maps between them, exactly what we need for building QITs stage by stage.
 
 ## Container Theory: Capturing Constructors
 
@@ -119,13 +119,13 @@ What are we building toward? Algebras that satisfy all the equations in our sign
 open import QIT.QW.Algebra
 ```
 
-How do we get from the stages to the final result? By taking the colimit—the categorical construction that glues together all the finite stages into the final infinite object:
+How do we get from the stages to the final result? By taking the colimit: the categorical construction that glues together all the finite stages into the final infinite object:
 
 ```agda
 open import QIT.QW.Colimit
 ```
 
-We need to prove that our QIT constructors have the right universal properties. This requires proving that the relevant functors preserve colimits—they're *cocontinuous*:
+We need to prove that our QIT constructors have the right universal properties. This requires proving that the relevant functors preserve colimits (they're *cocontinuous*):
 
 ```agda
 open import QIT.QW.Cocontinuity
@@ -188,7 +188,7 @@ This formalization directly addresses fundamental limitations in QW-type theory:
 
 ## Research Significance
 
-Blass (1983) shows that, in general, cocontinuity for polynomial-like functors can require choice principles, and Fiore et al. (2022) use WISC for general QW-type signatures. If we can prove the mobile signature is cocontinuous without these assumptions, we'd show that the choice-theoretic barriers aren't universal—that there exist meaningful classes of QIT signatures that sidestep these fundamental obstacles entirely.
+Blass (1983) shows that, in general, cocontinuity for polynomial-like functors can require choice principles, and Fiore et al. (2022) use WISC for general QW-type signatures. If we can prove the mobile signature is cocontinuous without these assumptions, we'd show that the choice-theoretic barriers aren't universal: that there exist meaningful classes of QIT signatures that sidestep these fundamental obstacles entirely.
 
 The forward direction of the cocontinuity isomorphism $F(\text{Colim } D) \to \text{Colim}(F \circ D)$ is successfully implemented. However, the reverse direction encounters substantial technical challenges involving ordinal bound management and permutation equivalence construction across different stages.
 
