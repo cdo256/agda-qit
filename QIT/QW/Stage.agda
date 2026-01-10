@@ -18,7 +18,7 @@ open import QIT.Relation.Plump S P
 open import QIT.Setoid.Diagram ≤p
 open import QIT.QW.W sig
 open import Data.Maybe
-open import QIT.QW.Equation S P
+open import QIT.QW.Equation S P using (Expr; assign; Assignment)
 
 -- Stage α: elements of the underlying W-type bounded by ordinal α.
 -- This gives us size-bounded approximations to the final quotient.
@@ -52,15 +52,16 @@ t ≤ᴱ α = ιᴱ t ≤ α
 -- algebras (not closed under sup), so it doesn't make sense to use
 -- as an assignment. Instead we use T-alg and require explicit proof
 -- on the ≈psat case.
-lhs' : ∀ e (ϕ : V {ℓV = ℓV} e → T) → T
-lhs' e ϕ = assign T-alg ϕ (lhs e)
+lhs' : ∀ (e : E) (ϕ : Assignment T-alg (Ξ e)) → T
+lhs' e ϕ = assign T-alg ϕ (Ξ e .lhs)
 
-rhs' : ∀ e (ϕ : V {ℓV = ℓV} e → T) → T
-rhs' e ϕ = assign T-alg ϕ (rhs e)
+rhs' : ∀ (e : E) (ϕ : Assignment T-alg (Ξ e)) → T
+rhs' e ϕ = assign T-alg ϕ (Ξ e .rhs)
 
 -- Stage-indexed equivalence relation: the quotient relation at each stage.
 -- This is built inductively using congruence, equation satisfaction,
 -- equivalence relation properties, and weakening.
+infixl 3 _⊢_≈ᵇ_
 data _⊢_≈ᵇ_ : (α : Z) → D₀ α → D₀ α → Prop (ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV) where
   -- Congruence: constructor applications respect equivalence
   ≈pcong : ∀ a μ (f g : ∀ i → D₀ (μ i))
@@ -68,7 +69,7 @@ data _⊢_≈ᵇ_ : (α : Z) → D₀ α → D₀ α → Prop (ℓS ⊔ ℓP ⊔
         → sup (ιˢ a , μ) ⊢ psup a μ f ≈ᵇ psup a μ g
 
   -- Equation satisfaction: enforce the equations from the signature
-  ≈psat : ∀ {α} e (ϕ : V e → T)
+  ≈psat : ∀ {α} (e : E) (ϕ : Assignment T-alg (Ξ e))
         → (l≤α : lhs' e ϕ ≤ᵀ α)
         → (r≤α : rhs' e ϕ ≤ᵀ α)
         → α ⊢  (lhs' e ϕ , l≤α)
@@ -82,6 +83,34 @@ data _⊢_≈ᵇ_ : (α : Z) → D₀ α → D₀ α → Prop (ℓS ⊔ ℓP ⊔
   -- Weakening: equivalences persist across stage inclusions
   ≈pweaken : ∀ {α β} → (α≤β : α ≤ β) → {ŝ t̂ : D₀ α}
           → α ⊢ ŝ ≈ᵇ t̂ → β ⊢ pweaken α≤β ŝ ≈ᵇ pweaken α≤β t̂
+
+module _ {ℓW}
+  (P : ∀ {α} {s t : D₀ α} → α ⊢ s ≈ᵇ t → Prop ℓW)
+  (mcong : ∀ a μ f g (r : ∀ i → μ i ⊢ f i ≈ᵇ g i)
+          → (∀ i → P (r i))
+          → P (≈pcong a μ f g r))
+  (msat : ∀ {α} (e : E) ϕ (l≤α : lhs' e ϕ ≤ᵀ α) (r≤α : rhs' e ϕ ≤ᵀ α)
+        → P (≈psat {α} e ϕ l≤α r≤α))
+  (mrefl : ∀ {α t} → P (≈prefl {α} {t}))
+  (msym : ∀ {α s t} (p : α ⊢ s ≈ᵇ t) → P p → P (≈psym p))
+  (mtrans : ∀ {α s t u} (p : α ⊢ s ≈ᵇ t) (q : α ⊢ t ≈ᵇ u)
+          → P p → P q → P (≈ptrans p q))
+  (mweaken : ∀ {α β} (α≤β : α ≤ β) {s t : D₀ α} (p : α ⊢ s ≈ᵇ t)
+            → P p → P (≈pweaken α≤β p))
+  where
+  ≈ᵇ-elim : ∀ {α} {s t : D₀ α} (p : α ⊢ s ≈ᵇ t) → P p
+  ≈ᵇ-elim (≈pcong a μ f g r) =
+    mcong a μ f g r (λ i → ≈ᵇ-elim (r i))
+  ≈ᵇ-elim (≈psat e ϕ l≤α r≤α) =
+    msat e ϕ l≤α r≤α
+  ≈ᵇ-elim ≈prefl =
+    mrefl
+  ≈ᵇ-elim (≈psym p) =
+    msym p (≈ᵇ-elim p)
+  ≈ᵇ-elim (≈ptrans p q) =
+    mtrans p q (≈ᵇ-elim p) (≈ᵇ-elim q)
+  ≈ᵇ-elim (≈pweaken α≤β p) =
+    mweaken α≤β p (≈ᵇ-elim p)
 
 -- Each stage forms a setoid with the stage-indexed equivalence.
 -- This gives us a sequence of quotient approximations.
