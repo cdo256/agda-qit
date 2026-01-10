@@ -72,8 +72,6 @@ shape-preserved α s t (≈pweaken α≤β s≈t) = shape-preserved _ _ _ s≈t
 node≉ᵇleaf : ∀ α {f g} s t → sup (n , f) ≡ s .fst → sup (l , g) ≡ t .fst → α ⊢ s ≈ᵇ t → ⊥p
 node≉ᵇleaf α s t f̂≡s ĝ≡t s≈t = n≢l (substp₂ (λ s t → shape s ≡p shape t) (≡.sym f̂≡s) (≡.sym ĝ≡t)
                                             (shape-preserved α s t s≈t))
-
-
 -- Fully inductive stage proofs, following the pattern  of the data.
 infixl 3 _⊢_≈ˢ_
 data _⊢_≈ˢ_ : (α : Z) → D₀ α → D₀ α → Prop ℓ0 where
@@ -126,6 +124,23 @@ data _⊢_≈ˢ_ : (α : Z) → D₀ α → D₀ α → Prop ℓ0 where
     p : ∀ (i : I) → _≡_ {A = D₀ (τ i)} (g (π̂ (π⁻¹ i)) , substp (λ ○ → g ○ ≤ᵀ τ i)
                                        (≡.sym (linv i)) (gi≤τi i)) (g i , gi≤τi i)
     p i = ΣP≡ _ _ (≡.cong g (linv i))
+
+≈strans : ∀ {α} {ŝ t̂ û : D₀ α} → α ⊢ ŝ ≈ˢ t̂ → α ⊢ t̂ ≈ˢ û → α ⊢ ŝ ≈ˢ û
+≈strans {α} {sup (l , f) , s≤α} {sup (l , g) , t≤α} {sup (l , h) , u≤α} ŝ≈t̂ t̂≈û = ≈sleaf s≤α u≤α
+≈strans {α} {sup (n , f) , s≤α} {sup (n , g) , t≤α} {sup (n , h) , u≤α}
+  (≈snode μ μi<α f g π fi≤μi gπi≤μi fi≈gπi)
+  (≈snode τ τi<α g h ρ gi≤τi hρi≤τi gi≈hρi) =
+  ≈snode μ μi<α f h (ρ ↔.∘ π) fi≤μi hρπi≤μi {!!}
+  where
+  module π = _↔_ π
+  module ρ = _↔_ ρ 
+  open _↔_ π renaming (to to π̂; from to π⁻¹)
+  open _↔_ ρ renaming (to to ρ̂; from to ρ⁻¹)
+  hρπi≤μi : ∀ i → h (ρ̂ (π̂ i)) ≤ᵀ μ i  
+  hρπi≤μi i = {!!}
+
+-- ≈strans {α} {sup (n , f) , s≤α} {sup (n , g) , t≤α} {sup (l , g) , t≤α}
+
 
 ≈ᵇ→≈ˢ : (α : Z) → (ŝ t̂ : D₀ α) → α ⊢ ŝ ≈ᵇ t̂ → α ⊢ ŝ ≈ˢ t̂
 ≈ᵇ→≈ˢ α (sup (l , f) , s≤α) (sup (n , g) , t≤α) ŝ≈t̂ =

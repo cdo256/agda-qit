@@ -115,6 +115,17 @@ module ↔ where
     ; linv = X↔Y .rinv }
     where open _↔_ X↔Y
 
+  _∘_ : {X Y Z : Set} → Y ↔ Z → X ↔ Y → X ↔ Z
+  q ∘ p = record
+    { to = λ x → q.to (p.to x)
+    ; from = λ z → p.from (q.from z)
+    ; rinv = λ x → ≡.trans (≡.cong p.from (q.rinv (p.to x))) (p.rinv x)
+    ; linv = λ z → ≡.trans (≡.cong q.to (p.linv (q.from z))) (q.linv z) }
+    where
+    module p = _↔_ p
+    module q = _↔_ q
+  
+
 open ↔ using (_↔_) public
 
 ⊥* : ∀ {ℓ} → Set ℓ
