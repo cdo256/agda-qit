@@ -1,6 +1,6 @@
 module QIT.Prelude where
 
-open import Level public using (Level; _⊔_; Lift; lift)
+open import Level public using (Level; _⊔_; Lift; lift; lower)
   renaming (suc to lsuc; zero to ℓ0)
 import Relation.Binary.PropositionalEquality
 module ≡ = Relation.Binary.PropositionalEquality
@@ -47,10 +47,17 @@ Trunc₂ R x y = ∥ R x y ∥
 
 -- These are quite differnet concepts, with confusingly similar names.
 -- ≡p is trunctated equality down to a path.
--- ≡ᴾ is an (untruncated) path over propositions
 infix 4 _≡p_
 _≡p_ : ∀ {ℓ} {A : Set ℓ} (x y : A) → Prop ℓ
 x ≡p y = ∥ x ≡ y ∥
+
+pattern reflp = ∣ ≡.refl ∣
+
+symp : ∀ {ℓ} {A : Set ℓ} {x y : A} → x ≡p y → y ≡p x 
+symp reflp = reflp
+
+transp : ∀ {ℓ} {A : Set ℓ} {x y z : A} → x ≡p y → y ≡p z → x ≡p z 
+transp reflp reflp = reflp
 
 substp : ∀ {A : Set ℓ} (B : A → Prop ℓ') {a1 a2 : A} (p : a1 ≡ a2) → B a1 → B a2
 substp B ≡.refl x = x
@@ -131,8 +138,8 @@ data Dec {ℓA} (A : Set ℓA) : Set ℓA where
 
 Discrete : ∀ {ℓA} (A : Set ℓA) → Set ℓA
 Discrete A = ∀ (x y : A) → Dec (x ≡ y)
-  
-infixr 3 if_then_else_ 
+
+infixr 3 if_then_else_
 if_then_else_ : ∀ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} (decA : Dec A) → B → B → B
 if yes _ then b else b' = b
 if no _ then b else b' = b'
