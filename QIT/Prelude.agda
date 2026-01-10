@@ -62,8 +62,12 @@ transp reflp reflp = reflp
 substp : ∀ {A : Set ℓ} (B : A → Prop ℓ') {a1 a2 : A} (p : a1 ≡ a2) → B a1 → B a2
 substp B ≡.refl x = x
 
+substp₂ : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : Set ℓB} (C : A → B → Prop ℓC) {a1 a2 : A} {b1 b2 : B}
+        → (p : a1 ≡ a2) (q : b1 ≡ b2) → C a1 b1 → C a2 b2
+substp₂ C ≡.refl ≡.refl c = c
+
 substp' : ∀ {A : Set ℓ} (B : A → Prop ℓ') {a1 a2 : A} (p : a1 ≡p a2) → B a1 → B a2
-substp' B ∣ _≡_.refl ∣ x = x
+substp' B reflp x = x
 
 postulate
   -- Cannot be proven from funExt

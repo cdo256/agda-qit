@@ -54,6 +54,9 @@ private
 node≢leaf : ∀ {f g} → _≡_ {A = T} (sup (n , f)) (sup (l , g)) → ⊥p
 node≢leaf ()
 
+n≢l : n ≡p l → ⊥p
+n≢l ∣ () ∣
+
 shape : T → Sᵀ
 shape (sup (s , _)) = s
 
@@ -66,44 +69,82 @@ shape-preserved α s t (≈ptrans {t̂ = u} s≈u u≈t) =
   transp (shape-preserved α s u s≈u) (shape-preserved α u t u≈t)
 shape-preserved α s t (≈pweaken α≤β s≈t) = shape-preserved _ _ _ s≈t
 
--- node≉ᵇleaf : ∀ α {f g} s t → sup (n , f) ≡ s .fst → sup (l , g) ≡ t .fst → α ⊢ s ≈ᵇ t → ⊥p
--- node≉ᵇleaf α s t n≡s l≡t (≈pcong a μ f g r) = {!!}
--- node≉ᵇleaf α s t n≡s l≡t (≈psat e ϕ l≤α r≤α) = {!!}
--- node≉ᵇleaf α s t ≡.refl l≡t ≈prefl = node≢leaf (≡.sym l≡t)
--- node≉ᵇleaf α s t ≡.refl ≡.refl (≈psym s≈t) = {!!}
--- node≉ᵇleaf α s t n≡s l≡t (≈ptrans s≈t s≈t₁) = {!!}
--- node≉ᵇleaf β s t n≡s l≡t (≈pweaken {α = α} α≤β s≈t) = node≉ᵇleaf α (s .fst , _) (t .fst , _) n≡s l≡t s≈t
--- -- node≉ᵇleaf α f f̂≤α p = ≈ᵇ-elim {!!} {!!} {!!} {!!} {!!} {!!} {!!} {!!}
--- --   where
--- --   C : ∀ {α s t} → (α ⊢ s ≈ᵇ t) → Prop {!!}
--- --   C {α} {s} {t} s≈t = {!s≡!}
+node≉ᵇleaf : ∀ α {f g} s t → sup (n , f) ≡ s .fst → sup (l , g) ≡ t .fst → α ⊢ s ≈ᵇ t → ⊥p
+node≉ᵇleaf α s t f̂≡s ĝ≡t s≈t = n≢l (substp₂ (λ s t → shape s ≡p shape t) (≡.sym f̂≡s) (≡.sym ĝ≡t)
+                                            (shape-preserved α s t s≈t))
 
 
--- node≉ᵇleaf : ∀ α f → (f̂≤α : sup (n , f) ≤ᵀ α) → α ⊢ sup (n , f) , f̂≤α ≈ᵇ sup (l , λ()) , sup≤ (λ ()) → ⊥p
--- node≉ᵇleaf α f f̂≤α p = ≈ᵇ-elim {!!} {!!} {!!} {!!} {!!} {!!} {!!} {!!}
---   where
---   C : ∀ {α s t} → (α ⊢ s ≈ᵇ t) → Prop {!!}
---   C {α} {s} {t} s≈t = {!s≡!}
+-- Fully inductive stage proofs, following the pattern  of the data.
+infixl 3 _⊢_≈ˢ_
+data _⊢_≈ˢ_ : (α : Z) → D₀ α → D₀ α → Prop ℓ0 where
+  ≈sleaf : ∀ {α} → α ⊢ sup (l , λ()) , sup≤ (λ()) ≈ˢ sup (l , λ()) , sup≤ (λ())
+  ≈snode : ∀ {α : Z} (μ : I → Z)
+         → (μi<α : ∀ i → μ i < α)
+         → (f g : I → T)
+         → (π : I ↔ I)
+         → (fi≤μi : ∀ i → f i ≤ᵀ μ i)
+         → (gπi≤μi : ∀ i → g (π .↔.to i) ≤ᵀ μ i)
+         → (fi≈gπi : ∀ i → μ i ⊢ f i , fi≤μi i ≈ˢ g (π .↔.to i) , gπi≤μi i)
+         → α ⊢  (sup (n , f)) , ≤≤ (sup≤ μi<α) (sup≤sup fi≤μi)
+             ≈ˢ (sup (n , g)) , ≤≤ (sup≤ λ i → μi<α (π .↔.from i))
+                  (sup≤sup λ i → substp (λ ○ → g ○ ≤ᵀ μ (π .↔.from i)) (π .↔.linv i) (gπi≤μi (π .↔.from i)))
 
+≈ᵇ→≈ˢ : (α : Z) → (ŝ t̂ : D₀ α) → α ⊢ ŝ ≈ᵇ t̂ → α ⊢ ŝ ≈ˢ t̂
+≈ᵇ→≈ˢ α (sup (l , f) , s≤α) (sup (n , g) , t≤α) ŝ≈t̂ = absurdp {!shape-preserved!}
+≈ᵇ→≈ˢ α (sup (n , f) , s≤α) (sup (l , g) , t≤α) ŝ≈t̂ = {!!}
+≈ᵇ→≈ˢ α (sup (l , f) , s≤α) (sup (l , g) , t≤α) ŝ≈t̂ = {!!}
+≈ᵇ→≈ˢ α (sup (n , f) , s≤α) (sup (n , g) , t≤α) ŝ≈t̂ = {!!}
+
+strengthen : ∀ {α β} (β≤α : β ≤ α) (s t : T) (s≤β : s ≤ᵀ β) (t≤β : t ≤ᵀ β)
+           → α ⊢ s , ≤≤ β≤α s≤β ≈ᵇ t , ≤≤ β≤α t≤β
+           → β ⊢ s , s≤β ≈ᵇ t , t≤β
+strengthen {α} {β} β≤α s t s≤β t≤β (≈pcong a μ f g r) = {!!}
+strengthen {α} {β} β≤α s t s≤β t≤β (≈psat e ϕ l≤α r≤α) = {!!}
+strengthen {α} {β} β≤α s t s≤β t≤β ≈prefl = ≈prefl
+strengthen {α} {β} β≤α s t s≤β t≤β (≈psym p) = ≈psym (strengthen β≤α t s t≤β s≤β p)
+strengthen {α} {β} β≤α s t s≤β t≤β (≈ptrans {t̂ = u , u≤α} p q) =
+  ≈ptrans (strengthen β≤α s u s≤β {!u≤β!} p) {!!}
+-- strengthen {α} {β} β≤α s t s≤β t≤β (≈pweaken {α = γ} {β = α} γ≤α p) = {!!}
+strengthen {α} {β} β≤α s t s≤β t≤β (≈pweaken {α = γ} {β = α} γ≤α (≈pcong a μ f g r)) = {!!}
+strengthen {α} {β} β≤α s t s≤β t≤β (≈pweaken {α = γ} {β = α} γ≤α (≈psat e ϕ l≤α r≤α)) = {!!}
+strengthen {α} {β} β≤α s t s≤β t≤β (≈pweaken {α = γ} {β = α} γ≤α ≈prefl) = ≈prefl
+strengthen {α} {β} β≤α s t s≤β t≤β (≈pweaken {α = γ} {β = α} γ≤α (≈psym p)) = {!!}
+strengthen {α} {β} β≤α s t s≤β t≤β (≈pweaken {α = γ} {β = α} γ≤α (≈ptrans p p₁)) = {!!}
+strengthen {α} {β} β≤α s t s≤β t≤β (≈pweaken {α = γ} {β = α} γ≤α (≈pweaken α≤β p)) = {!!}
+  -- ≈pweaken (≤≤ {!!} {!!}) (strengthen {!!} s t {!!} {!!} p)
+           
 
 enweaken : ∀ {α β γ} (α≤γ : α ≤ γ) (β≤γ : β ≤ γ) (ŝ : D₀ α) (t̂ : D₀ β)
          → γ ⊢ pweaken α≤γ ŝ ≈ᵇ pweaken β≤γ t̂
          → (α ∨ᶻ β) ⊢ pweaken ∨ᶻ-l ŝ ≈ᵇ pweaken ∨ᶻ-r t̂
-enweaken {α} {β} {γ} α≤γ β≤γ ŝ t̂ p = f α≤γ β≤γ ŝ t̂ a≡b p
+enweaken {α} {β} {γ} α≤γ β≤γ ŝ t̂ p = h α≤γ β≤γ ŝ t̂ a≡b p
   where
   a≡b : shape (ŝ .fst) ≡p shape (t̂ .fst) 
   a≡b = shape-preserved γ (pweaken α≤γ ŝ) (pweaken β≤γ t̂) p
-  f : ∀ {α β γ} (α≤γ : α ≤ γ) (β≤γ : β ≤ γ) (ŝ : D₀ α) (t̂ : D₀ β)
+  h : ∀ {α β γ} (α≤γ : α ≤ γ) (β≤γ : β ≤ γ) (ŝ : D₀ α) (t̂ : D₀ β)
     → shape (ŝ .fst) ≡p shape (t̂ .fst)
     → γ ⊢ pweaken α≤γ ŝ ≈ᵇ pweaken β≤γ t̂
     → (α ∨ᶻ β) ⊢ pweaken ∨ᶻ-l ŝ ≈ᵇ pweaken ∨ᶻ-r t̂
-  f {α} {β} {γ} α≤γ β≤γ (sup (l , f) , af≤α) (sup (l , g) , bg≤β) reflp s≈t =
-  
-   substp (λ ○ → α ∨ᶻ β ⊢ v̂ ≈ᵇ ○) (ΣP≡ v̂ (sup (l , g) , _) q) ≈prefl
-   where
-   q = leaf≡leaf f g
-   v̂ = sup (l , f) , ≤≤ ∨ᶻ-l af≤α 
-  f {α} {β} {γ} α≤γ β≤γ (sup (n , f) , af≤α) (sup (n , g) , bg≤β) reflp s≈t = {!!}
+  h {α} {β} {γ} α≤γ β≤γ (sup (l , f) , af≤α) (sup (l , g) , bg≤β) reflp s≈t =
+    substp (λ ○ → α ∨ᶻ β ⊢ v̂ ≈ᵇ ○) (ΣP≡ v̂ (sup (l , g) , _) q) ≈prefl
+    where
+    q = leaf≡leaf f g
+    v̂ = sup (l , f) , ≤≤ ∨ᶻ-l af≤α 
+  h {α} {β} {γ} α≤γ β≤γ (sup (n , f) , af≤α) (sup (n , g) , bg≤β) reflp (≈pcong n μ f' g' r) =
+    ≈pweaken (≤≤ ∨ᶻ-l af≤α) (≈pcong n {!!} {!!} {!!} {!!})
+    where
+    μ̂ : I → Z
+    f̂ : ∀ i → D₀ {!!}
+    ĝ : ∀ i → D₀ {!!}
+  h {α} {β} {γ} α≤γ β≤γ (sup (n , f) , af≤α) (sup (n , g) , bg≤β) reflp (≈psat e ϕ l≤α r≤α) = {!!}
+  h {α} {β} {γ} α≤γ β≤γ (sup (n , f) , af≤α) (sup (n , g) , bg≤β) reflp ≈prefl = ≈prefl
+  h {α} {β} {γ} α≤γ β≤γ ŝ@(sup (n , f) , af≤α) t̂@(sup (n , g) , bg≤β) reflp (≈psym t≈s) =
+    {!!}
+    where
+    u : γ ⊢ pweaken α≤γ ŝ ≈ᵇ pweaken β≤γ t̂
+    u = ≈psym t≈s
+  h {α} {β} {γ} α≤γ β≤γ (sup (n , f) , af≤α) (sup (n , g) , bg≤β) reflp (≈ptrans s≈t s≈t₁) = {!!}
+  h {α} {β} {γ} α≤γ β≤γ (sup (n , f) , af≤α) (sup (n , g) , bg≤β) reflp (≈pweaken α≤β s≈t) = {!!}
 
 ψ₀ : ⟨ F.F-ob (Colim D) ⟩ → ⟨ Colim (F ∘ᴰ D) ⟩
 ψ₀ (l , _) = ⊥ᶻ , l , λ()

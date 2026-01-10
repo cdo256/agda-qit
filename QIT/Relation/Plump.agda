@@ -92,7 +92,7 @@ mutual
   -- sup≤: a supremum is ≤ α provided all its children are < α.
   data _≤_ : Z → Z → Prop (ℓS ⊔ ℓP) where
     sup≤ : {s : Sᶻ} {f : Pᶻ s → Z}
-         → {α : Z} (f<α : ∀ β → f β < α)
+         → {α : Z} (f<α : ∀ i → f i < α)
          → sup (s , f) ≤ α
 
   -- <sup: strict inequality is witnessed by selecting a child β and
@@ -100,8 +100,8 @@ mutual
   -- is below some child.
   data _<_ : Z → Z → Prop (ℓS ⊔ ℓP) where
     <sup : {s : Sᶻ} {f : Pᶻ s → Z}
-         → (β : Pᶻ s) {α : Z}
-         → (α≤fi : α ≤ f β)
+         → (i : Pᶻ s) {α : Z}
+         → (α≤fi : α ≤ f i)
          → α < sup (s , f)
 
 -- Reflexivity of ≤ is derived by unfolding one layer:
@@ -257,3 +257,6 @@ isQuasiExtensionalZ =
   g : (i : Pᶻ ∨ˢ) → _ < (α ∨ᶻ β)
   g (lift (inj₁ tt)) = <sup (lift (inj₂ tt)) (≤refl β)
   g (lift (inj₂ tt)) = <sup (lift (inj₁ tt)) (≤refl α)
+
+sup≤sup : ∀ {s f g} (r : ∀ i → f i ≤ g i) → sup (s , f) ≤ sup (s , g)
+sup≤sup r = sup≤ (λ i → <sup i (r i))
