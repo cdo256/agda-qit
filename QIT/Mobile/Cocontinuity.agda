@@ -77,7 +77,7 @@ node≉ᵇleaf α s t f̂≡s ĝ≡t s≈t = n≢l (substp₂ (λ s t → shape
 -- Fully inductive stage proofs, following the pattern  of the data.
 infixl 3 _⊢_≈ˢ_
 data _⊢_≈ˢ_ : (α : Z) → D₀ α → D₀ α → Prop ℓ0 where
-  ≈sleaf : ∀ {α} → α ⊢ sup (l , λ()) , sup≤ (λ()) ≈ˢ sup (l , λ()) , sup≤ (λ())
+  ≈sleaf : ∀ {α f g} f̂≤α ĝ≤α → α ⊢ sup (l , f) , f̂≤α ≈ˢ sup (l , g) , ĝ≤α
   ≈snode : ∀ {α : Z} (μ : I → Z)
          → (μi<α : ∀ i → μ i < α)
          → (f g : I → T)
@@ -89,11 +89,56 @@ data _⊢_≈ˢ_ : (α : Z) → D₀ α → D₀ α → Prop ℓ0 where
              ≈ˢ (sup (n , g)) , ≤≤ (sup≤ λ i → μi<α (π .↔.from i))
                   (sup≤sup λ i → substp (λ ○ → g ○ ≤ᵀ μ (π .↔.from i)) (π .↔.linv i) (gπi≤μi (π .↔.from i)))
 
+≈sweaken : ∀ {α β} → (α≤β : α ≤ β) → {ŝ t̂ : D₀ α}
+        → α ⊢ ŝ ≈ˢ t̂ → β ⊢ pweaken α≤β ŝ ≈ˢ pweaken α≤β t̂
+≈sweaken α≤β (≈sleaf f̂≤α ĝ≤α) = ≈sleaf (≤≤ α≤β f̂≤α) (≤≤ α≤β ĝ≤α)
+≈sweaken α≤β (≈snode μ μi<α f g π fi≤μi gπi≤μi fi≈gπi) =
+  ≈snode μ (λ i → ≤< α≤β (μi<α i)) f g π fi≤μi gπi≤μi fi≈gπi
+
+≈srefl' : ∀ {s : T} → ιᶻ s ⊢ s , (≤refl _) ≈ˢ s , (≤refl _)
+≈srefl' t@{sup (l , f)} = ≈sleaf (≤refl (ιᶻ t)) (≤refl (ιᶻ t))
+≈srefl' t@{sup (n , f)} =
+  ≈snode {α = ιᶻ t} (λ i → ιᶻ (f i)) (λ i → <sup i (≤refl _)) f f
+         ↔.refl (λ _ → ≤refl _) (λ _ → ≤refl _) (λ _ → ≈srefl')
+
+≈srefl : ∀ {α} {ŝ : D₀ α} → α ⊢ ŝ ≈ˢ ŝ
+≈srefl {α} {sup (l , f) , s≤α} = ≈sleaf s≤α s≤α
+≈srefl {α} {sup (n , f) , s≤α} = ≈sweaken s≤α ≈srefl'
+
+≈ssym : ∀ {α} {ŝ t̂ : D₀ α} → α ⊢ ŝ ≈ˢ t̂ → α ⊢ t̂ ≈ˢ ŝ
+≈ssym {α} {sup (l , f) , s≤α} {sup (l , g) , t≤α} ŝ≈t̂ = ≈sleaf t≤α s≤α
+≈ssym {α} {sup (n , f) , s≤α} {sup (n , g) , t≤α}
+      (≈snode μ μi<α f g π fi≤μi gπi≤μi fi≈gπi) =
+  ≈snode τ τi≤α g f (↔.flip π) gi≤τi fπ⁻¹i≤τi gi≈fπ⁻¹i
+  where
+  open _↔_ π renaming (to to π̂; from to π⁻¹)
+  τ : I → Z
+  τ i = μ (π⁻¹ i)
+  τi≤α : ∀ i → τ i < α
+  τi≤α i = μi<α (π⁻¹ i)
+  gi≤τi : ∀ i → g i ≤ᵀ τ i
+  gi≤τi i = substp (λ ○ → g ○ ≤ᵀ τ i) (linv i) (gπi≤μi (π⁻¹ i))
+  fπ⁻¹i≤τi : ∀ i → f (π⁻¹ i) ≤ᵀ τ i
+  fπ⁻¹i≤τi i = fi≤μi (π⁻¹ i)
+  gi≈fπ⁻¹i : ∀ i → τ i ⊢ g i , gi≤τi i ≈ˢ f (π⁻¹ i) , fi≤μi (π⁻¹ i)
+  gi≈fπ⁻¹i i = substp (λ ○ → τ i ⊢ ○ ≈ˢ f (π⁻¹ i) , fi≤μi (π⁻¹ i)) (p i) (≈ssym (fi≈gπi (π⁻¹ i)))
+    where
+    p : ∀ (i : I) → _≡_ {A = D₀ (τ i)} (g (π̂ (π⁻¹ i)) , substp (λ ○ → g ○ ≤ᵀ τ i)
+                                       (≡.sym (linv i)) (gi≤τi i)) (g i , gi≤τi i)
+    p i = ΣP≡ _ _ (≡.cong g (linv i))
+
 ≈ᵇ→≈ˢ : (α : Z) → (ŝ t̂ : D₀ α) → α ⊢ ŝ ≈ᵇ t̂ → α ⊢ ŝ ≈ˢ t̂
-≈ᵇ→≈ˢ α (sup (l , f) , s≤α) (sup (n , g) , t≤α) ŝ≈t̂ = absurdp {!shape-preserved!}
-≈ᵇ→≈ˢ α (sup (n , f) , s≤α) (sup (l , g) , t≤α) ŝ≈t̂ = {!!}
-≈ᵇ→≈ˢ α (sup (l , f) , s≤α) (sup (l , g) , t≤α) ŝ≈t̂ = {!!}
-≈ᵇ→≈ˢ α (sup (n , f) , s≤α) (sup (n , g) , t≤α) ŝ≈t̂ = {!!}
+≈ᵇ→≈ˢ α (sup (l , f) , s≤α) (sup (n , g) , t≤α) ŝ≈t̂ =
+  absurdp (node≉ᵇleaf α (sup (n , g) , t≤α) (sup (l , f) , s≤α) ≡.refl ≡.refl (≈psym ŝ≈t̂))
+≈ᵇ→≈ˢ α (sup (n , f) , s≤α) (sup (l , g) , t≤α) ŝ≈t̂ =
+  absurdp (node≉ᵇleaf α (sup (n , f) , s≤α) (sup (l , g) , t≤α) ≡.refl ≡.refl ŝ≈t̂)
+≈ᵇ→≈ˢ α (sup (l , f) , s≤α) (sup (l , g) , t≤α) ŝ≈t̂ = ≈sleaf s≤α t≤α
+≈ᵇ→≈ˢ α (sup (n , f) , s≤α) (sup (n , g) , t≤α) (≈pcong a μ f₁ g₁ r) = {!!}
+≈ᵇ→≈ˢ α (sup (n , f) , s≤α) (sup (n , g) , t≤α) (≈psat e ϕ l≤α r≤α) = {!!}
+≈ᵇ→≈ˢ α (sup (n , f) , s≤α) (sup (n , g) , t≤α) ≈prefl = {!!}
+≈ᵇ→≈ˢ α (sup (n , f) , s≤α) (sup (n , g) , t≤α) (≈psym ŝ≈t̂) = {!!}
+≈ᵇ→≈ˢ α (sup (n , f) , s≤α) (sup (n , g) , t≤α) (≈ptrans ŝ≈t̂ ŝ≈t̂₁) = {!!}
+≈ᵇ→≈ˢ α (sup (n , f) , s≤α) (sup (n , g) , t≤α) (≈pweaken α≤β ŝ≈t̂) = {!!}
 
 strengthen : ∀ {α β} (β≤α : β ≤ α) (s t : T) (s≤β : s ≤ᵀ β) (t≤β : t ≤ᵀ β)
            → α ⊢ s , ≤≤ β≤α s≤β ≈ᵇ t , ≤≤ β≤α t≤β

@@ -100,6 +100,13 @@ module ↔ where
 
   open _↔_ public
 
+  refl : {X : Set} → X ↔ X
+  refl = record
+    { to = λ x → x
+    ; from = λ x → x
+    ; rinv = λ _ → ≡.refl
+    ; linv = λ _ → ≡.refl }
+
   flip : {X Y : Set} → X ↔ Y → Y ↔ X
   flip X↔Y = record
     { to = X↔Y .from
