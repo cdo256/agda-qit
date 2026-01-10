@@ -62,6 +62,7 @@ sucᶻ α = sup (∨ˢ , λ _ → α)
 -- Note: α and β are strictly less than α ∨ᶻ β, but we do not claim it
 -- is the least upper bound. (We only need a combinator producing some
 -- upper bound.)
+infixl 10 _∨ᶻ_
 _∨ᶻ_ : Z → Z → Z
 _∨ᶻ_ α β = sup (∨ˢ , f)
   where
