@@ -85,10 +85,11 @@ shape-preserved α s t (≈pweaken α≤β s≈t) = shape-preserved _ _ _ s≈t
 --   C : ∀ {α s t} → (α ⊢ s ≈ᵇ t) → Prop {!!}
 --   C {α} {s} {t} s≈t = {!s≡!}
 
+
 enweaken : ∀ {α β γ} (α≤γ : α ≤ γ) (β≤γ : β ≤ γ) (ŝ : D₀ α) (t̂ : D₀ β)
          → γ ⊢ pweaken α≤γ ŝ ≈ᵇ pweaken β≤γ t̂
          → (α ∨ᶻ β) ⊢ pweaken ∨ᶻ-l ŝ ≈ᵇ pweaken ∨ᶻ-r t̂
-enweaken {α} {β} {γ} α≤γ β≤γ ŝ t̂ p = {!!}
+enweaken {α} {β} {γ} α≤γ β≤γ ŝ t̂ p = f α≤γ β≤γ ŝ t̂ a≡b p
   where
   a≡b : shape (ŝ .fst) ≡p shape (t̂ .fst) 
   a≡b = shape-preserved γ (pweaken α≤γ ŝ) (pweaken β≤γ t̂) p
@@ -97,8 +98,11 @@ enweaken {α} {β} {γ} α≤γ β≤γ ŝ t̂ p = {!!}
     → γ ⊢ pweaken α≤γ ŝ ≈ᵇ pweaken β≤γ t̂
     → (α ∨ᶻ β) ⊢ pweaken ∨ᶻ-l ŝ ≈ᵇ pweaken ∨ᶻ-r t̂
   f {α} {β} {γ} α≤γ β≤γ (sup (l , f) , af≤α) (sup (l , g) , bg≤β) reflp s≈t =
-   substp (λ ○ → α ∨ᶻ β ⊢ sup (l , f) , ≤≤ ∨ᶻ-l af≤α ≈ᵇ {!!}) (leaf≡leaf f g) {!!} 
-    -- ≡→≈ (D̃ (α ∨ᶻ β)) {!leaf≡leaf!}
+  
+   substp (λ ○ → α ∨ᶻ β ⊢ v̂ ≈ᵇ ○) (ΣP≡ v̂ (sup (l , g) , _) q) ≈prefl
+   where
+   q = leaf≡leaf f g
+   v̂ = sup (l , f) , ≤≤ ∨ᶻ-l af≤α 
   f {α} {β} {γ} α≤γ β≤γ (sup (n , f) , af≤α) (sup (n , g) , bg≤β) reflp s≈t = {!!}
 
 ψ₀ : ⟨ F.F-ob (Colim D) ⟩ → ⟨ Colim (F ∘ᴰ D) ⟩
