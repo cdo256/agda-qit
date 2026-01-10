@@ -152,8 +152,9 @@ record Bounded≈ (s t : T) : Set (lsuc ℓ0) where
   fi≤μi i = f i .proj₂ .snd
   gi≤μi : ∀ i → tg i ≤ᵀ μg i
   gi≤μi i = g i .proj₂ .snd
-  inner : F.F-ob (D.D-ob α) [ n , (λ i → tf i , _) ≈ n , (λ i → tg i , _) ]
-  inner = mk≈ꟳ ≡.refl {!!}
+  inner : F.F-ob (D.D-ob α) [ n , (λ i → tf i , ≤≤ ∨ᶻ-l (≤≤ (child≤ _ _ i) (fi≤μi i)))
+                            ≈ n , (λ i → tg i , ≤≤ ∨ᶻ-r (≤≤ (child≤ _ _ i) (gi≤μi i))) ]
+  inner = mk≈ꟳ ≡.refl λ i → v i (u i (snd≈ i))
     where
     v : ∀ i → ∥ Bounded≈ (tf i) (tg i) ∥ → α ⊢ (tf i  , _) ≈ᵇ (tg i , _) 
     v i ∣ mkBounded≈ (sup (αs , μ)) s≤γ t≤γ s≈t ∣ = {!!}
