@@ -92,7 +92,7 @@ mutual
   -- sup≤: a supremum is ≤ α provided all its children are < α.
   data _≤_ : Z → Z → Prop (ℓS ⊔ ℓP) where
     sup≤ : {s : Sᶻ} {f : Pᶻ s → Z}
-         → {α : Z} (f<α : ∀ β → f β < α)
+         → {α : Z} (f<α : ∀ i → f i < α)
          → sup (s , f) ≤ α
 
   -- <sup: strict inequality is witnessed by selecting a child β and
@@ -100,8 +100,8 @@ mutual
   -- is below some child.
   data _<_ : Z → Z → Prop (ℓS ⊔ ℓP) where
     <sup : {s : Sᶻ} {f : Pᶻ s → Z}
-         → (β : Pᶻ s) {α : Z}
-         → (α≤fi : α ≤ f β)
+         → (i : Pᶻ s) {α : Z}
+         → (α≤fi : α ≤ f i)
          → α < sup (s , f)
 
 -- Reflexivity of ≤ is derived by unfolding one layer:
@@ -226,12 +226,25 @@ x ⊆⊇ y = (x ⊆ y) ∧ (y ⊆ x)
 isQuasiExtensionalZ : ∀ {x y} → (x ≤≥ y) ⇔ (x ⊆⊇ y)
 isQuasiExtensionalZ =
   (λ (α≤β , β≤α) → ≤→⊆ α≤β , ≤→⊆ β≤α) ,
-  λ (α⊆β , β⊆α) → ⊆→≤ α⊆β , ⊆→≤ β⊆α
+  (λ (α⊆β , β⊆α) → ⊆→≤ α⊆β , ⊆→≤ β⊆α)
 
 -- Congruence for ≤: pointwise ≤ on children implies ≤ on sups.
 ≤cong : ∀ s (μ τ : Pᶻ s → Z) → (r : ∀ i → μ i ≤ τ i)
       → sup (s , μ) ≤ sup (s , τ)
 ≤cong s μ τ r = sup≤ λ i → <sup i (r i)
+
+≤≥-refl : ∀ {x} → x ≤≥ x
+≤≥-refl {x} = ≤refl x , ≤refl x
+
+≤≥-sym : ∀ {x y} → x ≤≥ y → y ≤≥ x
+≤≥-sym (x≤y , y≤x) = y≤x , x≤y
+
+≤≥-trans : ∀ {x y z} → x ≤≥ y → y ≤≥ z → x ≤≥ z
+≤≥-trans (x≤y , y≤x) (y≤z , z≤y) = ≤≤ y≤z x≤y , ≤≤ y≤x z≤y
+
+≤≥-cong : ∀ s (μ τ : Pᶻ s → Z) → (r : ∀ i → μ i ≤≥ τ i)
+        → sup (s , μ) ≤≥ sup (s , τ)
+≤≥-cong s μ τ r = sup≤ (λ i → <sup i (r i .∧.fst)) , sup≤ (λ i → <sup i (r i .∧.snd))
 
 -- Strict and non-strict comparisons for join. These are the basic
 -- facts used when combining bounds in proofs (especially in ψ-cong and
