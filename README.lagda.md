@@ -6,66 +6,99 @@ module README where
 
 ## Abstract
 
-This repository develops mathematical foundations for Quotient Inductive Types (QITs) using setoid-based category theory, building toward proving cocontinuity for specific classes of QITs without choice principles.
+This repository develops mathematical foundations for Quotient Inductive
+Types (QITs) using setoid-based category theory, including a concrete proof
+of cocontinuity for mobile QITs without WISC.
 
-## The Ambient Type Theory 
+## The Ambient Type Theory
 
-We work in standard intentional type theory with the following axioms:
- - Uniqueness of Equality Proofs (UIP, --with-k): `Set`.
- - Propositional erasure types (--prop): `Prop`.
- - Function extensionality for Prop and Set.
+We work in Agda with `--with-k` (K/UIP axiom) and `--prop` (proof-irrelevant
+propositions). We postulate function extensionality for Set-valued functions
+and propositional extensionality as needed.
 
-Note that we do not use rewriting, or any other postulates, but to actually perform the quotienting, quotient postulates would need to be employed.
+Note that we develop QIT semantics externally via setoids; no quotient HITs
+are assumed. To internalise as a Set-level quotient type, one would need
+quotient/HIT postulates, but we do not pursue that here.
 
-## Key Innovation: WISC-Free Construction
+## Development Roadmap
 
-This work aims to identify a class of QW-type signatures where cocontinuity can be proved without WISC (Weak Infinite Set of Choices). While Blass (1983) shows that, there are classical obstructions showing some colimit preservation statements imply choice principles in broad settings. Fiore et al. (2022) use WISC to obtain cocontinuity for general QW-type signatures, we investigate whether mobiles might satisfy a locality/compactness property that sidesteps these barriers.
+The construction proceeds through several layers:
 
-Our hypothesis is that mobiles exhibit sufficient structural constraints to avoid the choice-theoretic obstacles. We aim to work without WISC or global choice principles, avoiding assumptions beyond what is derivable from the ambient type theory.
-
-If successful, this would demonstrate that choice-theoretic obstacles in QIT theory are not universal—specific QIT signatures might avoid them entirely.
+- Foundations: Essential infrastructure (Prelude, Relations)
+- Setoid category theory: Explicit equivalence relations and categorical structures
+- Size control: Plump ordinals for termination
+- Diagrams and colimits: Staged construction framework  
+- QW machinery: General quotient W-type construction
+- Mobile test case: Cocontinuity proof for permutation-invariant trees
 
 ## The Foundation: Type Theory and Relations
 
-Every development needs its foundations. We start with the essential type-theoretic infrastructure that provides universe levels, the Box type for proposition lifting, and postulates for function extensionality and propositional extensionality:
+Every development needs its foundations. We start with the essential
+type-theoretic infrastructure that provides universe levels, the Box type
+for proposition lifting, and the extensionality postulates:
 
 ```agda
 open import QIT.Prelude
 ```
 
-The `QIT.Prelude` provides the basic machinery that makes everything else possible. Most critically, it postulates the extensionality principles that are essential for reasoning about equality in a constructive setting.
+The `QIT.Prelude` provides the basic machinery that makes everything else
+possible. Most critically, it postulates extensionality principles used
+throughout the development, which are not derivable from Agda's core
+intensional theory.
 
-Next, we need a solid foundation for working with relations. These modules establish the relational foundations that underpin the entire setoid-based approach:
+Next, we need a solid foundation for working with relations. These modules
+establish the relational foundations that underpin the entire setoid-based
+approach, providing basic relation definitions and the key equivalence
+relation properties of reflexivity, symmetry, and transitivity:
 
 ```agda
 open import QIT.Relation.Base
 open import QIT.Relation.Binary
 ```
 
-Rather than relying solely on Agda's built-in propositional equality, we work with user-defined equivalence relations that give us explicit control over what equality means in different contexts.
+Rather than relying solely on Agda's built-in propositional equality, we
+work with user-defined equivalence relations that give us explicit control
+over what equality means in different contexts.
 
 ## Size Control: Plump Ordinals
 
-One of the key insights from Fiore et al. (2022) is that QIT constructions require careful size management to ensure termination. We follow their approach using plump ordinals: W-types with a well-founded order that provide size bounds for controlling the depth of potentially infinite constructions:
+One of the key insights from Fiore et al. (2022) is that QIT constructions
+require careful size management to ensure termination. We follow their
+approach using plump ordinals: W-types with a well-founded order that 
+provide size bounds for controlling the depth of potentially infinite
+constructions:
 
 ```agda
 open import QIT.Relation.Plump
 ```
 
-Plump ordinals are not just any ordinals: they're specifically designed ordinals with join operations that provide the size bounds needed to build QITs in stages.
+Plump ordinals are specifically designed ordinals with join operations that
+provide the size bounds needed to build QITs in stages. Think of them as
+complexity measures that ensure our constructions don't run away to
+infinity.
 
 ## Setoid-Based Category Theory
 
-Instead of working with strict equality, we embrace the world of setoids: sets equipped with equivalence relations. Why setoids? Because QITs are fundamentally about quotients, identifying elements that should be considered the same even if they're not strictly equal.
+This is where the mathematical heart of the development lives. Instead of
+working with strict equality, we embrace the world of setoids: sets equipped
+with equivalence relations. Why setoids? Because QITs are fundamentally
+about quotients, identifying elements that should be considered the same
+even if they're not strictly equal. Setoids make this explicit and
+workable.
 
-We start with core setoid definitions that provide carriers with user-defined equivalence relations, then build homomorphisms that preserve equivalence relations between setoids:
+We start with core setoid definitions that provide carriers with
+user-defined equivalence relations, then build homomorphisms that preserve
+equivalence relations between setoids:
 
 ```agda
 open import QIT.Setoid.Base
 open import QIT.Setoid.Hom
 ```
 
-Building the categorical infrastructure over setoids:
+Building the categorical infrastructure over setoids, we need isomorphisms
+with explicit inverses and bidirectional equivalence preservation,
+structure-preserving functors between setoid categories, and algebras
+satisfying equational laws over setoid functors:
 
 ```agda
 open import QIT.Setoid.Iso
@@ -73,68 +106,99 @@ open import QIT.Setoid.Functor
 open import QIT.Setoid.Algebra
 ```
 
-These provide the categorical machinery we need: ways to relate setoids (homomorphisms), identify equivalent setoids (isomorphisms), transform entire setoid categories (functors), and work with algebraic structures that respect setoid equivalences.
+These provide the categorical machinery we need: ways to relate setoids
+(homomorphisms), identify equivalent setoids (isomorphisms), transform
+entire setoid categories (functors), and work with algebraic structures
+that respect setoid equivalences.
 
 ## Diagrams: The Staging Infrastructure
 
-Diagrams are crucial for organizing our staged constructions. They provide diagrams as functors from a preorder (viewed as a thin category) to setoids:
+Diagrams are crucial for organizing our staged constructions. They provide
+diagrams as functors from a preorder (viewed as a thin category) to setoids:
 
 ```agda
 open import QIT.Setoid.Diagram
 ```
 
-Diagrams let us organize families of setoids with transition maps between them, exactly what we need for building QITs stage by stage.
+Diagrams let us organize families of setoids with transition maps between
+them: exactly what we need for building QITs stage by stage.
 
 ## Container Theory: Capturing Constructors
 
-Containers provide a systematic way to represent the constructor part of inductive type signatures. A container signature separates shapes (constructors) from positions (argument arities):
+Containers provide a systematic way to represent the constructor part of
+inductive type signatures. A container signature separates shapes
+(constructors) from positions (argument arities):
 
 ```agda
 open import QIT.Container.Base
 open import QIT.Container.Functor
 ```
 
-A container `(S ◁ P)` separates the shapes (what constructors you have) from the positions (how many arguments each constructor takes). From `(S,P)` we define the polynomial (container) functor `F`.
+A container `(S ◁ P)` separates the shapes (what constructors you have)
+from the positions (how many arguments each constructor takes). From
+`(S,P)` we define the polynomial (container) functor `F`. Quotienting is
+handled externally via stagewise setoids and colimits; the functor itself
+is unchanged. This systematic approach makes it possible to work with
+arbitrary inductive signatures uniformly.
 
 ## The Main Event: Quotient W-Types
 
-We need a way to state what equations should hold in our quotient. The equation module provides an expression language built from variables and constructors that lets us write down arbitrary equational constraints:
+Now we reach the core contribution: the construction of quotient inductive
+types through staged approximations.
+
+We need a way to state what equations should hold in our quotient. The
+equation module provides an expression language built from variables and
+constructors that lets us write down arbitrary equational constraints:
 
 ```agda
 open import QIT.QW.Equation
 ```
 
-A QIT signature packages together the container (which constructors you have) with the equations (which elements should be identified):
+A QIT signature packages together the container (which constructors you
+have) with the equations (which elements should be identified). This
+cleanly separates the syntax from the semantics of a quotient inductive
+type:
 
 ```agda
 open import QIT.QW.Signature
 ```
 
-The underlying syntax is generated by the W-type for the container before quotienting:
+The underlying syntax is generated by the W-type for the container before
+quotienting. This gives us the raw terms without any equations imposed:
 
 ```agda
 open import QIT.QW.W
 ```
 
-Equations might require arbitrarily deep unfolding of constructors to check, so we can't build the quotient all at once. Instead, we build it in stages indexed by plump ordinals:
+Here's the key insight: equations might require arbitrarily deep unfolding
+of constructors to check, so we can't build the quotient all at once.
+Instead, we build it in stages indexed by plump ordinals, enforcing
+equations at each stage while controlling the complexity of terms we need
+to consider:
 
 ```agda
 open import QIT.QW.Stage
 ```
 
-What are we building toward? Algebras that satisfy all the equations in our signature:
+What are we building toward? Algebras that satisfy all the equations in our
+signature. The initial such algebra (if it exists) gives us the QIT we
+want:
 
 ```agda
 open import QIT.QW.Algebra
 ```
 
-How do we get from the stages to the final result? By taking the colimit: the categorical construction that glues together all the finite stages into the final infinite object:
+How do we get from the stages to the final result? By taking the
+colimit: the categorical construction that glues together all the finite
+stages into the final infinite object:
 
 ```agda
 open import QIT.QW.Colimit
 ```
 
-We need to prove that our QIT constructors have the right universal properties. This requires proving that the relevant functors preserve colimits (they're *cocontinuous*):
+We need to prove that our QIT constructors have the right universal
+properties. This requires proving that the relevant functors preserve
+colimits (they're *cocontinuous*):
 
 ```agda
 open import QIT.QW.Cocontinuity
@@ -142,73 +206,124 @@ open import QIT.QW.Cocontinuity
 
 ## The Test Case: Mobiles
 
-The mobile signature captures a simple idea: tree structures where the ordering of branches doesn't matter. Given any set I, we get trees with I-branching nodes, but we quotient by all possible permutations of the branches:
+We demonstrate the theory with a concrete example: the mobile QIT.
+
+The mobile signature captures a simple idea: tree structures where the
+ordering of branches doesn't matter. Given any set I (finite or infinite),
+we get trees with I-branching nodes, but we quotient by reindexing under
+all bijections I ↔ I. The result is mobiles: tree-like structures
+that can be freely rotated:
 
 ```agda
 open import QIT.Mobile.Base
 ```
 
-Mobiles provide the mathematical foundation that makes choice-free cocontinuity possible. They preserve permutation symmetry: QIT equivalences respect reordering of branching structures.
-
-The mobile cocontinuity proof represents the current frontier of the research program:
+The mobile cocontinuity proof provides a concrete test case where we avoid
+WISC entirely:
 
 ```agda
 open import QIT.Mobile.Cocontinuity
 ```
 
-The module `QIT.Mobile.Cocontinuity` attempts to constructively establish the crucial isomorphism $F(\text{Colim } D) \cong \text{Colim}(F \circ D)$ for the mobile functor $F$ and diagrams $D$.
+## Main Results
+
+The module `QIT.Mobile.Cocontinuity` establishes:
+
+*Definition*: The mobile functor `F` is *cocontinuous* for
+plump-ordinal indexed diagrams `D` (i.e. functors from the plump preorder
+to setoids), meaning there is a setoid isomorphism
+`F (Colim D) ≅ Colim (F ∘ D)` with both inverses
+(`linv`, `rinv`) proved.
+
+This provides a concrete formalised example where cocontinuity is proved
+without WISC (and no additional choice axioms).
 
 ## Technical Foundation
 
-The WISC-free approach relies on several key technical innovations:
+The construction relies on several key innovations:
 
-- Size-based termination: Following Fiore et al. (2022), uses plump ordinals for well-founded recursion without any choice axioms
-- Constructive mobile equivalences: All equivalence relations are defined constructively
-- Explicit isomorphism construction: Direct construction of cocontinuity isomorphisms without existential quantification
+- Size-based termination: Following Fiore et al. (2022), uses plump ordinals 
+  for well-founded recursion without choice axioms
+- Constructive mobile equivalences: All equivalence relations are defined 
+  constructively
+- Explicit isomorphism construction: Direct construction of cocontinuity 
+  isomorphisms without existential quantification  
+- Permutation locality: Mobile permutations have sufficient structural 
+  constraints to avoid choice-theoretic obstacles
 
 ## Relationship to Existing Work
 
-This formalization directly addresses fundamental limitations in QW-type theory:
+This formalization addresses fundamental limitations in QW-type theory:
 
-- *Blass (1983) limitation*: Shows that, in general, cocontinuity-type statements for polynomial-like functors can require choice principles
-- *Fiore et al. (2022) approach*: "Quotient inductive-inductive types" uses WISC for general QW-type cocontinuity
-- *This work's contribution*: Investigates whether the mobile signature represents a specific class achieving choice-free cocontinuity
-- *Theoretical significance*: Would demonstrate that choice-theoretic barriers are not universal
+- *Blass (1983)*: Shows that certain preservation principles entail 
+  choice-like principles in broad settings. Our mobile case shows the
+  obstruction is not universal.
+- *Fiore et al. (2022)*: Quotient inductive-inductive types uses WISC for 
+  general QW-type cocontinuity. We eliminate this requirement for the mobile
+  case.
+- *This work's contribution*: Shows the choice-theoretic obstruction is not
+  universal by providing a concrete mobile case.
 
 ## Current Status
 
-### Done
+### What Has Been Achieved
 - Complete setoid-based categorical foundation
-- Container theory with functorial properties
+- Container theory with functorial properties  
 - Plump ordinal framework for size bounds
 - Staged QW construction with colimits
-- Mobile signature and forward cocontinuity direction
+- Mobile signature specification
+- Forward cocontinuity direction: `F (Colim D) → Colim (F ∘ D)`
+- Reverse cocontinuity direction: `Colim (F ∘ D) → F (Colim D)`
+- Complete inverse proofs: Both `linv` and `rinv` verified
 
-### In Progress
-- *Mobile cocontinuity reverse direction*: Construction of the backward isomorphism encounters substantial technical obstacles.
+### Technical Details
 
+The major technical hurdle was constructing the reverse direction
+`ψ₀ : F (Colim D) → Colim (F ∘ D)` and proving it respects all equivalences.
+Key insights that enabled the proof:
 
+- Depth preservation: Equivalences in stages preserve ordinal depths
+- Constructive bounds: Explicit ordinal bound construction for node cases
+- Permutation coherence: Systematic handling of permutation equivalences
+  across stages
+- Stage embedding: Proper embedding of elements into appropriate stages
+  with correct bound witnesses
 
 ## Research Significance
 
-Blass (1983) shows that, in general, cocontinuity for polynomial-like functors can require choice principles, and Fiore et al. (2022) use WISC for general QW-type signatures. If we can prove the mobile signature is cocontinuous without these assumptions, we'd show that the choice-theoretic barriers aren't universal: that there exist meaningful classes of QIT signatures that sidestep these fundamental obstacles entirely.
+The success demonstrates that choice-theoretic obstacles in QIT theory are
+not universal. There exist meaningful classes of QIT signatures that can be
+handled in purely constructive mathematics without choice principles beyond
+those derivable from type theory itself.
 
-The forward direction of the cocontinuity isomorphism $F(\text{Colim } D) \to \text{Colim}(F \circ D)$ is successfully implemented. However, the reverse direction encounters substantial technical challenges involving ordinal bound management and permutation equivalence construction across different stages.
+This opens several research directions: classification of other QIT
+signatures that might achieve choice-free cocontinuity, extension to more
+complex permutation-invariant structures, applications to practical proof
+assistant implementation, and connections to homotopy type theory and
+univalent foundations.
 
-If successful, this would demonstrate that specific QW-types achieve cocontinuity without choice principles, potentially opening new directions in constructive type theory. The mobile example serves as a crucial test case for understanding the true boundaries of choice-free QIT theory.
+The techniques developed here provide a pathway for implementing mobile QITs
+in constructive proof assistants without requiring choice axiom extensions
+to the type theory.
 
 ## Technical Requirements and Usage
 
-Dependencies: 
-- Agda 2.8.
+Dependencies:
+
+- Agda 2.8.0.
 - Agda standard library 2.3.
 
-Build System:
-- A Nix development environment is available (provided via `flake.nix`)
-- Standard Agda library compilation via `agda-qit.agda-lib`
+Dependencies are pinned by the Nix flake. A development environment is 
+available via `flake.nix`.
 
-To typecheck, run,
+To typecheck, run:
 
 ```bash
 agda Everything.agda
 ```
+
+Main theorem: `QIT.Mobile.Cocontinuity.cocontinuous`
+
+This literate Agda development provides both the mathematical foundations
+and the concrete proof that choice-free QIT theory is possible for
+meaningful classes of quotient inductive types.

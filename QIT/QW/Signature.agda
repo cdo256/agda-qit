@@ -14,7 +14,7 @@ private
   variable
     ℓS ℓP ℓE ℓV : Level
 
--- A QIT signature consists of:
+-- A QW signature consists of:
 -- - (S, P): container specifying constructors and their arities
 -- - E: set of equation names
 -- - Ξ: assigns each equation name an actual equation over the constructors

@@ -101,9 +101,9 @@ depth-preserving α (s , s≤α) (t , t≤α) (≈pweaken {α = β} β≤α p) =
   μ : I → Z
   μ i = f i .proj₁
 
-leaf≈leaf : ∀ α {f g f≤α g≤α} 
+leaf≈leaf : ∀ α {f g f≤α g≤α}
           → α ⊢ sup (l , f) , f≤α ≈ᵇ sup (l , g) , g≤α
-leaf≈leaf α {f} {g} {f≤α} {g≤α} = ≡→≈ (D̃ α) (ΣP≡ _ _ (leaf≡leaf f g)) 
+leaf≈leaf α {f} {g} {f≤α} {g≤α} = ≡→≈ (D̃ α) (ΣP≡ _ _ (leaf≡leaf f g))
 
 _≤≥ᵀ_ : ∀ (s t : T) → Prop _
 s ≤≥ᵀ t = ιᶻ s ≤≥ ιᶻ t
@@ -195,12 +195,12 @@ open ≈s hiding (s≤≥t; s≈t)
                             ≈ n , (λ i → tg i , ≤≤ ∨ᶻ-r (≤≤ (child≤ _ _ i) (gi≤μi i))) ]
   inner = mk≈ꟳ ≡.refl λ i → v i
     where
-    u : ∀ i → Colim D [ f i ≈ g i ] → μf i ∨ᶻ μg i ⊢ (tf i  , ≤≤ ∨ᶻ-l (fi≤μi i)) ≈ᵇ (tg i , ≤≤ ∨ᶻ-r (gi≤μi i)) 
+    u : ∀ i → Colim D [ f i ≈ g i ] → μf i ∨ᶻ μg i ⊢ (tf i  , ≤≤ ∨ᶻ-l (fi≤μi i)) ≈ᵇ (tg i , ≤≤ ∨ᶻ-r (gi≤μi i))
     u i p = ≈pweaken q (≈ˡ→≈ˢ (snd≈ i) .≈s.s≈t)
       where
       q : ιᶻ (f i .proj₂ .fst) ≤ μf i ∨ᶻ μg i
       q = ≤≤ ∨ᶻ-l (fi≤μi i)
-    v : ∀ i → α ⊢ (tf i  , _) ≈ᵇ (tg i , _) 
+    v : ∀ i → α ⊢ (tf i  , _) ≈ᵇ (tg i , _)
     v i = ≈pweaken μi≤α (u i (snd≈ i))
       where
       μi≤α : μ i ≤ α
