@@ -43,5 +43,4 @@ import QIT.Mobile.Base
 import QIT.Mobile.Cocontinuity
 
 -- Examples
--- import QIT.Examples.BoundedRational
 import QIT.Examples.HoleList
