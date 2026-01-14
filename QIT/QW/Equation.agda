@@ -25,6 +25,9 @@ Expr {ℓV} V = W Sʰ Pʰ
   Pʰ : Sʰ → Set ℓP
   Pʰ = ⊎.[ (λ _ → ⊥*) , P ]
 
+pattern varᴱ v {f} = sup (inj₁ v , f)
+pattern supᴱ s f = sup (inj₂ s , f)
+
 -- An equation equates two expressions over the same set of variables.
 -- This is the basic unit of equational specification: lhs ≈ rhs.
 record Equation ℓV : Set (lsuc ℓV ⊔ ℓS ⊔ ℓP) where
@@ -35,6 +38,7 @@ record Equation ℓV : Set (lsuc ℓV ⊔ ℓS ⊔ ℓP) where
     lhs : Expr V
     -- Right-hand side expression
     rhs : Expr V
+
 
 -- Equation satisfaction in a given algebra.
 -- An algebra satisfies an equation if the lhs and rhs evaluate to
@@ -47,8 +51,8 @@ module _ (Xα : ≈.Algebra (F (ℓS ⊔ ℓP) (ℓS ⊔ ℓP))) where
   -- Variables are replaced by their assignments, constructors are interpreted
   -- using the algebra's structure map.
   assign : ∀ {ℓV} → {V : Set ℓV} (ϕ : V → ⟨ X ⟩) (e : Expr V) → ⟨ X ⟩
-  assign ϕ (sup (inj₁ v , _)) = ϕ v
-  assign ϕ (sup (inj₂ s , f)) = α.to (s , λ i → assign ϕ (f i))
+  assign ϕ (varᴱ v) = ϕ v
+  assign ϕ (supᴱ s f) = α.to (s , λ i → assign ϕ (f i))
     where module α = ≈.Hom α
 
   -- Variable assignment for an equation: maps variables to algebra elements

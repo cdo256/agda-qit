@@ -18,7 +18,7 @@ open import QIT.Relation.Plump S P
 open import QIT.Setoid.Diagram ≤p
 open import QIT.QW.W sig
 open import Data.Maybe
-open import QIT.QW.Equation S P using (Expr; assign; Assignment)
+open import QIT.QW.Equation S P
 
 -- Stage α: elements of the underlying W-type bounded by ordinal α.
 -- This gives us size-bounded approximations to the final quotient.
@@ -38,8 +38,8 @@ pweaken α≤β (t , t≤α) = t , ≤≤ α≤β t≤α
 -- Ordinal complexity of expressions: measures the "depth" needed to satisfy equations.
 -- Variables have minimal complexity ⊥ᶻ, constructors have complexity based on arguments.
 ιᴱ : ∀ {ℓV} {V : Set ℓV} → Expr V → Z
-ιᴱ (sup (inj₁ v , f)) = ⊥ᶻ
-ιᴱ (sup (inj₂ s , f)) = sup (ιˢ s , λ i → ιᴱ (f i))
+ιᴱ (varᴱ v) = ⊥ᶻ
+ιᴱ (supᴱ s f) = sup (ιˢ s , λ i → ιᴱ (f i))
 
 -- Expression-ordinal comparison: when an expression fits within a stage.
 _≤ᴱ_ : ∀ {ℓV} {V : Set ℓV} → Expr V → Z → Prop (ℓS ⊔ ℓP)

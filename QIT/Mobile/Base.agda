@@ -72,8 +72,8 @@ sig = record
   ; E = I ↔ I                 -- Equations indexed by bijections I ↔ I
   ; Ξ = λ π → record          -- Each bijection π gives an equation:
     { V = I                   --   Variables: one for each child position
-    ; lhs = sup (inj₂ n , λ i → sup (inj₁ i , λ()))     -- n(xᵢ)ᵢ∈I
-    ; rhs = sup (inj₂ n , λ i → sup (inj₁ (π .↔.to i) , λ())) } } -- n(x_{π(i)})ᵢ∈I
+    ; lhs = QW.supᴱ n (λ i → QW.varᴱ i {λ()})     -- n(xᵢ)ᵢ∈I
+    ; rhs = QW.supᴱ n (λ i → QW.varᴱ (π .↔.to i) {λ()}) } } -- n(x_{π(i)})ᵢ∈I
 
 -- The equations say: n(xᵢ)ᵢ∈I ≈ n(x_{π(i)})ᵢ∈I for any bijection π.
 -- This makes node construction invariant under permutation of children,
