@@ -172,3 +172,6 @@ infixr 3 if_then_else_
 if_then_else_ : ∀ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} (decA : Dec A) → B → B → B
 if yes _ then b else b' = b
 if no _ then b else b' = b'
+
+const : ∀ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} (a : A) → B → A
+const a _ = a 
