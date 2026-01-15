@@ -51,8 +51,7 @@ module _ (Xα : ≈.Algebra (F (ℓS ⊔ ℓP) (ℓS ⊔ ℓP))) where
   -- Variables are replaced by their assignments, constructors are interpreted
   -- using the algebra's structure map.
   assign : ∀ {ℓV} → {V : Set ℓV} (ϕ : V → ⟨ X ⟩) (e : Expr V) → ⟨ X ⟩
-  assign ϕ (varᴱ v) = ϕ v
-  assign ϕ (supᴱ s f) = α.to (s , λ i → assign ϕ (f i))
+  assign ϕ = recW ⊎.[ (λ v _ → ϕ v) , (λ s f → α.to (s , f)) ]
     where module α = ≈.Hom α
 
   -- Variable assignment for an equation: maps variables to algebra elements

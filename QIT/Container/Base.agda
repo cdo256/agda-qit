@@ -25,12 +25,13 @@ module _ {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
   data W : Set (ℓS ⊔ ℓP) where
     sup : ⟦ S ◁ P ⟧ W → W
 
+module _ {ℓS ℓP} {S : Set ℓS} {P : S → Set ℓP} where
   -- Recursor for W-types: fold over the tree structure.
   -- Given a way to combine a shape s with results from P s many subtrees,
   -- produce a result for the entire tree. This implements structural recursion.
   recW : ∀ {ℓX} {X : Set ℓX}
       → (r : ∀ s (f : P s → X) → X)
-      → W → X
+      → W S P → X
   recW r (sup (s , f)) = r s λ i → recW r (f i)
 
 -- Container morphisms: natural transformations between container functors.

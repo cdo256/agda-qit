@@ -30,24 +30,11 @@ open import QIT.QW.Equation S P
 open import QIT.QW.Stage sig
 open import QIT.QW.Algebra sig
 open import QIT.Setoid.Diagram ≤p
+open import QIT.QW.StageColimit sig
 
 -- Colimits and cocontinuity
 open import QIT.QW.Colimit ≤p ℓD ℓD' hiding (_≈ˡ_)
 open import QIT.QW.Cocontinuity ≤p {ℓD} {ℓD'}
-
--- Module aliases for cleaner notation
-module F = ≈.Functor F
-module D = Diagram D
-module F∘D = Diagram (F ∘ᴰ D)
-
-private
-  T = W S P
-  αˡ : ⟨ Colim D ⟩ → Z
-  αˡ (α , t , t≤α) = α
-  tˡ : ⟨ Colim D ⟩ → T
-  tˡ (α , t , t≤α) = t
-  t≤αˡ : (x : ⟨ Colim D ⟩) → tˡ x ≤ᵀ αˡ x
-  t≤αˡ (α , t , t≤α) = t≤α
 
 θ₀ : ⟨ Colim (F ∘ᴰ D) ⟩ → ⟨ Colim D ⟩
 θ₀ (α , a , f) = β , t , t≤β
@@ -73,18 +60,20 @@ private
 θ = record { to = θ₀ ; cong = θ-cong }
 
 -- Main theorem: cocontinuous functors give initial algebras
-alg : Cocontinuous F D → ∥ Record ∥
-alg ∣ iso ∣ = ∣ record
+theorem : Cocontinuous F D → ∥ Record ∥
+theorem ∣ iso ∣ = ∣ record
   { Xα = record
     { alg = Xα
     ; sat = sat }
-  ; initial = {!!} } ∣
+  ; initial = record
+    { rec = {!!}
+    ; unique = {!!} } } ∣
   where
-  open ≈.Iso iso  
+  open ≈.Iso iso renaming (⟦_⟧ to ϕ₀; cong to ϕ-cong; ⟦_⟧⁻¹ to ψ₀; cong⁻¹ to ψ-cong)
   ϕ : ≈.Hom (Colim (F ∘ᴰ D)) (F.F-ob (Colim D))
-  ϕ = record { to = ⟦_⟧ ; cong = cong }
+  ϕ = record { to = ϕ₀ ; cong = ϕ-cong }
   ψ : ≈.Hom (F.F-ob (Colim D)) (Colim (F ∘ᴰ D))
-  ψ = record { to = ⟦_⟧⁻¹ ; cong = cong⁻¹ }
+  ψ = record { to = ψ₀ ; cong = ψ-cong }
   Xα : ≈.Algebra F
   Xα = record { X = Colim D ; α = θ ≈.∘ ψ }
   sat : Sat Xα Ξ
@@ -92,10 +81,15 @@ alg ∣ iso ∣ = ∣ record
     where
     open Equation (Ξ e)
     p : Colim D [ assign Xα ξ (lhs (Ξ e)) ≈ assign Xα ξ (rhs (Ξ e))  ]
-    p =
-      assign Xα ξ (lhs (Ξ e))
-        ≈⟨ {!!} ⟩
-      assign Xα ξ (rhs (Ξ e)) ∎
-      where
-      open Setoid (Colim D)
-      open ≈.≈syntax {S = Colim D}
+    p = joinTerms (assign Xα ξ (lhs (Ξ e))) (assign Xα ξ (rhs (Ξ e))) {!!}
+
+      -- assign Xα ξ (lhs (Ξ e))
+      --   ≈⟨ refl ⟩
+      -- recW ⊎.[ (λ v _ → ξ v) , (λ s f → θ₀ (ψ₀ (s , f))) ] (lhs (Ξ e))
+      --   ≈⟨ {!!} ⟩
+      -- recW ⊎.[ (λ v _ → ξ v) , (λ s f → θ₀ (ψ₀ (s , f))) ] (rhs (Ξ e))
+      --   ≈⟨ refl ⟩
+      -- assign Xα ξ (rhs (Ξ e)) ∎
+      -- where
+      -- open Setoid (Colim D)
+      -- open ≈.≈syntax {S = Colim D}
