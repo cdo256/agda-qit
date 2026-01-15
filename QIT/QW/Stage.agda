@@ -28,7 +28,7 @@ D₀ α = ΣP T (_≤ᵀ α)
 -- Constructor for stage elements: build a tree with given shape and children.
 -- The ordinal bound is computed from the children's bounds using plump structure.
 psup : ∀ a μ (f : ∀ i → D₀ (μ i)) → D₀ (sup (ιˢ a , μ))
-psup a μ f = sup (a , λ i → f i .fst) , sup≤ (λ i → <sup i (f i .snd))
+psup a μ f = sup (a , λ i → ⟨ f i ⟩ᴾ) , sup≤ (λ i → <sup i (f i .snd))
 
 -- Weakening: if α ≤ β then stage α embeds into stage β.
 -- This gives the morphisms in our diagram of stages.

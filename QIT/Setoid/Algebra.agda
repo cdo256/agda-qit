@@ -40,6 +40,7 @@ module Alg {ℓX ℓX'} (F : Functor ℓX ℓX' ℓX ℓX') where
       hom : ≈Hom X Y
       -- Commutativity condition: the square commutes
       comm : (β ∘ F-mor hom) ≈h (hom ∘ α)
+    open ≈Hom public
 
   -- An initial algebra has a unique homomorphism to every other algebra.
   -- This property characterizes recursive data types: the initial algebra

@@ -26,6 +26,7 @@ open F-Ob
 
 -- Size control and staging
 open import QIT.Relation.Plump S P
+open import QIT.QW.Equation S P
 open import QIT.QW.Stage sig
 open import QIT.QW.Algebra sig
 open import QIT.Setoid.Diagram ≤p
@@ -39,29 +40,62 @@ module F = ≈.Functor F
 module D = Diagram D
 module F∘D = Diagram (F ∘ᴰ D)
 
+private
+  T = W S P
+  αˡ : ⟨ Colim D ⟩ → Z
+  αˡ (α , t , t≤α) = α
+  tˡ : ⟨ Colim D ⟩ → T
+  tˡ (α , t , t≤α) = t
+  t≤αˡ : (x : ⟨ Colim D ⟩) → tˡ x ≤ᵀ αˡ x
+  t≤αˡ (α , t , t≤α) = t≤α
+
+θ₀ : ⟨ Colim (F ∘ᴰ D) ⟩ → ⟨ Colim D ⟩
+θ₀ (α , a , f) = β , t , t≤β
+  where
+  β : Z
+  β = sup (ιˢ a , λ _ → α)
+  t : T
+  t = sup (a , λ i → f i .fst)
+  t≤β : t ≤ᵀ β
+  t≤β = sup≤sup λ i → f i .snd
+
+θ-cong : ∀ {x y} → Colim (F ∘ᴰ D) [ x ≈ y ] → Colim D [ θ₀ x ≈ θ₀ y ]
+θ-cong {α , (a , f)} {α , (b , g)} (≈lstage α (mk≈ꟳ ≡.refl snd≈)) =
+  ≈lstage (sup (ιˢ a , (λ _ → α))) (≈pcong a (λ _ → α) f g snd≈)
+θ-cong {α , (a , f)} {β , (a , g)} (≈lstep p (a , f)) =
+  ≈lstep (sup≤sup λ _ → p) (sup (a , (λ i → f i .fst)) , _)
+θ-cong {α , (a , f)} {β , (b , g)} (≈lsym p) =
+  ≈lsym (θ-cong p)
+θ-cong {α , (a , f)} {β , (b , g)} (≈ltrans p q) =
+  ≈ltrans (θ-cong p) (θ-cong q)
+
+θ : ≈.Hom (Colim (F ∘ᴰ D)) (Colim D)
+θ = record { to = θ₀ ; cong = θ-cong }
+
 -- Main theorem: cocontinuous functors give initial algebras
-module _  where
-  alg : Cocontinuous F D → ∥ Alg ∥
-  alg ∣ cocont ∣ = ∣ record
-    { alg = record
-      { X = Colim D
-      ; α = record
-        { to = f
-        ; cong = f-cong } }
-    ; sat = {!!} } ∣
+alg : Cocontinuous F D → ∥ Record ∥
+alg ∣ iso ∣ = ∣ record
+  { Xα = record
+    { alg = Xα
+    ; sat = sat }
+  ; initial = {!!} } ∣
+  where
+  open ≈.Iso iso  
+  ϕ : ≈.Hom (Colim (F ∘ᴰ D)) (F.F-ob (Colim D))
+  ϕ = record { to = ⟦_⟧ ; cong = cong }
+  ψ : ≈.Hom (F.F-ob (Colim D)) (Colim (F ∘ᴰ D))
+  ψ = record { to = ⟦_⟧⁻¹ ; cong = cong⁻¹ }
+  Xα : ≈.Algebra F
+  Xα = record { X = Colim D ; α = θ ≈.∘ ψ }
+  sat : Sat Xα Ξ
+  sat e ξ = p
     where
-    open ≈.Iso cocont
-    f : ⟨ F.F-ob (Colim D) ⟩ → ⟨ Colim D ⟩
-    f (s , f) = sup (ιˢ s , λ i → f i .proj₁) , sup (s , λ i → f i .proj₂ .fst) , sup≤sup λ i → f i .proj₂ .snd
-    f-cong : ∀ {x y} → F.F-ob (Colim D) [ x ≈ y ] → Colim D [ f x ≈ f y ]
-    f-cong {s , f} {s , g} (mk≈ꟳ ≡.refl snd≈) = begin
-      (sup (ιˢ s , λ i → f i .proj₁) , sup (s , λ i → f i .proj₂ .fst) , sup≤sup λ i → f i .proj₂ .snd)
-        ≈⟨ ≈lstep (sup≤sup λ _ → ∨ᶻ-l) (sup (s , λ i → f i .proj₂ .fst) , sup≤sup λ i → f i .proj₂ .snd) ⟩
-      (sup (ιˢ s , λ i → f i .proj₁ ∨ᶻ g i .proj₁) , sup (s , λ i → f i .proj₂ .fst) , _)
-        ≈⟨ ≈lstage _ (≈pcong s (λ i → f i .proj₁ ∨ᶻ g i .proj₁)
-                               (λ i → f i .proj₂ .fst , ≤≤ ∨ᶻ-l {!sup≤sup!}) {!!} {!!}) ⟩
-      (sup (ιˢ s , λ i → f i .proj₁ ∨ᶻ g i .proj₁) , sup (s , λ i → g i .proj₂ .fst) , _)
-        ≈⟨ ≈lsym (≈lstep (sup≤sup λ _ → ∨ᶻ-r) (sup (s , λ i → g i .proj₂ .fst) , _)) ⟩
-      (sup (ιˢ s , λ i → g i .proj₁) , sup (s , λ i → g i .proj₂ .fst) , sup≤sup λ i → g i .proj₂ .snd) ∎
-      where open ≈.≈syntax {S = Colim D}
-      
+    open Equation (Ξ e)
+    p : Colim D [ assign Xα ξ (lhs (Ξ e)) ≈ assign Xα ξ (rhs (Ξ e))  ]
+    p =
+      assign Xα ξ (lhs (Ξ e))
+        ≈⟨ {!!} ⟩
+      assign Xα ξ (rhs (Ξ e)) ∎
+      where
+      open Setoid (Colim D)
+      open ≈.≈syntax {S = Colim D}

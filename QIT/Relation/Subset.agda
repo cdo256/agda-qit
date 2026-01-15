@@ -16,6 +16,9 @@ open ΣP public
 
 infixr 4 _,_
 
+⟨_⟩ᴾ : ∀ {a b} {A : Set a} {B : A → Prop b} → ΣP A B → A
+⟨ x , _ ⟩ᴾ = x
+
 -- Two variants on cubical's Σ≡Prop in a standard Agda environment.
 ΣP≡' : ∀ {a b} {A : Set a} {B : A → Prop b}
     → (a1 a2 : A) → a1 ≡ a2
