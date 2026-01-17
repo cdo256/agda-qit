@@ -1,11 +1,5 @@
 build:
-  ./build.py
-
-paper:
-  ./build-paper.py
-
-paper-fast:
-  ./build-paper.py --no-typecheck
+  agda Everything.agda
 
 clean:
   git clean -X -fd
