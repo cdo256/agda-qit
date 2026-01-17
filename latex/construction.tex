@@ -1,6 +1,5 @@
 % Options for packages loaded elsewhere
-\PassOptionsToPackage{unicode}{hyperref}
-\PassOptionsToPackage{hyphens}{url}
+
 \documentclass[
 ]{article}
 \usepackage{xcolor}
@@ -171,13 +170,10 @@ to a natural inclusion: \[
 two kinds \(<,\le:Z\to Z\to Prop\) on \(Z\) inductively:
 
 \[
-	\begin{align*}
-		\frac{\exists i. \alpha \le f i}{\alpha < sup(s,f) }\qquad\frac{\forall i.f i<\alpha }{sup(s,f)\le \alpha } \qquad \forall i\in b,~s:s_z,~f:p_z~s \to z,~\alpha :z \\
-	\end{align*}
+	\frac{\exists i. \alpha \le f i}{\alpha < sup(s,f) }\qquad\frac{\forall i.f i<\alpha }{sup(s,f)\le \alpha } \qquad \forall i\in b,~s:s_z,~f:p_z~s \to z,~\alpha :z
 \]
 
-\subsubsection{Properties of the Plump
-	Ordering}\label{properties-of-the-plump-ordering}
+\subsubsection{Properties of the Plump Ordering}\label{properties-of-the-plump-ordering}
 
 The plump ordering satisfies the following key properties, all proven
 constructively in the Agda formalization:
@@ -240,11 +236,11 @@ For each plump ordinal \(\alpha : Z\), define the type \(P_0(\alpha)\)
 of mobile elements at stage \(\alpha\) inductively:
 
 \[
-	\begin{align}
+	\begin{aligned}
 		\mathsf{leaf}   & : \forall \beta : I \to Z. P_0(\sup(I, \beta))                                               \\
 		\mathsf{node}   & : \forall \beta : I \to Z. \left(\forall i : I. P_0(\beta(i))\right) \to P_0(\sup(I, \beta)) \\
 		\mathsf{weaken} & : \forall \alpha, \gamma : Z. \alpha \le \gamma \to P_0(\alpha) \to P_0(\gamma)
-	\end{align}
+	\end{aligned}
 \]
 
 The key insight is that mobile elements are not simply bounded trees,

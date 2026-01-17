@@ -17,12 +17,12 @@
       repo = "just-agda";
       ref = "main";
     };
-    #agda-cubical = {
-    #  type = "github";
-    #  owner = "agda";
-    #  repo = "cubical";
-    #  ref = "master";
-    #};
+    lipics = {
+      type = "github";
+      owner = "cdo256";
+      repo = "lipics-authors";
+      ref = "main";
+    };
   };
 
   outputs =

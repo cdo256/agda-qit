@@ -13,6 +13,7 @@
         #just-agda = inputs.just-agda.packages.${system}.just-agda.override ({
         #  agda2-mode = pkgs.emacsPackages.agda2-mode;
         #});
+        lipics = inputs.lipics.packages.${system}.default;
         tex = pkgs.texlive.combine {
           inherit (pkgs.texlive)
             scheme-medium
@@ -36,7 +37,13 @@
             catchfilebetweentags
             titling
             dirtree
+            multirow
+            threeparttable
+            comment
+            cleveref
+            urlbst
             ;
+          inherit lipics;
         };
       };
     };

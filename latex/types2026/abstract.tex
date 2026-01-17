@@ -1,69 +1,81 @@
 % Options for packages loaded elsewhere
 \PassOptionsToPackage{unicode}{hyperref}
 \PassOptionsToPackage{hyphens}{url}
-\documentclass[
-]{article}
-\usepackage{xcolor}
-\usepackage{amsmath,amssymb}
-\setcounter{secnumdepth}{5}
-\usepackage{iftex}
-\ifPDFTeX
-  \usepackage[T1]{fontenc}
-  \usepackage[utf8]{inputenc}
-  \usepackage{textcomp} % provide euro and other symbols
-\else % if luatex or xetex
-  \usepackage{unicode-math} % this also loads fontspec
-  \defaultfontfeatures{Scale=MatchLowercase}
-  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
-\fi
-\usepackage{lmodern}
-\ifPDFTeX\else
-  % xetex/luatex font selection
-\fi
-% Use upquote if available, for straight quotes in verbatim environments
-\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
-\IfFileExists{microtype.sty}{% use microtype if available
-  \usepackage[]{microtype}
-  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
-}{}
-\makeatletter
-\@ifundefined{KOMAClassName}{% if non-KOMA class
-  \IfFileExists{parskip.sty}{%
-    \usepackage{parskip}
-  }{% else
-    \setlength{\parindent}{0pt}
-    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
-}{% if KOMA class
-  \KOMAoptions{parskip=half}}
-\makeatother
-\setlength{\emergencystretch}{3em} % prevent overfull lines
+\documentclass[a4paper,UKenglish,cleveref, autoref, thm-restate]{lipics-v2021}
+\bibliographystyle{plainurl}
+
+%\usepackage{xcolor}
+%\usepackage{amsmath,amssymb}
+%\setcounter{secnumdepth}{5}
+%\usepackage{iftex}
+%\ifPDFTeX
+%  \usepackage[T1]{fontenc}
+%  \usepackage[utf8]{inputenc}
+%  \usepackage{textcomp} % provide euro and other symbols
+%\else % if luatex or xetex
+%  \usepackage{unicode-math} % this also loads fontspec
+%  \defaultfontfeatures{Scale=MatchLowercase}
+%  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+%\fi
+%\usepackage{lmodern}
+%\ifPDFTeX\else
+%  % xetex/luatex font selection
+%\fi
+%% Use upquote if available, for straight quotes in verbatim environments
+%\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+%\IfFileExists{microtype.sty}{% use microtype if available
+%  \usepackage[]{microtype}
+%  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+%}{}
+%\makeatletter
+%\@ifundefined{KOMAClassName}{% if non-KOMA class
+%  \IfFileExists{parskip.sty}{%
+%    \usepackage{parskip}
+%  }{% else
+%    \setlength{\parindent}{0pt}
+%    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+%}{% if KOMA class
+%  \KOMAoptions{parskip=half}}
+%\makeatother
+%\setlength{\emergencystretch}{3em} % prevent overfull lines
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\usepackage{bookmark}
-\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\urlstyle{same}
-\hypersetup{
-  hidelinks,
-  pdfcreator={LaTeX via pandoc}}
+%\usepackage{bookmark}
+%\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+%\urlstyle{same}
+%\hypersetup{
+%  hidelinks,
+%  pdfcreator={LaTeX via pandoc}}
 
-\author{}
-\date{}
+\title{Constructing QITs from Quotients}
+
+\author{Thorsten Altenkirch}{University of Nottingham, UK}{thorsten.altenkirch@nottingham.ac.uk}{https://orcid.org/0000-0002-6582-5025}{}
+
+\author{Christina O'Donnell}{University of Nottingham, UK}{psxco3@nottingham.ac.uk}{[ORCID]}{Supported by the Engineering and Physical Sciences Research Council (EPSRC) Doctoral Landscape Award [Grant Ref: EP/YXXXXXX/1].}
+
+\authorrunning{T. Altenkirch and C. D. O'Donnell}
+\Copyright{Thorsten Altenkirch and Christina O'Donnell}
+
+\ccsdesc[500]{Theory of computation~Type theory}
+\ccsdesc[300]{Theory of computation~Constructive mathematics}
+\ccsdesc[300]{Theory of computation~Logic and verification}
+
+\keywords{Quotient Inductive Types, W-Types, Homotopy Type Theory, Agda, Bounded Locality, Constructive Mathematics}
+
+% Optional: Link to the ArXiv version or repository if applicable
+%\relatedversion{Full version hosted on arXiv: \url{https://arxiv.org/abs/xxxx.xxxxx}}
+
+\supplement{Source code available at \url{https://github.com/cdo256/agda-qit}}
 
 \begin{document}
 
-{
-\setcounter{tocdepth}{3}
-\tableofcontents
-}
-\section{Constructive Quotient-W Types via Bounded
-  Locality}\label{constructive-quotient-w-types-via-bounded-locality}
+\maketitle
 
-\subsection{1. Introduction and
-	Motivation}\label{introduction-and-motivation}
+\subsection{Introduction and Motivation}\label{introduction-and-motivation}
 
 Quotient Inductive Types (QITs) are a central mechanism for specifying
 datatypes equipped with identifications in set-truncated Homotopy Type
-Theory \cite{hottl2013-book}. They support a wide range of fundamental
+Theory \cite{hott2013-book}. They support a wide range of fundamental
 constructions, including the HoTT reals \cite{hott2013-book}, partiality
 monads \cite{altenkirch2017-partiality-monad}, and ordinal-like
 structures.
@@ -125,7 +137,7 @@ from genuinely non-constructive ones, and we develop a framework for
 expressing and exploiting this boundedness in the construction of
 initial QW-algebras.
 
-\subsection{2. Background}\label{background}
+\subsection{Background}\label{background}
 
 We briefly recall the framework of quotient-W types introduced by Fiore,
 Pitts, and Steenkamp \cite{fiore2022-quotients-inductive-types}. A QW
@@ -184,7 +196,7 @@ depth-bounded, the required coherence data can instead be constructed by
 well-founded recursion on a fixed ordinal bound \(\alpha\), avoiding any
 appeal to choice.
 
-\subsection{3. Locality Principle}\label{locality-principle}
+\subsection{Locality Principle}\label{locality-principle}
 
 We formalise the notion of locality by assigning a \emph{rank} function
 
@@ -198,7 +210,7 @@ inspects structure up to depth \(\le \alpha\).
 
 \[ \mathrm{rank} : T_\Sigma X \to \mathcal{O} \]
 
-\subsection{4. Main Result}\label{main-result}
+\subsection{Main Result}\label{main-result}
 
 Our main theorem is that \(\alpha\)-local QW signatures admit fully
 constructive initial algebra semantics.
@@ -215,7 +227,7 @@ constructable function between term bound and maximum proof depth,
 giving cocontinuity. This construction is fully constructive and does
 not require any choice principles.
 
-\subsection{5. Case Study: Infinite
+\subsection{Case Study: Infinite
 	Mobiles}\label{case-study-infinite-mobiles}
 
 Our formalisation in Agda proves that in the case of mobiles, the
@@ -230,7 +242,7 @@ of infinite mobiles as an initial QIT. This provides a concrete example
 of a genuinely infinitary quotient type that does \emph{not} require
 choice, contrary to previous assumptions.
 
-\subsection{6. Boundary Phenomena}\label{boundary-phenomena}
+\subsection{Boundary Phenomena}\label{boundary-phenomena}
 
 Our analysis explains why certain examples genuinely require choice. In
 the case of extensional ordinals, equality is defined by mutual
@@ -243,14 +255,14 @@ More generally, any quotient whose generators quantify over arbitrarily
 deep substructures or require unbounded transitive closure will fall
 outside the \(\alpha\)-local fragment.
 
-\subsection{7. Method Overview}\label{method-overview}
+\subsection{Method Overview}\label{method-overview}
 
 Technically, we construct stratified diagrams indexed by ordinals below
 \(\alpha\), and show that all cones factor through a bounded stage.
 Plumpness of the ordinal ensures the existence of suprema for such
 cones, yielding cocontinuity without choice.
 
-\subsection{8. Related Work}\label{related-work}
+\subsection{Related Work}\label{related-work}
 
 Our work builds on the QW framework of Fiore, Pitts, and Steenkamp
 \cite{fiore2022-quotients-inductive-types}, and complements the no-go
@@ -260,13 +272,13 @@ Pitts and Steenkamp's notion of infinitary inflation
 \cite{steenkamp2021-phd-thesis}, which similarly isolates sources of
 non-constructivity in inductive definitions.
 
-\subsection{9. Future Work}\label{future-work}
+\subsection{Future Work}\label{future-work}
 
 Future directions include formalising the locality theorem stated above,
 and extending the analysis to indexed QW types
 \cite{altenkirch2018-quotient-inductive-inductive}.
 
-\subsection{10. Conclusion}\label{conclusion}
+\subsection{Conclusion}\label{conclusion}
 
 We identify bounded locality as a structural criterion characterising
 which quotient-W types admit fully constructive constructions. This
@@ -275,7 +287,6 @@ and when they can be avoided. Our results show that many infinitary
 quotients previously thought to require choice are, in fact,
 constructible in a purely constructive setting.
 
-\bibliographystyle{plain}
 \bibliography{master}
 
 \end{document}

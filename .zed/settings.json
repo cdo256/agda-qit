@@ -1,0 +1,18 @@
+{
+    "load_direnv": "shell_hook",
+    "lsp": {
+        "texlab": {
+            "settings": {
+                "texlab": {
+                    "build": {
+                        "executable": "make",
+                        "args": ["all"],
+                        "onSave": true,
+                        "forwardSearchAfter": false
+                    },
+                    "auxDirectory": "out"
+                }
+            }
+        }
+    }
+}

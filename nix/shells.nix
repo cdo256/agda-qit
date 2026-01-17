@@ -15,6 +15,7 @@
           pkgs.pandoc
           pkgs.gnumake
           tex
+          lipics
           pkgs.fira-mono
           pkgs.dejavu_fonts
           pkgs.fontconfig
