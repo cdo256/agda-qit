@@ -1,0 +1,89 @@
+---
+bibliography: master.bib
+---
+# Constructive Quotient-W Types via Bounded Locality
+
+## 1. Introduction and Motivation
+
+Quotient Inductive Types (QITs) are a central mechanism for specifying datatypes equipped with identifications in set-truncated Homotopy Type Theory \cite{hottl2013-book}. They support a wide range of fundamental constructions, including the HoTT reals \cite{hott2013-book}, partiality monads \cite{altenkirch2017-partiality-monad}, and ordinal-like structures.
+
+Despite their expressive power, QITs present significant foundational difficulties. Shulman and Lumsdaine established a no-go theorem showing that certain QITs, including standard definitions of the countable ordinals, cannot be constructed using quotients alone \cite{lumsdaine2020-semantics-higher-inductive}. This suggests that some form of infinitary principle or choice is unavoidable in a constructive metatheory.
+
+Fiore, Pitts, and Steenkamp subsequently showed that a broad class of QITs, which they call Quotient-W Types (QW types), admit an Initial Algebra semantics assuming the Weak Initial Set of Covers (WISC) principle \cite{fiore2022-quotients-inductive-types}. Their result recovers many important examples, including the extensional countable ordinals. However, WISC remains a nontrivial choice principle \cite{vandenberg2012-wisc-axiom}, and its necessity is poorly understood. In particular, it is unclear which features of a QIT genuinely require choice, and which arise from limitations of existing proof techniques.
+
+In this work we isolate two structural properties of quotient systems that explains this distinction: _locality_ and the tighter property of _depth-delta_. Intuitively, locality measures how deeply one must inspect the inductive structure of terms in order to witness that two elements are equal while depth-delta measures the maximum depth change an equation. In pathological examples, such as tree ordinals, the principle of extensionality quantifies over _all_ ordinals less than a pair of ordinals, unbounded descent into subtrees, forcing the use of global choice principles. By contrast, in examples such as infinite mobiles—infinitely branching trees quotiented by permutation—equality preserves depth and never requires inspecting substructure beyond a fixed finite level. In fact because permutation doesn't change the subtree relation, we can say that it is in a class of depth-preserving QW types, along with the classical definition of multi-sets as a QW type over a list.
+
+Our key observation is that this boundedness of inspection depth is exactly what is needed to recover the Fiore–Pitts–Steenkamp construction constructively. We sketch a proof that for QW signatures whose equations are bounded by a fixed ordinal $\alpha$, cocontinuity of the associated polynomial functor can be proved without any appeal to any choice principle. As a consequence, we obtain a fully constructive construction of infinite mobiles as an initial QIT, contrary to previous expectations, which we have formalized in Agda \cite{vezzosi2021-cubical-agda-dependently}.
+
+This leads to our central research question:
+
+> Which quotient-W types can be constructed fully constructively, without assuming any form of choice?
+
+We propose bounded locality as a criterion separating constructible QITs from genuinely non-constructive ones, and we develop a framework for expressing and exploiting this boundedness in the construction of initial QW-algebras.
+
+## 2. Background
+
+We briefly recall the framework of quotient-W types introduced by Fiore, Pitts, and Steenkamp \cite{fiore2022-quotients-inductive-types}. A QW signature consists of:
+
+- A container $\Sigma = S \triangleleft P$ \cite{abbott2005-containers}, specifying the shape and positions of a Polynomial Functor whose initial algebra is a W-Type \cite{martinlof1984-intuitionistic}.
+
+- A system of equations $(E, V, l, r)$, where each equation $e : E$ has a set of variables $V(e)$ and left- and right-hand sides given by terms in the free $\Sigma$-algebra over those variables.
+
+From such a signature, Fiore et al. construct a diagram of approximations indexed by a size structure \cite{fiore2022-quotients-inductive-types}. Intuitively, this diagram represents successive stages of the quotient construction, where each stage gives the proofs available within a bounded depth. The desired QW type is obtained as the Colimit of this diagram.
+
+To show that this colimit yields an initial algebra, two key properties are required:
+
+1. The existence of suitable covers for the underlying W-type and the equation contexts.
+2. _Cocontinuity_ of the associated polynomial functor, i.e. preservation of the colimit.
+
+Both properties are established in Fiore et al. using the indexed WISC principle \cite{fiore2022-quotients-inductive-types}. In particular, WISC is crucial in proving cocontinuity, which amounts to constructing a isomorphism for the functor $F$ determined by the container $\Sigma$.
+
+Operationally, cocontinuity expresses the fact that applying constructors commutes with taking quotients: forming a node after quotienting is equivalent to quotienting after forming a node. The proof in Fiore et al. relies on WISC to select a cover to size-bound the family of subtrees, enabling the construction of inverse maps witnessing this isomorphism.
+
+Our work revisits this step. We observe that the need for WISC arises precisely when the equations allow arbitrarily deep inspection of terms, as in the extensional ordinal example. When all equations are depth-bounded, the required coherence data can instead be constructed by well-founded recursion on a fixed ordinal bound $\alpha$, avoiding any appeal to choice.
+
+## 3. Locality Principle
+
+We formalise the notion of locality by assigning a _rank_ function
+
+$$ \mathrm{rank} : T_\Sigma X \to \mathcal{O} $$
+
+measuring the height of the underlying tree. An equation system is said to be $\alpha$-local if, for every equation $e : E$, both sides $l(e)$ and $r(e)$ have rank _at most_ a fixed ordinal $\alpha$. Intuitively, this means that every generating equation only inspects structure up to depth $\le \alpha$.
+
+$$ \mathrm{rank} : T_\Sigma X \to \mathcal{O} $$
+
+## 4. Main Result
+
+Our main theorem is that $\alpha$-local QW signatures admit fully constructive initial algebra semantics.
+
+_Theorem_ Let $\Sigma$ be a QW signature whose equations are $\alpha$-local. Then the associated quotient-W type exists as an initial algebra, and its construction does not require WISC or any other choice principle.
+
+The proof follows the outline of Fiore–Pitts–Steenkamp \cite{fiore2022-quotients-inductive-types}, but replaces the use of WISC in the inverse map by offsetting by a bound ordinal $\alpha$, giving a constructable function between term bound and maximum proof depth, giving cocontinuity. This construction is fully constructive and does not require any choice principles.
+
+## 5. Case Study: Infinite Mobiles
+
+Our formalisation in Agda proves that in the case of mobiles, the defining equations are provably _depth-preserving_, since all variables on the left appear at the same depth on the right. This is enough to show that depth is preserved in the quotient type, and that if two terms are equal then they can be proven in the stage bounded by either ordinal.
+
+As a result, the main theorem yields a fully constructive construction of infinite mobiles as an initial QIT. This provides a concrete example of a genuinely infinitary quotient type that does _not_ require choice, contrary to previous assumptions.
+
+## 6. Boundary Phenomena
+
+Our analysis explains why certain examples genuinely require choice. In the case of extensional ordinals, equality is defined by mutual containment of downward closures, which requires unbounded descent into subtrees \cite{fiore2022-quotients-inductive-types}. No ordinal bound $\alpha$ suffices, and the quotient is therefore non-local. This accounts for the essential use of WISC in the construction of ordinals.
+
+More generally, any quotient whose generators quantify over arbitrarily deep substructures or require unbounded transitive closure will fall outside the $\alpha$-local fragment.
+
+## 7. Method Overview
+
+Technically, we construct stratified diagrams indexed by ordinals below $\alpha$, and show that all cones factor through a bounded stage. Plumpness of the ordinal ensures the existence of suprema for such cones, yielding cocontinuity without choice.
+
+## 8. Related Work
+
+Our work builds on the QW framework of Fiore, Pitts, and Steenkamp \cite{fiore2022-quotients-inductive-types}, and complements the no-go results of Shulman and Lumsdaine \cite{lumsdaine2020-semantics-higher-inductive}. It is also related to Pitts and Steenkamp’s notion of infinitary inflation \cite{steenkamp2021-phd-thesis}, which similarly isolates sources of non-constructivity in inductive definitions.
+
+## 9. Future Work
+
+Future directions include formalising the locality theorem stated above, and extending the analysis to indexed QW types \cite{altenkirch2018-quotient-inductive-inductive}.
+
+## 10. Conclusion
+
+We identify bounded locality as a structural criterion characterising which quotient-W types admit fully constructive constructions. This explains when choice principles such as WISC are genuinely necessary, and when they can be avoided. Our results show that many infinitary quotients previously thought to require choice are, in fact, constructible in a purely constructive setting.
