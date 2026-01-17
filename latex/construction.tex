@@ -1,0 +1,462 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Mobiles as a Quotient-Inductive Type via Plump Ordinals},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Mobiles as a Quotient-Inductive Type via Plump Ordinals}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{3}
+\tableofcontents
+}
+\subsection{Abstract}\label{abstract}
+
+This note describes a construction of infinitary mobiles as a
+quotient-inductive type. The construction proceeds in two stages. First,
+we give a setoid-based description in terms of a transfinite diagram
+indexed by a plump tree ordinal \((T,\le)\). Second, we show that the
+same construction can be carried out directly in the category
+\textbf{Set}, assuming the availability of non-recursive quotients or
+colimit higher inductive types.
+
+The key property of the index order \(T\) is that it possesses a
+\emph{definable supremum}: every family of elements indexed by \(I\) has
+a canonical upper bound. This avoids the need for WISC (the Weakly
+Initial Set of Covers), which is typically required to ensure that
+polynomial functors preserve colimits in exact completions. Our
+construction is an instance where these general-purpose axioms are
+unnecessary.
+
+\subsection{Setoid Infrastructure}\label{setoid-infrastructure}
+
+Before presenting the construction, we establish the fundamental
+categorical infrastructure based on setoids.
+
+\subsubsection{Setoids}\label{setoids}
+
+A \textbf{setoid} \(S = (|S|, {\approx_S})\) consists of a set \(|S|\)
+equipped with an equivalence relation \({\approx_S}\) satisfying:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Reflexivity}: \(x \approx_S x\) for all \(x \in |S|\)
+\item
+  \textbf{Symmetry}: \(x \approx_S y\) implies \(y \approx_S x\)
+\item
+  \textbf{Transitivity}: \(x \approx_S y\) and \(y \approx_S z\) implies
+  \(x \approx_S z\)
+\end{itemize}
+
+Setoids provide a foundation for working with quotient types while
+maintaining computational content.
+
+\subsubsection{Setoid Homomorphisms}\label{setoid-homomorphisms}
+
+A \textbf{setoid homomorphism} \(f: S \to T\) is a function
+\(f: |S| \to |T|\) that respects the equivalence relations:
+
+\[x \approx_S y \implies f(x) \approx_T f(y)\]
+
+Setoid homomorphisms compose in the obvious way, and every setoid has an
+identity homomorphism.
+
+Two homomorphisms \(f, g : S \to T\) are \textbf{homomorphically
+equivalent} if for all \(x \approx_S y\), we have
+\(f(x) \approx_T g(y)\). This yields an equivalence relation on the
+hom-sets, making setoids into a category \textbf{Setoid}.
+
+\subsubsection{Setoid Isomorphisms}\label{setoid-isomorphisms}
+
+A \textbf{setoid isomorphism} \(\phi: S \cong T\) consists of setoid
+homomorphisms \(\phi: S \to T\) and \(\phi^{-1}: T \to S\) such that:
+
+\[\phi^{-1} \circ \phi \approx \mathrm{id}_S \quad \text{and} \quad \phi \circ \phi^{-1} \approx \mathrm{id}_T\]
+
+where \(\approx\) denotes homomorphic equivalence. Setoid isomorphism
+defines an equivalence relation on setoids.
+
+\subsubsection{Setoid Functors}\label{setoid-functors}
+
+A \textbf{setoid functor} \(F: \mathbf{Setoid} \to \mathbf{Setoid}\)
+assigns to each setoid \(S\) a setoid \(F(S)\), and to each homomorphism
+\(f: S \to T\) a homomorphism \(F(f): F(S) \to F(T)\), satisfying:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Identity}: \(F(\mathrm{id}_S) \approx \mathrm{id}_{F(S)}\)
+\item
+  \textbf{Composition}: \(F(g \circ f) \approx F(g) \circ F(f)\)
+\item
+  \textbf{Congruence}: \(f \approx g\) implies \(F(f) \approx F(g)\)
+\end{itemize}
+
+These conditions ensure that \(F\) is a proper functor on the category
+of setoids.
+
+\subsection{Raw infinitary trees and
+plumpness}\label{raw-infinitary-trees-and-plumpness}
+
+Fix a set \(I\neq \emptyset\), either finite or infinitary. Define the W
+Type \(T\) of \(I\)-branching trees:
+
+\[\mathsf{leaf} : T, \qquad \mathsf{node} : (I \to T) \to T.\] Expressed
+as a container, this is: \[
+S_{T} = \mathbb{2}; \qquad P_{T}=[\bot,I];\qquad T= W~ S_{T}~ P_{T}
+\] We extend this to the plump ordinal trees over the W Type as: \[
+S_{Z} = \mathbb{3}; \qquad P_{Z}=[\bot,\mathbb{2} ,I]; \qquad Z=W~S_{Z}~P_{Z}
+\] This is because two compare two diagrams over ordinals \(\alpha\) and
+\(\beta\), we must be able to join the ordinals. This is necessary for
+proving congruence on the reverse direction of cocontinuity. The exact W
+type doesn't matter except that it must have sufficient constructors to
+be able to cover all branching cases, have a \(\bot\) constructor (so
+it's not empty), and a join \(\_\vee\_:Z\to Z \to Z\). This gives rise
+to a natural inclusion: \[
+\begin{aligned}
+\iota_T &:&T&\to &Z&\\
+\iota_T&:&sup(\bot,f)&\mapsto &sup(\bot,f)&\\
+\iota_T&:&sup(I,f)&\mapsto& sup(I,f)&
+\end{aligned}
+\] Define the plump order, defined as an inductive-inductive type with
+two kinds \(<,\le:Z\to Z\to Prop\) on \(Z\) inductively:
+
+\[
+\begin{align*}
+\frac{\exists i. \alpha \le f i}{\alpha < sup(s,f) }\qquad\frac{\forall i.f i<\alpha }{sup(s,f)\le \alpha } \qquad \forall i\in b,~s:s_z,~f:p_z~s \to z,~\alpha :z \\
+\end{align*}
+\]
+
+\subsubsection{Properties of the Plump
+Ordering}\label{properties-of-the-plump-ordering}
+
+The plump ordering satisfies the following key properties, all proven
+constructively in the Agda formalization:
+
+\textbf{Reflexivity}: For all \(i : Z\), we have \(i \le i\). This is
+proven by structural induction:
+\[\frac{\forall x. f(x) < \sup(s,f)}{\sup(s,f) \le \sup(s,f)}\]
+
+\textbf{Transitivity}: The plump ordering satisfies multiple forms of
+transitivity, proven by mutual recursion: - \(\le\) is transitive:
+\(i \le j \land j \le k \implies i \le k\) - \(<\) is transitive:
+\(i < j \land j < k \implies i < k\) - Mixed transitivity:
+\(i \le j \land j < k \implies i < k\) and
+\(i < j \land j \le k \implies i < k\)
+
+\textbf{Well-foundedness}: The strict ordering \(<\) is well-founded,
+meaning every element is accessible under the relation. This provides
+the foundation for transfinite induction principles over plump trees.
+
+\textbf{Preorder Structure}: The relation \(\le\) forms a preorder on
+\(Z\) with reflexivity and transitivity, providing the categorical
+foundation for diagram indexing.
+
+\textbf{Subset Characterization}: We can characterize the ordering using
+subset relations on the strict predecessors and successors:
+
+For plump trees \(i, j : Z\), we define: - \(i \subseteq j\) (downward
+closure) as \(\forall k : Z. k < i \implies k < j\) - \(i \supseteq j\)
+(upward closure) as \(\forall k : Z. i < k \implies j < k\)
+
+Intuitively, \(i \subseteq j\) means that every strict predecessor of
+\(i\) is also a strict predecessor of \(j\), while \(i \supseteq j\)
+means that every strict successor of \(i\) is also a strict successor of
+\(j\). Since we're working with well-founded trees rather than classical
+sets, ``subset'' here refers to inclusion of the strict predecessor sets
+in the well-founded ordering.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Equivalence}: \(i \le j \iff i \subseteq j\) and
+  \(i \le j \implies j \supseteq i\)
+\end{itemize}
+
+\textbf{Quasi-extensionality}: The plump ordering is quasi-extensional,
+meaning:
+\[(i \le j \land j \le i) \iff (i \subseteq j \land j \subseteq i)\]
+
+This property connects the ordering structure with the subset structure,
+providing a foundation for extensional reasoning about plump trees and
+enabling the definable supremum property crucial for cocontinuity.
+
+We then define \(<_T:T\to Z \to Prop\) as
+\[t<_T \alpha =\iota_T~ t < \alpha\] This gives us a way to bound trees
+by size ordinals. \#\# Mobile Diagram Construction
+
+\subsubsection{Mobile Elements}\label{mobile-elements}
+
+For each plump ordinal \(\alpha : Z\), define the type \(P_0(\alpha)\)
+of mobile elements at stage \(\alpha\) inductively:
+
+\[
+\begin{align}
+\mathsf{leaf} &: \forall \beta : I \to Z. P_0(\sup(I, \beta)) \\
+\mathsf{node} &: \forall \beta : I \to Z. \left(\forall i : I. P_0(\beta(i))\right) \to P_0(\sup(I, \beta)) \\
+\mathsf{weaken} &: \forall \alpha, \gamma : Z. \alpha \le \gamma \to P_0(\alpha) \to P_0(\gamma)
+\end{align}
+\]
+
+The key insight is that mobile elements are not simply bounded trees,
+but structured terms that can be: - \textbf{Leaves} at any node stage
+(indexed by functions \(\beta : I \to Z\)) - \textbf{Nodes} with
+recursively defined mobile children at smaller ordinals -
+\textbf{Weakened} from smaller to larger stages via the plump ordering
+
+\subsubsection{Mobile Equivalence}\label{mobile-equivalence}
+
+Define the mobile equivalence relation \(\approx^P\) on mobile elements
+by the generators:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Leaf equivalence}:
+  \(\mathsf{leaf}(\beta) \approx^P \mathsf{leaf}(\gamma)\) for any
+  \(\beta, \gamma : I \to Z\)
+\item
+  \textbf{Node congruence}:
+  \(\mathsf{node}(\beta, f) \approx^P \mathsf{node}(\gamma, g)\) if
+  \(\forall i : I. f(i) \approx^P g(i)\)
+\item
+  \textbf{Permutation symmetry}:
+  \(\mathsf{node}(\beta, f) \approx^P \mathsf{node}(\beta \circ \pi, f \circ \pi)\)
+  for any bijection \(\pi : I \leftrightarrow I\)
+\item
+  \textbf{Weakening transparency}:
+  \(s \approx^P \mathsf{weaken}(\alpha, \gamma, p, s)\) for any
+  \(p : \alpha \le \gamma\)
+\item
+  \textbf{Symmetry and transitivity}: \(\approx^P\) is symmetric and
+  transitive
+\end{itemize}
+
+This gives mobile equivalence the crucial \textbf{permutation symmetry}
+that distinguishes mobile categories from ordinary QIT signatures.
+
+\subsubsection{The Mobile Setoids}\label{the-mobile-setoids}
+
+For each stage \(\alpha : Z\), define the setoid:
+\[P(\alpha) := (P_0(\alpha), \approx^P)\]
+
+This construction ensures that each stage forms a proper setoid with
+reflexivity, symmetry, and transitivity of the mobile equivalence
+relation.
+
+\subsubsection{The Mobile Diagram}\label{the-mobile-diagram}
+
+The mobile diagram structure arises from the plump ordering on ordinals.
+For any \(p : \alpha \le \beta\) in the plump order, we obtain a setoid
+homomorphism:
+
+\[P(p) : P(\alpha) \to P(\beta)\]
+
+defined by \(P(p)(s) := \mathsf{weaken}(\alpha, \beta, p, s)\) with
+congruence established by the weakening transparency of mobile
+equivalence.
+
+This yields the mobile diagram:
+\[P : (Z, \le) \longrightarrow \mathbf{Setoid}\]
+
+satisfying the functorial properties: - \textbf{Identity}:
+\(P(\mathsf{refl}) \approx_h \mathsf{id}\) - \textbf{Composition}:
+\(P(q \circ p) \approx_h P(q) \circ P(p)\)
+
+The mobile diagram provides the foundation for constructing colimits
+that respect both the ordinal structure and the crucial permutation
+symmetries needed for mobile category theory.
+
+\subsubsection{The Mobile Colimit}\label{the-mobile-colimit}
+
+The colimit of the mobile diagram \(P : (Z, \le) \to \mathbf{Setoid}\)
+is constructed as follows:
+
+\textbf{Carrier}: The colimit carrier is the dependent sum:
+\[\text{Colim}_0 = \sum_{\alpha : Z} |P(\alpha)|\]
+
+\textbf{Equivalence Relation}: Define the colimit equivalence relation
+\(\approx^l\) on \(\text{Colim}_0\) inductively by:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Stage equivalence}: \((\alpha, x) \approx^l (\alpha, x')\) if
+  \(P(\alpha)[x \approx^P x']\)
+\item
+  \textbf{Step equivalence}: \((\alpha, x) \approx^l (\beta, P(p)(x))\)
+  for any \(p : \alpha \le \beta\)
+\item
+  \textbf{Symmetry}: \(s \approx^l t \implies t \approx^l s\)
+\item
+  \textbf{Transitivity}:
+  \(s \approx^l t \land t \approx^l u \implies s \approx^l u\)
+\end{itemize}
+
+\textbf{The Colimit Setoid}:
+\[\text{Colim}(P) := (\text{Colim}_0, \approx^l)\]
+
+\textbf{Cocone Structure}: The canonical injections are:
+\[\iota_\alpha : P(\alpha) \to \text{Colim}(P)\]
+\[\iota_\alpha(x) := (\alpha, x)\]
+
+These satisfy the cocone property: for any \(p : \alpha \le \beta\), we
+have \(\iota_\beta \circ P(p) \approx_h \iota_\alpha\).
+
+\textbf{Universal Property}: \(\text{Colim}(P)\) satisfies the universal
+property that for any other cocone with apex \(A\) and injections
+\(\{\kappa_\alpha : P(\alpha) \to A\}\), there exists a unique setoid
+homomorphism \(h : \text{Colim}(P) \to A\) making all triangles commute.
+
+\subsubsection{The quotient-polynomial
+functor}\label{the-quotient-polynomial-functor}
+
+Define an endofunctor on setoids:
+
+\[\widetilde F_B(X,\approx_X) := \bigl( 1 + (I \to X) \bigr) / \approx_F,\]
+
+where \(\approx_F\) is the smallest equivalence relation generated by:
+
+\[\mathsf{Leaf} \approx_F \mathsf{Leaf},\]
+
+\[\mathsf{Node}(f) \approx_F \mathsf{Node}(g) \;\text{if}\; \forall i,\; f(i)\approx_X g(i),\]
+
+\[\mathsf{Node}(f) \approx_F \mathsf{Node}(g) \;\text{if}\; \exists \pi : I\cong I,\ \forall i,\ f(i)\approx_X g(\pi(i)).\]
+
+\subsubsection{Cocontinuity}\label{cocontinuity}
+
+A crucial lemma is that for any \(g : I \to \mathrm{colim}P\), if
+\(g(i)\) is represented by \((t_i,x_i)\) then the definable supremum
+
+\[t^* := \mathsf{node}(i \mapsto t_i)\]
+
+satisfies \(t_i \le t^*\), hence
+
+\[g = \iota_{t^*} \circ h\]
+
+for the unique \(h : I \to P(t^*)\) defined by
+\(h(i) := P(t_i\le t^*)(x_i)\). This supplies the factorisation needed
+to prove that \(\widetilde F_B\) preserves this colimit.
+
+\subsection{Constructing Mobiles Directly in
+Set}\label{constructing-mobiles-directly-in-set}
+
+In this section we reinterpret the construction internally in Set, using
+a colimit higher inductive type. No use of WISC is required because the
+index order \((T,\le)\) has a definable supremum.
+
+\subsubsection{Explicit colimit
+constructors}\label{explicit-colimit-constructors}
+
+Define the colimit as a {[}{[}Higher Inductive Type{]}{]} \(M_B\) with
+constructors:
+
+\textbf{Points:}
+
+\[\mathsf{inc}(t,x) : M_B \qquad (t : T,\ x : P(t)).\]
+
+\textbf{Paths:}
+
+\[\mathsf{glue}(p,x) : \mathsf{inc}(t,x) = \mathsf{inc}(u, P(p)(x)) \qquad (p : t\le u).\]
+
+No further constructors are required.
+
+\subsubsection{\texorpdfstring{The functor \(\widetilde F_B\) on
+Set}{The functor \textbackslash widetilde F\_B on Set}}\label{the-functor-widetilde-f_b-on-set}
+
+Define
+
+\[\widetilde F_B(X) := \left( 1 + (I \to X) \right) / \approx,\]
+
+where \(\approx\) is the same permutation-generated relation as in the
+setoid case.
+
+\subsubsection{Cocontinuity in Set}\label{cocontinuity-in-set}
+
+Given \(g : I \to M_B\), write \(g(i)=\mathsf{inc}(t_i,x_i)\). Define
+\(t^* := \mathsf{node}(i \mapsto t_i)\) and
+
+\[h(i) := P(t_i\le t^*)(x_i).\]
+
+Then
+
+\[g(i) = \mathsf{inc}(t^*,h(i))\]
+
+up to paths generated by \(\mathsf{glue}\). This provides the factor
+needed for the \(\psi\) map of the cocontinuity equivalence.
+
+\subsubsection{The initial algebra}\label{the-initial-algebra}
+
+Cocontinuity yields an isomorphism
+
+\[\widetilde F_B(M_B) \cong \mathrm{Colim}(\widetilde F_B \circ P),\]
+
+from which we obtain a structure map
+
+\[\mathsf{mob}_B : \widetilde F_B(M_B) \to M_B.\]
+
+By transfinite induction along \(T\) and the colimit universal property,
+one obtains a unique algebra morphism into any other
+\(\widetilde F_B\)-algebra. Hence:
+
+\textbf{Theorem.} \(M_B\) is the {[}{[}Initial Algebra{]}{]} for
+\(\widetilde F_B\).
+
+\subsection{Remarks on WISC}\label{remarks-on-wisc}
+
+In general, proving that a polynomial or quotient-polynomial functor
+preserves colimits in a quotient completion requires a principle such as
+{[}{[}WISC{]}{]} to factor arbitrary maps through a small family of
+covers. In this specific case, the definable supremum provided by the
+plump order \((T,\le)\) replaces the need for any choice principle.
+
+\end{document}
