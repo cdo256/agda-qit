@@ -1,15 +1,17 @@
 OUT := out/latex
 export BIBINPUTS := latex:
 
-.PHONY: all clean
+# Find all .tex files in latex directory, excluding preambles
+TEX_FILES := $(filter-out latex/preamble.tex,$(wildcard latex/*.tex))
+PDF_FILES := $(patsubst latex/%.tex,$(OUT)/%.pdf,$(TEX_FILES))
 
-all: construction abstract
+.PHONY: all clean build
 
-construction: latex/construction.tex
+all: $(PDF_FILES)
+
+$(OUT)/%.pdf: latex/%.tex
+	@mkdir -p $(OUT)
 	latexmk -pdf -output-directory=$(OUT) -interaction=nonstopmode $<
-
-abstract: latex/types2026/abstract.tex
-	latexmk -pdf -output-directory=$(OUT)/types2026 -interaction=nonstopmode $<
 
 build:
 	agda Everything.agda
