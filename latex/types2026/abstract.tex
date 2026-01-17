@@ -56,10 +56,10 @@
 \tableofcontents
 }
 \section{Constructive Quotient-W Types via Bounded
-Locality}\label{constructive-quotient-w-types-via-bounded-locality}
+  Locality}\label{constructive-quotient-w-types-via-bounded-locality}
 
 \subsection{1. Introduction and
-Motivation}\label{introduction-and-motivation}
+	Motivation}\label{introduction-and-motivation}
 
 Quotient Inductive Types (QITs) are a central mechanism for specifying
 datatypes equipped with identifications in set-truncated Homotopy Type
@@ -116,8 +116,8 @@ expectations, which we have formalized in Agda
 This leads to our central research question:
 
 \begin{quote}
-Which quotient-W types can be constructed fully constructively, without
-assuming any form of choice?
+	Which quotient-W types can be constructed fully constructively, without
+	assuming any form of choice?
 \end{quote}
 
 We propose bounded locality as a criterion separating constructible QITs
@@ -132,15 +132,15 @@ Pitts, and Steenkamp \cite{fiore2022-quotients-inductive-types}. A QW
 signature consists of:
 
 \begin{itemize}
-\item
-  A container \(\Sigma = S \triangleleft P\)
-  \cite{abbott2005-containers}, specifying the shape and positions of a
-  Polynomial Functor whose initial algebra is a W-Type
-  \cite{martinlof1984-intuitionistic}.
-\item
-  A system of equations \((E, V, l, r)\), where each equation \(e : E\)
-  has a set of variables \(V(e)\) and left- and right-hand sides given
-  by terms in the free \(\Sigma\)-algebra over those variables.
+	\item
+	      A container \(\Sigma = S \triangleleft P\)
+	      \cite{abbott2005-containers}, specifying the shape and positions of a
+	      Polynomial Functor whose initial algebra is a W-Type
+	      \cite{martinlof1984-intuitionistic}.
+	\item
+	      A system of equations \((E, V, l, r)\), where each equation \(e : E\)
+	      has a set of variables \(V(e)\) and left- and right-hand sides given
+	      by terms in the free \(\Sigma\)-algebra over those variables.
 \end{itemize}
 
 From such a signature, Fiore et al.~construct a diagram of
@@ -154,14 +154,14 @@ To show that this colimit yields an initial algebra, two key properties
 are required:
 
 \begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
-\item
-  The existence of suitable covers for the underlying W-type and the
-  equation contexts.
-\item
-  \emph{Cocontinuity} of the associated polynomial functor,
-  i.e.~preservation of the colimit.
+	\def\labelenumi{\arabic{enumi}.}
+	\tightlist
+	\item
+	      The existence of suitable covers for the underlying W-type and the
+	      equation contexts.
+	\item
+	      \emph{Cocontinuity} of the associated polynomial functor,
+	      i.e.~preservation of the colimit.
 \end{enumerate}
 
 Both properties are established in Fiore et al.~using the indexed WISC
@@ -216,7 +216,7 @@ giving cocontinuity. This construction is fully constructive and does
 not require any choice principles.
 
 \subsection{5. Case Study: Infinite
-Mobiles}\label{case-study-infinite-mobiles}
+	Mobiles}\label{case-study-infinite-mobiles}
 
 Our formalisation in Agda proves that in the case of mobiles, the
 defining equations are provably \emph{depth-preserving}, since all
@@ -274,5 +274,8 @@ explains when choice principles such as WISC are genuinely necessary,
 and when they can be avoided. Our results show that many infinitary
 quotients previously thought to require choice are, in fact,
 constructible in a purely constructive setting.
+
+\bibliographystyle{plain}
+\bibliography{master}
 
 \end{document}

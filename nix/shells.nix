@@ -13,6 +13,7 @@
           pkgs.texlab
           pkgs.ltex-ls
           pkgs.pandoc
+          pkgs.gnumake
           tex
           pkgs.fira-mono
           pkgs.dejavu_fonts

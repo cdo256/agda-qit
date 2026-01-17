@@ -55,8 +55,8 @@
 \maketitle
 
 {
-\setcounter{tocdepth}{3}
-\tableofcontents
+	\setcounter{tocdepth}{3}
+	\tableofcontents
 }
 \subsection{Abstract}\label{abstract}
 
@@ -87,14 +87,14 @@ A \textbf{setoid} \(S = (|S|, {\approx_S})\) consists of a set \(|S|\)
 equipped with an equivalence relation \({\approx_S}\) satisfying:
 
 \begin{itemize}
-\tightlist
-\item
-  \textbf{Reflexivity}: \(x \approx_S x\) for all \(x \in |S|\)
-\item
-  \textbf{Symmetry}: \(x \approx_S y\) implies \(y \approx_S x\)
-\item
-  \textbf{Transitivity}: \(x \approx_S y\) and \(y \approx_S z\) implies
-  \(x \approx_S z\)
+	\tightlist
+	\item
+	      \textbf{Reflexivity}: \(x \approx_S x\) for all \(x \in |S|\)
+	\item
+	      \textbf{Symmetry}: \(x \approx_S y\) implies \(y \approx_S x\)
+	\item
+	      \textbf{Transitivity}: \(x \approx_S y\) and \(y \approx_S z\) implies
+	      \(x \approx_S z\)
 \end{itemize}
 
 Setoids provide a foundation for working with quotient types while
@@ -111,7 +111,7 @@ Setoid homomorphisms compose in the obvious way, and every setoid has an
 identity homomorphism.
 
 Two homomorphisms \(f, g : S \to T\) are \textbf{homomorphically
-equivalent} if for all \(x \approx_S y\), we have
+	equivalent} if for all \(x \approx_S y\), we have
 \(f(x) \approx_T g(y)\). This yields an equivalence relation on the
 hom-sets, making setoids into a category \textbf{Setoid}.
 
@@ -132,29 +132,29 @@ assigns to each setoid \(S\) a setoid \(F(S)\), and to each homomorphism
 \(f: S \to T\) a homomorphism \(F(f): F(S) \to F(T)\), satisfying:
 
 \begin{itemize}
-\tightlist
-\item
-  \textbf{Identity}: \(F(\mathrm{id}_S) \approx \mathrm{id}_{F(S)}\)
-\item
-  \textbf{Composition}: \(F(g \circ f) \approx F(g) \circ F(f)\)
-\item
-  \textbf{Congruence}: \(f \approx g\) implies \(F(f) \approx F(g)\)
+	\tightlist
+	\item
+	      \textbf{Identity}: \(F(\mathrm{id}_S) \approx \mathrm{id}_{F(S)}\)
+	\item
+	      \textbf{Composition}: \(F(g \circ f) \approx F(g) \circ F(f)\)
+	\item
+	      \textbf{Congruence}: \(f \approx g\) implies \(F(f) \approx F(g)\)
 \end{itemize}
 
 These conditions ensure that \(F\) is a proper functor on the category
 of setoids.
 
 \subsection{Raw infinitary trees and
-plumpness}\label{raw-infinitary-trees-and-plumpness}
+	plumpness}\label{raw-infinitary-trees-and-plumpness}
 
 Fix a set \(I\neq \emptyset\), either finite or infinitary. Define the W
 Type \(T\) of \(I\)-branching trees:
 
 \[\mathsf{leaf} : T, \qquad \mathsf{node} : (I \to T) \to T.\] Expressed
 as a container, this is: \[
-S_{T} = \mathbb{2}; \qquad P_{T}=[\bot,I];\qquad T= W~ S_{T}~ P_{T}
+	S_{T} = \mathbb{2}; \qquad P_{T}=[\bot,I];\qquad T= W~ S_{T}~ P_{T}
 \] We extend this to the plump ordinal trees over the W Type as: \[
-S_{Z} = \mathbb{3}; \qquad P_{Z}=[\bot,\mathbb{2} ,I]; \qquad Z=W~S_{Z}~P_{Z}
+	S_{Z} = \mathbb{3}; \qquad P_{Z}=[\bot,\mathbb{2} ,I]; \qquad Z=W~S_{Z}~P_{Z}
 \] This is because two compare two diagrams over ordinals \(\alpha\) and
 \(\beta\), we must be able to join the ordinals. This is necessary for
 proving congruence on the reverse direction of cocontinuity. The exact W
@@ -162,22 +162,22 @@ type doesn't matter except that it must have sufficient constructors to
 be able to cover all branching cases, have a \(\bot\) constructor (so
 it's not empty), and a join \(\_\vee\_:Z\to Z \to Z\). This gives rise
 to a natural inclusion: \[
-\begin{aligned}
-\iota_T &:&T&\to &Z&\\
-\iota_T&:&sup(\bot,f)&\mapsto &sup(\bot,f)&\\
-\iota_T&:&sup(I,f)&\mapsto& sup(I,f)&
-\end{aligned}
+	\begin{aligned}
+		\iota_T & : & T           & \to     & Z           & \\
+		\iota_T & : & sup(\bot,f) & \mapsto & sup(\bot,f) & \\
+		\iota_T & : & sup(I,f)    & \mapsto & sup(I,f)    &
+	\end{aligned}
 \] Define the plump order, defined as an inductive-inductive type with
 two kinds \(<,\le:Z\to Z\to Prop\) on \(Z\) inductively:
 
 \[
-\begin{align*}
-\frac{\exists i. \alpha \le f i}{\alpha < sup(s,f) }\qquad\frac{\forall i.f i<\alpha }{sup(s,f)\le \alpha } \qquad \forall i\in b,~s:s_z,~f:p_z~s \to z,~\alpha :z \\
-\end{align*}
+	\begin{align*}
+		\frac{\exists i. \alpha \le f i}{\alpha < sup(s,f) }\qquad\frac{\forall i.f i<\alpha }{sup(s,f)\le \alpha } \qquad \forall i\in b,~s:s_z,~f:p_z~s \to z,~\alpha :z \\
+	\end{align*}
 \]
 
 \subsubsection{Properties of the Plump
-Ordering}\label{properties-of-the-plump-ordering}
+	Ordering}\label{properties-of-the-plump-ordering}
 
 The plump ordering satisfies the following key properties, all proven
 constructively in the Agda formalization:
@@ -216,10 +216,10 @@ sets, ``subset'' here refers to inclusion of the strict predecessor sets
 in the well-founded ordering.
 
 \begin{itemize}
-\tightlist
-\item
-  \textbf{Equivalence}: \(i \le j \iff i \subseteq j\) and
-  \(i \le j \implies j \supseteq i\)
+	\tightlist
+	\item
+	      \textbf{Equivalence}: \(i \le j \iff i \subseteq j\) and
+	      \(i \le j \implies j \supseteq i\)
 \end{itemize}
 
 \textbf{Quasi-extensionality}: The plump ordering is quasi-extensional,
@@ -240,11 +240,11 @@ For each plump ordinal \(\alpha : Z\), define the type \(P_0(\alpha)\)
 of mobile elements at stage \(\alpha\) inductively:
 
 \[
-\begin{align}
-\mathsf{leaf} &: \forall \beta : I \to Z. P_0(\sup(I, \beta)) \\
-\mathsf{node} &: \forall \beta : I \to Z. \left(\forall i : I. P_0(\beta(i))\right) \to P_0(\sup(I, \beta)) \\
-\mathsf{weaken} &: \forall \alpha, \gamma : Z. \alpha \le \gamma \to P_0(\alpha) \to P_0(\gamma)
-\end{align}
+	\begin{align}
+		\mathsf{leaf}   & : \forall \beta : I \to Z. P_0(\sup(I, \beta))                                               \\
+		\mathsf{node}   & : \forall \beta : I \to Z. \left(\forall i : I. P_0(\beta(i))\right) \to P_0(\sup(I, \beta)) \\
+		\mathsf{weaken} & : \forall \alpha, \gamma : Z. \alpha \le \gamma \to P_0(\alpha) \to P_0(\gamma)
+	\end{align}
 \]
 
 The key insight is that mobile elements are not simply bounded trees,
@@ -259,26 +259,26 @@ Define the mobile equivalence relation \(\approx^P\) on mobile elements
 by the generators:
 
 \begin{itemize}
-\tightlist
-\item
-  \textbf{Leaf equivalence}:
-  \(\mathsf{leaf}(\beta) \approx^P \mathsf{leaf}(\gamma)\) for any
-  \(\beta, \gamma : I \to Z\)
-\item
-  \textbf{Node congruence}:
-  \(\mathsf{node}(\beta, f) \approx^P \mathsf{node}(\gamma, g)\) if
-  \(\forall i : I. f(i) \approx^P g(i)\)
-\item
-  \textbf{Permutation symmetry}:
-  \(\mathsf{node}(\beta, f) \approx^P \mathsf{node}(\beta \circ \pi, f \circ \pi)\)
-  for any bijection \(\pi : I \leftrightarrow I\)
-\item
-  \textbf{Weakening transparency}:
-  \(s \approx^P \mathsf{weaken}(\alpha, \gamma, p, s)\) for any
-  \(p : \alpha \le \gamma\)
-\item
-  \textbf{Symmetry and transitivity}: \(\approx^P\) is symmetric and
-  transitive
+	\tightlist
+	\item
+	      \textbf{Leaf equivalence}:
+	      \(\mathsf{leaf}(\beta) \approx^P \mathsf{leaf}(\gamma)\) for any
+	      \(\beta, \gamma : I \to Z\)
+	\item
+	      \textbf{Node congruence}:
+	      \(\mathsf{node}(\beta, f) \approx^P \mathsf{node}(\gamma, g)\) if
+	      \(\forall i : I. f(i) \approx^P g(i)\)
+	\item
+	      \textbf{Permutation symmetry}:
+	      \(\mathsf{node}(\beta, f) \approx^P \mathsf{node}(\beta \circ \pi, f \circ \pi)\)
+	      for any bijection \(\pi : I \leftrightarrow I\)
+	\item
+	      \textbf{Weakening transparency}:
+	      \(s \approx^P \mathsf{weaken}(\alpha, \gamma, p, s)\) for any
+	      \(p : \alpha \le \gamma\)
+	\item
+	      \textbf{Symmetry and transitivity}: \(\approx^P\) is symmetric and
+	      transitive
 \end{itemize}
 
 This gives mobile equivalence the crucial \textbf{permutation symmetry}
@@ -328,18 +328,18 @@ is constructed as follows:
 \(\approx^l\) on \(\text{Colim}_0\) inductively by:
 
 \begin{itemize}
-\tightlist
-\item
-  \textbf{Stage equivalence}: \((\alpha, x) \approx^l (\alpha, x')\) if
-  \(P(\alpha)[x \approx^P x']\)
-\item
-  \textbf{Step equivalence}: \((\alpha, x) \approx^l (\beta, P(p)(x))\)
-  for any \(p : \alpha \le \beta\)
-\item
-  \textbf{Symmetry}: \(s \approx^l t \implies t \approx^l s\)
-\item
-  \textbf{Transitivity}:
-  \(s \approx^l t \land t \approx^l u \implies s \approx^l u\)
+	\tightlist
+	\item
+	      \textbf{Stage equivalence}: \((\alpha, x) \approx^l (\alpha, x')\) if
+	      \(P(\alpha)[x \approx^P x']\)
+	\item
+	      \textbf{Step equivalence}: \((\alpha, x) \approx^l (\beta, P(p)(x))\)
+	      for any \(p : \alpha \le \beta\)
+	\item
+	      \textbf{Symmetry}: \(s \approx^l t \implies t \approx^l s\)
+	\item
+	      \textbf{Transitivity}:
+	      \(s \approx^l t \land t \approx^l u \implies s \approx^l u\)
 \end{itemize}
 
 \textbf{The Colimit Setoid}:
@@ -358,7 +358,7 @@ property that for any other cocone with apex \(A\) and injections
 homomorphism \(h : \text{Colim}(P) \to A\) making all triangles commute.
 
 \subsubsection{The quotient-polynomial
-functor}\label{the-quotient-polynomial-functor}
+	functor}\label{the-quotient-polynomial-functor}
 
 Define an endofunctor on setoids:
 
@@ -388,14 +388,14 @@ for the unique \(h : I \to P(t^*)\) defined by
 to prove that \(\widetilde F_B\) preserves this colimit.
 
 \subsection{Constructing Mobiles Directly in
-Set}\label{constructing-mobiles-directly-in-set}
+	Set}\label{constructing-mobiles-directly-in-set}
 
 In this section we reinterpret the construction internally in Set, using
 a colimit higher inductive type. No use of WISC is required because the
 index order \((T,\le)\) has a definable supremum.
 
 \subsubsection{Explicit colimit
-constructors}\label{explicit-colimit-constructors}
+	constructors}\label{explicit-colimit-constructors}
 
 Define the colimit as a {[}{[}Higher Inductive Type{]}{]} \(M_B\) with
 constructors:
@@ -411,7 +411,7 @@ constructors:
 No further constructors are required.
 
 \subsubsection{\texorpdfstring{The functor \(\widetilde F_B\) on
-Set}{The functor \textbackslash widetilde F\_B on Set}}\label{the-functor-widetilde-f_b-on-set}
+		Set}{The functor \textbackslash widetilde F\_B on Set}}\label{the-functor-widetilde-f_b-on-set}
 
 Define
 
@@ -458,5 +458,8 @@ preserves colimits in a quotient completion requires a principle such as
 {[}{[}WISC{]}{]} to factor arbitrary maps through a small family of
 covers. In this specific case, the definable supremum provided by the
 plump order \((T,\le)\) replaces the need for any choice principle.
+
+\bibliographystyle{plain}
+\bibliography{master}
 
 \end{document}
