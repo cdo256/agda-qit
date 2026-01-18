@@ -5,7 +5,7 @@
         "args": ["develop", "-c", "make", "all"],
         "use_new_terminal": false,
         "allow_concurrent_runs": false,
-        "reveal": "never"
+        "reveal": "no_focus"
     },
     {
         "label": "make clean",
@@ -13,7 +13,7 @@
         "args": ["develop", "-c", "make", "clean"],
         "use_new_terminal": false,
         "allow_concurrent_runs": false,
-        "reveal": "never"
+        "reveal": "no_focus"
     },
     {
         "label": "make build",
@@ -21,7 +21,7 @@
         "args": ["develop", "-c", "make", "build"],
         "use_new_terminal": false,
         "allow_concurrent_runs": false,
-        "reveal": "never"
+        "reveal": "no_focus"
     },
     {
         "label": "make pdf",
@@ -29,6 +29,6 @@
         "args": ["develop", "-c", "make", "pdf"],
         "use_new_terminal": false,
         "allow_concurrent_runs": false,
-        "reveal": "never"
+        "reveal": "no_focus"
     }
 ]

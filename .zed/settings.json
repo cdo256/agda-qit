@@ -14,5 +14,11 @@
                 }
             }
         }
+    },
+    "languages": {
+        "LaTeX": {
+            "preferred_line_length": 80,
+            "soft_wrap": "none"
+        }
     }
 }

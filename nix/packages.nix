@@ -42,6 +42,7 @@
             comment
             cleveref
             urlbst
+            mathpartir
             ;
           inherit lipics;
         };
