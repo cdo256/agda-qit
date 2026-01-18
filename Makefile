@@ -1,5 +1,6 @@
 OUT := out/latex
 export BIBINPUTS := latex:
+export TEXINPUTS := latex:
 
 # Find all .tex files in latex directory, excluding preambles
 TEX_FILES := $(filter-out latex/preamble.tex,$(wildcard latex/*.tex))
