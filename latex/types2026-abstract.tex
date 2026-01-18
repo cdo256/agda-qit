@@ -4,53 +4,12 @@
 \documentclass[a4paper,UKenglish,cleveref, autoref, thm-restate]{lipics-v2021}
 \bibliographystyle{plainurl}
 
-%\usepackage{xcolor}
-%\usepackage{amsmath,amssymb}
-%\setcounter{secnumdepth}{5}
-%\usepackage{iftex}
-%\ifPDFTeX
-%  \usepackage[T1]{fontenc}
-%  \usepackage[utf8]{inputenc}
-%  \usepackage{textcomp} % provide euro and other symbols
-%\else % if luatex or xetex
-%  \usepackage{unicode-math} % this also loads fontspec
-%  \defaultfontfeatures{Scale=MatchLowercase}
-%  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
-%\fi
-%\usepackage{lmodern}
-%\ifPDFTeX\else
-%  % xetex/luatex font selection
-%\fi
-%% Use upquote if available, for straight quotes in verbatim environments
-%\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
-%\IfFileExists{microtype.sty}{% use microtype if available
-%  \usepackage[]{microtype}
-%  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
-%}{}
-%\makeatletter
-%\@ifundefined{KOMAClassName}{% if non-KOMA class
-%  \IfFileExists{parskip.sty}{%
-%    \usepackage{parskip}
-%  }{% else
-%    \setlength{\parindent}{0pt}
-%    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
-%}{% if KOMA class
-%  \KOMAoptions{parskip=half}}
-%\makeatother
-%\setlength{\emergencystretch}{3em} % prevent overfull lines
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-%\usepackage{bookmark}
-%\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-%\urlstyle{same}
-%\hypersetup{
-%  hidelinks,
-%  pdfcreator={LaTeX via pandoc}}
 
 \title{Constructing QITs from Quotients}
 
 \author{Thorsten Altenkirch}{University of Nottingham, UK}{thorsten.altenkirch@nottingham.ac.uk}{https://orcid.org/0000-0002-6582-5025}{}
-
 \author{Christina O'Donnell}{University of Nottingham, UK}{psxco3@nottingham.ac.uk}{[ORCID]}{Supported by the Engineering and Physical Sciences Research Council (EPSRC) Doctoral Landscape Award [Grant Ref: EP/YXXXXXX/1].}
 
 \authorrunning{T. Altenkirch and C. D. O'Donnell}
@@ -60,7 +19,7 @@
 \ccsdesc[300]{Theory of computation~Constructive mathematics}
 \ccsdesc[300]{Theory of computation~Logic and verification}
 
-\keywords{Quotient Inductive Types, W-Types, Homotopy Type Theory, Agda, Bounded Locality, Constructive Mathematics}
+\keywords{Quotient Inductive Types, W-Types, Homotopy Type Theory, Agda, Constructive Mathematics}
 
 % Optional: Link to the ArXiv version or repository if applicable
 %\relatedversion{Full version hosted on arXiv: \url{https://arxiv.org/abs/xxxx.xxxxx}}
@@ -78,12 +37,12 @@ datatypes equipped with identifications in set-truncated Homotopy Type
 Theory \cite{hott2013-book}. They support a wide range of fundamental
 constructions, including the HoTT reals \cite{hott2013-book}, partiality
 monads \cite{altenkirch2017-partiality-monad}, and ordinal-like
-structures.
+structures \footnote{TODO: Citaiton}.
 
 Despite their expressive power, QITs present significant foundational
 difficulties. Shulman and Lumsdaine established a no-go theorem showing
-that certain QITs, including standard definitions of the countable
-ordinals, cannot be constructed using quotients alone
+that certain QITs, including Brower's definition of the countable ordinals,
+cannot be constructed using quotients alone
 \cite{lumsdaine2020-semantics-higher-inductive}. This suggests that some
 form of infinitary principle or choice is unavoidable in a constructive
 metatheory.
@@ -228,7 +187,7 @@ giving cocontinuity. This construction is fully constructive and does
 not require any choice principles.
 
 \section{Case Study: Infinite
-	Mobiles}\label{case-study-infinite-mobiles}
+  Mobiles}\label{case-study-infinite-mobiles}
 
 Our formalisation in Agda proves that in the case of mobiles, the
 defining equations are provably \emph{depth-preserving}, since all
