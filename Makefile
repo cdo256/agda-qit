@@ -5,9 +5,11 @@ export BIBINPUTS := latex:
 TEX_FILES := $(filter-out latex/preamble.tex,$(wildcard latex/*.tex))
 PDF_FILES := $(patsubst latex/%.tex,$(OUT)/%.pdf,$(TEX_FILES))
 
-.PHONY: all clean build
+.PHONY: all clean build pdf
 
-all: $(PDF_FILES)
+all: pdf build
+
+pdf: $(PDF_FILES)
 
 $(OUT)/%.pdf: latex/%.tex
 	@mkdir -p $(OUT)
