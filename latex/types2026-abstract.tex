@@ -36,25 +36,25 @@
 
 Quotient Inductive Types (QITs) are a central mechanism for specifying
 datatypes equipped with identifications in set-truncated Homotopy Type
-Theory \cite{hott2013-book}. They support a wide range of fundamental
-constructions, including the HoTT reals \cite{hott2013-book}, partiality
-monads \cite{altenkirch2017-partiality-monad}, and ordinal-like
-structures \footnote{TODO: Citaiton}.
+Theory~\cite{hott2013-book}. They support a wide range of fundamental
+constructions, including the HoTT reals~\cite{hott2013-book}, partiality
+monads~\cite{altenkirch2017-partiality-monad}, and ordinal-like
+structures.
 
 Despite their expressive power, QITs present significant foundational
 difficulties. Shulman and Lumsdaine established a no-go theorem showing
-that certain QITs, including Brower's standard definition of the countable
-ordinals, cannot be constructed using quotients alone
+that certain QITs, including Brouwer's standard definition of the
+countable ordinals, cannot be constructed using quotients alone
 \cite{lumsdaine2020-semantics-higher-inductive}. This suggests that some
 form of infinitary principle or choice is unavoidable in a constructive
 metatheory, at least in the general case.
 
 Fiore, Pitts, and Steenkamp subsequently showed that a broad class of
-QITs, which they call Quotient-W Types (QW types), admit an Initial
-Algebra semantics assuming the Weak Initial Set of Covers principle (WISC)
-\cite{fiore2022-quotients-inductive-types}. Their result
-recovers many important examples, including the extensional countable
-ordinals. However, WISC remains a non-constructive choice principle
+QITs, which they call Quotient-W Types (QW types), admit an initial
+algebra semantics assuming the Weak Initial Set of Covers principle
+(WISC)~\cite{fiore2022-quotients-inductive-types}. Their result recovers
+many important examples, including the extensional countable ordinals.
+However, WISC remains a non-constructive choice principle
 \cite{vandenberg2012-wisc-axiom}, and its necessity is poorly
 understood. In particular, it is unclear which features of a QIT
 genuinely require choice, and which arise from limitations of existing
@@ -63,38 +63,32 @@ proof techniques.
 This leads to our central research question:
 
 \begin{quote}
-	Which quotient-W types can be constructed fully constructively, without
-	assuming any form of choice?
+Which quotient-W types can be constructed fully constructively, without
+assuming any form of choice?
 \end{quote}
 
-% Say somewhere WISC is not a choice principle
-% Breadth is irrelevant, it's only a global depth bound needed to compare an arbitrary pair of nodes.
-
-%TODO: Define point and path constructor in general?
-%TODO: Reword?
-Our approach is to study one of the simplest infinitary previously thought to
-require choice example to test the need for WISC in defining QITs, while still
-being as simple as possible. We then try
-to prove that these exhibit an initial QW-algebra---a categorical structure that
-represents that there is exists a recursor (morphism between algebras), and that
-that recursor is unique (no `extra stuff' in Q beyond what is needed to
-represent the signature). We formalised this example in Agda and traced
-precisely where WISC is used in the Fiore--Pitts--Steenkamp construction to see
-if we could determine a weaker principle, that was more justified
-constructively. What we discovered, to our surprise, is that the step that Fiore
-et al. used WISC could actually be shown to be fully constructive. We postulate
-that a large class of QITs can be exhibited constructively.
-
-%TODO: Define WISC?
+Our approach is to study one of the simplest infinitary examples
+previously thought to require choice, in order to isolate the essential
+use of WISC. We aim to show that this example admits an initial
+QW-algebra, that is, a structure supporting a unique recursor
+(morphism between algebras), with no additional identifications beyond
+those imposed by the signature. We formalised this example in Agda and
+traced precisely where WISC is used in the Fiore--Pitts--Steenkamp
+construction, with the goal of identifying a weaker, more
+constructively justified principle. To our surprise, we found that the
+step where Fiore et al.~appeal to WISC can in fact be carried out fully
+constructively. We therefore postulate that a large class of QITs can be
+exhibited constructively.
 
 \section{Mobiles}
-The example that we chose--`mobiles'--have just two point constructors and one
-path constructor, making it much simpler than the other 'hard' cases we
-surveyed, while still being considered as challenging from a constructability
-standpoint.
 
-We define *mobiles* as well-founded trees quotiented by permutation at each
-level. (TODO: Figures). Specifically,
+The example we chose---\emph{mobiles}---has just two point constructors
+and one path constructor, making it substantially simpler than other
+challenging cases, while still being considered difficult from a
+constructability standpoint.
+
+We define mobiles as well-founded trees quotiented by permutation at
+each level. Concretely,
 
 $$
 \begin{array}{l@{\; }l@{\quad}l}
@@ -105,49 +99,47 @@ $$
 \end{array}
 $$
 
-for some $I:\mathcal{U}$ where $\mathsf{Mobile}^I$ represents functions from the
-branching index set $I$ and $\mathsf{Mobile}$'s. This has a clean, natural
-presentation that fits in three lines, unlike others which require auxillary
-data types, or stronger recursion semantics. %TODO: Terminology?
+for some $I : \mathcal{U}$, where $\mathsf{Mobile}^I$ denotes functions
+from the branching index set $I$ to $\mathsf{Mobile}$. This definition
+has a clean and compact presentation, in contrast to other examples
+which require auxiliary datatypes or stronger recursion principles.
+Unlike ordinal constructions, permutation does not involve recursive
+inspection of subtrees.
 
 \section{Main Idea}\label{main-idea}
 
-%Mention
-
 We briefly recall the framework of quotient-W types introduced by Fiore,
-Pitts, and Steenkamp \cite{fiore2022-quotients-inductive-types}. A QW
-signature consists of a container (representing branching structure) and a set
-of equations over the container. From such a signature, Fiore et al.~construct a diagram of
-approximations indexed by a size structure
-\cite{fiore2022-quotients-inductive-types}. Intuitively, this diagram
-represents successive stages of the quotient construction, where each
-stage gives the proofs available within a bounded depth. The desired QW
-type is obtained as the colimit $Q$ of this diagram.
+Pitts, and Steenkamp~\cite{fiore2022-quotients-inductive-types}. A QW
+signature consists of a container (representing branching structure)
+and a set of equations over that container. From such a signature, Fiore
+et al.~construct a diagram of approximations indexed by a size
+structure. Intuitively, this diagram represents successive stages of the
+quotient construction, where each stage captures the proofs available
+within a bounded depth. The desired QW type is obtained as the colimit
+$Q$ of this diagram.
 
-Fiore et al.~show this that this diagram is in fact an initial algebra: having a
-unique recursor, thereby showing that the structure using (indexed) WISC
-\cite{fiore2022-quotients-inductive-types}. In particular,
-WISC is crucial in proving \emph{cocontinuity}, meaning that forming
-constructors commute with quotienting, and that $Q$ is closed under all
+Fiore et al.~show that this diagram yields an initial algebra, hence
+supporting a unique recursor. Their proof relies essentially on WISC,
+notably to establish \emph{cocontinuity}, meaning that forming
+constructors commutes with quotienting and that $Q$ is closed under all
 constructors.
 
-The proof in Fiore et al.~relies on WISC to select a cover to size-bound the
-family of subtrees, enabling the construction of inverse maps witnessing
-this isomorphism.
+Concretely, WISC is used to select covers that bound the family of
+subtrees, enabling the construction of inverse maps witnessing the
+required isomorphism.
 
 Our work revisits this step. We observe that the need for WISC arises
-precisely when the equations allow arbitrarily deep inspection of terms,
-as in the extensional ordinal example. When all equations are
-depth-bounded, the required coherence data can instead be constructed by
-well-founded recursion on a fixed ordinal bound \(\alpha\), avoiding any
-appeal to choice. As a consequence, we obtain a fully constructive construction
-of infinite mobiles.
+precisely when equations allow arbitrarily deep inspection of terms, as
+in the extensional ordinal example. When all equations are
+\emph{depth-bounded}, the required coherence data can instead be
+constructed by well-founded recursion on a fixed ordinal bound
+$\alpha$, avoiding any appeal to choice. As a consequence, we obtain a
+fully constructive construction of infinite mobiles.
 
-We do this by introducing a depth-bound needed to compare any two values, by
-making use of the fact that every equation preserves tree depths, so if a pair
-of trees are equal then they must be at the same depth, and they must be
-comparable without intermediate terms of unbounded depth
-\cite{pitts2021-inflationary-iteration}.
+We exploit the fact that every defining equation for mobiles preserves
+tree depth. Thus, if two trees are equal, they must occur at the same
+depth, and can be compared without traversing intermediate terms of
+unbounded depth~\cite{pitts2021-inflationary-iteration}.
 
 \section{Conclusion}\label{conclusion}
 
@@ -158,17 +150,17 @@ and when they can be avoided. Our results show that many infinitary
 quotients previously thought to require choice are, in fact,
 constructible in a purely constructive setting.
 
-Our work builds on the QW framework of Fiore, Pitts, and Steenkamp
-\cite{fiore2022-quotients-inductive-types}, and complements the no-go
-results of Shulman and Lumsdaine
-\cite{lumsdaine2020-semantics-higher-inductive}. It is also related to
-Pitts and Steenkamp's notion of infinitary inflation
-\cite{steenkamp2021-phd-thesis}, which similarly isolates sources of
-non-constructivity in inductive definitions.
+Our work builds on the QW framework of Fiore, Pitts, and
+Steenkamp~\cite{fiore2022-quotients-inductive-types}, and complements
+the no-go results of Shulman and
+Lumsdaine~\cite{lumsdaine2020-semantics-higher-inductive}. It is also
+related to Pitts and Steenkamp's notion of infinitary
+inflation~\cite{steenkamp2021-phd-thesis}, which similarly isolates
+sources of non-constructivity in inductive definitions.
 
-Future directions include formalising the locality theorem stated above,
-and extending the analysis to indexed QW types
-\cite{altenkirch2018-quotient-inductive-inductive}.
+Future directions include formalising the locality theorem stated above
+and extending the analysis to indexed QW
+types~\cite{altenkirch2018-quotient-inductive-inductive}.
 
 \bibliography{master}
 
