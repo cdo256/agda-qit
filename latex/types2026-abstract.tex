@@ -12,7 +12,7 @@
 \title{Constructing QITs from Quotients}
 
 \author{Thorsten Altenkirch}{University of Nottingham, UK}{thorsten.altenkirch@nottingham.ac.uk}{https://orcid.org/0000-0002-6582-5025}{}
-\author{Christina O'Donnell}{University of Nottingham, UK}{psxco3@nottingham.ac.uk}{[ORCID]}{Supported by the Engineering and Physical Sciences Research Council (EPSRC) Doctoral Landscape Award [Grant Ref: EP/YXXXXXX/1].}
+\author{Christina O'Donnell}{University of Nottingham, UK}{psxco3@nottingham.ac.uk}{}{Supported by the Engineering and Physical Sciences Research Council (EPSRC) Doctoral Landscape Award [Grant Ref: EP/Z534948/1].}
 
 \authorrunning{T. Altenkirch and C. D. O'Donnell}
 \Copyright{Thorsten Altenkirch and Christina O'Donnell}
@@ -117,6 +117,7 @@ inspection of subtrees.
 
 \section{Main Idea}\label{main-idea}
 
+
 We briefly recall the framework of quotient-W types introduced by Fiore,
 Pitts, and Steenkamp~\cite{fiore2022-quotients-inductive-types}. A QW
 signature consists of a container (representing branching structure)
@@ -152,24 +153,30 @@ unbounded depth~\cite{pitts2021-inflationary-iteration}.
 
 \section{Conclusion}\label{conclusion}
 
-We identify bounded locality as a structural criterion characterising
-which quotient-W types admit fully constructive constructions. This
-explains when choice principles such as WISC are genuinely necessary,
-and when they can be avoided. Our results show that many infinitary
-quotients previously thought to require choice are, in fact,
-constructible in a purely constructive setting.
+Our results show that the seemingly non-trivial example of infinitary trees can
+in fact be proved initial in a fully constructive setting. In particular, we
+show that infinite mobiles, previously believed to require choice, admit a
+purely constructive construction. This suggests that there may be a large class
+of QITs which were previously thought to require choice, but which can in fact
+be expressed constructively.
 
-Our work builds on the QW framework of Fiore, Pitts, and
-Steenkamp~\cite{fiore2022-quotients-inductive-types}, and complements
-the no-go results of Shulman and
-Lumsdaine~\cite{lumsdaine2020-semantics-higher-inductive}. It is also
-related to Pitts and Steenkamp's notion of infinitary
-inflation~\cite{steenkamp2021-phd-thesis}, which similarly isolates
-sources of non-constructivity in inductive definitions.
+Our work builds on the QW framework of Fiore, Pitts, and Steenkamp
+\cite{fiore2022-quotients-inductive-types}, and complements the no-go results of
+Shulman and Lumsdaine \cite{lumsdaine2020-semantics-higher-inductive}. It is
+also related to Pitts and Steenkamp's notion of infinitary inflation
+\cite{steenkamp2021-phd-thesis}, which similarly isolates sources of
+non-constructivity in inductive definitions.
 
-Future directions include formalising the locality theorem stated above
-and extending the analysis to indexed QW
-types~\cite{altenkirch2018-quotient-inductive-inductive}.
+An immediate next step is to identify a \emph{syntactic} criterion ensuring that
+a given QIT can be expressed without relying on choice principles. We propose a
+notion of \emph{locality}, placing a global ordinal depth bound on all
+generating equations. We speculate that such a bound would suffice to show that
+any equality proof need only consider expansions up to an ordinal of the form
+$\alpha \cdot \omega$, and hence that the QIT admits a fully constructive semantics.
+
+Future work includes formalising this locality criterion, extending the analysis
+to indexed QW types \cite{altenkirch2018-quotient-inductive-inductive}, and
+developing a syntax-directed method for identifying constructible QITs.
 
 \bibliography{master}
 
