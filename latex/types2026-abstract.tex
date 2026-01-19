@@ -1,4 +1,3 @@
-% Options for packages loaded elsewhere
 \PassOptionsToPackage{unicode}{hyperref}
 \PassOptionsToPackage{hyphens}{url}
 \documentclass[a4paper,UKenglish,cleveref, autoref, thm-restate]{lipics-v2021}
@@ -38,10 +37,8 @@ Quotient Inductive Types (QITs) are a central mechanism for specifying
 datatypes equipped with identifications in set-truncated Homotopy Type
 Theory~\cite{hott2013-book}. They support a wide range of fundamental
 constructions, including the HoTT reals~\cite{hott2013-book}, partiality
-monads~\cite{altenkirch2017-partiality-monad}, and ordinal-like
-structures.
-
-Despite their expressive power, QITs present significant foundational
+monads~\cite{altenkirch2017-partiality-monad}, and various presentations of
+ordinals. However, QITs present significant foundational
 difficulties. Shulman and Lumsdaine established a no-go theorem showing
 that certain QITs, including Brouwer's standard definition of the
 countable ordinals, cannot be constructed using quotients alone
@@ -54,42 +51,29 @@ QITs, which they call Quotient-W Types (QW types), admit an initial
 algebra semantics assuming the Weak Initial Set of Covers principle
 (WISC)~\cite{fiore2022-quotients-inductive-types}. Their result recovers
 many important examples, including the extensional countable ordinals.
-However, WISC remains a non-constructive choice principle
+However, WISC, although constructively acceptable, is not well aligned with the
+internal, computational character of type theory,
 \cite{vandenberg2012-wisc-axiom}, and its necessity is poorly
 understood. In particular, it is unclear which features of a QIT
 genuinely require choice, and which arise from limitations of existing
-proof techniques.
-
-This leads to our central research question:
+proof techniques. We therefore ask:
 
 \begin{quote}
-Which quotient-W types can be constructed fully constructively, without
-assuming any form of choice?
+Which QITs can be constructed without WISC?
 \end{quote}
 
 Our approach is to study one of the simplest infinitary examples
 previously thought to require choice, in order to isolate the essential
-use of WISC. We aim to show that this example admits an initial
-QW-algebra, that is, a structure supporting a unique recursor
-(morphism between algebras), with no additional identifications beyond
-those imposed by the signature. We formalised this example in Agda and
-traced precisely where WISC is used in the Fiore--Pitts--Steenkamp
-construction, with the goal of identifying a weaker, more
-constructively justified principle. To our surprise, we found that the
-step where Fiore et al.~appeal to WISC can in fact be carried out fully
-constructively. We therefore postulate that a large class of QITs can be
-exhibited constructively.
+use of WISC.
+
+We formalised this example in Agda and traced precisely where WISC is used in
+the Fiore–Pitts–Steenkamp construction. To our surprise, the step where WISC is
+invoked can in fact be carried out fully constructively. We therefore postulate
+that a significant large class of QITs can be exhibited constructively.
 
 \section{Mobiles}
 
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.6\textwidth]{Fig-01}
-\caption{Diagram construction showing bounded depth approximations converging to the quotient-W type.}
-\label{fig:diagram}
-\end{figure}
-
-The example we chose---\emph{mobiles}---has just two point constructors
+We study \emph{mobiles}, which has just two point constructors
 and one path constructor, making it substantially simpler than other
 challenging cases, while still being considered difficult from a
 constructability standpoint.
@@ -98,48 +82,40 @@ We define mobiles as well-founded trees quotiented by permutation at
 each level. Concretely,
 
 $$
-\begin{array}{l@{\; }l@{\quad}l}
-  \multicolumn{3}{l}{\textbf{data } \mathsf{Mobile} : \mathcal{U} \textbf{ where}} \\
-  \quad \mathsf{leaf}        & : \mathsf{Mobile} \\
-  \quad \mathsf{node}(f)     & : \mathsf{Mobile}                                  & \forall f : \mathsf{Mobile}^I \\
-  \quad \mathsf{perm}(\pi,f) & : \mathsf{node}(f) = \mathsf{node}(f \circ \pi) & \forall \pi : I \cong I ;\, f : \mathsf{Mobile}^I
-\end{array}
+\begin{aligned}
+  &\textbf{data } \mathsf{Mobile}(I : \mathcal{U}) : \mathcal{U} \textbf{ where} \\
+  &\quad \mathsf{leaf} : \mathsf{Mobile}(I) \\
+  &\quad \mathsf{node} : (I \to \mathsf{Mobile}(I)) \to \mathsf{Mobile}(I) \\
+  &\quad \mathsf{perm} : (\phi : \mathsf{Iso}(I, I)) \to (f : I \to \mathsf{Mobile}(I)) \to \mathsf{node}(f) = \mathsf{node}(f \circ \phi)
+\end{aligned}
 $$
 
-for some $I : \mathcal{U}$, where $\mathsf{Mobile}^I$ denotes functions
-from the branching index set $I$ to $\mathsf{Mobile}$. This definition
-has a clean and compact presentation, in contrast to other examples
+for some $I : \mathcal{U}$, which may be infinite, where $\mathsf{Mobile}^I$
+denotes functions from the branching index set $I$ to $\mathsf{Mobile}$. This
+definition has a clean and compact presentation, in contrast to other examples
 which require auxiliary datatypes or stronger recursion principles.
 
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.5\textwidth]{mobiles-rough}
-\caption{Example mobiles showing tree structures quotiented by permutation at each level.}
-\label{fig:mobiles}
-\end{figure}
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.6\textwidth]{Fig-02}
-\caption{Comparison of constructive vs. non-constructive approaches to quotient-W types.}
-\label{fig:comparison}
-\end{figure}
+%TODO: Add figure if we have space.
+%\begin{figure}[h]
+%\centering
+%\includegraphics[width=0.5\textwidth]{mobiles-rough}
+%\caption{Example mobiles showing tree structures quotiented by permutation at each level.}
+%\label{fig:mobiles}
+%\end{figure}
 
 Unlike ordinal constructions, permutation does not involve recursive
 inspection of subtrees.
 
 \section{Main Idea}\label{main-idea}
 
-
-We briefly recall the framework of quotient-W types introduced by Fiore,
-Pitts, and Steenkamp~\cite{fiore2022-quotients-inductive-types}. A QW
-signature consists of a container (representing branching structure)
-and a set of equations over that container. From such a signature, Fiore
-et al.~construct a diagram of approximations indexed by a size
-structure. Intuitively, this diagram represents successive stages of the
-quotient construction, where each stage captures the proofs available
-within a bounded depth. The desired QW type is obtained as the colimit
-$Q$ of this diagram.
+We briefly recall the framework of quotient-W types introduced by Fiore et al.
+~\cite{fiore2022-quotients-inductive-types}. A QIT
+signature consists of a tree branching structure and a set of equations over
+that shape. From such a signature, they construct a diagram of
+approximations indexed by a size structure. Intuitively, this diagram represents
+successive stages of the quotient construction, where each stage captures the
+proofs available within a bounded depth. The desired QIT type is obtained as the
+colimit $Q$ of this diagram.
 
 Fiore et al.~show that this diagram yields an initial algebra, hence
 supporting a unique recursor. Their proof relies essentially on WISC,
@@ -147,17 +123,18 @@ notably to establish \emph{cocontinuity}, meaning that forming
 constructors commutes with quotienting and that $Q$ is closed under all
 constructors.
 
+TODO: Summary of our construction of mobiles.
 Concretely, WISC is used to select covers that bound the family of
 subtrees, enabling the construction of inverse maps witnessing the
 required isomorphism.
 
-Our work revisits this step. We observe that the need for WISC arises
+We observe that the need for WISC arises
 precisely when equations allow arbitrarily deep inspection of terms, as
 in the extensional ordinal example. When all equations are
 \emph{depth-bounded}, the required coherence data can instead be
 constructed by well-founded recursion on a fixed ordinal bound
 $\alpha$, avoiding any appeal to choice. As a consequence, we obtain a
-fully constructive construction of infinite mobiles.
+WISC-free construction of infinite mobiles.
 
 We exploit the fact that every defining equation for mobiles preserves
 tree depth. Thus, if two trees are equal, they must occur at the same
@@ -166,14 +143,14 @@ unbounded depth~\cite{pitts2021-inflationary-iteration}.
 
 \section{Conclusion}\label{conclusion}
 
-Our results show that the seemingly non-trivial example of infinitary trees can
-in fact be proved initial in a fully constructive setting. In particular, we
-show that infinite mobiles, previously believed to require choice, admit a
-purely constructive construction. This suggests that there may be a large class
-of QITs which were previously thought to require choice, but which can in fact
-be expressed constructively.
+We show that it is possible for non-trivial infinitary QITs to admit an initial
+algebra without appealing to WISC. In particular, we show that infinite mobiles,
+previously believed to require choice, admit a purely constructive construction.
+This suggests that there may be a sigificant class of QITs which were previously
+thought to require choice, but which can in fact be expressed without any form
+of choice.
 
-Our work builds on the QW framework of Fiore, Pitts, and Steenkamp
+Our work builds on the QIT framework of Fiore et al.
 \cite{fiore2022-quotients-inductive-types}, and complements the no-go results of
 Shulman and Lumsdaine \cite{lumsdaine2020-semantics-higher-inductive}. It is
 also related to Pitts and Steenkamp's notion of infinitary inflation
@@ -188,8 +165,10 @@ any equality proof need only consider expansions up to an ordinal of the form
 $\alpha \cdot \omega$, and hence that the QIT admits a fully constructive semantics.
 
 Future work includes formalising this locality criterion, extending the analysis
-to indexed QW types \cite{altenkirch2018-quotient-inductive-inductive}, and
+to a broader class of QITs \cite{altenkirch2018-quotient-inductive-inductive}, and
 developing a syntax-directed method for identifying constructible QITs.
+
+TODO: “Although WISC is constructively acceptable, it is not well aligned with the internal, computational character of Type Theory.”
 
 \bibliography{master}
 
