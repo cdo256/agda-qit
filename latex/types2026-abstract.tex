@@ -1,31 +1,28 @@
-\PassOptionsToPackage{unicode}{hyperref}
-\PassOptionsToPackage{hyphens}{url}
-\documentclass[a4paper,UKenglish,cleveref, autoref, thm-restate]{lipics-v2021}
-\usepackage{mathpartir}
+\documentclass{easychair}
+
 \usepackage{amsmath}
-\bibliographystyle{plainurl}
+\usepackage{amssymb}
+\usepackage{mathpartir}
+\usepackage{graphicx}
 
 \providecommand{\tightlist}{%
 \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 
 \title{Constructing QITs from Quotients}
 
-\author{Thorsten Altenkirch}{University of Nottingham, UK}{thorsten.altenkirch@nottingham.ac.uk}{https://orcid.org/0000-0002-6582-5025}{}
-\author{Christina O'Donnell}{University of Nottingham, UK}{psxco3@nottingham.ac.uk}{}{Supported by the Engineering and Physical Sciences Research Council (EPSRC) Doctoral Landscape Award [Grant Ref: EP/Z534948/1].}
+\author{
+    Thorsten Altenkirch\inst{1}
+\and
+    Christina O'Donnell\inst{1}\thanks{Supported by the Engineering and Physical Sciences Research Council (EPSRC) Doctoral Landscape Award [Grant Ref: EP/Z534948/1].}
+}
+
+\institute{
+    University of Nottingham, UK\\
+    \email{\{thorsten.altenkirch,psxco3\}@nottingham.ac.uk}
+}
 
 \authorrunning{T. Altenkirch and C. D. O'Donnell}
-\Copyright{Thorsten Altenkirch and Christina O'Donnell}
-
-\ccsdesc[500]{Theory of computation~Type theory}
-\ccsdesc[300]{Theory of computation~Constructive mathematics}
-\ccsdesc[300]{Theory of computation~Logic and verification}
-
-\keywords{Quotient Inductive Types, W-Types, Homotopy Type Theory, Agda, Constructive Mathematics}
-
-% Optional: Link to the ArXiv version or repository if applicable
-%\relatedversion{Full version hosted on arXiv: \url{https://arxiv.org/abs/xxxx.xxxxx}}
-
-\supplement{Source code available at \url{https://github.com/cdo256/agda-qit}}
+\titlerunning{Constructing QITs from Quotients}
 
 \begin{document}
 
@@ -160,6 +157,7 @@ Future work includes formalising this locality criterion, extending the analysis
 to a broader class of QITs \cite{altenkirch2018-quotient-inductive-inductive}, and
 developing a syntax-directed method for identifying constructible QITs.
 
+\bibliographystyle{plain}
 \bibliography{master}
 
 \end{document}

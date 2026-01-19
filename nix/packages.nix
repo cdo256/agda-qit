@@ -42,7 +42,9 @@
             comment
             cleveref
             urlbst
+            footmisc
             mathpartir
+            lastpage
             ;
           inherit lipics;
         };
