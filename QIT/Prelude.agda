@@ -138,10 +138,13 @@ congp : ∀ {a b} {A : Set a} {B : Set b} (f : A → B)
       → ∀ {x y} → x ≡p y → f x ≡p f y
 congp f ∣ ≡.refl ∣ = ∣ ≡.refl ∣
 
+infix 6 ¬_
 ¬_ : ∀ {ℓ} (X : Prop ℓ) → Prop ℓ
 ¬ X = X → ⊥p
 
 module ∧ {ℓ ℓ'} (A : Prop ℓ) (B : Prop ℓ') where
+  infixr 5 _∧_
+  infixr 4 _,_
   record _∧_ : Prop (ℓ ⊔ ℓ') where
     constructor _,_
     field
@@ -152,12 +155,14 @@ module ∧ {ℓ ℓ'} (A : Prop ℓ) (B : Prop ℓ') where
 open ∧ public using (_∧_; _,_)
 
 module ∨ {ℓ ℓ'} (A : Prop ℓ) (B : Prop ℓ') where
+  infixr 4 _∨_
   data _∨_ : Prop (ℓ ⊔ ℓ') where
     inl : A → _∨_
     inr : B → _∨_
 
 open ∨ public using (_∨_)
 
+infix 3 _⇔_
 _⇔_ : ∀ {ℓ ℓ'} (A : Prop ℓ) (B : Prop ℓ') → Prop (ℓ ⊔ ℓ')
 A ⇔ B = (A → B) ∧ (B → A)
 
