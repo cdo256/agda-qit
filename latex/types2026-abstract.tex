@@ -56,7 +56,7 @@ genuinely require choice, and which arise from limitations of existing
 proof techniques. We therefore ask:
 
 \begin{quote}
-Which QITs can be constructed without WISC?
+	Which QITs can be constructed without WISC?
 \end{quote}
 
 Our approach is to study one of the simplest infinitary examples
@@ -65,13 +65,13 @@ use of WISC.
 
 We formalised this example in Agda and traced precisely where WISC is used in
 the Fiore–Pitts–Steenkamp construction. To our surprise, the step where WISC is
-invoked can in fact be carried out fully constructively. We therefore postulate
-that a significant large class of infinitary QITs can be constructed from
-quotient types only. 
+invoked can in fact be carried out fully constructively. This provides evidence
+that a wider class of infinitary QITs can be constructed from quotient types
+only.
 
 \section{Mobiles}
 
-We study \emph{mobiles}, which has just two point constructors
+We study \emph{mobiles}, which have just two point constructors
 and one path constructor, making it substantially simpler than other
 challenging cases, while still being considered difficult from a
 constructability standpoint.
@@ -80,12 +80,12 @@ We define mobiles as well-founded trees quotiented by permutation at
 each level. Concretely,
 
 $$
-\begin{aligned}
-  &\textbf{data } \mathsf{Mobile}(I : \mathcal{U}) : \mathcal{U} \textbf{ where} \\
-  &\quad \mathsf{leaf} : \mathsf{Mobile}(I) \\
-  &\quad \mathsf{node} : (I \to \mathsf{Mobile}(I)) \to \mathsf{Mobile}(I) \\
-  &\quad \mathsf{perm} : (\phi : \mathsf{Iso}(I, I)) \to (f : I \to \mathsf{Mobile}(I)) \to \mathsf{node}(f) = \mathsf{node}(f \circ \phi)
-\end{aligned}
+	\begin{aligned}
+		 & \textbf{data } \mathsf{Mobile}(I : \mathcal{U}) : \mathcal{U} \textbf{ where}                                                           \\
+		 & \quad \mathsf{leaf} : \mathsf{Mobile}(I)                                                                                                \\
+		 & \quad \mathsf{node} : (I \to \mathsf{Mobile}(I)) \to \mathsf{Mobile}(I)                                                                 \\
+		 & \quad \mathsf{perm} : (\phi : \mathsf{Iso}(I, I)) \to (f : I \to \mathsf{Mobile}(I)) \to \mathsf{node}(f) = \mathsf{node}(f \circ \phi)
+	\end{aligned}
 $$
 
 for some $I : \mathcal{U}$, which may be infinite, where $\mathsf{Mobile}^I$
@@ -104,7 +104,7 @@ signature consists of a tree branching structure and a set of equations over
 that shape. From such a signature, they construct a diagram of
 approximations indexed by a size structure. Intuitively, this diagram represents
 successive stages of the quotient construction, where each stage captures the
-proofs available within a bounded depth. The desired QIT type is obtained as the
+proofs available within a bounded depth. The desired QIT is obtained as the
 colimit $Q$ of this diagram.
 
 Fiore et al.~show that this diagram yields an initial algebra, hence
@@ -115,7 +115,7 @@ constructors.
 
 Concretely, WISC is used to select covers that bound the family of
 subtrees, enabling the construction of inverse maps witnessing the
-required isomorphism.
+required isomorphism, i.e. an isomorphism $F(\mathrm{colim} D) \cong \mathrm{colim}(F \circ D)$.
 
 We observe that the need for WISC arises
 precisely when equations allow arbitrarily deep inspection of terms, as
@@ -135,10 +135,9 @@ unbounded depth~\cite{pitts2021-inflationary-iteration}.
 We show that it is possible for non-trivial infinitary QITs to admit an initial
 algebra without appealing to WISC. In particular, we show that infinite mobiles,
 previously believed to require choice, admit a purely constructive construction.
-This suggests that there may be a sigificant class of QITs which were previously
+This suggests that there may be a significant class of QITs which were previously
 thought to require choice, but which can in fact be expressed without any form
 of choice.
-
 
 Our work builds on the QIT framework of Fiore et al.
 \cite{fiore2022-quotients-inductive-types}, and complements the no-go results of
