@@ -18,7 +18,7 @@ T = W S P
 
 -- View T as a setoid with propositional equality (without a quotient)
 T̃ : Setoid (ℓS ⊔ ℓP) (ℓS ⊔ ℓP)
-T̃ = ≡setoid T
+T̃ = T /≡
 
 module _ where
   -- Congruence: sup respects equivalence in the functor interpretation
