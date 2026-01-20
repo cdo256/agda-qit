@@ -80,8 +80,12 @@ theorem ∣ iso ∣ = ∣ record
   sat e ξ = p
     where
     open Equation (Ξ e)
-    p : Colim D [ assign Xα ξ (lhs (Ξ e)) ≈ assign Xα ξ (rhs (Ξ e))  ]
-    p = joinTerms (assign Xα ξ (lhs (Ξ e))) (assign Xα ξ (rhs (Ξ e))) {!!}
+    p : Colim D [ assign Xα ξ (lhs (Ξ e)) ≈ assign Xα ξ (rhs (Ξ e)) ]
+    p = joinTerms {!≈psat ? ? ?!}
+      where
+      s : {!!} ⊢ {!!} ≈ᵇ {!!}
+      s = ≈psat e {!ξ!} {!!} {!!}
+      
 
       -- assign Xα ξ (lhs (Ξ e))
       --   ≈⟨ refl ⟩

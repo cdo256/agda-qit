@@ -48,10 +48,10 @@ tˡ (α , t , t≤α) = t
 t≤αˡ : (x : ⟨ Colim D ⟩) → tˡ x ≤ᵀ αˡ x
 t≤αˡ (α , t , t≤α) = t≤α
 
-joinTerms : ∀ (x y : ⟨ Colim D ⟩)
+joinTerms : ∀ {x y : ⟨ Colim D ⟩}
           → αˡ x ∨ᶻ αˡ y ⊢ (tˡ x , ≤≤ ∨ᶻ-l (t≤αˡ x)) ≈ᵇ (tˡ y , ≤≤ ∨ᶻ-r (t≤αˡ y))
           → Colim D [ x ≈ y ]
-joinTerms (α , s , s≤α) (β , t , t≤β) p = 
+joinTerms {α , s , s≤α} {β , t , t≤β} p = 
   begin
     (α , s , s≤α)
       ≈⟨ ≈lstep ∨ᶻ-l (s , _) ⟩

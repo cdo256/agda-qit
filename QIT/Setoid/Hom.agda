@@ -28,6 +28,12 @@ idHom {S = S} = record
   { to = λ x → x
   ; cong = λ p → p }
 
+≡Hom : ∀ {ℓX ℓY ℓY'} {X : Set ℓX} {Y : Setoid ℓY ℓY'} (f : X → ⟨ Y ⟩)
+     → Hom (X /≡) Y
+≡Hom {Y = Y} f = record
+  { to = f
+  ; cong = λ p → ≡p→≈ Y (congp f p) }
+
 -- Equivalence relation on homomorphisms: pointwise equivalence in codomain.
 -- Two homomorphisms f, g are equivalent if f(x) ≈_T g(x) for all x.
 -- This is extensional equality for functions between setoids.
