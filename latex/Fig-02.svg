@@ -19,10 +19,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
-     inkscape:zoom="2"
-     inkscape:cx="527"
-     inkscape:cy="83.25"
-     inkscape:window-width="3840"
+     inkscape:zoom="2.8284271"
+     inkscape:cx="420.72853"
+     inkscape:cy="139.83037"
+     inkscape:window-width="1920"
      inkscape:window-height="2114"
      inkscape:window-x="0"
      inkscape:window-y="0"
@@ -69,7 +69,7 @@
      y="228.14284"><tspan
        x="174.61317"
        y="228.14284"
-       id="tspan1">a</tspan></text>
+       id="tspan1">s</tspan></text>
   <text
      class="cls-2"
      id="text2"
@@ -77,7 +77,7 @@
      y="228.16084"><tspan
        x="238.95964"
        y="228.16084"
-       id="tspan2">b</tspan></text>
+       id="tspan2">t</tspan></text>
   <text
      class="cls-2"
      id="text3"
@@ -85,7 +85,7 @@
      y="228.16084"><tspan
        x="303.44019"
        y="228.16084"
-       id="tspan3">c</tspan></text>
+       id="tspan3">u</tspan></text>
   <text
      class="cls-2"
      id="text4"
@@ -93,7 +93,7 @@
      y="224.31"><tspan
        x="546.19153"
        y="224.31"
-       id="tspan4">c</tspan></text>
+       id="tspan4">u</tspan></text>
   <text
      class="cls-2"
      id="text5"
@@ -101,7 +101,7 @@
      y="224.29199"><tspan
        x="608.90167"
        y="224.29199"
-       id="tspan5">a</tspan></text>
+       id="tspan5">s</tspan></text>
   <text
      class="cls-2"
      id="text6"
@@ -109,7 +109,7 @@
      y="226.19608"><tspan
        x="670.03857"
        y="226.19608"
-       id="tspan6">b</tspan></text>
+       id="tspan6">t</tspan></text>
   <g
      id="g6">
     <rect
@@ -126,40 +126,11 @@
   </g>
   <text
      class="cls-5"
-     transform="translate(352.85 78.26)"
+     transform="translate(352.85,78.26)"
      id="text7"><tspan
        x="0"
        y="0"
-       id="tspan7">I = {a,b,c}</tspan></text>
-  <g
-     id="g25">
-    <g
-       id="g10"
-       transform="matrix(0.99784914,0,0,1,0.63233231,0)">
-      <text
-         class="cls-4"
-         transform="translate(292.72,275.36)"
-         id="text8"><tspan
-           x="0"
-           y="0"
-           xml:space="preserve"
-           id="tspan8">(a    c, b   a, c   b)</tspan></text>
-      <polygon
-         class="cls-1"
-         points="344.01,262.83 347.3,266.44 331.68,266.44 331.68,263.49 330.52,263.49 330.52,267.6 330.52,271.7 331.68,271.7 331.68,268.75 347.3,268.75 344.01,272.37 344.86,273.14 349.91,267.6 344.86,262.05 "
-         id="polygon8" />
-      <polygon
-         class="cls-1"
-         points="417.29,266.44 417.29,263.49 416.14,263.49 416.14,267.6 416.14,271.7 417.29,271.7 417.29,268.75 432.92,268.75 429.62,272.37 430.48,273.14 435.52,267.6 430.48,262.05 429.62,262.83 432.92,266.44 "
-         id="polygon9"
-         transform="translate(-1.5737465,1.395877)" />
-      <polygon
-         class="cls-1"
-         points="519.53,266.44 503.91,266.44 503.91,263.49 502.75,263.49 502.75,267.6 502.75,271.7 503.91,271.7 503.91,268.75 519.53,268.75 516.24,272.37 517.09,273.14 522.14,267.6 517.09,262.05 516.24,262.83 "
-         id="polygon10"
-         transform="translate(-9.2676188)" />
-    </g>
-  </g>
+       id="tspan7">I = {1, 2, 3}</tspan></text>
   <text
      class="cls-3"
      transform="translate(387.55 138.89)"
@@ -233,4 +204,64 @@
        d="m 184.97006,188.70482 62.85,-74.65 v 74.65 -74.65 l 61.01,74.65 -61.01,-74.65"
        id="path25" />
   </g>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:times;-inkscape-font-specification:times;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke:#000000;stroke-opacity:1"
+     x="201.56065"
+     y="153.304"
+     id="text25"><tspan
+       sodipodi:role="line"
+       id="tspan25"
+       x="201.56065"
+       y="153.304">1</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:times;-inkscape-font-specification:times;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke:#000000;stroke-opacity:1"
+     x="237.25"
+     y="157.86"
+     id="text26"><tspan
+       sodipodi:role="line"
+       id="tspan26"
+       x="237.25"
+       y="157.86">2</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:times;-inkscape-font-specification:times;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke:#000000;stroke-opacity:1"
+     x="284.75"
+     y="150.83987"
+     id="text27"><tspan
+       sodipodi:role="line"
+       id="tspan27"
+       x="284.75"
+       y="150.83987">3</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:times;-inkscape-font-specification:times;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke:#000000;stroke-opacity:1"
+     x="619.72797"
+     y="160.511"
+     id="text28"><tspan
+       sodipodi:role="line"
+       id="tspan28"
+       x="619.72797"
+       y="160.511">1</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:times;-inkscape-font-specification:times;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke:#000000;stroke-opacity:1"
+     x="575.25"
+     y="152.25"
+     id="text29"><tspan
+       sodipodi:role="line"
+       id="tspan29"
+       x="575.25"
+       y="152.25">3</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:times;-inkscape-font-specification:times;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke:#000000;stroke-opacity:1"
+     x="652.25"
+     y="150.33998"
+     id="text30"><tspan
+       sodipodi:role="line"
+       id="tspan30"
+       x="652.25"
+       y="150.33998">2</tspan></text>
 </svg>
