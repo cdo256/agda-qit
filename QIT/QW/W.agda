@@ -1,15 +1,13 @@
 open import QIT.Prelude
 open import QIT.Setoid
 open import QIT.Container.Base
-open import QIT.QW.Signature
 
 -- Define quotient W-types: W-types equipped with a quotient relation.
 -- This extends ordinary W-types with equations, allowing us to quotient
 -- out unwanted distinctions. The result is the foundation for defining
 -- quotient inductive types (QITs) with both constructors and equations.
-module QIT.QW.W {ℓS ℓP ℓE ℓV} (sig : Sig ℓS ℓP ℓE ℓV) where
+module QIT.QW.W {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) (ℓA ℓA' : Level) where
 
-open Sig sig
 open import QIT.Container.Functor S P (ℓS ⊔ ℓP) (ℓS ⊔ ℓP)
 
 -- Underlying W-type: trees with shapes S and positions P

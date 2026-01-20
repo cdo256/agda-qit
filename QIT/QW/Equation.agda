@@ -9,6 +9,7 @@ module QIT.QW.Equation {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
 open import QIT.Container.Base
 open import QIT.Container.Functor S P
 open import QIT.Setoid
+open import QIT.QW.W S P (ℓS ⊔ ℓP) (ℓS ⊔ ℓP)
 
 -- Expressions over variables V: terms built from V and constructor signature (S,P).
 -- These are W-types over the extended signature (V ⊎ S, Pʰ) where:
