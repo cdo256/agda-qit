@@ -1,3 +1,4 @@
+{-# OPTIONS --type-in-type #-}
 open import QIT.Prelude
 open import QIT.Setoid
 open import QIT.Container.Base
@@ -19,17 +20,17 @@ T̃ : Setoid (ℓS ⊔ ℓP) (ℓS ⊔ ℓP)
 T̃ = T /≡
 
 module _ where
-  -- Congruence: sup respects equivalence in the functor interpretation
-  α-cong : ∀ {sf} {tg} → F-ob T̃ [ sf ≈ tg ] → sup sf ≡p sup tg
-  α-cong {s , f} {s , g} (F-Ob.mk≈ꟳ ≡.refl snd≈) = q (funExtp snd≈)
-    where
-    open F-Ob T̃
-    q : f ≡p g → sup (s , f) ≡p sup (s , g)
-    q ∣ ≡.refl ∣ = ∣ ≡.refl ∣
-  T-α : ≈.Hom (F-ob T̃) T̃
-  T-α = record
-    { to = sup
-    ; cong = α-cong }
+-- Congruence: sup respects equivalence in the functor interpretation
+α-cong : ∀ {sf} {tg} → F-ob T̃ [ sf ≈ tg ] → sup sf ≡p sup tg
+α-cong {s , f} {s , g} (F-Ob.mk≈ꟳ ≡.refl snd≈) = q (funExtp snd≈)
+  where
+  open F-Ob T̃
+  q : f ≡p g → sup (s , f) ≡p sup (s , g)
+  q ∣ ≡.refl ∣ = ∣ ≡.refl ∣
+T-α : ≈.Hom (F-ob T̃) T̃
+T-α = record
+  { to = sup
+  ; cong = α-cong }
 
 -- T forms an algebra for the container functor F.
 -- The structure map is just the W-type constructor sup.

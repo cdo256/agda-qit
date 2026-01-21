@@ -1,3 +1,4 @@
+{-# OPTIONS --type-in-type #-}
 open import QIT.Prelude
 open import QIT.QW.Signature
 
@@ -16,7 +17,7 @@ open import QIT.Setoid as ≈
 open import QIT.Relation.Subset
 open import QIT.Relation.Plump S P
 open import QIT.Setoid.Diagram ≤p
-open import QIT.QW.W sig
+open import QIT.QW.W S P (ℓS ⊔ ℓP) (ℓS ⊔ ℓP)
 open import Data.Maybe
 open import QIT.QW.Equation S P
 
@@ -37,13 +38,13 @@ pweaken α≤β (t , t≤α) = t , ≤≤ α≤β t≤α
 
 -- Ordinal complexity of expressions: measures the "depth" needed to satisfy equations.
 -- Variables have minimal complexity ⊥ᶻ, constructors have complexity based on arguments.
-ιᴱ : ∀ {ℓV} {V : Set ℓV} → Expr V → Z
-ιᴱ (varᴱ v) = ⊥ᶻ
-ιᴱ (supᴱ s f) = sup (ιˢ s , λ i → ιᴱ (f i))
+ιᵉ : ∀ {ℓV} {V : Set ℓV} → Expr V → Z
+ιᵉ (varᴱ v) = ⊥ᶻ
+ιᵉ (supᴱ s f) = sup (ιˢ s , λ i → ιᵉ (f i))
 
 -- Expression-ordinal comparison: when an expression fits within a stage.
 _≤ᴱ_ : ∀ {ℓV} {V : Set ℓV} → Expr V → Z → Prop (ℓS ⊔ ℓP)
-t ≤ᴱ α = ιᴱ t ≤ α
+t ≤ᴱ α = ιᵉ t ≤ α
 
 -- Interpretation of equation sides as W-type elements.
 -- These functions evaluate expressions in the underlying W-type T.
