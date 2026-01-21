@@ -1,4 +1,3 @@
-{-# OPTIONS --type-in-type #-}
 open import QIT.Prelude
 open import QIT.Setoid
 open import QIT.Container.Base
@@ -9,15 +8,15 @@ open import QIT.Container.Base
 -- quotient inductive types (QITs) with both constructors and equations.
 module QIT.QW.W {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) (ℓA ℓA' : Level) where
 
-open import QIT.Container.Functor S P (ℓS ⊔ ℓP) (ℓS ⊔ ℓP)
+open import QIT.Container.Functor S P ℓA ℓA'
 
 -- Underlying W-type: trees with shapes S and positions P
 T : Set (ℓS ⊔ ℓP)
 T = W S P
 
 -- View T as a setoid with propositional equality (without a quotient)
-T̃ : Setoid (ℓS ⊔ ℓP) (ℓS ⊔ ℓP)
-T̃ = T /≡
+T̃ : Setoid ℓA ℓA'
+T̃ = record { Carrier = Lift ℓA T ; _≈_ = λ x y → Lift ℓA' (lower x ≡ lower y) ; isEquivalence = record { refl = lift ≡.refl ; sym = λ (lift p) → lift (≡.sym p) ; trans = λ (lift p) (lift q) → lift (≡.trans p q) } }
 
 module _ where
 -- Congruence: sup respects equivalence in the functor interpretation
@@ -25,8 +24,8 @@ module _ where
 α-cong {s , f} {s , g} (F-Ob.mk≈ꟳ ≡.refl snd≈) = q (funExtp snd≈)
   where
   open F-Ob T̃
-  q : f ≡p g → sup (s , f) ≡p sup (s , g)
-  q ∣ ≡.refl ∣ = ∣ ≡.refl ∣
+  q : f ≡p g → sup (s , f) ≡p sup ((s , g))
+  q reflp = reflp
 T-α : ≈.Hom (F-ob T̃) T̃
 T-α = record
   { to = sup
