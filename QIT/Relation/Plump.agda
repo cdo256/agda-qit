@@ -278,3 +278,6 @@ isQuasiExtensionalZ =
 
 sup≤sup : ∀ {s f g} (r : ∀ i → f i ≤ g i) → sup (s , f) ≤ sup (s , g)
 sup≤sup r = sup≤ (λ i → <sup i (r i))
+
+≡→≤ : ∀ {α β} → α ≡ β → α ≤ β
+≡→≤ {α} {α} ≡.refl = ≤refl α

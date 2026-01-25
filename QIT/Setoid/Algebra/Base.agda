@@ -79,7 +79,7 @@ module _
   lowerP : ∀ {ℓ a} {A : Prop a} → LiftP ℓ A → A
   lowerP (liftp p) = p
 
-  liftAlgebra : Algebra F → Algebra {!!}
+  -- liftAlgebra : Algebra F → Algebra {!!}
   -- liftAlgebra alg = AlgBig.mkAlg X-lifted α-lifted
   --   where
   --     open AlgSmall.Algebra alg renaming (X to X-small; α to α-small)

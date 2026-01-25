@@ -84,7 +84,7 @@ theorem ∣ iso ∣ = ∣ record
     p = joinTerms {!≈psat ? ? ?!}
       where
       s : {!!} ⊢ {!!} ≈ᵇ {!!}
-      s = ≈psat e {!ξ!} {!!} {!!}
+      s = ≈psat e {!!} {!!} {!!}
       
 
       -- assign Xα ξ (lhs (Ξ e))

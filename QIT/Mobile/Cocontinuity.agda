@@ -80,7 +80,7 @@ depth-preserving α (s , s≤α) (t , t≤α) (≈pcong a μ f g r) =
   where p : ∀ i → ιᶻ (f i .fst) ≤≥ ιᶻ (g i .fst)
         p i = depth-preserving (μ i) (f i) (g i) (r i)
 depth-preserving α (s , _) (t , _) (≈psat π ϕ _ _) =
-    sup≤ (λ i → <sup (π⁻¹ i) (substp (λ ○ → ιᶻ (ϕ i) ≤ ιᶻ (ϕ ○)) (≡.sym (linv i)) (≤refl (ιᶻ (ϕ i)))))
+    sup≤ (λ i → <sup (π⁻¹ i) (≡→≤ (≡.cong (λ ○ → ιᶻ (ϕ ○)) (≡.sym (linv i)))))
   , sup≤ (λ i → <sup (π̂ i) (≤refl (ιᶻ (ϕ (π̂ i)))))
   where
   open _↔_ π renaming (to to π̂; from to π⁻¹)

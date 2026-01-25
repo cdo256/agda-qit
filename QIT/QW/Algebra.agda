@@ -24,6 +24,7 @@ record Alg : Set (lsuc ℓS ⊔ lsuc ℓP ⊔ ℓE ⊔ ℓV) where
     alg : ≈.Algebra F
     -- Satisfaction: all equations in the signature hold
     sat : Sat alg Ξ
+  open ≈.Algebra alg public
 
 -- Homomorphism between QIT algebras: just container algebra homomorphisms.
 -- The satisfaction proofs are automatically preserved by homomorphisms,
