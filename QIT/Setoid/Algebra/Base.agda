@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 open import QIT.Prelude
 
 -- Define algebras over setoid endofunctors. An algebra for a functor F

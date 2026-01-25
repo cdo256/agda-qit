@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 open import QIT.Prelude
 open import QIT.Setoid.Base
 open import QIT.Setoid.Hom
@@ -32,3 +33,14 @@ record Functor ℓd ℓd' ℓc ℓc' : Set (lsuc ℓd ⊔ lsuc ℓd' ⊔ lsuc �
 
     -- Respects homomorphism equivalence: if f ≈ g then F(f) ≈ F(g)
     F-resp : ∀ {S T} (f g : Hom S T) → f ≈h g → F-mor f ≈h F-mor g
+
+-- Needs to be polynomial functor.
+liftFunctor : ∀ {ℓd ℓd' ℓc ℓc'} ℓdl ℓdl' ℓcl ℓcl'
+            → Functor ℓd ℓd' ℓc ℓc'
+            → Functor (ℓd ⊔ ℓdl) (ℓd' ⊔ ℓdl') (ℓc ⊔ ℓcl) (ℓc' ⊔ ℓcl')
+liftFunctor ℓdl ℓdl' ℓcl ℓcl' F = record
+  { F-ob = λ S → {!!}
+  ; F-mor = {!!}
+  ; F-id = {!!}
+  ; F-comp = {!!}
+  ; F-resp = {!!} }

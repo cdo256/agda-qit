@@ -87,3 +87,14 @@ _/≡ B = record
 ≡p→≈ : ∀ {ℓ ℓ'} → (A : Setoid ℓ ℓ') → {x y : ⟨ A ⟩} → x ≡p y → A [ x ≈ y ]
 ≡p→≈ A {x} ∣ p ∣ = substp (λ ○ → x ≈ ○) p refl
   where open Setoid A
+
+LiftSetoid : ∀ {ℓ ℓ'} ℓl ℓl' → Setoid ℓ ℓ' → Setoid (ℓl ⊔ ℓ) (ℓl' ⊔ ℓ') 
+LiftSetoid ℓl ℓl' S = record
+  { Carrier = Lift ℓl Carrier
+  ; _≈_ = λ (lift x) (lift y) → LiftP ℓl' (x ≈ y)
+  ; isEquivalence = record
+    { refl = λ {_} → liftp refl
+    ; sym = λ (liftp p) → liftp (sym p)
+    ; trans = λ (liftp p) (liftp q) → liftp (trans p q) } }
+  where
+  open Setoid S
