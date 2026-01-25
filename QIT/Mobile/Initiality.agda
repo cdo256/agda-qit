@@ -68,7 +68,7 @@ theorem ∣ iso ∣ = ∣ record
     ; sat = sat }
   ; initial = record
     { rec = rec
-    ; unique = {!!} } } ∣
+    ; unique = unique } } ∣
   where
   open ≈.Hom θ̂ renaming (to to θ̂₀; cong to θ̂-cong)
   Qθ : ≈.Algebra F
@@ -114,7 +114,7 @@ theorem ∣ iso ∣ = ∣ record
       q = ≈psat π (λ i → tˡ (ξ i)) (θ.t≤β (sup (ιˢ n , (λ i → αˡ (ξ i)))) n (λ i → tˡ (ξ i) , _)) _
   rec : (Yβ : Alg) → Hom (record { alg = Qθ ; sat = sat }) Yβ
   rec Yβ = record { hom = ≈.Alg.mkHom r comm }
-    where
+    module rec where
     open Alg Yβ renaming (X to Y; α to β; sup to βsup; sat to Ysat)
     module Y = Setoid Y
     module β = ≈.Hom β
@@ -166,5 +166,11 @@ theorem ∣ iso ∣ = ∣ record
       where
       open Setoid Y
       open ≈.≈syntax {S = Y}
-
-      
+  Q̂ : Alg
+  Q̂ = record { alg = Qθ ; sat = sat }
+  unique : ∀ Yβ (f : Hom Q̂ Yβ) {x} → Alg.X Yβ [ f .Hom.to x ≈ rec Yβ .Hom.to x ]
+  unique Yβ f {α , t , t≤α} = {!!}
+    where
+    open Alg Yβ renaming (X to Y; α to β; sup to βsup; sat to Ysat)
+    module Y = Setoid Y
+    module β = ≈.Hom β
