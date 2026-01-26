@@ -123,18 +123,18 @@ theorem ∣ iso ∣ = ∣ record
     r₀ : Colim₀ D → ⟨ Y ⟩
     r₀ (_ , t , _) = c t
     r-cong : ∀ {x y} → Colim D [ x ≈ y ] → Y [ r₀ x ≈ r₀ y ]
-    r-cong {α , (s1 , α≤s1)} {α , (s2 , α≤s2)} (≈lstage α p) = r-cong-stage p
+    r-cong (≈lstage α p) = r-cong-stage p
       where
       r-cong-stage : ∀ {α ŝ t̂} → α ⊢ ŝ ≈ᵇ t̂ → r₀ (α , ŝ) Y.≈ r₀ (α , t̂)
-      r-cong-stage {α} {ŝ} {t̂} (≈pcong a μ f g u) = β.cong (mk≈ꟳ ≡.refl λ i → r-cong-stage (u i))
-      r-cong-stage {α} {ŝ} {t̂} (≈psat e ϕ₁ l≤α r≤α) = Ysat e (λ z → c (ϕ₁ z))
-      r-cong-stage {α} {ŝ} {t̂} ≈prefl = Y.refl
-      r-cong-stage {α} {ŝ} {t̂} (≈psym p) = Y.sym (r-cong-stage p)
-      r-cong-stage {α} {ŝ} {t̂} (≈ptrans p q) = Y.trans (r-cong-stage p) (r-cong-stage q)
-      r-cong-stage {α} {ŝ} {t̂} (≈pweaken β≤α p) = r-cong-stage p
-    r-cong {α1 , (s1 , α≤s1)} {α2 , (s1 , α≤s2)} (≈lstep p (s1 , snd₁)) = Y.refl
-    r-cong {α1 , (s1 , α≤s1)} {α2 , (s2 , α≤s2)} (≈lsym p) = Y.sym (r-cong p)
-    r-cong {α1 , (s1 , α≤s1)} {α2 , (s2 , α≤s2)} (≈ltrans p q) = Y.trans (r-cong p) (r-cong q)
+      r-cong-stage (≈pcong a μ f g u) = β.cong (mk≈ꟳ ≡.refl λ i → r-cong-stage (u i))
+      r-cong-stage (≈psat e ϕ₁ l≤α r≤α) = Ysat e (λ z → c (ϕ₁ z))
+      r-cong-stage ≈prefl = Y.refl
+      r-cong-stage (≈psym p) = Y.sym (r-cong-stage p)
+      r-cong-stage (≈ptrans p q) = Y.trans (r-cong-stage p) (r-cong-stage q)
+      r-cong-stage (≈pweaken _ p) = r-cong-stage p
+    r-cong (≈lstep p (s1 , snd₁)) = Y.refl
+    r-cong (≈lsym p) = Y.sym (r-cong p)
+    r-cong (≈ltrans p q) = Y.trans (r-cong p) (r-cong q)
     r : ≈.Hom (Colim D) Y
     r = record { to = r₀ ; cong = r-cong }
     comm : (β ≈.∘ F-mor r) ≈h (r ≈.∘ θ̂)
