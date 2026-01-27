@@ -3,7 +3,13 @@
 \documentclass[a4paper,UKenglish,cleveref, autoref, thm-restate]{lipics-v2021}
 \usepackage{mathpartir}
 \usepackage{amsmath}
+\usepackage{mathtools}
 \bibliographystyle{plainurl}
+
+% Define missing control sequences
+\providecommand{\coloneqq}{\mathrel{\mathop:}=}
+\providecommand{\sym}{\sim}
+\DeclareMathOperator*{\colim}{colim}
 
 \providecommand{\tightlist}{%
 \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
@@ -120,9 +126,16 @@ the size index alone.
 Concretely, we define mobiles as a quotient of well-founded
 \(\mathbb{N}\)-branching trees by levelwise permutation and construct
 them as the colimit of a transfinite sequence of stagewise quotients. We
-show that constructor formation preserves this colimit constructively,
-and derive the expected initial algebra property. All results have been
-formalised in Agda.
+show that constructor formation preserves this colimit constructively:
+
+\[
+	\mathrm{colim}_\alpha F(D_\alpha) \cong F\Bigl(\mathrm{colim}_\alpha D_\alpha\Bigr)
+\]
+
+and derive the expected initial algebra property. The depth-preservation
+property for mobiles and the resulting constructive cocontinuity proof have been
+formalised in Agda. We rely on the general FPS initiality theorem
+\cite{fiore2022-quotients-inductive-types} to obtain the elimination principle.
 
 This identifies a new subclass of infinitary QITs that can be
 constructed purely from quotient types, without additional choice
@@ -392,21 +405,6 @@ follows.
 Thus any stagewise equality proof implies that the underlying trees have
 the same depth, up to mutual boundedness.
 
-\begin{lemma}[Mobiles are depth-preserving]
-	\label{lem:mobiles-depth-preserving}
-	The QIT of mobiles is depth-preserving.
-\end{lemma}
-
-\begin{proof}[Proof]
-	The only structural generating equation is permutation at a node:
-	$\mathsf{node}(f) = \mathsf{node}(f \circ \varphi)$. This equation
-	preserves the constructor shape, simply permuting the variables at depth 1.
-	All children are preserved, so by quasi-extensionality, depth is preserved.
-	Congruence and the equivalence rules for equality also
-	preserve depth. Hence any derivation of $\approx_\alpha$ relates trees of the
-	same depth.
-\end{proof}
-
 \subsection{Tight equality without explicit bounds}
 
 Depth preservation allows us to replace bounded equality $\approx_\alpha$ by a
@@ -415,7 +413,7 @@ their depths.
 
 Define mutual boundedness on trees by
 \[
-	s \sim t \;\;:\!\!\equiv\;\; \mathrm{depth}(s) \sim \mathrm{depth}(t).
+	s \sim t \coloneqq \mathrm{depth}(s) \sim \mathrm{depth}(t)
 \]
 
 \begin{definition}[Tight equality]
@@ -438,48 +436,167 @@ Define mutual boundedness on trees by
 
 \begin{lemma}[Tightening]
 	\label{lem:tightening}
-	If $\alpha \vdash \hat s \approx^b \hat t$ in $D_\alpha$, then
-	$\hat s.\mathsf{fst} \approx^s \hat t.\mathsf{fst}$.
+	Suppose $\approx_\alpha$ is depth-preserving for all $\alpha$.
+	If $\hat s \approx_\alpha \hat t$ in $D_\alpha$, then $s \approx^s t$.
 \end{lemma}
+
+\begin{proof}
+	This proof is straightforward by induction on constructors of $\approx_\alpha$.
+	Structural properties are given directly from Lemma
+	\ref{lem:tight-eq-structure}. Weakening is irrelevant since the bound is
+	ignored. The remaining case is if they are related by an equation. We know
+	that $s \sim t$, so it remains to show that $s \approx_{\mathrm{depth}(s)} t$.
+	This is done by showing the left and right sides of the equation can be
+	tightened.
+\end{proof}
 
 The crucial point is that Lemma~\ref{lem:mobiles-depth-preserving}
 supplies the required depth comparison needed to form a tight equality.
 
-\subsection{Locality and cocontinuity}
+\subsection{Depth preservation and cocontinuity}
+\label{sec:depth-cocontinuity}
 
-Let $D \coloneqq \mathrm{colim}_\alpha D_\alpha$ be the FPS colimit. In
-general, showing that the polynomial functor $F$ preserves this colimit
-requires bounding families of subtrees uniformly, which is where FPS use
-WISC \cite{fiore2022-quotients-inductive-types,vandenberg2012-wisc-axiom}.
+Let $F$ be the polynomial functor determined by the point constructors of
+the signature. In the mobile case one may take $F(X) \coloneqq 1 + (I \to X)$,
+but the statements below are written for a general polynomial functor. Let
+$D : \mathsf{Ord} \to \mathsf{Setoid}$ be the FPS stage diagram
+$\alpha \mapsto D_\alpha$ with structure maps $D_\alpha \to D_\beta$ for
+$\alpha \le \beta$, and write
+\[
+	Q \;\coloneqq\; \mathrm{colim}_\alpha D_\alpha
+	\qquad\text{and}\qquad
+	L \;\coloneqq\; \mathrm{colim}_\alpha (F \circ D)_\alpha.
+\]
+Cocontinuity of $F$ with respect to $D$ is the statement that the canonical map
+\[
+	\mathrm{colim}_\alpha F(D_\alpha) \longrightarrow F\Bigl(\mathrm{colim}_\alpha D_\alpha\Bigr)
+\]
+is an isomorphism. In \cite{fiore2022-quotients-inductive-types} this is the
+place where WISC is used, in order to bound families of subtrees uniformly and
+thereby construct an inverse map.
 
-For depth-preserving signatures, the situation simplifies: any equality
-between terms can be witnessed at a stage determined by the depths of
-those terms alone. The size index no longer carries essential
-information; it can be reconstructed from the term shapes.
+In contrast, for depth-preserving signatures we can build the inverse map
+constructively, because the necessary bounds can be reconstructed from term
+depths rather than chosen globally.
 
-\begin{theorem}[Constructive cocontinuity for depth-preserving QITs]
+\subsubsection{The forward map.}
+There is a canonical comparison map $\varphi : L \to F(Q)$ induced by the
+colimit universal property. Concretely, an element of $L$ is represented by a
+pair $(\alpha, x)$ with $x \in F(D_\alpha)$, and we define $\varphi$ by pushing
+all $D_\alpha$-components into $Q$:
+\[
+	\varphi(\alpha, x) \;\coloneqq\; F(\iota_\alpha)(x),
+\]
+where $\iota_\alpha : D_\alpha \to Q$ is the colimit injection.
+
+In the mobile case, writing $x$ as either $\mathsf{inl}(\star)$ or
+$\mathsf{inr}(f)$ with $f:I\to D_\alpha$, we have
+\[
+	\varphi(\alpha,\mathsf{inl}(\star)) = \mathsf{inl}(\star),
+	\qquad
+	\varphi(\alpha,\mathsf{inr}(f)) = \mathsf{inr}(\lambda i.\ \iota_\alpha(f(i))).
+\]
+
+\subsubsection{The inverse map and the role of depth preservation.}
+To construct $\psi : F(Q) \to L$ one must, given $f:I\to Q$, choose a stage at
+which all the children of $f$ can be represented simultaneously. In the general
+FPS argument, producing such a uniform bound is where WISC enters.
+
+For depth-preserving signatures we avoid this by choosing a stage canonically
+from the term data. Informally, for each $i:I$ pick a representative
+\[
+	f(i) = (\alpha_i, \hat t_i) \in Q,
+\]
+and take the stage $\alpha \coloneqq \sup_i \alpha_i$ (or any chosen join
+operation on sizes). Then define
+\[
+	\psi(\mathsf{inr}(f)) \;\coloneqq\; \bigl(\alpha,\,\mathsf{inr}(g)\bigr)
+	\quad\text{where}\quad
+	g(i) \;\coloneqq\; \mathsf{weaken}_{\alpha_i\le\alpha}(\hat t_i) \in D_\alpha.
+\]
+The subtle point is well-definedness: $f(i)$ has many representatives, and
+changing representatives must not change the resulting element of the colimit
+$L$.
+
+This is precisely where depth preservation is used. The ``tightening'' lemma
+(Lemma~\ref{lem:tightening}) and its colimit analogue allow us to replace any
+colimit equality proof by a tight equality proof whose bound is determined by
+$\mathrm{depth}$ alone. As a result, transporting along stage inclusions becomes
+inessential in equality proofs (the step case is trivial), and $\psi$ becomes
+well-defined without any choice of covers.
+
+\subsubsection{Congruence of $\varphi$ and $\psi$.}
+To complete the construction one proves:
+\begin{enumerate}
+	\item $\varphi$ respects the colimit equality on $L$ (routine, by colimit
+	      induction and stagewise congruence).
+	\item $\psi$ respects the setoid equality on $F(Q)$.
+	      In the mobile case, this reduces to showing that if
+	      $f(i) =_{Q} g(i)$ for all $i$, then the stagewise families constructed for
+	      $\psi(\mathsf{inr}(f))$ and $\psi(\mathsf{inr}(g))$ are equal in the
+	      colimit. Here the key step is: from $f(i)=_Q g(i)$ obtain a tight equality
+	      between underlying trees, then weaken it to the chosen join stage, and
+	      finally apply congruence of the $F$-constructor.
+\end{enumerate}
+
+\subsubsection{Inverse laws.}
+Finally, one proves the left and right inverse laws:
+\[
+	\varphi \circ \psi = \mathrm{id}_{F(Q)}
+	\qquad\text{and}\qquad
+	\psi \circ \varphi = \mathrm{id}_{L}.
+\]
+For mobiles, the first is immediate by inspecting constructors: $\mathsf{leaf}$
+maps to $\mathsf{leaf}$ and $\mathsf{node}$ maps by pointwise colimit injection
+followed by a single colimit step.
+
+For the second, one shows that every representative $(\alpha,x)$ of $L$ is
+equal, in the colimit, to the representative constructed by $\psi(\varphi(\alpha,x))$.
+In the node case, this reduces to a single use of a canonical inequality
+$\alpha \le \sup_{i:I}\alpha$ (or its analogue) witnessing that each child lies
+below the joined stage.
+
+\begin{theorem}[Constructive cocontinuity from depth preservation]
 	\label{thm:constructive-cocontinuity}
-	Let a QW signature be depth-preserving. Then the associated polynomial
-	functor $F$ preserves the colimit of the FPS size-indexed diagram
-	constructively, i.e.\ without using WISC.
+	If the stagewise equality relations $\approx_\alpha$ are depth-preserving, then
+	the comparison map $\varphi : \mathrm{colim}_\alpha F(D_\alpha) \to F(\mathrm{colim}_\alpha D_\alpha)$
+	is an isomorphism. Equivalently, $F$ preserves the colimit of the FPS diagram
+	constructively (without using WISC).
 \end{theorem}
 
-\begin{proof}[Proof idea]
-	Using tight equality, constructor formation can be defined directly on
-	colimit representatives by structural recursion on trees, since all
-	necessary bounds can be reconstructed from depths. No global choice of
-	bounding covers is required.
+\begin{proof}[Proof sketch]
+	Define $\varphi$ as above. Define $\psi$ by choosing the join stage of the
+	indices of the children and weakening each child into that stage. Prove that
+	$\psi$ is well-defined and respects equality by using tightening:
+	any equality in $Q$ can be witnessed at a stage determined by
+	$\mathrm{depth}$, so the step/weakening cases in the colimit equality become
+	inessential. Finally prove the inverse laws by constructor case analysis and
+	the colimit step equations.
 \end{proof}
 
 \begin{corollary}[Initial algebra without WISC]
-	\label{cor:initial-algebra-local}
-	For a depth-preserving QW signature, the FPS construction yields an
-	initial $F$-algebra satisfying the equations, without assuming WISC.
+	\label{cor:initial-algebra-depth}
+	For a depth-preserving QW signature, the FPS colimit $Q$ carries an $F$-algebra
+	structure satisfying the equations, and this algebra is initial, without
+	assuming WISC.
 \end{corollary}
 
-In the next section we apply this result to the mobile signature,
-completing the construction of mobiles as a quotient inductive type in
-predicative type theory with quotients alone.
+\section{Constructing mobiles without WISC}
+
+\begin{lemma}[Mobiles are depth-preserving]
+	\label{lem:mobiles-depth-preserving}
+	The QIT of mobiles is depth-preserving.
+\end{lemma}
+
+\begin{proof}[Proof]
+	The only structural generating equation is permutation at a node:
+	$\mathsf{node}(f) = \mathsf{node}(f \circ \varphi)$. This equation
+	preserves the constructor shape, simply permuting the variables at depth 1.
+	All children are preserved, so by quasi-extensionality, depth is preserved.
+	Congruence and the equivalence rules for equality also
+	preserve depth. Hence any derivation of $\approx_\alpha$ relates trees of the
+	same depth.
+\end{proof}
 
 \bibliography{master}
 

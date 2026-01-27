@@ -135,6 +135,7 @@ open ≈s hiding (s≤≥t; s≈t)
                                 (λ i → g i , r i .≈s.s≤≥t .∧.snd)
                                 (λ i → r i .≈s.s≈t))
 
+-- tightening
 ≈ᵇ→≈ˢ : ∀ {α ŝ t̂} → D̃ α [ ŝ ≈ t̂ ]
      → ŝ .fst ≈ˢ t̂ .fst
 ≈ᵇ→≈ˢ {α} {s , s≤α} {t , t≤α} p = u p

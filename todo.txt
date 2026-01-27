@@ -1,0 +1,40 @@
+Notes (Section 4 only, things you may be missing / worth tightening)
+
+1. **State the cocontinuity goal as a specific isomorphism.**
+   In the text, explicitly name the two objects:
+   [
+   L = \mathrm{colim}*\alpha (F\circ D)*\alpha
+   \quad\text{and}\quad
+   F(Q)=F(\mathrm{colim}*\alpha D*\alpha),
+   ]
+   and say “we construct an isomorphism (L \cong F(Q)) by maps (\varphi,\psi)”.
+
+2. **Be explicit about the join/sup operation you use on sizes.**
+   Your Agda proof uses operations like (\vee^z) and (\sup(\iota^s n,\mu)).
+   In the paper, state minimally: “we assume the size index has joins/sups
+   required by polynomial branching”. Cite FPS for this and treat it as black-box.
+
+3. **Clarify precisely where depth preservation is used.**
+   In your code, the critical place is the lemma converting colimit equality
+   to tight equality ((\approx^l \to \approx^s)), with the step case becoming
+   trivial. Make that explicit in prose: it is the reason you can ignore bounds
+   when proving (\psi)-congruence.
+
+4. **Check the assumptions on (I).**
+   Your Agda module assumes (|I|) (mere inhabitation) to pick an index when
+   proving an inequality like (\alpha \le \sup(\ldots)) in the node case.
+   Decide whether the paper assumes (I) inhabited. If you only need it for a
+   convenience lemma, mention it explicitly; otherwise it will look like hidden
+   choice.
+
+5. **Make the dependence on “depth-preserving for all stages” explicit.**
+   Your Lemma~\ref{lem:tightening} currently assumes depth preservation for all
+   (\alpha). The theorem should either assume depth preservation globally, or
+   state and use a lemma “stagewise depth preservation lifts to colimit
+   tightening”.
+
+6. **Spell out the equation-satisfaction case in tightening.**
+   In Lemma~\ref{lem:tightening} you say “tightened”, but readers will want a
+   one-line explanation: “the instantiated lhs and rhs have the same depth by
+   Lemma~\ref{lem:mobiles-depth-preserving}, hence can be re-bounded to
+   (\mathrm{depth}(s))”.
