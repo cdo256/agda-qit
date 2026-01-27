@@ -1,7 +1,7 @@
 open import QIT.Prelude
 open import QIT.Setoid
 open import QIT.Container.Base
-open import QIT.QW.Equation
+open import QIT.QW.Equation 
 
 -- Define signatures for quotient inductive types (QITs).
 -- A signature specifies both the constructors (via a container) and

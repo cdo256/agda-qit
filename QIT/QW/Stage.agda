@@ -1,4 +1,3 @@
-{-# OPTIONS --type-in-type #-}
 open import QIT.Prelude
 open import QIT.QW.Signature
 
@@ -17,9 +16,9 @@ open import QIT.Setoid as ≈
 open import QIT.Relation.Subset
 open import QIT.Relation.Plump S P
 open import QIT.Setoid.Diagram ≤p
-open import QIT.QW.W S P (ℓS ⊔ ℓP) (ℓS ⊔ ℓP)
+open import QIT.QW.W S P 
 open import Data.Maybe
-open import QIT.QW.Equation S P
+open import QIT.QW.Equation S P ℓV
 
 -- Stage α: elements of the underlying W-type bounded by ordinal α.
 -- This gives us size-bounded approximations to the final quotient.
@@ -38,12 +37,12 @@ pweaken α≤β (t , t≤α) = t , ≤≤ α≤β t≤α
 
 -- Ordinal complexity of expressions: measures the "depth" needed to satisfy equations.
 -- Variables have minimal complexity ⊥ᶻ, constructors have complexity based on arguments.
-ιᵉ : ∀ {ℓV} {V : Set ℓV} → Expr V → Z
+ιᵉ : {V : Set ℓV} → Expr V → Z
 ιᵉ (varᴱ v) = ⊥ᶻ
 ιᵉ (supᴱ s f) = sup (ιˢ s , λ i → ιᵉ (f i))
 
 -- Expression-ordinal comparison: when an expression fits within a stage.
-_≤ᴱ_ : ∀ {ℓV} {V : Set ℓV} → Expr V → Z → Prop (ℓS ⊔ ℓP)
+_≤ᴱ_ : {V : Set ℓV} → Expr V → Z → Prop (ℓS ⊔ ℓP)
 t ≤ᴱ α = ιᵉ t ≤ α
 
 -- Interpretation of equation sides as W-type elements.

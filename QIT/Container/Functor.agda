@@ -1,4 +1,3 @@
-{-# OPTIONS --type-in-type #-}
 open import QIT.Prelude
 open import QIT.Setoid
 open import QIT.Relation.Binary

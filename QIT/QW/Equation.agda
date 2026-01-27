@@ -1,47 +1,46 @@
-{-# OPTIONS --type-in-type #-}
 open import QIT.Prelude
 
 -- Define expressions and equations over container signatures.
 -- Expressions are terms built from variables and constructors, used to
 -- state equations that should hold in the quotient. This provides the
 -- equational theory component of quotient inductive type signatures.
-module QIT.QW.Equation {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
+module QIT.QW.Equation {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) (ℓV : Level) where
 
 open import QIT.Container.Base
-open import QIT.Container.Functor S P (ℓS ⊔ ℓP) (ℓS ⊔ ℓP)
+open import QIT.Container.Functor S P (ℓS ⊔ ℓP ⊔ ℓV) (ℓS ⊔ ℓP ⊔ ℓV)
 open import QIT.Setoid
-open import QIT.QW.W S P (ℓS ⊔ ℓP) (ℓS ⊔ ℓP)
+open import QIT.QW.W S P
 
 -- Expressions over variables V: terms built from V and constructor signature (S,P).
 -- These are W-types over the extended signature (V ⊎ S, Pʰ) where:
 -- - Variables V have no arguments (arity ⊥*)
 -- - Constructors S keep their original arities P
 -- Extended shapes: variables or constructors
-Sʰ : ∀ {ℓV} (V : Set ℓV) → Set (ℓS ⊔ ℓV)
+Sʰ : (V : Set ℓV) → Set (ℓS ⊔ ℓV)
 Sʰ V = V ⊎ S
 
 -- Extended positions: variables are nullary, constructors keep original arity
-Pʰ : ∀ {ℓV} (V : Set ℓV) → Sʰ V → Set ℓP
+Pʰ : (V : Set ℓV) → Sʰ V → Set ℓP
 Pʰ V = ⊎.[ (λ _ → ⊥*) , P ]
 
-Expr : ∀ {ℓV} (V : Set ℓV) → Set (ℓS ⊔ ℓP ⊔ ℓV)
-Expr {ℓV} V = W (Sʰ V) (Pʰ V)
+Expr : (V : Set ℓV) → Set (ℓS ⊔ ℓP ⊔ ℓV)
+Expr V = W (Sʰ V) (Pʰ V)
 -- Expr V = FreeAlgebra S P V
 
 pattern varᴱ v {f} = sup (inj₁ v , f)
 pattern supᴱ s f = sup (inj₂ s , f)
 
-ιᴱ : ∀ {ℓV} {V : Set ℓV} → W S P → Expr V
+ιᴱ : {V : Set ℓV} → W S P → Expr V
 ιᴱ (sup (s , f)) = supᴱ s λ i → ιᴱ (f i)
 
-ExprAlg : ∀ {ℓV} (V : Set ℓV) → ≈.Algebra F
+ExprAlg : (V : Set ℓV) → ≈.Algebra F
 ExprAlg V = record
   { X = Expr V /≡
   ; α = record
     { to = β 
     ; cong = β-cong } }
   where
-  Ẽ : Setoid ℓ0 ℓ0
+  Ẽ : Setoid _ _
   Ẽ = Expr V /≡
   open F-Ob Ẽ
   β : ⟦ S ◁ P ⟧ (Expr V) → Expr V
@@ -54,7 +53,7 @@ ExprAlg V = record
 
 -- An equation equates two expressions over the same set of variables.
 -- This is the basic unit of equational specification: lhs ≈ rhs.
-record Equation ℓV : Set (lsuc ℓV ⊔ ℓS ⊔ ℓP) where
+record Equation : Set (lsuc ℓV ⊔ ℓS ⊔ ℓP) where
   field
     -- Variables appearing in the equation
     V : Set ℓV
@@ -74,30 +73,29 @@ module _ (Xα : ≈.Algebra F) where
   -- Evaluate an expression in the algebra given a variable assignment.
   -- Variables are replaced by their assignments, constructors are interpreted
   -- using the algebra's structure map.
-  assign : ∀ {ℓV} → {V : Set ℓV} (ϕ : V → ⟨ X ⟩) (e : Expr V) → ⟨ X ⟩
+  assign : {V : Set ℓV} (ϕ : V → ⟨ X ⟩) (e : Expr V) → ⟨ X ⟩
   assign ϕ = recW ⊎.[ (λ v _ → ϕ v) , (λ s f → α.to (s , f)) ]
     where module α = ≈.Hom α
 
   -- Variable assignment for an equation: maps variables to algebra elements
-  Assignment : ∀ {ℓV} → Equation ℓV → Set (ℓS ⊔ ℓP ⊔ ℓV)
+  Assignment : Equation → Set (ℓS ⊔ ℓP ⊔ ℓV)
   Assignment e = V → ⟨ X ⟩
     where open Equation e
 
   -- An equation is satisfied if lhs ≈ rhs under all variable assignments.
   -- This is universal quantification over all ways to instantiate variables.
-  SatEq : ∀ {ℓV} → Equation ℓV
-        → Prop (ℓS ⊔ ℓP ⊔ ℓV)
+  SatEq : Equation → Prop (ℓS ⊔ ℓP ⊔ ℓV)
   SatEq e = ∀ (ϕ : Assignment e) → assign ϕ lhs X.≈ assign ϕ rhs
     where open Equation e
 
   -- Satisfaction of a collection of equations indexed by E.
   -- The algebra must satisfy every equation in the collection.
-  Sat : ∀ {ℓE ℓV} → {E : Set ℓE}
-      → (E → Equation ℓV)
+  Sat : ∀ {ℓE} → {E : Set ℓE}
+      → (E → Equation)
       → Prop (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV)
   Sat Ξ = ∀ e → SatEq (Ξ e)
 
-module _ {ℓV} {V : Set ℓV} {Xα : ≈.Algebra F}
+module _ {V : Set ℓV} {Xα : ≈.Algebra F}
          (h : ≈.Alg.Hom F (ExprAlg V) Xα) where
   module h = ≈.Alg.Hom h
   open ≈.Algebra Xα
@@ -129,7 +127,8 @@ module _ {ℓV} {V : Set ℓV} {Xα : ≈.Algebra F}
     assign Xα ρ (supᴱ s f) ∎
     where
     module F = ≈.Functor F
-    F₀ : Setoid ℓ0 ℓ0 → Setoid ℓ0 ℓ0
+    F₀ : Setoid (ℓS ⊔ ℓP ⊔ ℓV) (ℓS ⊔ ℓP ⊔ ℓV)
+       → Setoid (ℓS ⊔ ℓP ⊔ ℓV) (ℓS ⊔ ℓP ⊔ ℓV)
     F₀ = F.F-ob
     Fh : ⟨ F₀ (Expr V /≡) ⟩ → ⟨ F₀ X ⟩
     Fh = ≈.Hom.to (F.F-mor h.hom) 

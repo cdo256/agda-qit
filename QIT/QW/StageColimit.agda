@@ -33,7 +33,6 @@ open import QIT.Setoid.Diagram ≤p
 
 -- Colimits and cocontinuity
 open import QIT.QW.Colimit ≤p ℓD ℓD' hiding (_≈ˡ_)
-open import QIT.QW.Cocontinuity ≤p {ℓD} {ℓD'}
 
 -- Module aliases for cleaner notation
 module F = ≈.Functor F

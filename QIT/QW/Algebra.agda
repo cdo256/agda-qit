@@ -1,4 +1,3 @@
-{-# OPTIONS --type-in-type #-}
 open import QIT.Prelude
 open import QIT.Setoid
 open import QIT.Container.Base
@@ -12,13 +11,13 @@ open import QIT.QW.Signature
 module QIT.QW.Algebra {ℓS ℓP ℓE ℓV} (sig : Sig ℓS ℓP ℓE ℓV) where
 
 open Sig sig
-open import QIT.Container.Functor S P (ℓS ⊔ ℓP) (ℓS ⊔ ℓP)
-open import QIT.QW.Equation S P
+open import QIT.Container.Functor S P (ℓS ⊔ ℓP ⊔ ℓV) (ℓS ⊔ ℓP ⊔ ℓV)
+open import QIT.QW.Equation S P ℓV
 
 -- A QIT algebra: a container algebra that satisfies the signature equations.
 -- This consists of a setoid with operations (container algebra) plus
 -- proofs that all equations hold in this algebra.
-record Alg : Set (lsuc ℓS ⊔ lsuc ℓP ⊔ ℓE ⊔ ℓV) where
+record Alg : Set (lsuc ℓS ⊔ lsuc ℓP ⊔ ℓE ⊔ lsuc ℓV) where
   field
     -- Underlying container algebra: setoid + structure map
     alg : ≈.Algebra F
@@ -29,7 +28,7 @@ record Alg : Set (lsuc ℓS ⊔ lsuc ℓP ⊔ ℓE ⊔ ℓV) where
 -- Homomorphism between QIT algebras: just container algebra homomorphisms.
 -- The satisfaction proofs are automatically preserved by homomorphisms,
 -- so we only need to give the underlying algebra homomorphism.
-record Hom (Xα Yβ : Alg) : Set (lsuc ℓS ⊔ lsuc ℓP ⊔ ℓE ⊔ ℓV) where
+record Hom (Xα Yβ : Alg) : Set (lsuc ℓS ⊔ lsuc ℓP ⊔ ℓE ⊔ lsuc ℓV) where
   field
     hom : ≈.Alg.Hom F (Alg.alg Xα) (Alg.alg Yβ)
 
@@ -39,7 +38,7 @@ record Hom (Xα Yβ : Alg) : Set (lsuc ℓS ⊔ lsuc ℓP ⊔ ℓE ⊔ ℓV) whe
 -- Initial QIT algebra: has a unique homomorphism to every other QIT algebra.
 -- This characterizes the "free" or "syntax" algebra where only the signature
 -- equations hold and no additional equations are imposed.
-record IsInitial (Xα : Alg) : Set (lsuc ℓS ⊔ lsuc ℓP ⊔ ℓE ⊔ ℓV) where
+record IsInitial (Xα : Alg) : Set (lsuc ℓS ⊔ lsuc ℓP ⊔ ℓE ⊔ lsuc ℓV) where
   open Hom
   field
     -- Recursor: canonical map to any QIT algebra
@@ -49,7 +48,7 @@ record IsInitial (Xα : Alg) : Set (lsuc ℓS ⊔ lsuc ℓP ⊔ ℓE ⊔ ℓV) w
 
 -- Package of initial QIT algebra: the algebra together with initiality proof.
 -- This represents the quotient inductive type defined by the signature.
-record Record : Set (lsuc ℓS ⊔ lsuc ℓP ⊔ ℓE ⊔ ℓV) where
+record Record : Set (lsuc ℓS ⊔ lsuc ℓP ⊔ ℓE ⊔ lsuc ℓV) where
   field
     -- The initial algebra
     Xα : Alg
