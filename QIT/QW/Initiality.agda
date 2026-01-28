@@ -85,7 +85,7 @@ theorem ∣ iso ∣ = ∣ record
       where
       s : {!!} ⊢ {!!} ≈ᵇ {!!}
       s = ≈psat e {!!} {!!} {!!}
-      
+
 
       -- assign Xα ξ (lhs (Ξ e))
       --   ≈⟨ refl ⟩

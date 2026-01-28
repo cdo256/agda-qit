@@ -11,12 +11,13 @@ open Sig sig
 open import QIT.Relation.Subset
 open import QIT.Relation.Binary
 open import QIT.Container.Base
-open import QIT.Container.Functor S P
+open import QIT.Container.Functor S P (ℓS ⊔ ℓP ⊔ ℓV) (ℓS ⊔ ℓP ⊔ ℓV)
 open import QIT.Setoid as ≈
 open import QIT.Relation.Subset
 open import QIT.Relation.Plump S P
 open import QIT.Setoid.Diagram ≤p
-open import QIT.QW.W S P 
+open import QIT.QW.W S P
+open import QIT.Setoid.LiftAlgebra S P ℓV
 open import Data.Maybe
 open import QIT.QW.Equation S P ℓV
 
@@ -52,11 +53,15 @@ t ≤ᴱ α = ιᵉ t ≤ α
 -- algebras (not closed under sup), so it doesn't make sense to use
 -- as an assignment. Instead we use T-alg and require explicit proof
 -- on the ≈psat case.
-lhs' : ∀ (e : E) (ϕ : Assignment T-alg (Ξ e)) → T
-lhs' e ϕ = assign T-alg ϕ (Ξ e .lhs)
+-- Lift T-alg to the higher universe levels needed in this module
+T-alg-lifted : AlgBig
+T-alg-lifted = liftAlgebra T-alg
 
-rhs' : ∀ (e : E) (ϕ : Assignment T-alg (Ξ e)) → T
-rhs' e ϕ = assign T-alg ϕ (Ξ e .rhs)
+lhs' : ∀ (e : E) (ϕ : Assignment T-alg-lifted (Ξ e)) → T
+lhs' e ϕ = lower (assign T-alg-lifted ϕ (Ξ e .lhs))
+
+rhs' : ∀ (e : E) (ϕ : Assignment T-alg-lifted (Ξ e)) → T
+rhs' e ϕ = lower (assign T-alg-lifted ϕ (Ξ e .rhs))
 
 -- Stage-indexed equivalence relation: the quotient relation at each stage.
 -- This is built inductively using congruence, equation satisfaction,
@@ -69,7 +74,7 @@ data _⊢_≈ᵇ_ : (α : Z) → D₀ α → D₀ α → Prop (ℓS ⊔ ℓP ⊔
         → sup (ιˢ a , μ) ⊢ psup a μ f ≈ᵇ psup a μ g
 
   -- Equation satisfaction: enforce the equations from the signature
-  ≈psat : ∀ {α} (e : E) (ϕ : Assignment T-alg (Ξ e))
+  ≈psat : ∀ {α} (e : E) (ϕ : Assignment T-alg-lifted (Ξ e))
         → (l≤α : lhs' e ϕ ≤ᵀ α)
         → (r≤α : rhs' e ϕ ≤ᵀ α)
         → α ⊢  (lhs' e ϕ , l≤α)

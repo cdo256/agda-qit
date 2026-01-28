@@ -118,7 +118,7 @@ module _ (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ŝ .f
     u (≈psat e ϕ l≤α r≤α) = mk≈ˢ s~ᵀt (≈psat e ϕ (≤refl (ιᶻ (lhs' e ϕ))) _)
       where
       s~ᵀt : s ~ᵀ t
-      s~ᵀt = depth-preserving α ({!!} , s≤α) ({!!} , t≤α) p
+      s~ᵀt = depth-preserving α (s , s≤α) (t , t≤α) p
     u ≈prefl = ≈srefl
     u (≈psym p) = ≈ssym (≈ᵇ→≈ˢ p)
     u (≈ptrans p q) = ≈strans (≈ᵇ→≈ˢ p) (≈ᵇ→≈ˢ q)
@@ -211,7 +211,7 @@ module _ (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ŝ .f
       { ⟦_⟧ = ϕ₀
       ; ⟦_⟧⁻¹ = ψ₀
       ; cong = ϕ-cong
-      ; cong⁻¹ = ψ-cong 
+      ; cong⁻¹ = ψ-cong
       ; linv = linv
       ; rinv = rinv
       }

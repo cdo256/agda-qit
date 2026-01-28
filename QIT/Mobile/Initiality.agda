@@ -88,9 +88,9 @@ theorem ∣ iso ∣ = ∣ record
         ≈⟨ refl ⟩
       sup (ιˢ n , λ _ → sup (ιˢ n , λ i → αˡ (ξ i))) , sup (n , λ i → tˡ (ξ i)) , _
         ≈⟨ ≈lstage (sup (ιˢ n , (λ _ → sup (ιˢ n , (λ i → αˡ (ξ i)))))) q ⟩
-      sup (ιˢ n , λ _ → sup (ιˢ n , λ i → αˡ (ξ i))) , sup (n , λ i → tˡ (ξ (π.to i))) , _ 
+      sup (ιˢ n , λ _ → sup (ιˢ n , λ i → αˡ (ξ i))) , sup (n , λ i → tˡ (ξ (π.to i))) , _
         ≈⟨ ≈lstep l≤r (sup (n , (λ i → tˡ (ξ (π.to i)))) , _) ⟩
-      sup (ιˢ n , λ _ → sup (ιˢ n , λ i → αˡ (ξ (π.to i)))) , sup (n , λ i → tˡ (ξ (π.to i))) , _ 
+      sup (ιˢ n , λ _ → sup (ιˢ n , λ i → αˡ (ξ (π.to i)))) , sup (n , λ i → tˡ (ξ (π.to i))) , _
         ≈⟨ refl ⟩
       θ₀ (sup (ιˢ n , λ i → αˡ (ξ (π.to i))) , n , λ i →
         tˡ (ξ (π.to i)) , ≤≤ (child≤ (ιˢ n) (λ i → αˡ (ξ (π.to i))) i) (t≤αˡ (ξ (π.to i))))
@@ -99,17 +99,17 @@ theorem ∣ iso ∣ = ∣ record
         ≈⟨ refl ⟩
       assign Qθ ξ (supᴱ n (λ i → varᴱ (π.to i) {λ()})) ∎
       where
-      module π = _↔_ π 
+      module π = _↔_ π
       open ≈.≈syntax {S = Colim D}
       open Setoid (Colim D)
       β : Z
       β = sup (ιˢ n , λ _ → sup (ιˢ n , λ i → αˡ (ξ i)))
       l≤r : (sup (ιˢ n , (λ _ → sup (ιˢ n , (λ i → αˡ (ξ i))))))
-          ≤ (sup (ιˢ n , (λ _ → sup (ιˢ n , (λ i → αˡ (ξ (π.to i))))))) 
+          ≤ (sup (ιˢ n , (λ _ → sup (ιˢ n , (λ i → αˡ (ξ (π.to i)))))))
       l≤r = sup≤sup λ _ → sup≤ λ i → <sup (π.from i) (≡→≤ (≡.cong (λ ○ → αˡ (ξ ○)) (≡.sym (π.linv i))))
       r≤l : (sup (ιˢ n , (λ _ → sup (ιˢ n , (λ i → αˡ (ξ (π.to i)))))))
-          ≤ (sup (ιˢ n , (λ _ → sup (ιˢ n , (λ i → αˡ (ξ i)))))) 
-      r≤l = sup≤sup λ _ → sup≤ λ i → <sup (π.to i) (≤refl (αˡ (ξ (π.to i)))) 
+          ≤ (sup (ιˢ n , (λ _ → sup (ιˢ n , (λ i → αˡ (ξ i))))))
+      r≤l = sup≤sup λ _ → sup≤ λ i → <sup (π.to i) (≤refl (αˡ (ξ (π.to i))))
       q : D̃ β [ sup (n , λ i → tˡ (ξ i)) , _ ≈ sup (n , λ i → tˡ (ξ (π.to i))) , _ ]
       q = ≈psat π (λ i → tˡ (ξ i)) (θ.t≤β (sup (ιˢ n , (λ i → αˡ (ξ i)))) n (λ i → tˡ (ξ i) , _)) _
   rec : (Yβ : Alg) → Hom (record { alg = Qθ ; sat = sat }) Yβ
@@ -156,7 +156,7 @@ theorem ∣ iso ∣ = ∣ record
       u : βsup (l , λ i → r₀ (f i))
         ≡ βsup (l , λ i → c (g i))
       u = ≡.cong (λ ○ → βsup (l , ○)) (funExt (λ ()))
-      
+
     comm {n , f} =
       βsup (n , λ i → r₀ (f i))
         ≈⟨ refl ⟩
@@ -166,5 +166,3 @@ theorem ∣ iso ∣ = ∣ record
       where
       open Setoid Y
       open ≈.≈syntax {S = Y}
-
-      

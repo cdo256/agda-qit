@@ -87,3 +87,17 @@ _/≡ B = record
 ≡p→≈ : ∀ {ℓ ℓ'} → (A : Setoid ℓ ℓ') → {x y : ⟨ A ⟩} → x ≡p y → A [ x ≈ y ]
 ≡p→≈ A {x} ∣ p ∣ = substp (λ ○ → x ≈ ○) p refl
   where open Setoid A
+
+-- Lift a setoid to higher universe levels.
+-- This allows us to transport setoids from lower levels to higher levels,
+-- which is needed when working with functors at different universe levels.
+LiftSetoid : ∀ {ℓ ℓ'} (ℓl ℓl' : Level) → Setoid ℓ ℓ' → Setoid (ℓ ⊔ ℓl) (ℓ' ⊔ ℓl')
+LiftSetoid ℓl ℓl' A = record
+  { Carrier = Lift ℓl (Setoid.Carrier A)
+  ; _≈_ = λ x y → LiftP ℓl' (Setoid._≈_ A (lower x) (lower y))
+  ; isEquivalence = record
+    { refl = liftp (Setoid.refl A)
+    ; sym = λ (liftp p) → liftp (Setoid.sym A p)
+    ; trans = λ (liftp p) (liftp q) → liftp (Setoid.trans A p q)
+    }
+  }
