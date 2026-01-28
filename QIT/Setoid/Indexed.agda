@@ -4,6 +4,9 @@ open import QIT.Prelude
 open import QIT.Relation.Base
 import QIT.Relation.IndexedBinary as IndexedBinary
 
+-- Indexed setoids generalize ordinary setoids by allowing the carrier to vary
+-- over an index set. This is crucial for the QIT development where we need to
+-- relate elements living at different stages or levels of a construction.
 
 record Setoid ℓI ℓA ℓR : Set (lsuc (ℓI ⊔ ℓA ⊔ ℓR)) where
   field
@@ -28,9 +31,11 @@ module _ {ℓI ℓA ℓR} (S : Setoid ℓI ℓA ℓR) where
   _[_≈_] : ∀ {i j} → A i → A j → Prop _
   _[_≈_] {i} {j} x y = R i j x y
 
+  -- Equational reasoning syntax for indexed setoids.
+  -- Allows writing proofs in chain style: begin x ≈⟨ p ⟩ y ≈⟨ q ⟩ z ∎
+  -- Transitivity can involve three different indices i, j, k.
   module ≈syntax where
     infix 1 begin_
-
     begin_ : ∀ {i j} {x : A i} {y : A j} → x ≈ y → x ≈ y
     begin p = p
 
@@ -40,13 +45,14 @@ module _ {ℓI ℓA ℓR} (S : Setoid ℓI ℓA ℓR) where
     syntax step-≈ x q p = x ≈⟨ p ⟩ q
 
     infix 3 _∎
-
     _∎ : ∀ {i} (x : A i) → x ≈ x
     x ∎ = refl
 
 module _ where
   import QIT.Setoid.Base as Unindexed
 
+  -- Convert a regular setoid to an indexed setoid with trivial indexing.
+  -- Uses the unit type ⊤ as the index set, so there's only one index.
   UnindexedSetoid→IndexedSetoid : ∀ {ℓA ℓR} → Unindexed.Setoid ℓA ℓR → Setoid ℓ0 ℓA ℓR
   UnindexedSetoid→IndexedSetoid S = record
       { I = ⊤
@@ -58,9 +64,15 @@ module _ where
         ; trans = S.trans } }
     where module S = Unindexed.Setoid S
 
+  -- Convert an indexed setoid (at level ℓ0) to a regular setoid.
+  -- Takes the dependent sum Σ I A as the carrier, and defines equality
+  -- on pairs (i, x) and (j, y) using the indexed relation R i j x y.
   IndexedSetoid→UnindexedSetoid : ∀ {ℓA ℓR} → Setoid ℓ0 ℓA ℓR → Unindexed.Setoid ℓA ℓR
   IndexedSetoid→UnindexedSetoid S = record
     { Carrier = Σ S.I S.A
     ; _≈_ = λ (i , x) (j , y) → S.R i j x y
-    ; isEquivalence = record { refl = S.refl ; sym = S.sym ; trans = S.trans } }
+    ; isEquivalence = record
+      { refl = S.refl
+      ; sym = S.sym
+      ; trans = S.trans } }
     where module S = Setoid S

@@ -7,10 +7,10 @@ open import QIT.Container.Base
 
 open import QIT.QW.Signature
 
--- Define cocontinuous functors: functors that preserve colimits.
--- A functor F is cocontinuous if F(colim D) ≅ colim(F ∘ D) for all diagrams D.
--- This property is crucial for showing that container functors preserve the
--- colimit construction used to build quotient inductive types.
+-- Cocontinuous functors preserve colimits: F(colim D) ≅ colim(F ∘ D).
+-- This property is crucial for showing that container functors preserve
+-- the colimit construction used to build quotient inductive types.
+-- The isomorphism enables interchanging functor application and colimit construction.
 
 module QIT.QW.Cocontinuity {ℓS ℓP ℓE ℓV} (sig : Sig ℓS ℓP ℓE ℓV) where
 open Sig sig
@@ -38,9 +38,6 @@ private
   ℓc' = ℓS ⊔ ℓP ⊔ ℓD ⊔ ℓD'
 
 -- A functor F is cocontinuous if it preserves colimits up to isomorphism.
--- This means F(colim P) ≅ colim(F ∘ P) for any diagram P.
--- Cocontinuity ensures that applying F doesn't interfere with the
--- colimit construction - the functor and colimit operations commute.
 Cocontinuous : (F : ≈.Functor ℓc ℓc' ℓc ℓc') (D : ≈.Diagram ≤p ℓc ℓc')
               → Prop ℓc'
 Cocontinuous F D =
@@ -48,9 +45,12 @@ Cocontinuous F D =
 
 open F-Ob
 
+-- Forward direction: map from Colim(F ∘ᴰ D) to F-ob(Colim D).
+-- An element (α, (s, f)) becomes (s, λ i → (α, f i)).
 ϕ₀ : ⟨ Colim (F ∘ᴰ D) ⟩ → ⟨ F.F-ob (Colim D) ⟩
 ϕ₀ (α , (s , f)) = s , (λ b → α , f b)
 
+-- Congruence for ϕ₀ at a specific stage.
 ϕ-cong-stage : ∀ α {x y} → F∘D.D-ob α [ x ≈ y ] → F.F-ob (Colim D) [ ϕ₀ (α , x) ≈ ϕ₀ (α , y) ]
 ϕ-cong-stage α {a , f} {a , g} (mk≈ꟳ ≡.refl snd≈) =
   mk≈ꟳ ≡.refl q
@@ -61,6 +61,7 @@ open F-Ob
     u :  α ⊢ f i ≈ᵇ g i
     u = snd≈ i
 
+-- Full congruence property for ϕ₀.
 ϕ-cong : ∀ {x y} → Colim (F ∘ᴰ D) [ x ≈ y ] → F.F-ob (Colim D) [ ϕ₀ x ≈ ϕ₀ y ]
 ϕ-cong (≈lstage α e) = ϕ-cong-stage α e
 ϕ-cong (≈lstep {α} {j} (sup≤ p) (s , f)) =
@@ -68,15 +69,19 @@ open F-Ob
 ϕ-cong (≈lsym p) = ≈fsym (Colim D) (ϕ-cong p)
 ϕ-cong (≈ltrans p q) = ≈ftrans (Colim D) (ϕ-cong p) (ϕ-cong q)
 
+-- Backward direction: map from F-ob(Colim D) to Colim(F ∘ᴰ D).
+-- Find a common upper bound for all stages, then weaken elements to this stage.
 ψ₀ : ⟨ F.F-ob (Colim D) ⟩ → ⟨ Colim (F ∘ᴰ D) ⟩
 ψ₀ (s , f) = sup (ιˢ s , μ) , s , λ i → pweaken (child≤ (ιˢ s) μ i) (f i .proj₂)
   where
   μ : P s → Z
   μ i = f i .proj₁
 
+-- Tree compatibility relation based on ordinal bounds.
 _~ᵀ_ : ∀ (s t : T) → Prop _
 s ~ᵀ t = ιᶻ s ≤≥ ιᶻ t
 
+-- Strong equivalence between trees: ordinal compatibility plus provable equality.
 module ≈s where
   record _≈ˢ_ (s t : T) : Prop (ℓS ⊔ ℓP ⊔ lsuc ℓV ⊔ ℓE) where
     constructor mk≈ˢ
@@ -105,10 +110,13 @@ open ≈s hiding (s~t; s≈t)
                                 (λ i → g i , r i .≈s.s~t .∧.snd)
                                 (λ i → r i .≈s.s≈t))
 
-module _ (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ŝ .fst ~ᵀ t̂ .fst) where
-  -- tightening
-  ≈ᵇ→≈ˢ : ∀ {α ŝ t̂} → D̃ α [ ŝ ≈ t̂ ]
-        → ŝ .fst ≈ˢ t̂ .fst
+-- Under the depth-preserving assumption, we can prove cocontinuity.
+-- The assumption ensures equivalent elements have compatible ordinal bounds.
+module _ (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ŝ .fst ~ᵀ t̂ .fst) where
+
+  -- Tighten stage-level relations to strong tree equivalences.
+  ≈ᵇ→≈ˢ : ∀ {α ŝ t̂} → D̃ α [ ŝ ≈ t̂ ]
+        → ŝ .fst ≈ˢ t̂ .fst
   ≈ᵇ→≈ˢ {α} {s , s≤α} {t , t≤α} p = u p
     where
     u : D̃ α [ s , s≤α ≈ t , t≤α ]
@@ -123,14 +131,15 @@ module _ (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ŝ .f
     u (≈ptrans p q) = ≈strans (≈ᵇ→≈ˢ p) (≈ᵇ→≈ˢ q)
     u (≈pweaken _ p) = (≈ᵇ→≈ˢ p)
 
-
-  ≈ˡ→≈ˢ : ∀ {ŝ t̂} → Colim D [ ŝ ≈ t̂ ]
-      → ŝ .proj₂ .fst ≈ˢ t̂ .proj₂ .fst
+  -- Lift tightening from stage relations to colimit relations.
+  ≈ˡ→≈ˢ : ∀ {ŝ t̂} → Colim D [ ŝ ≈ t̂ ]
+      → ŝ .proj₂ .fst ≈ˢ t̂ .proj₂ .fst
   ≈ˡ→≈ˢ {α , s , s≤α} {α , t , t≤α} (≈lstage α p) = ≈ᵇ→≈ˢ p
   ≈ˡ→≈ˢ {α , s , s≤α} {β , t , t≤β} (≈lstep p x) = ≈srefl
   ≈ˡ→≈ˢ {α , s , s≤α} {β , t , t≤β} (≈lsym p) = ≈ssym (≈ˡ→≈ˢ p)
   ≈ˡ→≈ˢ {α , s , s≤α} {β , t , t≤β} (≈ltrans p q) = ≈strans (≈ˡ→≈ˢ p) (≈ˡ→≈ˢ q)
 
+  -- Congruence for ψ₀: convert colimit relations to stage relations.
   ψ-cong : ∀ {x y} → F.F-ob (Colim D) [ x ≈ y ] → Colim (F ∘ᴰ D) [ ψ₀ x ≈ ψ₀ y ]
   ψ-cong {s , f} {s , g} (mk≈ꟳ ≡.refl snd≈) = begin
     ψ₀ (s , f)
@@ -171,6 +180,7 @@ module _ (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ŝ .f
     open Setoid (Colim (F ∘ᴰ D))
     open ≈.≈syntax {S = Colim (F ∘ᴰ D)}
 
+  -- Left inverse: ϕ₀ ∘ ψ₀ ≈ id on F-ob(Colim D).
   linv : ∀ y → F.F-ob (Colim D) [ (ϕ₀ (ψ₀ y)) ≈ y ]
   linv (s , g) =
     ϕ₀ (ψ₀ (s , g))
@@ -185,6 +195,7 @@ module _ (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ŝ .f
     open Diagram D
     open ≈.≈syntax {S = (F.F-ob (Colim D))}
 
+  -- Right inverse: ψ₀ ∘ ϕ₀ ≈ id on Colim(F ∘ᴰ D).
   rinv : ∀ x → Colim (F ∘ᴰ D) [ (ψ₀ (ϕ₀ x)) ≈ x ]
   rinv (α , (s , g)) = begin
     ψ₀ (ϕ₀ (α , (s , g)))
@@ -202,6 +213,7 @@ module _ (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ŝ .f
     open Setoid (Colim (F ∘ᴰ D))
     open ≈.≈syntax {S = Colim (F ∘ᴰ D)}
 
+  -- Main result: container functors are cocontinuous under depth preservation.
   depthPrserving→cocontinuous : Cocontinuous F D
   depthPrserving→cocontinuous = ∣ iso ∣
     where
