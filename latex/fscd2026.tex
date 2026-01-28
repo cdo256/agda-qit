@@ -6,18 +6,12 @@
 \usepackage{mathtools}
 \bibliographystyle{plainurl}
 
-% Define missing control sequences
-\providecommand{\coloneqq}{\mathrel{\mathop:}=}
-\providecommand{\sym}{\sim}
-\DeclareMathOperator*{\colim}{colim}
-
-\providecommand{\tightlist}{%
-\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-
 \title{Depth-Preserving QW Types are Constructive}
 
-\author{Thorsten Altenkirch}{University of Nottingham, UK}{thorsten.altenkirch@nottingham.ac.uk}{https://orcid.org/0000-0002-6582-5025}{}
-\author{Christina O'Donnell}{University of Nottingham, UK}{psxco3@nottingham.ac.uk}{}{Supported by the Engineering and Physical Sciences Research Council (EPSRC) Doctoral Landscape Award [Grant Ref: EP/Z534948/1].}
+\author{Thorsten Altenkirch}{University of Nottingham, UK}
+    {thorsten.altenkirch@nottingham.ac.uk}{https://orcid.org/0000-0002-6582-5025}{}
+\author{Christina O'Donnell}{University of Nottingham, UK}
+    {psxco3@nottingham.ac.uk}{}{Supported by the Engineering and Physical Sciences Research Council (EPSRC) Doctoral Landscape Award [Grant Ref: EP/Z534948/1].}
 
 \authorrunning{T. Altenkirch and C. D. O'Donnell}
 \Copyright{Thorsten Altenkirch and Christina O'Donnell}
@@ -28,18 +22,22 @@
 
 \keywords{Quotient Inductive Types, W-Types, Homotopy Type Theory, Agda, Constructive Mathematics}
 
+% Optional: Link to the ArXiv version or repository if applicable
+%\relatedversion{Full version hosted on arXiv: \url{https://arxiv.org/abs/xxxx.xxxxx}}
+
 \supplement{Source code available at \url{https://github.com/cdo256/agda-qit}}
 
 \begin{document}
 
 \maketitle
+
 \begin{abstract}
 	Quotient Inductive Types (QITs) provide a powerful mechanism for defining
-	datatypes equipped with identifications. However, their general
-	construction raises foundational difficulties: certain QITs cannot
-	be constructed using quotient types alone. Subsequent work by Fiore, Pitts, and
-	Steenkamp introduced Quotient--W types (QW types), showing that a broad class of
-	QITs admit initial algebra semantics assuming the Weak Initial Set of Covers
+	datatypes equipped with identifications. However, their general construction
+	raises foundational difficulties: certain QITs cannot be constructed using
+	quotient types alone. Subsequent work by Fiore, Pitts, and Steenkamp
+	introduced Quotient--W types (QW types), showing that a broad class of QITs
+	admit initial algebra semantics assuming the Weak Initial Set of Covers
 	(WISC) principle.
 
 	We identify a structural condition on QW signatures, depth preservation, and
@@ -52,46 +50,104 @@
 	ensure that stagewise equalities do not change term depth. Exploiting this
 	boundedness allows us to establish the required cocontinuity argument
 	constructively.
+
+	This result provides evidence that some infinitary QITs previously thought to
+	require choice are in fact constructible in a choice-free setting. We
+	conclude by outlining a prospective syntactic criterion, based on bounding the
+	depth of equations, that may characterise a larger class of constructible QITs.
 \end{abstract}
 
+%{
+%	\setcounter{tocdepth}{3}
+%	\tableofcontents
+%}
 \section{Introduction}\label{introduction}
 
 Quotient inductive types (QITs) extend ordinary inductive types with
 equational identifications and provide a uniform way to define datatypes
-equipped with canonical equalities. Despite their usefulness, QITs are known to
+equipped with canonical equalities. They play an important role in
+formalised mathematics in type theory, where they are used to present
+structures such as Cauchy reals, partiality monads, and various
+constructions of ordinals. Despite their usefulness, QITs are known to
 pose subtle foundational and semantic difficulties, especially when
 their constructors involve infinitary branching or when their path
 constructors express extensionality principles.
 
 Fiore, Pitts, and Steenkamp (FPS) introduced a general semantic
 framework for a large class of QITs, called quotient--W types (QW
-types). Their proof that constructor formation commutes with the size-indexed
-colimit relies on the Weak Initial Set of Covers principle (WISC), a weak choice
-principle that is not derivable in standard predicative type theory.
+types). Their construction proceeds by building a size-indexed diagram
+of stagewise approximations and taking a colimit, yielding an initial
+algebra that supports the expected elimination principle. However, their
+proof that constructor formation commutes with this colimit relies on
+the Weak Initial Set of Covers principle (WISC), a weak choice principle
+that is not derivable in standard predicative type theory. While WISC is
+constructively acceptable in many settings, its use raises a natural
+question: which features of a QIT genuinely require such principles, and
+which arise from the generality of the FPS argument?
 
-In this paper, we identify a structural class of QW types whose semantics is
-fully constructive. We introduce the notion of \emph{depth preservation} and
-show that for signatures satisfying this property, the FPS construction
-succeeds without WISC. We investigate this through the case study of
-\textbf{mobiles}, i.e.~well-founded trees with countably many children at each
-node, quotiented by permutation of subtrees. While previously thought to
-require choice, we show that mobiles are depth-preserving and thus admit a
-constructive initial algebra semantics.
+In this paper we investigate this question through a concrete infinitary
+example: \textbf{mobiles}, i.e.~well-founded trees with countably many
+children at each node, quotiented by permutation of subtrees. Mobiles
+form a conceptually simple QIT with one infinitary constructor and one
+path constructor expressing that the order of children is irrelevant.
+Mobiles form a conceptually simple QIT with one infinitary constructor
+and one path constructor expressing that the order of children is
+irrelevant. In earlier work of Fiore, Pitts, and Steenkamp, this example
+is presented as a representative infinitary quotient inductive type for
+which their general construction relies on WISC.
+\cite{fiore2020-qw-types}
+
+%TODO: Check which ordinals are difficult.
+Our main result is that all depth-preserving QW types admit an initial algebra semantics
+\textbf{without using WISC}. We achieve this by refining the FPS
+size-indexed construction. We observe that the reliance on WISC in the
+FPS proof is tied to equations that require recursive inspection at
+unbounded depth, as in extensional definitions of ordinals. In contrast,
+the permutation equations for mobiles are \emph{depth-preserving}: they act
+only at a single tree level and do not require comparing subtrees
+recursively. We formalise this depth-condition on QIT
+signatures and show that, under this condition, the key cocontinuity
+step in the FPS construction can be proved by well-founded recursion on
+the size index alone.
+
+Concretely, we define mobiles as a quotient of well-founded
+\(\mathbb{N}\)-branching trees by levelwise permutation and construct
+them as the colimit of a transfinite sequence of stagewise quotients. We
+show that constructor formation preserves this colimit constructively:
+
+\[
+	\mathrm{colim}_\alpha F(D_\alpha) \cong F\Bigl(\mathrm{colim}_\alpha D_\alpha\Bigr)
+\]
+
+and derive the expected initial algebra property. The depth-preservation
+property for mobiles and the resulting constructive cocontinuity proof have been
+formalised in Agda. We rely on the general FPS initiality theorem
+\cite{fiore2022-quotients-inductive-types} to obtain the elimination principle
+and show it is unique.
+
+This identifies a new subclass of infinitary QITs that can be
+constructed purely from quotient types, without additional choice
+principles. It also clarifies the role of WISC in the FPS framework:
+choice is needed when equations enforce global, unbounded recursive
+comparison, but not when they are local to bounded depth.
 
 \subsection{Contributions}\label{contributions}
 
 \begin{itemize}
-	\item \textbf{Depth preservation as a structural property.} We introduce
-	      depth preservation for QW signatures, ensuring that stagewise equalities do
+	\item \textbf{Depth preservation as a structural property.}
+	      We introduce the notion of depth preservation for QW
+	      signatures, ensuring that stagewise equalities do
 	      not change term depth.
-	\item \textbf{General constructive cocontinuity.} We prove that all
-	      depth-preserving QW types are constructively cocontinuous, i.e., the FPS
-	      colimit commutes with the signature functor without WISC.
-	\item \textbf{Mechanisation.} We mechanise this general result in Agda and
-	      verify the hypotheses for infinitary mobiles.
-	\item \textbf{Constructive construction of mobiles.} As a corollary, we
-	      obtain a fully constructive initial algebra semantics for infinitary
-	      mobiles, providing evidence that this class of QITs does not require choice.
+	\item \textbf{General constructive cocontinuity.}
+	      We prove that all depth-preserving QW types are constructively cocontinuous,
+	      i.e., the FPS colimit commutes with the signature functor without WISC.
+	\item \textbf{Formalisation.}
+	      We formalise this general result in Agda and verify the hypotheses for
+	      infinitary mobiles.
+	\item \textbf{Constructive construction of mobiles.}
+	      As a corollary, we obtain a fully constructive initial algebra semantics for
+	      infinitary mobiles, providing evidence that this class of QITs does not
+	      require choice.
 \end{itemize}
 
 \section{Background}\label{background}
@@ -100,31 +156,122 @@ constructive initial algebra semantics.
 \label{quotient-inductive-types}
 
 Inductive types in dependent type theory are characterised by initial
-algebra semantics for strictly positive endofunctors. Quotient inductive types
-(QITs) extend these by including path constructors that impose equations
-between generated elements. Even in the set-truncated case, equations that
-express extensionality over infinitary data can obstruct straightforward
-constructions.
+algebra semantics for strictly positive endofunctors and admit
+introduction, elimination, and computation rules justified by
+well-founded recursion
+\cite{martinlof1984-intuitionistic,dybjer1994-inductive-families}.
+Categorically, such types correspond to initial algebras of polynomial
+functors, whose structure can be described concretely using containers
+\cite{abbott2005-containers} and, more generally, dependent polynomial
+functors \cite{gambino2004-wellfounded-trees-polynomial}. These
+semantics extend to constructive set-theoretic settings via well-founded
+trees
+\cite{moerdijk2000-wellfounded-trees,aczel1978-type-theoretic-interpretation,palmgren2002-developments-cst}.
+
+Quotient inductive types (QITs) extend ordinary inductive types by
+including path constructors that impose equations between generated
+elements. They are typically considered in set-truncated settings, where
+all higher paths are forced to be trivial
+\cite{awodey2012-type-theory-homotopy,kraus2015-truncation-levels}. QITs
+have been used to give intrinsic presentations of structures such as
+partiality monads \cite{altenkirch2017-partiality-monad} and appear as a
+special case of the more general quotient inductive-inductive types
+(QIITs) \cite{altenkirch2018-quotient-inductive-inductive}.
+
+Despite their expressive power, QITs do not in general admit a simple
+initial algebra semantics. Lumsdaine and Shulman showed that certain
+higher inductive types cannot be constructed in standard model
+categories without additional assumptions
+\cite{lumsdaine2020-semantics-higher-inductive}. Even in the
+set-truncated case, equations that express extensionality over
+infinitary data can obstruct straightforward constructions.
 
 \subsubsection{QW Types and Size-Indexed
 	Constructions}\label{qw-types-and-size-indexed-constructions}
 
 Fiore, Pitts, and Steenkamp introduced \emph{quotient--W types} (QW
-types) as a general semantic framework for QITs. They construct a diagram of
-stagewise approximations indexed by a well-founded size structure. The desired
-QIT is the colimit of this diagram. The key technical step is a
-\emph{cocontinuity} result: the polynomial functor must preserve the colimit.
-In the general case, this proof relies on WISC to bound the branching
-behaviour of families of subtrees.
+types) as a general semantic framework for a large class of QITs
+\cite{fiore2020-qw-types,fiore2022-quotients-inductive-types,steenkamp2021-phd-thesis}.
+A QW signature consists of a polynomial branching structure together
+with a family of equations between terms. From such a signature they
+construct a diagram of stagewise approximations indexed by a
+well-founded size structure. At each stage, one forms a quotient of
+well-founded trees whose subtrees come from earlier stages. The desired
+QIT is obtained as the colimit of this diagram.
+
+The key technical step in their development is a \emph{cocontinuity}
+result: the polynomial functor determined by the signature must preserve
+the size-indexed colimit. This ensures that the colimit carries an
+algebra structure and satisfies the expected initiality property. In the
+general case, the proof of cocontinuity relies on the Weak Initial Set
+of Covers (WISC) axiom \cite{vandenberg2012-wisc-axiom}, a weak choice
+principle that guarantees the existence of sufficiently small families
+of covers. Intuitively, WISC is used to bound the branching behaviour of
+families of subtrees so that constructor formation can be exchanged with
+the colimit.
+
+Related ideas appear in Pitts and Steenkamp's work on inflationary
+iteration, where initial algebras for certain infinitary constructions
+are obtained via transfinite iteration under boundedness assumptions
+\cite{pitts2021-inflationary-iteration}. In both settings, well-founded
+size indices play a role analogous to ordinal stages in classical
+constructions of inductive definitions.
+
+\subsubsection{Choice Principles and Infinitary Inductive Constructions}
+\label{choice-principles-and-infinitary-inductive-constructions}
+
+The use of WISC situates QW-type semantics within a broader landscape of
+constructive set and type theories that admit weak choice principles
+\cite{aczel1978-type-theoretic-interpretation,palmgren2002-developments-cst}.
+While WISC is strictly weaker than full choice and is validated in many
+predicative models, it is not derivable in intensional type theory and
+its computational interpretation remains unclear. Understanding when
+such principles are genuinely required is therefore an important
+foundational question.
+
+Infinitary inductive definitions provide natural test cases for this
+analysis. Examples include countably branching trees modulo extensional
+equality and type-theoretic presentations of ordinals, where equality is
+defined by mutual inclusion of subtrees
+\cite{coquand2010-constructively-finite}. In such cases, equations may
+require recursive comparison at arbitrarily large depths, making it
+difficult to bound the data needed to construct algebra structures at
+colimit stages.
+
+This paper investigates a contrasting infinitary example---mobiles, i.e.
+well-founded trees quotiented by permutation of immediate subtrees---and
+shows that, despite their infinitary branching, their defining equations
+are sufficiently local to admit a fully constructive QW-type
+construction without WISC.
+Inductive types in dependent type theory are characterised by initial algebra
+semantics for strictly positive endofunctors. Quotient inductive types (QITs)
+extend these by including path constructors that impose equations between
+generated elements. Even in the set-truncated case, equations that express
+extensionality over infinitary data can obstruct straightforward constructions.
+
+\subsubsection{QW Types and Size-Indexed Constructions}
+\label{qw-types-and-size-indexed-constructions}
+
+Fiore, Pitts, and Steenkamp introduced \emph{quotient--W types} (QW types) as a
+general semantic framework for QITs. They construct a diagram of stagewise
+approximations indexed by a well-founded size structure. The desired QIT is the
+colimit of this diagram. The key technical step is a \emph{cocontinuity} result:
+the polynomial functor must preserve the colimit. In the general case, this
+proof relies on WISC to bound the branching behaviour of families of subtrees.
 
 \section{Mobiles}
 
-We study \emph{mobiles}, well-founded trees with infinitary branching
-indices $I$, quotiented by permutation of immediate subtrees.
+We study \emph{mobiles}, i.e.\ well-founded trees with infinitary branching,
+quotiented by permutation of immediate subtrees. Fix a type $I$ of
+branching indices, which may be infinite (for example $I \equiv \mathbb{N}$).
+Informally, mobiles are generated by a leaf, a node constructor taking an
+$I$-indexed family of subtrees, and an equation identifying nodes whose
+children differ only by a permutation of $I$.
 
 \medskip
 
 \noindent\textbf{Signature.}
+We consider the following QIT signature:
 \[
 	\begin{aligned}
 		 & \mathsf{leaf} : M                                                \\
@@ -133,38 +280,142 @@ indices $I$, quotiented by permutation of immediate subtrees.
 		\mathsf{node}(f) = \mathsf{node}(f \circ \varphi).
 	\end{aligned}
 \]
+Here $\mathsf{Iso}(I,I)$ denotes bijections on $I$. The path constructor
+$\mathsf{perm}$ enforces that the order of children at each node is
+irrelevant.
 
+\medskip
+
+\noindent\textbf{Underlying polynomial.}
+Ignoring equations, the point constructors correspond to the polynomial
+endofunctor
+\[
+	F(X) \;\coloneqq\; 1 + (I \to X),
+\]
+whose initial algebra is the type of well-founded $I$-branching trees.
+Mobiles arise by quotienting this W-type by the congruence generated by
+the permutation equations.
+
+\medskip
+
+\noindent\textbf{Locality of equations.}
+A key feature of this signature is that the equations act only at a
+single tree level. The path constructor $\mathsf{perm}$ compares two
+terms of the form $\mathsf{node}(f)$ and $\mathsf{node}(f\circ\varphi)$
+without recursively inspecting the subtrees $f(i)$. This contrasts with
+extensional equality principles for ordinals, where equality requires
+mutual recursive comparison of subtrees at unbounded depth.
+
+This locality property will be formalised in the next section as
+\emph{depth-boundedness} of equations and will be used to show that the
+QW-type construction for mobiles does not require WISC.
 A key feature is that the equations act only at a single tree level. This
 locality suggests that the size bounds needed for cocontinuity can be
 reconstructed from the terms themselves.
+
+\bigskip
 
 \section{Depth-Preserving QW Types are Constructive}
 \label{sec:local-qits}
 
 We now isolate a structural condition on QW signatures under which the
-FPS construction can be carried out constructively.
+Fiore--Pitts--Steenkamp (FPS) size-indexed construction can be carried out
+constructively. The key idea is that, for certain signatures, equality
+proofs never relate terms of genuinely different depth. This allows the
+size bounds in the FPS diagram to be reconstructed from the shapes of
+terms themselves, eliminating the need for the WISC-based bounding
+argument.
+
+Unlike the FPS construction, which expands on free F-algebras as the we use the
+depth of terms directly as their stage-wise expansion.
+
+\subsection{Depth in the size-indexed diagram}
+
+Let $T$ be the underlying W-type generated by the polynomial part of a
+QW signature, before quotienting by equations. As in the FPS framework,
+we assume a well-founded size index (ordinal-like) and a depth function
+\[
+	\mathrm{depth} : T \to \mathsf{Ord}
+\]
+assigning to each tree its rank. For ordinals $\alpha,\beta$ write
+$\alpha \sym \beta$ for mutual boundedness.
+
+At stage $\alpha$ of the FPS construction, elements of the approximant
+$D_\alpha$ are represented by pairs
+\[
+	\hat s = (s, s \le \alpha)
+\]
+where $s:T$ and $s\le\alpha$ is a proof that $\mathrm{depth}~s \le \alpha$.
+
+For each stage $\alpha$, we define a relation
+\[
+	\approx_\alpha \;\subseteq\; D_\alpha \times D_\alpha
+\]
+as the least relation satisfying the following clauses.
+
+\begin{enumerate}
+	\item \textbf{Congruence.}
+	      If $f,g : B(a)\to D$ are families of subterms such that
+	      $f(i) \approx_{\mu(i)} g(i)$ for all $i$, then
+	      \[
+		      \mathsf{sup}(a,f) \approx_\alpha \mathsf{sup}(a,g).
+	      \]
+
+	\item \textbf{Equation satisfaction.}
+	      For every equation $e$ in the signature and every assignment of its
+	      variables to terms bounded by $\alpha$, the instantiated left- and
+	      right-hand sides are related by $\approx_\alpha$.
+
+	\item \textbf{Equivalence closure.}
+	      The relation $\approx_\alpha$ is reflexive, symmetric, and transitive.
+
+	\item \textbf{Weakening.}
+	      If $\alpha \le \beta$ and $\hat s \approx_\alpha \hat t$, then their
+	      images in $D_\beta$ are related by $\approx_\beta$.
+\end{enumerate}
 
 \subsection{Stage structure recap}
 
+Intuitively, a QIT is \emph{local} if its defining equations do not move
+information between different depths of a term. We formalise this as
+follows.
+
+\begin{definition}[Depth-preserving QIT]
+	A QW signature is \emph{depth-preserving} if for all stages $\alpha$ and
+	all $\hat s,\hat t \in D_\alpha$,
+	\[
+		\hat s \approx_\alpha \hat t
+		\quad\Rightarrow\quad
+		\mathrm{depth}~s \sim \mathrm{depth}~t.
+	\]
 Let $T$ be the underlying W-type. We assume a well-founded size index and a
-depth function $\mathrm{depth} : T \to \mathsf{Ord}$. At stage $\alpha$,
-elements of $D_\alpha$ are pairs $\hat s = (s, s \le \alpha)$ where $s:T$.
-The relation $\approx_\alpha \subseteq D_\alpha \times D_\alpha$ is defined
-via congruence, equation satisfaction, equivalence closure, and weakening.
+depth function $\mathrm{depth} : T \to \mathsf{Ord}$. For each stage $\alpha$,
+we define a relation $\approx_\alpha \;\subseteq\; D_\alpha \times D_\alpha$ as
+the least relation satisfying congruence, equation satisfaction, equivalence
+closure, and weakening. Unlike the general FPS case, we use the depth of terms
+directly to bound their stagewise expansion.
 
 \subsection{Definition of depth preservation}
 
 \begin{definition}[Depth-preserving QW signature]
-	A QW signature is \emph{depth-preserving} if for all stages $\alpha$ and
-	all $\hat s,\hat t \in D_\alpha$,
-	$ \hat s \approx_\alpha \hat t \Rightarrow \mathrm{depth}~s \sim \mathrm{depth}~t. $
+	A QW signature is \emph{depth-preserving} if for all stages $\alpha$ and all
+	$\hat s,\hat t \in D_\alpha$, $\hat s \approx_\alpha \hat t \Rightarrow
+		\mathrm{depth}~s \sim \mathrm{depth}~t.$
 \end{definition}
 
 \subsection{Tight equality construction}
 
-We define a ``tight'' equality on underlying trees that reconstructs bounds.
-For $s,t:T$, $s \approx^s t$ consists of a proof $s \sim t$ and a proof
-$(s,\_) \approx_{\mathrm{depth}(s)} (t,\_)$.
+Depth preservation allows us to replace bounded equality by a ``tight'' equality
+on the underlying trees. Define mutual boundedness on trees by
+$s \sim t \coloneqq \mathrm{depth}(s) \sim \mathrm{depth}(t)$.
+\begin{definition}[Tight equality]
+	For $s,t:T$, define $s \approx^s t$ to consist of:
+	\begin{enumerate}
+		\item a proof that $s \sim t$, and
+		\item a bounded equality proof $(s,\_) \approx_{\mathrm{depth}(s)} (t,\_)$,
+		      where the bounds are reconstructed using depth information.
+	\end{enumerate}
+\end{definition}
 
 \subsection{Colimit tightening lemma}
 
@@ -182,10 +433,13 @@ $(s,\_) \approx_{\mathrm{depth}(s)} (t,\_)$.
 \end{theorem}
 
 \begin{proof}[Proof sketch]
-	Construct the inverse map $\psi : F(Q) \to L$ by choosing the join stage
-	of indices of children. Tightening ensures $\psi$ is well-defined
-	without a choice of covers, as any equality in the colimit can be
-	witnessed at a stage determined by $\mathrm{depth}$.
+	Let $Q \coloneqq \mathrm{colim}_\alpha D_\alpha$ and $L \coloneqq
+		\mathrm{colim}_\alpha (F \circ D)_\alpha$. We construct the inverse map
+	$\psi : F(Q) \to L$ by choosing the join stage of indices of children.
+	Tightening ensures $\psi$ is well-defined without a choice of covers, as any
+	equality in the colimit can be witnessed at a stage determined by
+	$\mathrm{depth}$ alone. This eliminates the reliance on WISC for uniform
+	bounds.
 \end{proof}
 
 \subsection{Corollary: initial algebra without WISC}
@@ -195,39 +449,134 @@ $(s,\_) \approx_{\mathrm{depth}(s)} (t,\_)$.
 	quotients alone.
 \end{corollary}
 
-In Section~\ref{sec:mobiles-app} we verify that mobiles satisfy depth preservation.
+\section{Infinitary mobiles as a depth-preserving QW type}
+\label{sec:mobiles}
 
-\section{Infinitary Mobiles as a Depth-Preserving QW Type}
-\label{sec:mobiles-app}
+In this section we instantiate the general result of
+Section~\ref{sec:local-qits}: \emph{depth-preserving QW signatures are
+	constructively cocontinuous}. We do so for the QW signature of
+\emph{mobiles}, i.e.\ $I$-branching trees quotiented by permutation of
+children at each node.
+
+\subsection{The mobile signature}
+
+Fix a type $I$ of branch indices. Consider the container (polynomial)
+signature with shapes
+\[
+	S \;\coloneqq\; \{\mathsf{leaf},\mathsf{node}\}
+\]
+and arities
+\[
+	P(\mathsf{leaf}) \coloneqq \varnothing,
+	\qquad
+	P(\mathsf{node}) \coloneqq I.
+\]
+The associated polynomial endofunctor is
+\[
+	F(X) \;\coloneqq\; \sum_{s:S} (P(s)\to X)
+	\;\cong\;
+	1 + (I \to X),
+\]
+where we identify $\mathsf{leaf}$ with the left summand and $\mathsf{node}$
+with the right summand.
+
+The equations $E$ are indexed by bijections on $I$:
+\[
+	E \coloneqq \mathsf{Iso}(I,I),
+\]
+and each $\pi \in E$ generates the equation schema
+\[
+	\mathsf{node}(x_i)_{i:I} \;=\; \mathsf{node}(x_{\pi(i)})_{i:I},
+\]
+i.e.\ node formation is invariant under permuting the $I$-indexed family
+of children.
+
+This is a QW signature in the sense of Fiore--Pitts--Steenkamp
+\cite{fiore2022-quotients-inductive-types}.
+
+\subsection{Depth preservation for mobiles}
+
+Recall from Section~\ref{sec:local-qits} that a QW signature is
+\emph{depth-preserving} if for all stages $\alpha$ and all bounded
+representatives $\hat s,\hat t\in D_\alpha$,
+\[
+	\hat s \approx_\alpha \hat t
+	\quad\Rightarrow\quad
+	\mathrm{depth}(s) \sim \mathrm{depth}(t).
+\]
 
 \begin{lemma}[Mobiles are depth-preserving]
-	\label{lem:mobiles-depth-preserving}
-	The QIT of mobiles is depth-preserving.
+	\label{lem:mobiles-depth-preserving-sec5}
+	The mobile signature is depth-preserving.
 \end{lemma}
 
-\begin{proof}
-	The permutation equation $\mathsf{node}(f) = \mathsf{node}(f \circ \varphi)$
-	simply permutes variables at depth 1. Since all children are preserved, any
-	derivation of $\approx_\alpha$ relates trees of the same depth.
+\begin{proof}[Proof sketch]
+	By induction on the derivation of $\hat s \approx_\alpha \hat t$.
+	The equivalence-closure rules preserve depth immediately. For congruence,
+	depth preservation follows from the induction hypotheses on corresponding
+	subtrees and the definition of depth for W-types as a supremum of child
+	depths.
+
+	For the equation rule, the two sides of the instantiated permutation
+	equation are
+	\[
+		\mathsf{node}(f)
+		\qquad\text{and}\qquad
+		\mathsf{node}(f\circ \pi),
+	\]
+	which have the same outer constructor and the same multiset of
+	children depths; hence their depths coincide. \qedhere
 \end{proof}
 
-By instantiating Theorem~\ref{thm:constructive-cocontinuity}, we conclude that
-infinitary mobiles admit a fully constructive initial algebra semantics.
+\subsection{Constructive cocontinuity and existence of mobiles}
 
-\section{Formalisation Statement}
+Let $D:\mathsf{Ord}\to\mathsf{Setoid}$ be the FPS stage diagram for the
+mobile signature, and let $Q\coloneqq \mathrm{colim}_\alpha D_\alpha$ be
+its colimit. By Theorem~\ref{thm:constructive-cocontinuity}
+(Section~\ref{sec:local-qits}),
+depth preservation implies cocontinuity of the polynomial functor $F$:
+\[
+	\mathrm{colim}_\alpha F(D_\alpha) \;\cong\; F\!\left(\mathrm{colim}_\alpha D_\alpha\right)
+	\quad\text{constructively.}
+\]
 
-We mechanise the general theorem that depth-preserving QW types are
-cocontinuous, and instantiate it to mobiles. The development in Agda
-verifies that the cocontinuity argument for depth-preserving signatures does
-not rely on choice principles.
+\begin{theorem}[Cocontinuity for mobiles without WISC]
+	\label{thm:mobiles-cocontinuity}
+	The mobile stage diagram is cocontinuous without assuming WISC.
+\end{theorem}
+
+\begin{proof}
+	Immediate from Lemma~\ref{lem:mobiles-depth-preserving-sec5} and
+	Theorem~\ref{thm:constructive-cocontinuity}. \qedhere
+\end{proof}
+
+Finally, we appeal to the general FPS initiality theorem, which states
+that cocontinuity yields an initial algebra for the colimit
+\cite{fiore2022-quotients-inductive-types}.
+
+\begin{corollary}[Mobiles exist without WISC]
+	\label{cor:mobiles-exist}
+	In MLTT with quotient types (in the same metatheory as FPS), the QIT of
+	infinitary mobiles exists without assuming WISC. Concretely, the colimit
+	$Q$ carries an $F$-algebra structure satisfying the permutation equations,
+	and this algebra is initial among such algebras.
+\end{corollary}
+
+\subsection{Mechanisation status}
+
+We have mechanised in Agda:
+(i) the proof that the mobile signature is depth-preserving, and
+(ii) the construction of the cocontinuity isomorphism obtained from
+depth preservation. The initiality/recursion principle is inherited from
+the FPS theorem \cite{fiore2022-quotients-inductive-types}.
 
 \section{Conclusion}
 
 We show that depth-preserving QW types form a class of infinitary quotient
 inductive types that admit constructive semantics. This isolates a precise
-source of non-constructivity in the FPS construction—unbounded recursive
-comparison—and suggests a syntactic criterion for identifying QITs that do
-not require choice.
+source of non-constructivity in the FPS construction---unbounded recursive
+comparison---and suggests a syntactic criterion for identifying QITs that do not
+require choice.
 
 \bibliography{master}
 
