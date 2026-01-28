@@ -1,4 +1,3 @@
-{-# OPTIONS --type-in-type #-}
 open import QIT.Prelude
 open import QIT.Setoid
 open import QIT.Relation.Base
@@ -79,7 +78,7 @@ _~ᵀ_ : ∀ (s t : T) → Prop _
 s ~ᵀ t = ιᶻ s ≤≥ ιᶻ t
 
 module ≈s where
-  record _≈ˢ_ (s t : T) : Prop _ where
+  record _≈ˢ_ (s t : T) : Prop (ℓS ⊔ ℓP ⊔ lsuc ℓV ⊔ ℓE) where
     constructor mk≈ˢ
     field
       s~t : s ~ᵀ t
@@ -178,7 +177,7 @@ module _ (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ŝ .f
       ≈⟨ ≈frefl (Colim D) ⟩
     (s , λ i → sup (ιˢ s , λ i → g i .proj₁) , pweaken (child≤ (ιˢ s) μ i) (g i .proj₂))
       ≈⟨ mk≈ꟳ ≡.refl (λ i → ≈lsym (≈lstep (child≤ (ιˢ s) μ i) (g i .proj₂))) ⟩
-    (s , λ i → g i .proj₁ , g i .proj₂) ∎
+    (s , g) ∎
     where
     μ : P s → Z
     μ i = g i .proj₁
@@ -203,8 +202,8 @@ module _ (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ŝ .f
     open Setoid (Colim (F ∘ᴰ D))
     open ≈.≈syntax {S = Colim (F ∘ᴰ D)}
 
-  cocontinuous : Cocontinuous F D
-  cocontinuous = ∣ iso ∣
+  depthPrserving→cocontinuous : Cocontinuous F D
+  depthPrserving→cocontinuous = ∣ iso ∣
     where
     iso : ≈.Iso (Colim (F ∘ᴰ D)) (F.F-ob (Colim D))
     iso = record

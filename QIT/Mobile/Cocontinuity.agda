@@ -1,8 +1,7 @@
-{-# OPTIONS --type-in-type #-}
+
 open import QIT.Prelude
 
-module QIT.Mobile.Cocontinuity
-  (I : Set) (_ : ∥ I ∥) where
+module QIT.Mobile.Cocontinuity (I : Set) where
 
 open import QIT.Relation.Binary
 open import QIT.Relation.Subset
@@ -13,7 +12,7 @@ open import QIT.Relation.Plump Sᵀ Pᵀ
 open import QIT.Setoid.Diagram ≤p
 
 open import QIT.QW.Colimit ≤p ℓ0 (lsuc ℓ0) hiding (_≈ˡ_)
-open import QIT.QW.Cocontinuity ≤p
+open import QIT.QW.Cocontinuity sig using (depthPrserving→cocontinuous; Cocontinuous)
 open import QIT.QW.Stage sig
 open import QIT.QW.StageColimit sig using (joinTerms; αˡ; tˡ; t≤αˡ)
 
@@ -31,8 +30,8 @@ depth-preserving α (s , s≤α) (t , t≤α) (≈pcong a μ f g r) =
   where p : ∀ i → ιᶻ (f i .fst) ≤≥ ιᶻ (g i .fst)
         p i = depth-preserving (μ i) (f i) (g i) (r i)
 depth-preserving α (s , _) (t , _) (≈psat π ϕ _ _) =
-    sup≤ (λ i → <sup (π⁻¹ i) (≡→≤ (≡.cong (λ ○ → ιᶻ (ϕ ○)) (≡.sym (linv i)))))
-  , sup≤ (λ i → <sup (π̂ i) (≤refl (ιᶻ (ϕ (π̂ i)))))
+    sup≤ (λ i → <sup (π⁻¹ i) (≡→≤ (≡.cong (λ ○ → ιᶻ (lower (ϕ ○))) (≡.sym (linv i)))))
+  , sup≤ (λ i → <sup (π̂ i) (≤refl (ιᶻ (lower (ϕ (π̂ i))))))
   where
   open _↔_ π renaming (to to π̂; from to π⁻¹)
 depth-preserving α (s , s≤α) (s , t≤α) ≈prefl = ≤refl (ιᶻ s) , ≤refl (ιᶻ s)
@@ -46,14 +45,4 @@ depth-preserving α (s , s≤α) (t , t≤α) (≈ptrans {t̂ = u , u≤α} p q)
 depth-preserving α (s , s≤α) (t , t≤α) (≈pweaken {α = β} β≤α p) = depth-preserving β _ _ p
 
 cocontinuous : Cocontinuous F D
-cocontinuous = ∣ iso ∣
-  where
-  iso : ≈.Iso (Colim (F ∘ᴰ D)) (F.F-ob (Colim D))
-  iso = record
-    { ⟦_⟧ = ϕ₀
-    ; ⟦_⟧⁻¹ = ψ₀
-    ; cong = ϕ-cong
-    ; cong⁻¹ = ψ-cong depth-preserving
-    ; linv = linv
-    ; rinv = rinv
-    }
+cocontinuous = depthPrserving→cocontinuous depth-preserving
