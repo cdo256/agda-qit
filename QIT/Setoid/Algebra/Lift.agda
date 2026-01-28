@@ -6,7 +6,7 @@ open import QIT.Prelude
 --
 -- The key insight: instead of lifting the carrier, we create an adapter that translates
 -- between the low-level and high-level functor representations while preserving semantics.
-module QIT.Setoid.LiftAlgebra
+module QIT.Setoid.Algebra.Lift
   {ℓS ℓP : Level} (S : Set ℓS) (P : S → Set ℓP)
   (ℓV : Level)  -- The additional level we need to accommodate
   where

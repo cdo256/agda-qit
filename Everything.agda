@@ -1,4 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
 module Everything where
 
 -- Base
@@ -21,6 +20,8 @@ import QIT.Setoid.Iso
 import QIT.Setoid.Sigma
 import QIT.Setoid.Diagram
 import QIT.Setoid.Functor
+import QIT.Setoid.Algebra.Base
+import QIT.Setoid.Algebra.Lift
 import QIT.Setoid.Algebra
 import QIT.Setoid
 
@@ -34,6 +35,7 @@ import QIT.QW.Equation
 import QIT.QW.Signature
 import QIT.QW.Algebra
 import QIT.QW.Stage
+import QIT.QW.StageColimit
 import QIT.QW.Colimit
 import QIT.QW.Cocontinuity
 import QIT.QW
@@ -42,5 +44,11 @@ import QIT.QW
 import QIT.Mobile.Base
 import QIT.Mobile.Cocontinuity
 
+
 -- Examples
 import QIT.Examples.HoleList
+import QIT.Examples.ListBag
+import QIT.Examples.RotTree
+import QIT.Examples.Trunc
+import QIT.Examples.CauchyReals
+-- import QIT.Examples.PartialityMonad

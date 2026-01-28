@@ -17,7 +17,7 @@ open import QIT.Relation.Subset
 open import QIT.Relation.Plump S P
 open import QIT.Setoid.Diagram ≤p
 open import QIT.QW.W S P
-open import QIT.Setoid.LiftAlgebra S P ℓV
+open import QIT.Setoid.Algebra.Lift S P ℓV
 open import Data.Maybe
 open import QIT.QW.Equation S P ℓV
 

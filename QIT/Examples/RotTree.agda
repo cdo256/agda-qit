@@ -18,15 +18,10 @@ Pᵀ n = Fin 2
 -- Plain lists
 T = W Sᵀ Pᵀ
 
-
-
--- [_,_] : {n : ℕ} {A : Set} {B : Set} → (b : B) → (Fin n → B) → Fin (suc n) → B
--- [_,_] = {!!}
-
-branchᴱ : ∀ {V : Set} (s t : QW.Expr Sᵀ Pᵀ V) → QW.Expr Sᵀ Pᵀ V
+branchᴱ : ∀ {V : Set} (s t : QW.Expr Sᵀ Pᵀ ℓ0 V) → QW.Expr Sᵀ Pᵀ ℓ0 V
 branchᴱ s t = QW.supᴱ n (lookup (s ∷ t ∷ []))
 
-var : ∀ {V : Set} (v : V) → QW.Expr Sᵀ Pᵀ V
+var : ∀ {V : Set} (v : V) → QW.Expr Sᵀ Pᵀ ℓ0 V
 var v = QW.varᴱ v {λ()}
 
 rot : QW.Equation Sᵀ Pᵀ ℓ0
