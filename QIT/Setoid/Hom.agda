@@ -93,3 +93,15 @@ g ∘ f = record
 ∘-assoc {D = D} h g f {x} = refl
   where
   open Setoid D
+
+∘-resp-≈ : ∀ {ℓA ℓA' ℓB ℓB' ℓC ℓC'}
+         → {A : Setoid ℓA ℓA'} {B : Setoid ℓB ℓB'} {C : Setoid ℓC ℓC'}
+         → {g₁ g₂ : Hom B C} → {f₁ f₂ : Hom A B}
+         → (g₁≈g₂ : g₁ ≈h g₂) (f₁≈f₂ : f₁ ≈h f₂)
+         → (g₁ ∘ f₁) ≈h (g₂ ∘ f₂)
+∘-resp-≈ {C = C} {g₁ = g₁} g₁≈g₂ f₁≈f₂ =
+  C.trans (g₁.cong f₁≈f₂) g₁≈g₂
+  where
+  module C = Setoid C
+  module g₁ = Hom g₁
+
