@@ -1,5 +1,7 @@
 module QIT.Relation where
 
+open import QIT.Relation.Base public
+
 import QIT.Relation.Binary
 module Binary = QIT.Relation.Binary
 
