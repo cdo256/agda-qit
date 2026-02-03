@@ -163,7 +163,7 @@ absurd* ()
 -- Congruence for truncated equality.
 congp : ∀ {a b} {A : Set a} {B : Set b} (f : A → B)
       → ∀ {x y} → x ≡p y → f x ≡p f y
-congp f ∣ ≡.refl ∣ = ∣ ≡.refl ∣
+congp f reflp = reflp
 
 -- Logical negation for propositions.
 infix 6 ¬_
