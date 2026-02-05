@@ -134,7 +134,7 @@ D̃ α = record
 D : Diagram (ℓS ⊔ ℓP) (ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV)
 D = record
   { D-ob = D̃
-  ; D-mor = Hom
+  ; D-hom = Hom
   ; D-id = Id
   ; D-comp = Comp }
   where

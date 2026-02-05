@@ -45,7 +45,7 @@ module _ {ℓX ℓX'} (F : Functor ℓX ℓX' ℓX ℓX') where
       -- Underlying homomorphism between carriers
       hom : ≈Hom X Y
       -- Commutativity condition: the square commutes
-      comm : (β ∘ F-mor hom) ≈h (hom ∘ α)
+      comm : (β ∘ F-hom hom) ≈h (hom ∘ α)
     open ≈Hom hom public
 
   -- An initial algebra has a unique homomorphism to every other algebra.

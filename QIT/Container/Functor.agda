@@ -60,7 +60,7 @@ open F-Ob using (F-ob) public
 
 -- Morphism part of the functor: lift homomorphisms f : A → B to F f : F A → F B.
 -- Apply f pointwise to the function part while preserving the shape.
-module F-Mor {A B : Setoid ℓA ℓA'} (f : ≈.Hom A B) where
+module F-Hom {A B : Setoid ℓA ℓA'} (f : ≈.Hom A B) where
   module A = ≈.Setoid A
   module B = ≈.Setoid B
   module f = ≈.Hom f
@@ -74,18 +74,18 @@ module F-Mor {A B : Setoid ℓA ℓA'} (f : ≈.Hom A B) where
   congh : ∀ {x y} → (F-ob A Setoid.≈ x) y → (B ≈ꟳ ⟦ x ⟧h) ⟦ y ⟧h
   congh (mk≈ꟳ fst≡ snd≈) = mk≈ꟳ fst≡ (λ p → f.cong (snd≈ p))
 
-  F-mor : ≈.Hom (F-ob A) (F-ob B)
-  F-mor = record
+  F-hom : ≈.Hom (F-ob A) (F-ob B)
+  F-hom = record
     { to = ⟦_⟧h
     ; cong = congh
     }
 
-open F-Mor using (F-mor) public
+open F-Hom using (F-hom) public
 
 -- Functorial laws: F preserves identity, composition, and equivalence
 
 -- F preserves identity: F(id) ≈ id
-F-id : {S : Setoid ℓA ℓA'} → F-mor {A = S} ≈.idHom ≈h ≈.idHom
+F-id : {S : Setoid ℓA ℓA'} → F-hom {A = S} ≈.idHom ≈h ≈.idHom
 F-id {S} {s , f} = F-Ob.mk≈ꟳ ≡.refl λ p → S.refl {f p}
   where
   module S = ≈.Setoid S
@@ -99,7 +99,7 @@ module F-Comp {S T U : Setoid ℓA ℓA'} (f : ≈.Hom S T) (g : ≈.Hom T U) wh
   module g = ≈.Hom g
   open F-Ob
 
-  F-comp : F-mor (g ≈.∘ f) ≈h (F-mor g ≈.∘ F-mor f)
+  F-comp : F-hom (g ≈.∘ f) ≈h (F-hom g ≈.∘ F-hom f)
   F-comp =
     mk≈ꟳ ≡.refl λ p → (≈.Hom.cong g) (≈.Hom.cong f f.S.refl)
 
@@ -116,9 +116,9 @@ module F-Resp
   module f = ≈.Hom f
   module g = ≈.Hom g
   open F-Ob
-  open F-Mor hiding (F-mor)
+  open F-Hom hiding (F-hom)
 
-  F-resp : F-mor f ≈h F-mor g
+  F-resp : F-hom f ≈h F-hom g
   F-resp = mk≈ꟳ ≡.refl λ _ → f≈g
 
 open F-Resp using (F-resp) public
@@ -127,7 +127,7 @@ open F-Resp using (F-resp) public
 F : ≈.Functor ℓA ℓA' (ℓS ⊔ ℓP ⊔ ℓA) (ℓS ⊔ ℓP ⊔ ℓA')
 F = record
   { F-ob = F-ob
-  ; F-mor = F-mor
+  ; F-hom = F-hom
   ; F-id = F-id
   ; F-comp = F-comp
   ; F-resp = F-resp }

@@ -21,14 +21,14 @@ record Functor ℓd ℓd' ℓc ℓc' : Set (lsuc ℓd ⊔ lsuc ℓd' ⊔ lsuc �
     F-ob : ∀ (S : D) → Setoid ℓc ℓc'
 
     -- Morphism mapping: sends homomorphisms to homomorphisms
-    F-mor : ∀ {S T : D} → Hom S T → Hom (F-ob S) (F-ob T)
+    F-hom : ∀ {S T : D} → Hom S T → Hom (F-ob S) (F-ob T)
 
     -- Preserves identity: F(id) ≈ id
-    F-id : ∀ {S : D} → F-mor idHom ≈h idHom {S = F-ob S}
+    F-id : ∀ {S : D} → F-hom idHom ≈h idHom {S = F-ob S}
 
     -- Preserves composition: F(g ∘ f) ≈ F(g) ∘ F(f)
     F-comp : ∀ {S T U : D} → (f : Hom S T) → (g : Hom T U)
-           → F-mor (g ∘ f) ≈h (F-mor g ∘ F-mor f)
+           → F-hom (g ∘ f) ≈h (F-hom g ∘ F-hom f)
 
     -- Respects homomorphism equivalence: if f ≈ g then F(f) ≈ F(g)
-    F-resp : ∀ {S T} (f g : Hom S T) → f ≈h g → F-mor f ≈h F-mor g
+    F-resp : ∀ {S T} (f g : Hom S T) → f ≈h g → F-hom f ≈h F-hom g

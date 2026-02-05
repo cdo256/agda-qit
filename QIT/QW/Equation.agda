@@ -131,5 +131,5 @@ module _ {V : Set ℓV} {Xα : ≈.Algebra F}
        → Setoid (ℓS ⊔ ℓP ⊔ ℓV) (ℓS ⊔ ℓP ⊔ ℓV)
     F₀ = F.F-ob
     Fh : ⟨ F₀ (Expr V /≡) ⟩ → ⟨ F₀ X ⟩
-    Fh = ≈.Hom.to (F.F-mor h.hom) 
+    Fh = ≈.Hom.to (F.F-hom h.hom) 
     open ≈.≈syntax {S = X}

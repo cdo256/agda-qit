@@ -24,7 +24,7 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
   -- Extract underlying function from diagram morphism
   Pf : ∀ {i j} (p : i ≤ j) → (⟨ P̂ i ⟩ → ⟨ P̂ j ⟩)
   Pf p = to
-    where open ≈.Hom (D-mor p)
+    where open ≈.Hom (D-hom p)
 
   -- Carrier of the colimit: disjoint union of all objects in the diagram.
   -- Elements are tagged by their stage index i and contain a value from P̂ i.
@@ -92,7 +92,7 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
       inj      : ∀ i → ≈.Hom (P̂ i) Apex
       -- Commutativity: injections respect diagram morphisms
       commutes : ∀ {i j} (p : i ≤ j)
-               → (inj i) ≈h (inj j ≈.∘ D-mor p)
+               → (inj i) ≈h (inj j ≈.∘ D-hom p)
 
   open Cocone
 
@@ -118,10 +118,10 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
   record isLimitingCocone (C : Cocone) : Set (lsuc ℓI ⊔ lsuc ℓ≤ ⊔ lsuc ℓD ⊔ lsuc ℓD') where
     field
       -- Mediating morphism to any cocone
-      mor    : ∀ C' → ColimMorphism C C'
+      hom    : ∀ C' → ColimMorphism C C'
       -- Uniqueness of the mediating morphism
       unique : ∀ C' → (F : ColimMorphism C C')
-             → F .apexHom ≈h mor C' .apexHom
+             → F .apexHom ≈h hom C' .apexHom
 
   open isLimitingCocone
 
@@ -162,7 +162,7 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
   -- Main theorem: our construction is the colimit
   isLimitingCoconeLimitCocone : isLimitingCocone LimitCocone
   isLimitingCoconeLimitCocone = record
-    { mor    = F
+    { hom    = F
     ; unique = λ C' G → G .commutes _
     }
     where

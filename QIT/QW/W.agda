@@ -51,7 +51,7 @@ module Rec (Yβ : ≈.Algebra F) where
   rec-cong reflp = ≡→≈ Y ≡.refl
   rec : ≈.Hom T̃ Y
   rec = record { to = rec₀ ; cong = rec-cong }
-  rec-comm : (β ≈.∘ F-mor rec) ≈h (rec ≈.∘ T-α)
+  rec-comm : (β ≈.∘ F-hom rec) ≈h (rec ≈.∘ T-α)
   rec-comm = Setoid.refl Y
 
   open ≈.Alg.Hom
