@@ -4,7 +4,7 @@ open import QIT.Set.Base
 open import QIT.Relation.Binary
 open import QIT.Category.Base
 
-module QIT.Set.Category where
+module QIT.Category.Set where
 
 SetCat : ∀ ℓA → Category (lsuc ℓA) (ℓA) ℓA
 SetCat ℓA = record
