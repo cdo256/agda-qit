@@ -13,7 +13,7 @@ module QIT.Container.Functor {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) (�
 -- Object part of the functor: given a setoid A, construct F A.
 -- Elements are pairs (s, f) where s : S and f : P s → ⟨A⟩.
 -- Equivalence is defined pointwise: (s, f) ≈ (t, g) if s ≡ t and f p ≈ g p'.
-module F-Ob (A : Setoid ℓA ℓA') where
+module Ob (A : Setoid ℓA ℓA') where
   open ≈.Setoid A
 
   -- Technical equivalence relation for container elements.
@@ -47,8 +47,8 @@ module F-Ob (A : Setoid ℓA ℓA') where
     v p = substp (λ ○ → x .proj₂ p ≈ z .proj₂ ○) ≡.refl (u p)
 
   -- The setoid F A with container elements and pointwise equivalence
-  F-ob : Setoid (ℓS ⊔ ℓP ⊔ ℓA) (ℓS ⊔ ℓP ⊔ ℓA')
-  F-ob = record
+  ob : Setoid (ℓS ⊔ ℓP ⊔ ℓA) (ℓS ⊔ ℓP ⊔ ℓA')
+  ob = record
     { Carrier = ⟦ S ◁ P ⟧ ⟨ A ⟩
     ; _≈_ = _≈ꟳ_
     ; isEquivalence = record
@@ -56,57 +56,57 @@ module F-Ob (A : Setoid ℓA ℓA') where
       ; sym = ≈fsym
       ; trans = ≈ftrans } }
 
-open F-Ob using (F-ob) public
+open Ob using (ob) public
 
 -- Morphism part of the functor: lift homomorphisms f : A → B to F f : F A → F B.
 -- Apply f pointwise to the function part while preserving the shape.
-module F-Hom {A B : Setoid ℓA ℓA'} (f : ≈.Hom A B) where
+module Hom {A B : Setoid ℓA ℓA'} (f : ≈.Hom A B) where
   module A = ≈.Setoid A
   module B = ≈.Setoid B
   module f = ≈.Hom f
-  open F-Ob
+  open Ob
 
   -- Underlying function: map f over the P s → A part
   ⟦_⟧h : ⟦ S ◁ P ⟧ ⟨ A ⟩ → ⟦ S ◁ P ⟧ ⟨ B ⟩
   ⟦ s , g ⟧h = s , λ x → f.to (g x)
 
   -- Congruence: F f preserves equivalence
-  congh : ∀ {x y} → (F-ob A Setoid.≈ x) y → (B ≈ꟳ ⟦ x ⟧h) ⟦ y ⟧h
+  congh : ∀ {x y} → (ob A Setoid.≈ x) y → (B ≈ꟳ ⟦ x ⟧h) ⟦ y ⟧h
   congh (mk≈ꟳ fst≡ snd≈) = mk≈ꟳ fst≡ (λ p → f.cong (snd≈ p))
 
-  F-hom : ≈.Hom (F-ob A) (F-ob B)
-  F-hom = record
+  hom : ≈.Hom (ob A) (ob B)
+  hom = record
     { to = ⟦_⟧h
     ; cong = congh
     }
 
-open F-Hom using (F-hom) public
+open Hom using (hom) public
 
 -- Functorial laws: F preserves identity, composition, and equivalence
 
 -- F preserves identity: F(id) ≈ id
-F-id : {S : Setoid ℓA ℓA'} → F-hom {A = S} ≈.idHom ≈h ≈.idHom
-F-id {S} {s , f} = F-Ob.mk≈ꟳ ≡.refl λ p → S.refl {f p}
+id : {S : Setoid ℓA ℓA'} → hom {A = S} ≈.idHom ≈h ≈.idHom
+id {S} {s , f} = Ob.mk≈ꟳ ≡.refl λ p → S.refl {f p}
   where
   module S = ≈.Setoid S
 
 -- F preserves composition: F(g ∘ f) ≈ F g ∘ F f
-module F-Comp {S T U : Setoid ℓA ℓA'} (f : ≈.Hom S T) (g : ≈.Hom T U) where
+module Comp {S T U : Setoid ℓA ℓA'} (f : ≈.Hom S T) (g : ≈.Hom T U) where
   module S = ≈.Setoid S
   module T = ≈.Setoid T
   module U = ≈.Setoid U
   module f = ≈.Hom f
   module g = ≈.Hom g
-  open F-Ob
+  open Ob
 
-  F-comp : F-hom (g ≈.∘ f) ≈h (F-hom g ≈.∘ F-hom f)
-  F-comp =
+  comp : hom (g ≈.∘ f) ≈h (hom g ≈.∘ hom f)
+  comp =
     mk≈ꟳ ≡.refl λ p → (≈.Hom.cong g) (≈.Hom.cong f f.S.refl)
 
-open F-Comp using (F-comp) public
+open Comp using (comp) public
 
 -- F respects homomorphism equivalence: if f ≈ g then F f ≈ F g
-module F-Resp
+module Resp
   {S T : Setoid ℓA ℓA'}
   (f g : ≈.Hom S T)
   (f≈g : f ≈h g)
@@ -115,19 +115,19 @@ module F-Resp
   module T = ≈.Setoid T
   module f = ≈.Hom f
   module g = ≈.Hom g
-  open F-Ob
-  open F-Hom hiding (F-hom)
+  open Ob
+  open Hom hiding (hom)
 
-  F-resp : F-hom f ≈h F-hom g
-  F-resp = mk≈ꟳ ≡.refl λ _ → f≈g
+  resp : hom f ≈h hom g
+  resp = mk≈ꟳ ≡.refl λ _ → f≈g
 
-open F-Resp using (F-resp) public
+open Resp using (resp) public
 
 -- The complete setoid functor induced by container (S ◁ P)
 F : ≈.Functor ℓA ℓA' (ℓS ⊔ ℓP ⊔ ℓA) (ℓS ⊔ ℓP ⊔ ℓA')
 F = record
-  { F-ob = F-ob
-  ; F-hom = F-hom
-  ; F-id = F-id
-  ; F-comp = F-comp
-  ; F-resp = F-resp }
+  { ob = ob
+  ; hom = hom
+  ; id = id
+  ; comp = comp
+  ; resp = resp }

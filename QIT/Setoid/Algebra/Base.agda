@@ -15,10 +15,10 @@ open import QIT.Container.Base hiding (sup)
 --    α : F X → X
 -- This is used for defining initial algebras.
 module _ {ℓX ℓX'} (F : Functor ℓX ℓX' ℓX ℓX') where
-  open Functor F
+  module F = Functor F
 
   SupType : (X : Setoid ℓX ℓX') → Set (ℓX ⊔ ℓX')
-  SupType X = ≈Hom (F-ob X) X 
+  SupType X = ≈Hom (F.ob X) X 
 
   -- An F-algebra consists of a setoid carrier X and a structure map α : F X → X.
   -- The structure map gives meaning to the functor's operations on the carrier.
@@ -45,7 +45,7 @@ module _ {ℓX ℓX'} (F : Functor ℓX ℓX' ℓX ℓX') where
       -- Underlying homomorphism between carriers
       hom : ≈Hom X Y
       -- Commutativity condition: the square commutes
-      comm : (β ∘ F-hom hom) ≈h (hom ∘ α)
+      comm : (β ∘ F.hom hom) ≈h (hom ∘ α)
     open ≈Hom hom public
 
   -- An initial algebra has a unique homomorphism to every other algebra.

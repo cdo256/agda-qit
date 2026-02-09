@@ -11,7 +11,7 @@ open import QIT.QW.Signature
 module QIT.QW.Algebra {ℓS ℓP ℓE ℓV} (sig : Sig ℓS ℓP ℓE ℓV) where
 
 open Sig sig
-open import QIT.Container.Functor S P (ℓS ⊔ ℓP ⊔ ℓV) (ℓS ⊔ ℓP ⊔ ℓV)
+open import QIT.Container.Functor S P (ℓS ⊔ ℓP ⊔ ℓV) (ℓS ⊔ ℓP ⊔ ℓV) using (F)
 open import QIT.QW.Equation S P ℓV
 
 -- A QIT algebra: a container algebra that satisfies the signature equations.

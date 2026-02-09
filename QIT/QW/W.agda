@@ -8,7 +8,9 @@ open import QIT.Container.Base
 -- quotient inductive types (QITs) with both constructors and equations.
 module QIT.QW.W {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
 
-open import QIT.Container.Functor S P (ℓS ⊔ ℓP) (ℓS ⊔ ℓP)
+open import QIT.Container.Functor S P (ℓS ⊔ ℓP) (ℓS ⊔ ℓP) hiding (hom)
+
+module F = ≈.Functor F
 
 -- Underlying W-type: trees with shapes S and positions P
 T : Set (ℓS ⊔ ℓP)
@@ -18,15 +20,14 @@ T = W S P
 T̃ : Setoid (ℓS ⊔ ℓP) (ℓS ⊔ ℓP)
 T̃ = T /≡
 
-module _ where
 -- Congruence: sup respects equivalence in the functor interpretation
-α-cong : ∀ {sf} {tg} → F-ob T̃ [ sf ≈ tg ] → sup sf ≡p sup tg
-α-cong {s , f} {s , g} (F-Ob.mk≈ꟳ ≡.refl snd≈) = q (funExtp snd≈)
+α-cong : ∀ {sf} {tg} → ob T̃ [ sf ≈ tg ] → sup sf ≡p sup tg
+α-cong {s , f} {s , g} (Ob.mk≈ꟳ ≡.refl snd≈) = q (funExtp snd≈)
   where
-  open F-Ob T̃
+  open Ob T̃
   q : f ≡p g → sup (s , f) ≡p sup (s , g)
   q ∣ ≡.refl ∣ = ∣ ≡.refl ∣
-T-α : ≈.Hom (F-ob T̃) T̃
+T-α : ≈.Hom (ob T̃) T̃
 T-α = record
   { to = sup
   ; cong = α-cong }
@@ -51,7 +52,7 @@ module Rec (Yβ : ≈.Algebra F) where
   rec-cong reflp = ≡→≈ Y ≡.refl
   rec : ≈.Hom T̃ Y
   rec = record { to = rec₀ ; cong = rec-cong }
-  rec-comm : (β ≈.∘ F-hom rec) ≈h (rec ≈.∘ T-α)
+  rec-comm : (β ≈.∘ F.hom rec) ≈h (rec ≈.∘ T-α)
   rec-comm = Setoid.refl Y
 
   open ≈.Alg.Hom
@@ -60,7 +61,7 @@ module Rec (Yβ : ≈.Algebra F) where
     f.hom .to (W.sup (s , g))
       ≈⟨ sym f.comm ⟩
     β₀ (s , λ i → f.hom .to (g i)) 
-      ≈⟨ β.cong (F-Ob.mk≈ꟳ ≡.refl λ i → unique f {g i}) ⟩
+      ≈⟨ β.cong (Ob.mk≈ꟳ ≡.refl λ i → unique f {g i}) ⟩
     β₀ (s , λ i → rec₀ (g i)) 
       ≈⟨ refl ⟩
     rec₀ (W.sup (s , g)) ∎
@@ -72,7 +73,9 @@ module Rec (Yβ : ≈.Algebra F) where
 
 isInitialT : ≈.Alg.IsInitial F T-alg
 isInitialT = record
-  { rec = λ Yβ → record { hom = rec Yβ ; comm = λ {x} → rec-comm Yβ {x} }
+  { rec = λ Yβ → record
+    { hom = rec Yβ
+    ; comm = λ {x} → rec-comm Yβ {x} }
   ; unique = unique }
   where
   open Rec

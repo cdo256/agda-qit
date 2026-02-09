@@ -25,7 +25,7 @@ private
 -- Container functor
 open import QIT.Container.Base
 open import QIT.Container.Functor S P ℓD ℓD'
-open F-Ob
+open Ob
 
 -- Size control and staging
 open import QIT.Relation.Plump S P

@@ -47,18 +47,18 @@ adaptAlgebra smallAlg = record { X = X-big ; α = α-big }
 
     -- The structure map: convert big functor input to small functor input,
     -- apply the small algebra, then lift the result
-    op-big : ⟨ FBig.F-ob X-big ⟩ → ⟨ X-big ⟩
+    op-big : ⟨ FBig.ob X-big ⟩ → ⟨ X-big ⟩
     op-big (s , k) = lift (≈.Hom.to α-small (s , λ p → lower (k p)))
 
     -- Congruence: if big inputs are equal, then outputs are equal
-    cong-big : {x y : ⟨ FBig.F-ob X-big ⟩} →
-               FBig.F-ob X-big [ x ≈ y ] →
+    cong-big : {x y : ⟨ FBig.ob X-big ⟩} →
+               FBig.ob X-big [ x ≈ y ] →
                X-big [ op-big x ≈ op-big y ]
-    cong-big {s , k} {s' , k'} (FBig.F-Ob.mk≈ꟳ eqS eqK) =
-      liftp (≈.Hom.cong α-small (FSmall.F-Ob.mk≈ꟳ eqS (λ p → lowerP (eqK p))))
+    cong-big {s , k} {s' , k'} (FBig.Ob.mk≈ꟳ eqS eqK) =
+      liftp (≈.Hom.cong α-small (FSmall.Ob.mk≈ꟳ eqS (λ p → lowerP (eqK p))))
 
     -- The big structure map
-    α-big : ≈.Hom (FBig.F-ob X-big) X-big
+    α-big : ≈.Hom (FBig.ob X-big) X-big
     α-big = record
       { to = op-big
       ; cong = cong-big

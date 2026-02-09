@@ -42,7 +42,7 @@ ExprAlg V = record
   where
   Ẽ : Setoid _ _
   Ẽ = Expr V /≡
-  open F-Ob Ẽ
+  open Ob Ẽ
   β : ⟦ S ◁ P ⟧ (Expr V) → Expr V
   β (s , f) = supᴱ s f
   β-cong : ∀ {sf tg} → (p : sf ≈ꟳ tg) → (β sf ≡p β tg)
@@ -119,17 +119,17 @@ module _ {V : Set ℓV} {Xα : ≈.Algebra F}
     h.to (supᴱ s f)
       ≈⟨ sym h.comm ⟩
     α.to (Fh (s , f))
-      ≈⟨ α.cong (F-Ob.mk≈ꟳ ≡.refl λ i → refl) ⟩
+      ≈⟨ α.cong (Ob.mk≈ꟳ ≡.refl λ i → refl) ⟩
     α.to (s , λ i → h.to (f i))
-      ≈⟨ α.cong (F-Ob.mk≈ꟳ ≡.refl λ i → assign-unique ρ vsat (f i)) ⟩
+      ≈⟨ α.cong (Ob.mk≈ꟳ ≡.refl λ i → assign-unique ρ vsat (f i)) ⟩
     α.to (s , (λ i → assign Xα ρ (f i)))
       ≈⟨ refl ⟩
     assign Xα ρ (supᴱ s f) ∎
     where
-    module F = ≈.Functor F
+    module F' = ≈.Functor F
     F₀ : Setoid (ℓS ⊔ ℓP ⊔ ℓV) (ℓS ⊔ ℓP ⊔ ℓV)
        → Setoid (ℓS ⊔ ℓP ⊔ ℓV) (ℓS ⊔ ℓP ⊔ ℓV)
-    F₀ = F.F-ob
+    F₀ = F'.ob
     Fh : ⟨ F₀ (Expr V /≡) ⟩ → ⟨ F₀ X ⟩
-    Fh = ≈.Hom.to (F.F-hom h.hom) 
+    Fh = ≈.Hom.to (F'.hom h.hom) 
     open ≈.≈syntax {S = X}

@@ -41,17 +41,17 @@ private
 Cocontinuous : (F : ≈.Functor ℓc ℓc' ℓc ℓc') (D : ≈.Diagram ≤p ℓc ℓc')
               → Prop ℓc'
 Cocontinuous F D =
-  Colim (F ∘ᴰ D) ≅ F-ob (Colim D)
+  Colim (F ∘ᴰ D) ≅ ob (Colim D)
 
-open F-Ob
+open Ob
 
--- Forward direction: map from Colim(F ∘ᴰ D) to F-ob(Colim D).
+-- Forward direction: map from Colim(F ∘ᴰ D) to ob(Colim D).
 -- An element (α, (s, f)) becomes (s, λ i → (α, f i)).
-ϕ₀ : ⟨ Colim (F ∘ᴰ D) ⟩ → ⟨ F.F-ob (Colim D) ⟩
+ϕ₀ : ⟨ Colim (F ∘ᴰ D) ⟩ → ⟨ F.ob (Colim D) ⟩
 ϕ₀ (α , (s , f)) = s , (λ b → α , f b)
 
 -- Congruence for ϕ₀ at a specific stage.
-ϕ-cong-stage : ∀ α {x y} → F∘D.ob α [ x ≈ y ] → F.F-ob (Colim D) [ ϕ₀ (α , x) ≈ ϕ₀ (α , y) ]
+ϕ-cong-stage : ∀ α {x y} → F∘D.ob α [ x ≈ y ] → F.ob (Colim D) [ ϕ₀ (α , x) ≈ ϕ₀ (α , y) ]
 ϕ-cong-stage α {a , f} {a , g} (mk≈ꟳ ≡.refl snd≈) =
   mk≈ꟳ ≡.refl q
   where
@@ -62,16 +62,16 @@ open F-Ob
     u = snd≈ i
 
 -- Full congruence property for ϕ₀.
-ϕ-cong : ∀ {x y} → Colim (F ∘ᴰ D) [ x ≈ y ] → F.F-ob (Colim D) [ ϕ₀ x ≈ ϕ₀ y ]
+ϕ-cong : ∀ {x y} → Colim (F ∘ᴰ D) [ x ≈ y ] → F.ob (Colim D) [ ϕ₀ x ≈ ϕ₀ y ]
 ϕ-cong (≈lstage α e) = ϕ-cong-stage α e
 ϕ-cong (≈lstep {α} {j} (sup≤ p) (s , f)) =
   mk≈ꟳ ≡.refl λ k → ≈lstep (sup≤ p) (f k)
 ϕ-cong (≈lsym p) = ≈fsym (Colim D) (ϕ-cong p)
 ϕ-cong (≈ltrans p q) = ≈ftrans (Colim D) (ϕ-cong p) (ϕ-cong q)
 
--- Backward direction: map from F-ob(Colim D) to Colim(F ∘ᴰ D).
+-- Backward direction: map from ob(Colim D) to Colim(F ∘ᴰ D).
 -- Find a common upper bound for all stages, then weaken elements to this stage.
-ψ₀ : ⟨ F.F-ob (Colim D) ⟩ → ⟨ Colim (F ∘ᴰ D) ⟩
+ψ₀ : ⟨ F.ob (Colim D) ⟩ → ⟨ Colim (F ∘ᴰ D) ⟩
 ψ₀ (s , f) = sup (ιˢ s , μ) , s , λ i → pweaken (child≤ (ιˢ s) μ i) (f i .proj₂)
   where
   μ : P s → Z
@@ -140,7 +140,7 @@ module _ (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ŝ .fst 
   ≈ˡ→≈ˢ {α , s , s≤α} {β , t , t≤β} (≈ltrans p q) = ≈strans (≈ˡ→≈ˢ p) (≈ˡ→≈ˢ q)
 
   -- Congruence for ψ₀: convert colimit relations to stage relations.
-  ψ-cong : ∀ {x y} → F.F-ob (Colim D) [ x ≈ y ] → Colim (F ∘ᴰ D) [ ψ₀ x ≈ ψ₀ y ]
+  ψ-cong : ∀ {x y} → F.ob (Colim D) [ x ≈ y ] → Colim (F ∘ᴰ D) [ ψ₀ x ≈ ψ₀ y ]
   ψ-cong {s , f} {s , g} (mk≈ꟳ ≡.refl snd≈) = begin
     ψ₀ (s , f)
       ≈⟨ ≈lrefl (F ∘ᴰ D) ⟩
@@ -180,8 +180,8 @@ module _ (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ŝ .fst 
     open Setoid (Colim (F ∘ᴰ D))
     open ≈.≈syntax {S = Colim (F ∘ᴰ D)}
 
-  -- Left inverse: ϕ₀ ∘ ψ₀ ≈ id on F-ob(Colim D).
-  linv : ∀ y → F.F-ob (Colim D) [ (ϕ₀ (ψ₀ y)) ≈ y ]
+  -- Left inverse: ϕ₀ ∘ ψ₀ ≈ id on ob(Colim D).
+  linv : ∀ y → F.ob (Colim D) [ (ϕ₀ (ψ₀ y)) ≈ y ]
   linv (s , g) =
     ϕ₀ (ψ₀ (s , g))
       ≈⟨ ≈frefl (Colim D) ⟩
@@ -191,9 +191,9 @@ module _ (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ŝ .fst 
     where
     μ : P s → Z
     μ i = g i .proj₁
-    open Setoid (F.F-ob (Colim D))
+    open Setoid (F.ob (Colim D))
     open Diagram D
-    open ≈.≈syntax {S = (F.F-ob (Colim D))}
+    open ≈.≈syntax {S = (F.ob (Colim D))}
 
   -- Right inverse: ψ₀ ∘ ϕ₀ ≈ id on Colim(F ∘ᴰ D).
   rinv : ∀ x → Colim (F ∘ᴰ D) [ (ψ₀ (ϕ₀ x)) ≈ x ]
@@ -217,7 +217,7 @@ module _ (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ŝ .fst 
   depthPrserving→cocontinuous : Cocontinuous F D
   depthPrserving→cocontinuous = ∣ iso ∣
     where
-    iso : ≈.Iso (Colim (F ∘ᴰ D)) (F.F-ob (Colim D))
+    iso : ≈.Iso (Colim (F ∘ᴰ D)) (F.ob (Colim D))
     iso = record
       { ⟦_⟧ = ϕ₀
       ; ⟦_⟧⁻¹ = ψ₀

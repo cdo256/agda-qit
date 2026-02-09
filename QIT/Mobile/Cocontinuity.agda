@@ -18,7 +18,7 @@ open import QIT.QW.StageColimit sig using (joinTerms; αˡ; tˡ; t≤αˡ)
 
 open import QIT.Container.Functor Sᵀ Pᵀ ℓ0 (lsuc ℓ0)
 
-open F-Ob
+open Ob
 
 module F = ≈.Functor F
 module D = Diagram D

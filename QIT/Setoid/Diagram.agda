@@ -53,26 +53,26 @@ _∘ᴰ_ {ℓD} {ℓD'} {ℓF} {ℓF'} F P = record
 
   -- Apply F to each object in the diagram
   ob : (i : I) → Setoid ℓF ℓF'
-  ob = λ i → F.F-ob (P.ob i)
+  ob = λ i → F.ob (P.ob i)
 
   -- Apply F to each morphism in the diagram
   hom : ∀ {i j} → ≤p .proj₁ i j
-      → Hom (F.F-ob (P.ob i)) (F.F-ob (P.ob j))
+      → Hom (F.ob (P.ob i)) (F.ob (P.ob j))
   hom p = record
-    { to = F.F-hom (P.hom p) .Hom.to
-    ; cong = F.F-hom (P.hom _) .Hom.cong }
+    { to = F.hom (P.hom p) .Hom.to
+    ; cong = F.hom (P.hom _) .Hom.cong }
 
   -- F preserves identity: F(id) ≈ id
   id : ∀ {i} → {x : ⟨ ob i ⟩}
-       → ob i ⊢ F.F-hom (P.hom ≤.refl) .Hom.to x ≈ x
-  id {i} {x} = ob i .trans u F.F-id
+       → ob i ⊢ F.hom (P.hom ≤.refl) .Hom.to x ≈ x
+  id {i} {x} = ob i .trans u F.id
     where
     open Setoid
     open Hom
     open import QIT.Relation.Binary
-    u : ob i ⊢ (F.F-hom (P.hom ≤.refl) .to x)
-               ≈ (F.F-hom idHom) .to x
-    u = F.F-resp (P.hom _) idHom P.id
+    u : ob i ⊢ (F.hom (P.hom ≤.refl) .to x)
+               ≈ (F.hom idHom) .to x
+    u = F.resp (P.hom _) idHom P.id
 
   -- F preserves composition: F(g ∘ f) ≈ F(g) ∘ F(f)
   comp : ∀ {i j k} → (p : i ≤ j) (q : j ≤ k)
@@ -81,11 +81,11 @@ _∘ᴰ_ {ℓD} {ℓD'} {ℓF} {ℓF'} F P = record
     begin
       to (hom (≤.trans p q)) x
         ≈⟨ ob _ .refl ⟩
-      to (F.F-hom (P.hom (≤.trans p q))) x
-        ≈⟨ F.F-resp (P.hom _) (P.hom _ ∘h P.hom _)
+      to (F.hom (P.hom (≤.trans p q))) x
+        ≈⟨ F.resp (P.hom _) (P.hom _ ∘h P.hom _)
                     (P.comp p q) ⟩
-      to (F.F-hom (P.hom q ∘h P.hom p )) x
-        ≈⟨ F.F-comp (P.hom _) (P.hom _) ⟩
+      to (F.hom (P.hom q ∘h P.hom p )) x
+        ≈⟨ F.comp (P.hom _) (P.hom _) ⟩
       to (hom q ∘h hom p) x ∎
     where
     open ≈syntax {S = ob k}

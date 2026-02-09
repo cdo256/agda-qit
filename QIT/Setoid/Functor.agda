@@ -18,17 +18,17 @@ record Functor ℓd ℓd' ℓc ℓc' : Set (lsuc ℓd ⊔ lsuc ℓd' ⊔ lsuc �
     D = Setoid ℓd ℓd'
   field
     -- Object mapping: sends setoids to setoids
-    F-ob : ∀ (S : D) → Setoid ℓc ℓc'
+    ob : ∀ (S : D) → Setoid ℓc ℓc'
 
     -- Morphism mapping: sends homomorphisms to homomorphisms
-    F-hom : ∀ {S T : D} → Hom S T → Hom (F-ob S) (F-ob T)
+    hom : ∀ {S T : D} → Hom S T → Hom (ob S) (ob T)
 
     -- Preserves identity: F(id) ≈ id
-    F-id : ∀ {S : D} → F-hom idHom ≈h idHom {S = F-ob S}
+    id : ∀ {S : D} → hom idHom ≈h idHom {S = ob S}
 
     -- Preserves composition: F(g ∘ f) ≈ F(g) ∘ F(f)
-    F-comp : ∀ {S T U : D} → (f : Hom S T) → (g : Hom T U)
-           → F-hom (g ∘ f) ≈h (F-hom g ∘ F-hom f)
+    comp : ∀ {S T U : D} → (f : Hom S T) → (g : Hom T U)
+           → hom (g ∘ f) ≈h (hom g ∘ hom f)
 
     -- Respects homomorphism equivalence: if f ≈ g then F(f) ≈ F(g)
-    F-resp : ∀ {S T} (f g : Hom S T) → f ≈h g → F-hom f ≈h F-hom g
+    resp : ∀ {S T} (f g : Hom S T) → f ≈h g → hom f ≈h hom g
