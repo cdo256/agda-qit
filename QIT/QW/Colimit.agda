@@ -19,12 +19,12 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
     _≤_ : BinaryRel I ℓ≤
     _≤_ = ≤p .proj₁
 
-  open ≈.Diagram P renaming (D-ob to P̂)
+  open ≈.Diagram P renaming (ob to P̂)
 
   -- Extract underlying function from diagram morphism
   Pf : ∀ {i j} (p : i ≤ j) → (⟨ P̂ i ⟩ → ⟨ P̂ j ⟩)
   Pf p = to
-    where open ≈.Hom (D-hom p)
+    where open ≈.Hom (hom p)
 
   -- Carrier of the colimit: disjoint union of all objects in the diagram.
   -- Elements are tagged by their stage index i and contain a value from P̂ i.
@@ -92,7 +92,7 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
       inj      : ∀ i → ≈.Hom (P̂ i) Apex
       -- Commutativity: injections respect diagram morphisms
       commutes : ∀ {i j} (p : i ≤ j)
-               → (inj i) ≈h (inj j ≈.∘ D-hom p)
+               → (inj i) ≈h (inj j ≈.∘ hom p)
 
   open Cocone
 

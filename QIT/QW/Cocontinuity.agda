@@ -51,7 +51,7 @@ open F-Ob
 ϕ₀ (α , (s , f)) = s , (λ b → α , f b)
 
 -- Congruence for ϕ₀ at a specific stage.
-ϕ-cong-stage : ∀ α {x y} → F∘D.D-ob α [ x ≈ y ] → F.F-ob (Colim D) [ ϕ₀ (α , x) ≈ ϕ₀ (α , y) ]
+ϕ-cong-stage : ∀ α {x y} → F∘D.ob α [ x ≈ y ] → F.F-ob (Colim D) [ ϕ₀ (α , x) ≈ ϕ₀ (α , y) ]
 ϕ-cong-stage α {a , f} {a , g} (mk≈ꟳ ≡.refl snd≈) =
   mk≈ꟳ ≡.refl q
   where

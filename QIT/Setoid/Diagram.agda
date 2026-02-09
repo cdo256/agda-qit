@@ -25,16 +25,16 @@ private
 record Diagram ℓD ℓD' : Set (ℓ≤ ⊔ ℓI ⊔ lsuc ℓD ⊔ lsuc ℓD') where
   field
     -- Object mapping: each index gets a setoid
-    D-ob : ∀ (i : I) → Setoid ℓD ℓD'
+    ob : ∀ (i : I) → Setoid ℓD ℓD'
 
     -- Morphism mapping: order relations become homomorphisms
-    D-hom : ∀ {i j} → (p : i ≤ j) → Hom (D-ob i) (D-ob j)
+    hom : ∀ {i j} → (p : i ≤ j) → Hom (ob i) (ob j)
 
     -- Functorial laws: preserve identity and composition
-    D-id : ∀ {i : I}
-         → D-hom (≤.refl) ≈h (idHom {S = D-ob i})
-    D-comp : ∀ {i j k} → (p : i ≤ j) (q : j ≤ k)
-           → D-hom (≤.trans p q) ≈h (D-hom q ∘h D-hom p)
+    id : ∀ {i : I}
+         → hom (≤.refl) ≈h (idHom {S = ob i})
+    comp : ∀ {i j k} → (p : i ≤ j) (q : j ≤ k)
+           → hom (≤.trans p q) ≈h (hom q ∘h hom p)
 
 -- Functor composition with diagrams: F ∘ P applies functor F to diagram P.
 -- If P : I → Setoid and F : Setoid → Setoid, then F ∘ P : I → Setoid.
@@ -42,53 +42,53 @@ record Diagram ℓD ℓD' : Set (ℓ≤ ⊔ ℓI ⊔ lsuc ℓD ⊔ lsuc ℓD') w
 _∘ᴰ_ : ∀ {ℓD ℓD' ℓF ℓF'} → (F : Functor ℓD ℓD' ℓF ℓF') (P : Diagram ℓD ℓD')
     → Diagram ℓF ℓF'
 _∘ᴰ_ {ℓD} {ℓD'} {ℓF} {ℓF'} F P = record
-  { D-ob = D-ob
-  ; D-hom = D-hom
-  ; D-id = λ {i} → D-id {i}
-  ; D-comp = λ {i} {j} {k} → D-comp {i} {j} {k} }
+  { ob = ob
+  ; hom = hom
+  ; id = λ {i} → id {i}
+  ; comp = λ {i} {j} {k} → comp {i} {j} {k} }
   where
   module F = Functor F
   module P = Diagram P
   open Setoid using () renaming (_≈_ to _⊢_≈_)
 
   -- Apply F to each object in the diagram
-  D-ob : (i : I) → Setoid ℓF ℓF'
-  D-ob = λ i → F.F-ob (P.D-ob i)
+  ob : (i : I) → Setoid ℓF ℓF'
+  ob = λ i → F.F-ob (P.ob i)
 
   -- Apply F to each morphism in the diagram
-  D-hom : ∀ {i j} → ≤p .proj₁ i j
-      → Hom (F.F-ob (P.D-ob i)) (F.F-ob (P.D-ob j))
-  D-hom p = record
-    { to = F.F-hom (P.D-hom p) .Hom.to
-    ; cong = F.F-hom (P.D-hom _) .Hom.cong }
+  hom : ∀ {i j} → ≤p .proj₁ i j
+      → Hom (F.F-ob (P.ob i)) (F.F-ob (P.ob j))
+  hom p = record
+    { to = F.F-hom (P.hom p) .Hom.to
+    ; cong = F.F-hom (P.hom _) .Hom.cong }
 
   -- F preserves identity: F(id) ≈ id
-  D-id : ∀ {i} → {x : ⟨ D-ob i ⟩}
-       → D-ob i ⊢ F.F-hom (P.D-hom ≤.refl) .Hom.to x ≈ x
-  D-id {i} {x} = D-ob i .trans u F.F-id
+  id : ∀ {i} → {x : ⟨ ob i ⟩}
+       → ob i ⊢ F.F-hom (P.hom ≤.refl) .Hom.to x ≈ x
+  id {i} {x} = ob i .trans u F.F-id
     where
     open Setoid
     open Hom
     open import QIT.Relation.Binary
-    u : D-ob i ⊢ (F.F-hom (P.D-hom ≤.refl) .to x)
+    u : ob i ⊢ (F.F-hom (P.hom ≤.refl) .to x)
                ≈ (F.F-hom idHom) .to x
-    u = F.F-resp (P.D-hom _) idHom P.D-id
+    u = F.F-resp (P.hom _) idHom P.id
 
   -- F preserves composition: F(g ∘ f) ≈ F(g) ∘ F(f)
-  D-comp : ∀ {i j k} → (p : i ≤ j) (q : j ≤ k)
-         → D-hom (≤.trans p q) ≈h (D-hom q ∘h D-hom p)
-  D-comp {i} {j} {k} p q {x} =
+  comp : ∀ {i j k} → (p : i ≤ j) (q : j ≤ k)
+         → hom (≤.trans p q) ≈h (hom q ∘h hom p)
+  comp {i} {j} {k} p q {x} =
     begin
-      to (D-hom (≤.trans p q)) x
-        ≈⟨ D-ob _ .refl ⟩
-      to (F.F-hom (P.D-hom (≤.trans p q))) x
-        ≈⟨ F.F-resp (P.D-hom _) (P.D-hom _ ∘h P.D-hom _)
-                    (P.D-comp p q) ⟩
-      to (F.F-hom (P.D-hom q ∘h P.D-hom p )) x
-        ≈⟨ F.F-comp (P.D-hom _) (P.D-hom _) ⟩
-      to (D-hom q ∘h D-hom p) x ∎
+      to (hom (≤.trans p q)) x
+        ≈⟨ ob _ .refl ⟩
+      to (F.F-hom (P.hom (≤.trans p q))) x
+        ≈⟨ F.F-resp (P.hom _) (P.hom _ ∘h P.hom _)
+                    (P.comp p q) ⟩
+      to (F.F-hom (P.hom q ∘h P.hom p )) x
+        ≈⟨ F.F-comp (P.hom _) (P.hom _) ⟩
+      to (hom q ∘h hom p) x ∎
     where
-    open ≈syntax {S = D-ob k}
+    open ≈syntax {S = ob k}
     open Setoid
     open Hom
     open import QIT.Relation.Binary

@@ -133,10 +133,10 @@ D̃ α = record
 -- will give us the final quotient inductive type.
 D : Diagram (ℓS ⊔ ℓP) (ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV)
 D = record
-  { D-ob = D̃
-  ; D-hom = Hom
-  ; D-id = Id
-  ; D-comp = Comp }
+  { ob = D̃
+  ; hom = Hom
+  ; id = Id
+  ; comp = Comp }
   where
   -- Morphisms are weakening maps preserving equivalence
   Hom : ∀ {α β} → α ≤ β → ≈.Hom (D̃ α) (D̃ β)
