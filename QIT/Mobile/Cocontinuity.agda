@@ -1,5 +1,6 @@
 
 open import QIT.Prelude
+open import QIT.Prop
 
 module QIT.Mobile.Cocontinuity (I : Set) where
 

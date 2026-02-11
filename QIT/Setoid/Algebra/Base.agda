@@ -1,4 +1,5 @@
 open import QIT.Prelude
+open import QIT.Prop
 
 -- Define algebras over setoid endofunctors. An algebra for a functor F
 -- is a setoid X equipped with a structure map α : F X → X. This is the

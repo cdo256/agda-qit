@@ -1,6 +1,7 @@
 module QIT.Relation.Binary where
 
 open import QIT.Prelude
+open import QIT.Prop
 open import QIT.Relation.Base
 
 module _ {ℓA ℓR} {A : Set ℓA} (R : BinaryRel A ℓR) where

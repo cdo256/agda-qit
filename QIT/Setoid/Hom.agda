@@ -1,4 +1,5 @@
 open import QIT.Prelude
+open import QIT.Prop
 open import QIT.Setoid.Base
 open import QIT.Relation.Binary using (IsEquivalence)
 

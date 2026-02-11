@@ -1,4 +1,5 @@
 open import QIT.Prelude
+open import QIT.Prop
 open import QIT.Relation.Base
 open import QIT.Relation.Binary
 open import QIT.Setoid.Base

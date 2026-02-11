@@ -1,4 +1,5 @@
 open import QIT.Prelude
+open import QIT.Prop
 
 -- Module for creating adapter algebras that work with Container functors at higher universe levels
 -- while keeping the same underlying carrier type. This allows reusing algebras defined at lower

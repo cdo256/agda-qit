@@ -1,6 +1,7 @@
 module QIT.Relation.Subset where
 
 open import QIT.Prelude
+open import QIT.Prop
 
 -- Refinement type of A under B
 -- This defines a particular subset of A. It is the same definition as

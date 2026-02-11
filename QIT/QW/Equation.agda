@@ -1,4 +1,5 @@
 open import QIT.Prelude
+open import QIT.Prop
 
 -- Define expressions and equations over container signatures.
 -- Expressions are terms built from variables and constructors, used to
