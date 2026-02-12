@@ -34,8 +34,5 @@ module ≈ where
   open import QIT.Setoid.Base public
   open import QIT.Setoid.Hom public
   open import QIT.Setoid.Iso public
-  open import QIT.Setoid.Functor public
-  open import QIT.Setoid.Algebra public
-  open import QIT.Setoid.Diagram public
 
 open ≈ using (Setoid; ⟨_⟩; _/≡; _≈h_; _[_≈_]; _≅_; ≡p→≈; ≡→≈) public

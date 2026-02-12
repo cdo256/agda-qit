@@ -11,6 +11,11 @@ open import QIT.Container.Base
 open import QIT.Container.Functor S P (ℓS ⊔ ℓP ⊔ ℓV) (ℓS ⊔ ℓP ⊔ ℓV)
 open import QIT.Setoid
 open import QIT.QW.W S P
+open import QIT.Functor.Base
+
+module Fᴱ = Functor F
+
+open import QIT.Algebra.Base F as Alg
 
 -- Expressions over variables V: terms built from V and constructor signature (S,P).
 -- These are W-types over the extended signature (V ⊎ S, Pʰ) where:
@@ -34,16 +39,16 @@ pattern supᴱ s f = sup (inj₂ s , f)
 ιᴱ : {V : Set ℓV} → W S P → Expr V
 ιᴱ (sup (s , f)) = supᴱ s λ i → ιᴱ (f i)
 
-ExprAlg : (V : Set ℓV) → ≈.Algebra F
+ExprAlg : (V : Set ℓV) → Algebra
 ExprAlg V = record
   { X = Expr V /≡
   ; α = record
-    { to = β 
+    { to = β
     ; cong = β-cong } }
   where
   Ẽ : Setoid _ _
   Ẽ = Expr V /≡
-  open Ob Ẽ
+  open F-Ob Ẽ
   β : ⟦ S ◁ P ⟧ (Expr V) → Expr V
   β (s , f) = supᴱ s f
   β-cong : ∀ {sf tg} → (p : sf ≈ꟳ tg) → (β sf ≡p β tg)
@@ -67,8 +72,8 @@ record Equation : Set (lsuc ℓV ⊔ ℓS ⊔ ℓP) where
 -- Equation satisfaction in a given algebra.
 -- An algebra satisfies an equation if the lhs and rhs evaluate to
 -- equivalent elements under all variable assignments.
-module _ (Xα : ≈.Algebra F) where
-  open ≈.Algebra Xα
+module _ (Xα : Algebra) where
+  open Algebra Xα
   module X = Setoid X
 
   -- Evaluate an expression in the algebra given a variable assignment.
@@ -96,20 +101,20 @@ module _ (Xα : ≈.Algebra F) where
       → Prop (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV)
   Sat Ξ = ∀ e → SatEq (Ξ e)
 
-module _ {V : Set ℓV} {Xα : ≈.Algebra F}
-         (h : ≈.Alg.Hom F (ExprAlg V) Xα) where
-  module h = ≈.Alg.Hom h
-  open ≈.Algebra Xα
+module _ {V : Set ℓV} {Xα : Algebra}
+         (h : Hom (ExprAlg V) Xα) where
+  open Hom h
+  open Algebra Xα
   open Setoid X
   module α = ≈.Hom α
 
   assign-unique
     : (ρ : V → ⟨ X ⟩)
-    → (vsat : ∀ v f → X [ h.to (varᴱ v {f}) ≈ ρ v ])
+    → (vsat : ∀ v f → X [ ≈.Hom.to hom (varᴱ v {f}) ≈ ρ v ])
     → (e : Expr V)
-    → X [ h.to e ≈ assign Xα ρ e ]
+    → X [ ≈.Hom.to hom e ≈ assign Xα ρ e ]
   assign-unique ρ vsat (varᴱ v {f}) = begin
-    h.to (varᴱ v {f})
+    ≈.Hom.to hom (varᴱ v {f})
       ≈⟨ vsat v f ⟩
     ρ v
       ≈⟨ refl ⟩
@@ -117,20 +122,16 @@ module _ {V : Set ℓV} {Xα : ≈.Algebra F}
     where
     open ≈.≈syntax {S = X}
   assign-unique ρ vsat (supᴱ s f) = begin
-    h.to (supᴱ s f)
-      ≈⟨ sym h.comm ⟩
+    ≈.Hom.to hom (supᴱ s f)
+      ≈⟨ sym comm ⟩
     α.to (Fh (s , f))
-      ≈⟨ α.cong (Ob.mk≈ꟳ ≡.refl λ i → refl) ⟩
-    α.to (s , λ i → h.to (f i))
-      ≈⟨ α.cong (Ob.mk≈ꟳ ≡.refl λ i → assign-unique ρ vsat (f i)) ⟩
+      ≈⟨ α.cong (F-Ob.mk≈ꟳ ≡.refl λ i → refl) ⟩
+    α.to (s , λ i → ≈.Hom.to hom (f i))
+      ≈⟨ α.cong (F-Ob.mk≈ꟳ ≡.refl λ i → assign-unique ρ vsat (f i)) ⟩
     α.to (s , (λ i → assign Xα ρ (f i)))
       ≈⟨ refl ⟩
     assign Xα ρ (supᴱ s f) ∎
     where
-    module F' = ≈.Functor F
-    F₀ : Setoid (ℓS ⊔ ℓP ⊔ ℓV) (ℓS ⊔ ℓP ⊔ ℓV)
-       → Setoid (ℓS ⊔ ℓP ⊔ ℓV) (ℓS ⊔ ℓP ⊔ ℓV)
-    F₀ = F'.ob
-    Fh : ⟨ F₀ (Expr V /≡) ⟩ → ⟨ F₀ X ⟩
-    Fh = ≈.Hom.to (F'.hom h.hom) 
+    Fh : ⟨ Fᴱ.ob (Expr V /≡) ⟩ → ⟨ Fᴱ.ob X ⟩
+    Fh = ≈.Hom.to (Fᴱ.hom hom)
     open ≈.≈syntax {S = X}

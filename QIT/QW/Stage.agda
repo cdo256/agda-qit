@@ -1,4 +1,5 @@
 open import QIT.Prelude
+open import QIT.Prop
 open import QIT.QW.Signature
 
 -- Define staged construction of quotient W-types using plump ordinals.
@@ -12,14 +13,23 @@ open import QIT.Relation.Subset
 open import QIT.Relation.Binary
 open import QIT.Container.Base
 open import QIT.Container.Functor S P (ℓS ⊔ ℓP ⊔ ℓV) (ℓS ⊔ ℓP ⊔ ℓV)
-open import QIT.Setoid as ≈
+open import QIT.Setoid
 open import QIT.Relation.Subset
 open import QIT.Relation.Plump S P
-open import QIT.Setoid.Diagram ≤p
 open import QIT.QW.W S P
-open import QIT.Setoid.Algebra.Lift S P ℓV
+open import QIT.Algebra.Lift S P ℓV
 open import Data.Maybe
 open import QIT.QW.Equation S P ℓV
+open import QIT.Functor.Base
+open import QIT.Functor.Composition
+open import QIT.Category.Preorder
+open import QIT.Category.Setoid
+
+-- Diagram is a functor from a preorder category to setoids
+Diagram : ∀ ℓD ℓD' → Set _
+Diagram ℓD ℓD' = Functor (PreorderCat Z ≤p) (SetoidCat ℓD ℓD')
+
+open Box
 
 -- Stage α: elements of the underlying W-type bounded by ordinal α.
 -- This gives us size-bounded approximations to the final quotient.
@@ -134,22 +144,23 @@ D̃ α = record
 D : Diagram (ℓS ⊔ ℓP) (ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV)
 D = record
   { ob = D̃
-  ; hom = Hom
-  ; id = Id
-  ; comp = Comp }
+  ; hom = hom
+  ; id = id
+  ; comp = comp
+  ; resp = λ _ → ≈prefl }
   where
   -- Morphisms are weakening maps preserving equivalence
-  Hom : ∀ {α β} → α ≤ β → ≈.Hom (D̃ α) (D̃ β)
-  Hom {α} {β} α≤β = record
+  hom : ∀ {α β} → Box (α ≤ β) → ≈.Hom (D̃ α) (D̃ β)
+  hom {α} {β} (box α≤β) = record
     { to = pweaken α≤β
     ; cong = ≈pweaken α≤β }
 
   -- Identity law: weakening by reflexivity is the identity
-  Id : ∀ {α} → (Hom (≤refl α)) ≈h ≈.idHom
-  Id {α} {ŝ} = ≈prefl
+  id : ∀ {α} → hom (box (≤refl α)) ≈h ≈.idHom
+  id {α} {ŝ} = ≈prefl
 
   -- Composition law: weakening composes correctly
-  Comp : ∀ {α β γ} (p : α ≤ β) (q : β ≤ γ) →
-      Hom (≤≤ q p) ≈h (Hom q ≈.∘ Hom p)
-  Comp {α} {β} {γ} p q {ŝ} =
+  comp : ∀ {α β γ} (p : Box (α ≤ β)) (q : Box (β ≤ γ)) →
+      hom (box (≤≤ (q .unbox) (p .unbox))) ≈h (hom q ≈.∘ hom p)
+  comp {α} {β} {γ} (box p) (box q) {ŝ} =
     ≈pweaken q (≈pweaken p (≈prefl {t̂ = ŝ}))

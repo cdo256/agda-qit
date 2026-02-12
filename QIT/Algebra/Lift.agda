@@ -7,28 +7,32 @@ open import QIT.Prop
 --
 -- The key insight: instead of lifting the carrier, we create an adapter that translates
 -- between the low-level and high-level functor representations while preserving semantics.
-module QIT.Setoid.Algebra.Lift
+module QIT.Algebra.Lift
   {ℓS ℓP : Level} (S : Set ℓS) (P : S → Set ℓP)
   (ℓV : Level)  -- The additional level we need to accommodate
   where
 
 open import QIT.Setoid as ≈
 open import QIT.Container.Base
+open import QIT.Functor.Base
 
 -- Import Container functors at both level configurations
 import QIT.Container.Functor S P (ℓS ⊔ ℓP) (ℓS ⊔ ℓP) as FSmall
 import QIT.Container.Functor S P (ℓS ⊔ ℓP ⊔ ℓV) (ℓS ⊔ ℓP ⊔ ℓV) as FBig
 
+import QIT.Algebra.Base FSmall.F as AlgSmall
+import QIT.Algebra.Base FBig.F as AlgBig
+
 -- Type aliases for the algebra types
-AlgSmall = ≈.Algebra FSmall.F
-AlgBig = ≈.Algebra FBig.F
+AlgSmall = AlgSmall.Algebra
+AlgBig = AlgBig.Algebra
 
 -- Create an adapter algebra that works with the higher-level functor
 -- but delegates operations to the original algebra at lower levels
 adaptAlgebra : AlgSmall → AlgBig
 adaptAlgebra smallAlg = record { X = X-big ; α = α-big }
   where
-    open ≈.Algebra smallAlg renaming (X to X-small; α to α-small)
+    open AlgSmall.Algebra smallAlg renaming (X to X-small; α to α-small)
 
     -- The big setoid uses lifted carrier but provides transparent access
     X-big : Setoid (ℓS ⊔ ℓP ⊔ ℓV) (ℓS ⊔ ℓP ⊔ ℓV)
@@ -48,18 +52,19 @@ adaptAlgebra smallAlg = record { X = X-big ; α = α-big }
 
     -- The structure map: convert big functor input to small functor input,
     -- apply the small algebra, then lift the result
-    op-big : ⟨ FBig.ob X-big ⟩ → ⟨ X-big ⟩
+    module FBigFunctor = Functor FBig.F
+    op-big : ⟨ FBigFunctor.ob X-big ⟩ → ⟨ X-big ⟩
     op-big (s , k) = lift (≈.Hom.to α-small (s , λ p → lower (k p)))
 
     -- Congruence: if big inputs are equal, then outputs are equal
-    cong-big : {x y : ⟨ FBig.ob X-big ⟩} →
-               FBig.ob X-big [ x ≈ y ] →
+    cong-big : {x y : ⟨ FBigFunctor.ob X-big ⟩} →
+               FBigFunctor.ob X-big [ x ≈ y ] →
                X-big [ op-big x ≈ op-big y ]
-    cong-big {s , k} {s' , k'} (FBig.Ob.mk≈ꟳ eqS eqK) =
-      liftp (≈.Hom.cong α-small (FSmall.Ob.mk≈ꟳ eqS (λ p → lowerP (eqK p))))
+    cong-big {s , k} {s' , k'} (FBig.F-Ob.mk≈ꟳ eqS eqK) =
+      liftp (≈.Hom.cong α-small (FSmall.F-Ob.mk≈ꟳ eqS (λ p → lowerP (eqK p))))
 
     -- The big structure map
-    α-big : ≈.Hom (FBig.ob X-big) X-big
+    α-big : ≈.Hom (FBigFunctor.ob X-big) X-big
     α-big = record
       { to = op-big
       ; cong = cong-big

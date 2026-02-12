@@ -3,6 +3,10 @@ open import QIT.Prop
 open import QIT.Relation.Base
 open import QIT.Relation.Binary
 open import QIT.Setoid
+open import QIT.Functor.Base
+open import QIT.Category.Base hiding (_[_≈_]; _[_,_]; _[_∘_])
+open import QIT.Category.Preorder
+open import QIT.Category.Setoid
 
 -- Define colimits of diagrams indexed by preorders.
 -- A colimit is the "union" of all objects in a diagram, identifying elements
@@ -12,7 +16,7 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
   {I : Set ℓI}
   (≤p : Preorder I ℓ≤)
   (ℓD ℓD' : Level)
-  (P : ≈.Diagram ≤p ℓD ℓD')
+  (P : Functor (PreorderCat I ≤p) (SetoidCat ℓD ℓD'))
   where
 
   private
@@ -20,12 +24,12 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
     _≤_ : BinaryRel I ℓ≤
     _≤_ = ≤p .proj₁
 
-  open ≈.Diagram P renaming (ob to P̂)
+  open Functor P renaming (ob to P̂)
 
   -- Extract underlying function from diagram morphism
   Pf : ∀ {i j} (p : i ≤ j) → (⟨ P̂ i ⟩ → ⟨ P̂ j ⟩)
   Pf p = to
-    where open ≈.Hom (hom p)
+    where open ≈.Hom (hom (box p))
 
   -- Carrier of the colimit: disjoint union of all objects in the diagram.
   -- Elements are tagged by their stage index i and contain a value from P̂ i.
@@ -93,7 +97,7 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
       inj      : ∀ i → ≈.Hom (P̂ i) Apex
       -- Commutativity: injections respect diagram morphisms
       commutes : ∀ {i j} (p : i ≤ j)
-               → (inj i) ≈h (inj j ≈.∘ hom p)
+               → (inj i) ≈h (inj j ≈.∘ hom (box p))
 
   open Cocone
 

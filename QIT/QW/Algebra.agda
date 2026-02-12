@@ -1,4 +1,5 @@
 open import QIT.Prelude
+open import QIT.Prop
 open import QIT.Setoid
 open import QIT.Container.Base
 open import QIT.QW.Equation using (Equation)
@@ -13,6 +14,8 @@ module QIT.QW.Algebra {ℓS ℓP ℓE ℓV} (sig : Sig ℓS ℓP ℓE ℓV) wher
 open Sig sig
 open import QIT.Container.Functor S P (ℓS ⊔ ℓP ⊔ ℓV) (ℓS ⊔ ℓP ⊔ ℓV) using (F)
 open import QIT.QW.Equation S P ℓV
+open import QIT.Functor.Base
+open import QIT.Algebra.Base F as AlgBase hiding (Hom; IsInitial)
 
 -- A QIT algebra: a container algebra that satisfies the signature equations.
 -- This consists of a setoid with operations (container algebra) plus
@@ -20,20 +23,20 @@ open import QIT.QW.Equation S P ℓV
 record Alg : Set (lsuc ℓS ⊔ lsuc ℓP ⊔ ℓE ⊔ lsuc ℓV) where
   field
     -- Underlying container algebra: setoid + structure map
-    alg : ≈.Algebra F
+    alg : AlgBase.Algebra
     -- Satisfaction: all equations in the signature hold
     sat : Sat alg Ξ
-  open ≈.Algebra alg public
+  open AlgBase.Algebra alg public
 
 -- Homomorphism between QIT algebras: just container algebra homomorphisms.
 -- The satisfaction proofs are automatically preserved by homomorphisms,
 -- so we only need to give the underlying algebra homomorphism.
 record Hom (Xα Yβ : Alg) : Set (lsuc ℓS ⊔ lsuc ℓP ⊔ ℓE ⊔ lsuc ℓV) where
   field
-    hom : ≈.Alg.Hom F (Alg.alg Xα) (Alg.alg Yβ)
+    hom : AlgBase.Hom (Alg.alg Xα) (Alg.alg Yβ)
 
   -- Re-export the underlying homomorphism for convenience
-  open ≈.Alg.Hom hom renaming (hom to alghom) public
+  open AlgBase.Hom hom renaming (hom to alghom) public
 
 -- Initial QIT algebra: has a unique homomorphism to every other QIT algebra.
 -- This characterizes the "free" or "syntax" algebra where only the signature

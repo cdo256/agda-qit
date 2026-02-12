@@ -10,7 +10,11 @@ open import QIT.Mobile.Base I
 open import QIT.Setoid as ≈
 open import QIT.Container.Base
 open import QIT.Relation.Plump Sᵀ Pᵀ
-open import QIT.Setoid.Diagram ≤p
+open import QIT.Functor.Base
+open import QIT.Functor.Composition
+open import QIT.Category.Base hiding (_[_≈_]; _[_,_]; _[_∘_])
+open import QIT.Category.Preorder
+open import QIT.Category.Setoid
 
 open import QIT.QW.Colimit ≤p ℓ0 (lsuc ℓ0) hiding (_≈ˡ_)
 open import QIT.QW.Cocontinuity sig using (depthPrserving→cocontinuous; Cocontinuous)
@@ -18,12 +22,12 @@ open import QIT.QW.Stage sig
 open import QIT.QW.StageColimit sig using (joinTerms; αˡ; tˡ; t≤αˡ)
 
 open import QIT.Container.Functor Sᵀ Pᵀ ℓ0 (lsuc ℓ0)
+open F-Ob
 
-open Ob
-
-module F = ≈.Functor F
-module D = Diagram D
-module F∘D = Diagram (F ∘ᴰ D)
+-- Diagram and _∘ᴰ_ are imported from Stage
+module F = Functor F
+module D = Functor D
+module F∘D = Functor (F ∘ᴰ D)
 
 depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ιᶻ (ŝ .fst) ≤≥ ιᶻ (t̂ .fst)
 depth-preserving α (s , s≤α) (t , t≤α) (≈pcong a μ f g r) =

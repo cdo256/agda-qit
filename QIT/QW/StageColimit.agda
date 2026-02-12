@@ -1,6 +1,9 @@
 
 -- Basic foundations
 open import QIT.Prelude
+open import QIT.Prop
+open import QIT.Functor.Base
+open import QIT.Functor.Composition
 open import QIT.Setoid
 open import QIT.Relation.Base
 open import QIT.Relation.Binary
@@ -25,21 +28,20 @@ private
 -- Container functor
 open import QIT.Container.Base
 open import QIT.Container.Functor S P ℓD ℓD'
-open Ob
+open F-Ob
 
 -- Size control and staging
 open import QIT.Relation.Plump S P
 open import QIT.QW.Stage sig
 open import QIT.QW.Algebra sig
-open import QIT.Setoid.Diagram ≤p
 
 -- Colimits and cocontinuity
 open import QIT.QW.Colimit ≤p ℓD ℓD' hiding (_≈ˡ_)
 
 -- Module aliases for cleaner notation
-module F = ≈.Functor F
-module D = Diagram D
-module F∘D = Diagram (F ∘ᴰ D)
+module F = Functor F
+module D = Functor D
+module F∘D = Functor (F ∘ D)
 
 -- The underlying W-type of trees before quotienting.
 T = W S P

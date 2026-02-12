@@ -5,6 +5,11 @@ open import QIT.Relation.Base
 open import QIT.Relation.Binary
 open import QIT.Relation.Subset
 open import QIT.Container.Base
+open import QIT.Functor.Base
+open import QIT.Functor.Composition
+open import QIT.Category.Base hiding (_[_≈_]; _[_,_]; _[_∘_])
+open import QIT.Category.Preorder
+open import QIT.Category.Setoid
 
 open import QIT.QW.Signature
 
@@ -23,36 +28,39 @@ private
 -- Container functor
 open import QIT.Container.Base
 open import QIT.Container.Functor S P ℓD ℓD'
+open F-Ob
 
 -- Size control and staging
 open import QIT.Relation.Plump S P
 open import QIT.QW.Stage sig
 open import QIT.QW.Algebra sig
-open import QIT.Setoid.Diagram ≤p
 open import QIT.QW.StageColimit sig
 
 -- Colimits and cocontinuity
 open import QIT.QW.Colimit ≤p ℓD ℓD' hiding (_≈ˡ_)
+
+-- Diagram and _∘_ are already in scope from Stage import
 
 private
   ℓc = ℓS ⊔ ℓD
   ℓc' = ℓS ⊔ ℓP ⊔ ℓD ⊔ ℓD'
 
 -- A functor F is cocontinuous if it preserves colimits up to isomorphism.
-Cocontinuous : (F : ≈.Functor ℓc ℓc' ℓc ℓc') (D : ≈.Diagram ≤p ℓc ℓc')
+Cocontinuous : (F : Functor (SetoidCat ℓc ℓc') (SetoidCat ℓc ℓc')) (D : Diagram ℓc ℓc')
               → Prop ℓc'
 Cocontinuous F D =
-  Colim (F ∘ᴰ D) ≅ ob (Colim D)
+  Colim (F ∘ D) ≅ Functor.ob F (Colim D)
 
-open Ob
+module Ob = Functor F
+-- F, D, and F∘D modules are already defined in StageColimit
 
--- Forward direction: map from Colim(F ∘ᴰ D) to ob(Colim D).
+-- Forward direction: map from Colim(F ∘ D) to ob(Colim D).
 -- An element (α, (s, f)) becomes (s, λ i → (α, f i)).
-ϕ₀ : ⟨ Colim (F ∘ᴰ D) ⟩ → ⟨ F.ob (Colim D) ⟩
+ϕ₀ : ⟨ Colim (F ∘ D) ⟩ → ⟨ Ob.ob (Colim D) ⟩
 ϕ₀ (α , (s , f)) = s , (λ b → α , f b)
 
 -- Congruence for ϕ₀ at a specific stage.
-ϕ-cong-stage : ∀ α {x y} → F∘D.ob α [ x ≈ y ] → F.ob (Colim D) [ ϕ₀ (α , x) ≈ ϕ₀ (α , y) ]
+ϕ-cong-stage : ∀ α {x y} → F∘D.ob α [ x ≈ y ] → Ob.ob (Colim D) [ ϕ₀ (α , x) ≈ ϕ₀ (α , y) ]
 ϕ-cong-stage α {a , f} {a , g} (mk≈ꟳ ≡.refl snd≈) =
   mk≈ꟳ ≡.refl q
   where
@@ -63,16 +71,16 @@ open Ob
     u = snd≈ i
 
 -- Full congruence property for ϕ₀.
-ϕ-cong : ∀ {x y} → Colim (F ∘ᴰ D) [ x ≈ y ] → F.ob (Colim D) [ ϕ₀ x ≈ ϕ₀ y ]
+ϕ-cong : ∀ {x y} → Colim (F ∘ D) [ x ≈ y ] → Ob.ob (Colim D) [ ϕ₀ x ≈ ϕ₀ y ]
 ϕ-cong (≈lstage α e) = ϕ-cong-stage α e
 ϕ-cong (≈lstep {α} {j} (sup≤ p) (s , f)) =
   mk≈ꟳ ≡.refl λ k → ≈lstep (sup≤ p) (f k)
 ϕ-cong (≈lsym p) = ≈fsym (Colim D) (ϕ-cong p)
 ϕ-cong (≈ltrans p q) = ≈ftrans (Colim D) (ϕ-cong p) (ϕ-cong q)
 
--- Backward direction: map from ob(Colim D) to Colim(F ∘ᴰ D).
+-- Backward direction: map from ob(Colim D) to Colim(F ∘ D).
 -- Find a common upper bound for all stages, then weaken elements to this stage.
-ψ₀ : ⟨ F.ob (Colim D) ⟩ → ⟨ Colim (F ∘ᴰ D) ⟩
+ψ₀ : ⟨ Ob.ob (Colim D) ⟩ → ⟨ Colim (F ∘ D) ⟩
 ψ₀ (s , f) = sup (ιˢ s , μ) , s , λ i → pweaken (child≤ (ιˢ s) μ i) (f i .proj₂)
   where
   μ : P s → Z
@@ -141,10 +149,10 @@ module _ (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ŝ .fst 
   ≈ˡ→≈ˢ {α , s , s≤α} {β , t , t≤β} (≈ltrans p q) = ≈strans (≈ˡ→≈ˢ p) (≈ˡ→≈ˢ q)
 
   -- Congruence for ψ₀: convert colimit relations to stage relations.
-  ψ-cong : ∀ {x y} → F.ob (Colim D) [ x ≈ y ] → Colim (F ∘ᴰ D) [ ψ₀ x ≈ ψ₀ y ]
+  ψ-cong : ∀ {x y} → Ob.ob (Colim D) [ x ≈ y ] → Colim (F ∘ D) [ ψ₀ x ≈ ψ₀ y ]
   ψ-cong {s , f} {s , g} (mk≈ꟳ ≡.refl snd≈) = begin
     ψ₀ (s , f)
-      ≈⟨ ≈lrefl (F ∘ᴰ D) ⟩
+      ≈⟨ ≈lrefl (F ∘ D) ⟩
     (αf , s , λ i → tf i , _)
       ≈⟨ ≈lstep ∨ᶻ-l (s , _) ⟩
     (αf ∨ᶻ αg , s , λ i → tf i , ≤≤ ∨ᶻ-l (≤≤ (child≤ _ _ _) (fi≤μi i)))
@@ -152,7 +160,7 @@ module _ (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ŝ .fst 
     (αf ∨ᶻ αg , s , λ i → tg i , ≤≤ ∨ᶻ-r (≤≤ (child≤ _ _ _) (gi≤μi i)))
       ≈⟨ ≈lsym (≈lstep ∨ᶻ-r (s , _)) ⟩
     (αg , s , λ i → tg i , _)
-      ≈⟨ ≈lrefl (F ∘ᴰ D) ⟩
+      ≈⟨ ≈lrefl (F ∘ D) ⟩
     ψ₀ (s , g) ∎
     where
     μf : P s → Z
@@ -178,11 +186,11 @@ module _ (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ŝ .fst 
       μi≤α : μ i ≤ α
       μi≤α = ∨ᶻ≤ (<≤ ∨ᶻ-l< (child≤ (ιˢ s) μf i)) (<≤ ∨ᶻ-r< (child≤ (ιˢ s) μg i))
     open ≈.Hom
-    open Setoid (Colim (F ∘ᴰ D))
-    open ≈.≈syntax {S = Colim (F ∘ᴰ D)}
+    open Setoid (Colim (F ∘ D))
+    open ≈.≈syntax {S = Colim (F ∘ D)}
 
   -- Left inverse: ϕ₀ ∘ ψ₀ ≈ id on ob(Colim D).
-  linv : ∀ y → F.ob (Colim D) [ (ϕ₀ (ψ₀ y)) ≈ y ]
+  linv : ∀ y → Ob.ob (Colim D) [ (ϕ₀ (ψ₀ y)) ≈ y ]
   linv (s , g) =
     ϕ₀ (ψ₀ (s , g))
       ≈⟨ ≈frefl (Colim D) ⟩
@@ -192,12 +200,11 @@ module _ (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ŝ .fst 
     where
     μ : P s → Z
     μ i = g i .proj₁
-    open Setoid (F.ob (Colim D))
-    open Diagram D
-    open ≈.≈syntax {S = (F.ob (Colim D))}
+    open Setoid (Ob.ob (Colim D))
+    open ≈.≈syntax {S = (Ob.ob (Colim D))}
 
-  -- Right inverse: ψ₀ ∘ ϕ₀ ≈ id on Colim(F ∘ᴰ D).
-  rinv : ∀ x → Colim (F ∘ᴰ D) [ (ψ₀ (ϕ₀ x)) ≈ x ]
+  -- Right inverse: ψ₀ ∘ ϕ₀ ≈ id on Colim(F ∘ D).
+  rinv : ∀ x → Colim (F ∘ D) [ (ψ₀ (ϕ₀ x)) ≈ x ]
   rinv (α , (s , g)) = begin
     ψ₀ (ϕ₀ (α , (s , g)))
       ≈⟨ refl ⟩
@@ -211,14 +218,14 @@ module _ (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ŝ .fst 
     where
     α' = sup (ιˢ s , λ _ → α)
     β = α ∨ᶻ α'
-    open Setoid (Colim (F ∘ᴰ D))
-    open ≈.≈syntax {S = Colim (F ∘ᴰ D)}
+    open Setoid (Colim (F ∘ D))
+    open ≈.≈syntax {S = Colim (F ∘ D)}
 
   -- Main result: container functors are cocontinuous under depth preservation.
   depthPrserving→cocontinuous : Cocontinuous F D
   depthPrserving→cocontinuous = ∣ iso ∣
     where
-    iso : ≈.Iso (Colim (F ∘ᴰ D)) (F.ob (Colim D))
+    iso : ≈.Iso (Colim (F ∘ D)) (Ob.ob (Colim D))
     iso = record
       { ⟦_⟧ = ϕ₀
       ; ⟦_⟧⁻¹ = ψ₀

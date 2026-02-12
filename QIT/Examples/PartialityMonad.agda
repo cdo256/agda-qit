@@ -1,13 +1,14 @@
 module QIT.Examples.PartialityMonad where
 
 open import QIT.Prelude renaming (⊤ to ⊤'; ⊥ to ⊥') hiding (_≟_)
+open import QIT.Prop
 open import QIT.Relation.Subset
 import Data.Nat as ℕ
 open ℕ using (ℕ; zero; suc)
-import Data.Bool as 𝔹 
+import Data.Bool as 𝔹
 open 𝔹 using (Bool; false; true)
 
-import Data.Integer as ℤ 
+import Data.Integer as ℤ
 open ℤ using (ℤ)
 
 mutual
@@ -38,7 +39,7 @@ mutual
 
 module TM (Σ : Set) (_≟Σ_ : Discrete Σ) where
   Σ' = Σ ⊎ ⊤'
-  
+
   record TM : Set₁ where
     field
       S : Set

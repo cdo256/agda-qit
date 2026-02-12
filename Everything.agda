@@ -12,17 +12,21 @@ import QIT.Relation.Plump
 import QIT.Relation.Tests
 import QIT.Relation
 
+-- Category
+import QIT.Category.Base
+import QIT.Category.Preorder
+import QIT.Category.Set
+import QIT.Category.Setoid
+import QIT.Functor.Base
+import QIT.Functor.Composition
+import QIT.Algebra.Base
+
 -- Category of Setoids
 import QIT.Setoid.Base
 import QIT.Setoid.Indexed
 import QIT.Setoid.Hom
 import QIT.Setoid.Iso
 import QIT.Setoid.Sigma
-import QIT.Setoid.Diagram
-import QIT.Setoid.Functor
-import QIT.Setoid.Algebra.Base
-import QIT.Setoid.Algebra.Lift
-import QIT.Setoid.Algebra
 import QIT.Setoid
 
 -- Containers
@@ -43,7 +47,6 @@ import QIT.QW
 -- Mobile construction
 import QIT.Mobile.Base
 import QIT.Mobile.Cocontinuity
-
 
 -- Examples
 import QIT.Examples.HoleList

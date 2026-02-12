@@ -2,7 +2,7 @@ module QIT.Category.Base where
 
 open import QIT.Prelude
 open import QIT.Relation
-open import QIT.Setoid
+open import QIT.Setoid.Base hiding (_[_≈_])
 
 -- Taken from 'Agda Categories', changed to make BinaryRel Prop-valued.
 record Category (o ℓ e : Level) : Set (lsuc (o ⊔ ℓ ⊔ e)) where
@@ -60,3 +60,20 @@ record Category (o ℓ e : Level) : Set (lsuc (o ⊔ ℓ ⊔ e)) where
 
   e-level : Level
   e-level = e
+
+module _ {o ℓ e : Level} where
+
+  -- Convenience functions for working over multiple categories at once:
+  -- C [ x , y ] (for x y objects of C) - Hom_C(x , y)
+  -- C [ f ≈ g ] (for f g arrows of C)  - that f and g are equivalent arrows
+  -- C [ f ∘ g ] (for f g composable arrows of C) - composition in C
+  infix 10  _[_,_] _[_≈_] _[_∘_]
+
+  _[_,_] : (C : Category o ℓ e) → (X : Category.Obj C) → (Y : Category.Obj C) → Set ℓ
+  _[_,_] = Category._⇒_
+
+  _[_≈_] : (C : Category o ℓ e) → ∀ {X Y} (f g : C [ X , Y ]) → Prop e
+  _[_≈_] = Category._≈_
+
+  _[_∘_] : (C : Category o ℓ e) → ∀ {X Y Z} (f : C [ Y , Z ]) → (g : C [ X , Y ]) → C [ X , Z ]
+  _[_∘_] = Category._∘_

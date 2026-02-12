@@ -1,7 +1,7 @@
 open import QIT.Prelude
 open import QIT.Category.Base
 
-module QIT.Category.Functor
+module QIT.Functor.Base
   {ℓCo} {ℓCh} {ℓCe} {ℓDo} {ℓDh} {ℓDe}
   (C : Category ℓCo ℓCh ℓCe)
   (D : Category ℓDo ℓDh ℓDe)
@@ -11,8 +11,10 @@ record Functor : Set (ℓCo ⊔ ℓCh ⊔ ℓCe ⊔ ℓDo ⊔ ℓDh ⊔ ℓDe) w
   module C = Category C
   module D = Category D
   field
-    ob : ∀ (S : C.Obj) → D.Obj
-    hom : ∀ {S T : C.Obj} → S C.⇒ T → (ob S) D.⇒ (ob T)
-    id : ∀ {S : C.Obj} → hom C.id D.≈ D.id {ob S}
-    comp : ∀ {S T U : C.Obj} → (f : S C.⇒ T) → (g : T C.⇒ U)
+    ob : ∀ (x : C.Obj) → D.Obj
+    hom : ∀ {x y : C.Obj} → C [ x , y ] → D [ ob x , ob y ]
+    id : ∀ {x : C.Obj} → hom C.id D.≈ D.id {ob x}
+    comp : ∀ {x y z : C.Obj} → (f : C [ x , y ]) → (g : C [ y , z ])
          → hom (g C.∘ f) D.≈ (hom g D.∘ hom f)
+    resp : ∀ {x y} {f g : C [ x , y ]} → C [ f ≈ g ] → D [ hom f ≈ hom g ] 
+
