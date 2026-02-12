@@ -109,3 +109,11 @@ isProp A = ∀ (x y : A) → x ≡ y
 
 isContr : ∀ {ℓA} → Set ℓA → Set ℓA
 isContr A = Σ A λ x → ∀ y → x ≡ y
+
+≡cong₃ : ∀ {ℓA ℓB ℓC ℓD} {A : Set ℓA} {B : Set ℓB} {C : Set ℓC} {D : Set ℓD}
+      → (f : A → B → C → D) → ∀ {u v w x y z} → u ≡ v → w ≡ x → y ≡ z → f u w y ≡ f v x z
+≡cong₃ f ≡.refl ≡.refl ≡.refl = ≡.refl
+
+≡subst₃ : ∀ {ℓA ℓB ℓC ℓR} {A : Set ℓA} {B : Set ℓB} {C : Set ℓC}
+        → (R : A → B → C → Set ℓR) → ∀ {u v w x y z} → u ≡ v → w ≡ x → y ≡ z → R u w y → R v x z
+≡subst₃ f ≡.refl ≡.refl ≡.refl a = a
