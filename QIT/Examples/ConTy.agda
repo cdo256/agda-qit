@@ -3,6 +3,8 @@ module QIT.Examples.ConTy where
 open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Relation.Subset
+open import QIT.Relation.Base
+open import QIT.Relation.WellFounded
 
 module Plain where
   data Con : Set
@@ -20,7 +22,7 @@ module Erased where
   -- Following Setsini's 2023 thesis, sect 3.2.
   data Con₀ : Set
   data Ty₀ : Set
-   
+
   data Con₀ where
     ∙₀ : Con₀
     _▷₀_ : Con₀ → Ty₀ → Con₀
@@ -46,7 +48,7 @@ module Erased where
        → Ty₁ Γ₀ A₀
        → Ty₁ (Γ₀ ▷₀ A₀) B₀
        → Ty₁ Γ₀ (π₀ Γ₀ A₀ B₀)
-      
+
   inv-ι₁ : ∀ {Γ₀ Δ₀} → Ty₁ Γ₀ (ι₀ Δ₀) → Γ₀ ≡ Δ₀
   inv-ι₁ {∙₀} {∙₀} A₁ = ≡.refl
   inv-ι₁ {Γ₀ ▷₀ _} {Γ₀ ▷₀ _} (ι₁ Γ₁) = ≡.refl
@@ -60,7 +62,7 @@ module Erased where
   isPropCon₁ ∙₁ ∙₁ =
     ≡.refl
   isPropCon₁ (Γ₁ ▷₁ A₁) (Δ₁ ▷₁ B₁) =
-    ≡.cong₂ _▷₁_ (isPropCon₁ Γ₁ Δ₁) {!!}
+    ≡.cong₂ _▷₁_ (isPropCon₁ Γ₁ Δ₁) (isPropTy₁ A₁ B₁)
 
   isPropTy₁ (ι₁ Γ₁) (ι₁ Δ₁) =
     ≡.cong ι₁ (isPropCon₁ Γ₁ Δ₁)
@@ -69,17 +71,14 @@ module Erased where
 
   Con : Set
   Con = Σ Con₀ Con₁
-  
+
   Ty : Con → Set
   Ty (Γ₀ , _) = Σ Ty₀ (Ty₁ Γ₀)
-  
+
   ∙ : Con
   ∙ = ∙₀ , ∙₁
   _▷_ : (Γ : Con) → Ty Γ → Con
   (Γ₀ , Γ₁) ▷ (A₀ , A₁) = (Γ₀ ▷₀ A₀) , (Γ₁ ▷₁ A₁)
-
-  _₀ = proj₁
-  _₁ = proj₂
 
   ι : (Γ : Con) → Ty Γ
   ι (Γ₀ , Γ₁) = ι₀ Γ₀ , ι₁ Γ₁
@@ -97,71 +96,126 @@ module Erased where
       πᴰ : ∀ {Γ A B} (Γᴰ : Conᴰ Γ) (Aᴰ : Tyᴰ Γᴰ A) (Bᴰ : Tyᴰ (Γᴰ ▷ᴰ Aᴰ) B)
          → Tyᴰ Γᴰ (π Γ A B)
 
-  module RecursionRecursion (D : DisplayedAlgebra) where
-    open DisplayedAlgebra D
-    elimCon : (Γ : Con) → Conᴰ Γ
-    elimTy : {Γ : Con} (A : Ty Γ) → Tyᴰ (elimCon Γ) A
+  -- module RecursionRecursion (D : DisplayedAlgebra) where
+  --   open DisplayedAlgebra D
+  --   elimCon : (Γ : Con) → Conᴰ Γ
+  --   elimTy : {Γ : Con} (A : Ty Γ) → Tyᴰ (elimCon Γ) A
 
-    elimCon (∙₀ , ∙₁) = ∙ᴰ
-    elimCon (Γ₀ ▷₀ A₀ , Γ₁ ▷₁ A₁) = elimCon (Γ₀ , Γ₁) ▷ᴰ elimTy (A₀ , A₁)
+  --   elimCon (∙₀ , ∙₁) = ∙ᴰ
+  --   elimCon (Γ₀ ▷₀ A₀ , Γ₁ ▷₁ A₁) = elimCon (Γ₀ , Γ₁) ▷ᴰ elimTy (A₀ , A₁)
 
-    elimTy {Γ₀ , Γ₁} (ι₀ Γ₀ , ι₁ Γ₁') =
-      ≡.subst (λ ○ → Tyᴰ (elimCon (Γ₀ , Γ₁)) (ι₀ Γ₀ , ι₁ ○)) p u
-      where
-      p : Γ₁ ≡ Γ₁'
-      p = isPropCon₁ Γ₁ Γ₁'
-      u : Tyᴰ (elimCon (Γ₀ , Γ₁)) (ι (Γ₀ , Γ₁))
-      u = ιᴰ (elimCon (Γ₀ , Γ₁))
-    elimTy {Γ₀ , Γ₁} (π₀ Γ₀ A₀ B₀ , π₁ Γ₁' A₁ B₁) =
-      ≡.subst (λ ○ → Tyᴰ (elimCon (Γ₀ , Γ₁)) (π₀ Γ₀ A₀ B₀ , π₁ ○ A₁ B₁)) p u
-      where
-      p : Γ₁ ≡ Γ₁'
-      p = isPropCon₁ Γ₁ Γ₁'
-      v : Tyᴰ (elimCon (Γ₀ ▷₀ A₀ , Γ₁ ▷₁ A₁)) (B₀ , B₁)
-      v = elimTy (B₀ , B₁)
-      q : elimCon ((Γ₀ ▷₀ A₀) , (Γ₁ ▷₁ A₁))
-        ≡ elimCon (Γ₀ , Γ₁) ▷ᴰ elimTy (A₀ , A₁)
-      q = {!!}
-      u : Tyᴰ (elimCon (Γ₀ , Γ₁)) (π₀ Γ₀ A₀ B₀ , π₁ Γ₁ A₁ B₁)
-      u = πᴰ (elimCon (Γ₀ , Γ₁)) (elimTy (A₀ , A₁)) (subst (λ ○ → Tyᴰ ○ (B₀ , B₁)) q v)
+  --   elimTy {Γ₀ , Γ₁} (ι₀ Γ₀ , ι₁ Γ₁') =
+  --     ≡.subst (λ ○ → Tyᴰ (elimCon (Γ₀ , Γ₁)) (ι₀ Γ₀ , ι₁ ○)) p u
+  --     where
+  --     p : Γ₁ ≡ Γ₁'
+  --     p = isPropCon₁ Γ₁ Γ₁'
+  --     u : Tyᴰ (elimCon (Γ₀ , Γ₁)) (ι (Γ₀ , Γ₁))
+  --     u = ιᴰ (elimCon (Γ₀ , Γ₁))
+  --   elimTy {Γ₀ , Γ₁} (π₀ Γ₀ A₀ B₀ , π₁ Γ₁' A₁ B₁) =
+  --     ≡.subst (λ ○ → Tyᴰ (elimCon (Γ₀ , Γ₁)) (π₀ Γ₀ A₀ B₀ , π₁ ○ A₁ B₁)) p u
+  --     where
+  --     p : Γ₁ ≡ Γ₁'
+  --     p = isPropCon₁ Γ₁ Γ₁'
+  --     v : Tyᴰ (elimCon (Γ₀ ▷₀ A₀ , Γ₁ ▷₁ A₁)) (B₀ , B₁)
+  --     v = elimTy (B₀ , B₁)
+  --     q : elimCon ((Γ₀ ▷₀ A₀) , (Γ₁ ▷₁ A₁))
+  --       ≡ elimCon (Γ₀ , Γ₁) ▷ᴰ elimTy (A₀ , A₁)
+  --     q = {!!}
+  --     u : Tyᴰ (elimCon (Γ₀ , Γ₁)) (π₀ Γ₀ A₀ B₀ , π₁ Γ₁ A₁ B₁)
+  --     u = πᴰ (elimCon (Γ₀ , Γ₁)) (elimTy (A₀ , A₁)) (subst (λ ○ → Tyᴰ ○ (B₀ , B₁)) q v)
 
   module _ (D : DisplayedAlgebra) where
     open DisplayedAlgebra D
     data ElimCon : (Γ : Con) → Conᴰ Γ → Set
-    data ElimTy : ∀ {Γ Γ̂} (A : Ty Γ) → ElimCon Γ Γ̂ → Tyᴰ Γ̂ A → Set
+    data ElimTy : ∀ {Γ} (Γ̂ : Conᴰ Γ) (A : Ty Γ) → Tyᴰ Γ̂ A → Set
 
     data ElimCon where
       e∙ : ElimCon ∙ ∙ᴰ
-      e▷ : ∀ {Γ Γ̂ A Â} → (Γᵉ : ElimCon Γ Γ̂) → ElimTy A Γᵉ Â → ElimCon (Γ ▷ A) (Γ̂ ▷ᴰ Â)
+      e▷ : ∀ {Γ Γ̂ A Â} → (Γᵉ : ElimCon Γ Γ̂) → ElimTy Γ̂ A Â → ElimCon (Γ ▷ A) (Γ̂ ▷ᴰ Â)
 
     data ElimTy where
-      eι : ∀ {Γ Γ̂} → (Γᵉ : ElimCon Γ Γ̂) → ElimTy (ι Γ) Γᵉ (ιᴰ Γ̂)
+      eι : ∀ {Γ Γ̂} → (Γᵉ : ElimCon Γ Γ̂) → ElimTy Γ̂ (ι Γ) (ιᴰ Γ̂)
       eπ : ∀ {Γ Γ̂ A Â B B̂} → (Γᵉ : ElimCon Γ Γ̂)
-         → ElimTy A Γᵉ Â → (Δᵉ : ElimCon (Γ ▷ A) (Γ̂ ▷ᴰ Â))
-         → ElimTy B Δᵉ B̂ → ElimTy (π Γ A B) Γᵉ (πᴰ Γ̂ Â B̂)
+         → ElimTy Γ̂ A Â → (Δᵉ : ElimCon (Γ ▷ A) (Γ̂ ▷ᴰ Â))
+         → ElimTy (Γ̂ ▷ᴰ Â) B B̂ → ElimTy Γ̂ (π Γ A B) (πᴰ Γ̂ Â B̂)
 
-    isContrElimCon : ∀ Γ → isContr (Σ _ (ElimCon Γ))
-    isContrElimTy : ∀ {Γ Γ̂} (A : Ty Γ) → (Γᵉ : ElimCon Γ Γ̂) → isContr (Σ _ (ElimTy A Γᵉ))
 
-    Con-∃ : ∀ (Γ : Con) → Σ _ λ Γ̂ → ElimCon Γ Γ̂
-    Ty-∃ : ∀ {Γ Γ̂} (A : Ty Γ) → (Γᵉ : ElimCon Γ Γ̂) → Σ _ λ Aᵉ → ElimTy A Γᵉ Aᵉ
-    Con-∃! : ∀ (Γ : Con) → ∀ Γ̂ → ElimCon Γ Γ̂ → proj₁ (Con-∃ Γ) ≡ Γ̂
-    Ty-∃! : ∀ {Γ Γ̂} (A : Ty Γ) → (Γᵉ : ElimCon Γ Γ̂) → ∀ Aᵉ → ElimTy A Γᵉ Aᵉ → proj₁ (Ty-∃ A Γᵉ) ≡ Aᵉ 
+    data ConTy₀ : Set ℓ0 where
+      con : Con₀ → ConTy₀
+      ty : Ty₀ → ConTy₀
+      
+    data ConTy : Set ℓ0 where
+      con : Con → ConTy
+      ty : {Γ : Con} → Ty Γ → ConTy
 
-    Con-∃ (∙₀ , ∙₁) = ∙ᴰ , e∙
-    Con-∃ ((Γ₀ ▷₀ A₀) , (Γ₁ ▷₁ A₁)) = 
-      let Γ̂ , Γᵉ = Con-∃ (Γ₀ , Γ₁)
-          Â , Aᵉ = Ty-∃ (A₀ , A₁) Γᵉ
-      in (Γ̂ ▷ᴰ Â) , e▷ Γᵉ Aᵉ
+    ConTyFst : ConTy → ConTy₀
+    ConTyFst (con (Γ₀ , _)) = con Γ₀
+    ConTyFst (ty (A₀ , _)) = ty A₀
 
-    Ty-∃ {Γ₀ , Γ₁} {Γ̂ = Γ̂} (ι₀ Γ₀ , ι₁ Γ₁') Γᵉ' with isPropCon₁ Γ₁ Γ₁'
-    ... | ≡.refl = ιᴰ Γ̂  , eι Γᵉ'
-    Ty-∃ {Γ₀ , Γ₁} {Γ̂ = Γ̂} (π₀ Γ₀ A₀ B₀ , π₁ Γ₁' A₁ B₁) Γᵉ
-      with isPropCon₁ Γ₁ Γ₁' 
+    data _<₀_ : ConTy₀ → ConTy₀ → Set (lsuc ℓ0) where
+      <▷₀-1 : ∀ Γ A → con Γ <₀ con (Γ ▷₀ A)
+      <▷₀-2 : ∀ Γ A → ty A <₀ con (Γ ▷₀ A)
+      <ι₀-1 : ∀ Γ → con Γ <₀ ty (ι₀ Γ)
+      <π₀-1 : ∀ Γ A B → con Γ <₀ ty (π₀ Γ A B)
+      <π₀-2 : ∀ Γ A B → ty A <₀ ty (π₀ Γ A B)
+      <π₀-3 : ∀ Γ A B → ty B <₀ ty (π₀ Γ A B)
+      <<₀ : ∀ x y z → x <₀ y → y <₀ z → x <₀ z
+
+    _<_ : ConTy → ConTy → Set (lsuc ℓ0) 
+    x < y = ConTyFst x <₀ ConTyFst y
+
+    access : ∀ {x} → Acc _<₀_ x → ∀ y → _<₀_ y x → Acc _<₀_ y
+    access (acc rs) y y<x = rs y y<x
+
+    <₀-wf : WellFounded _<₀_
+    r-con : ∀ Γ → WfRec _<₀_ (Acc _<₀_) (con Γ)
+    r-ty : ∀ A → WfRec _<₀_ (Acc _<₀_) (ty A)
+
+    <₀-wf (con Γ) = acc (r-con Γ)
+    <₀-wf (ty A)  = acc (r-ty A)
+
+    r-con _ _ (<▷₀-1 Γ A) = <₀-wf (con Γ)
+    r-con _ _ (<▷₀-2 Γ A) = <₀-wf (ty A)
+    r-con _ _ (<<₀ x y (con Γ) x<y y<Γ) =
+      access (r-con Γ y y<Γ) x x<y
+
+    r-ty _ _ (<ι₀-1 Γ) = <₀-wf (con Γ)
+    r-ty _ _ (<π₀-1 Γ A B) = <₀-wf (con Γ)
+    r-ty _ _ (<π₀-2 Γ A B) = <₀-wf (ty A)
+    r-ty _ _ (<π₀-3 Γ A B) = <₀-wf (ty B)
+    r-ty _ _ (<<₀ x y (ty A) x<y y<A) =
+      access (r-ty A y y<A) x x<y
+
+    <-wf : WellFounded _<_
+    <-wf = wfProj _<₀_ ConTyFst <₀-wf
+
+    ConTy-∃-Type : ConTy → Set
+    ConTy-∃-Type (con Γ) = Σ (Conᴰ Γ) (ElimCon Γ)
+    ConTy-∃-Type (ty {Γ} A) = ∀ {Γ̂} → ElimCon Γ Γ̂ → Σ (Tyᴰ Γ̂ A) (ElimTy Γ̂ A)
+    ConTy-∃-step : ∀ x → (∀ y → y < x → ConTy-∃-Type y) → ConTy-∃-Type x
+    ConTy-∃-step (con (∙₀ , ∙₁)) rec = ∙ᴰ , e∙
+    ConTy-∃-step (con (Γ₀ ▷₀ A₀ , Γ₁ ▷₁ A₁)) rec =
+      let (Γ̂ , Γᵉ) = rec (con (Γ₀ , Γ₁)) (<▷₀-1 _ _)
+          (Â , Aᵉ) = rec (ty (A₀ , A₁)) (<▷₀-2 _ _) Γᵉ
+      in (Γ̂ ▷ᴰ Â) , e▷ Γᵉ Aᵉ
+    ConTy-∃-step (ty {Γ₀ , Γ₁} (ι₀ Γ₀ , ι₁ Γ₁')) rec {Γ̂} Γᵉ
+      with isPropCon₁ Γ₁ Γ₁'
+    ... | ≡.refl = ιᴰ Γ̂ , eι Γᵉ 
+    ConTy-∃-step (ty {Γ₀ , Γ₁} (π₀ Γ₀ A₀ B₀ , π₁ Γ₁' A₁ B₁)) rec {Γ̂} Γᵉ
+      with isPropCon₁ Γ₁ Γ₁'
     ... | ≡.refl =
-      let Â , Aᵉ = Ty-∃ (A₀ , A₁) Γᵉ
-          Δ̂ , Δᵉ = Con-∃ ((Γ₀ , Γ₁) ▷ (A₀ , A₁))
-          B̂ , Bᵉ = Ty-∃ (B₀ , B₁) Δᵉ
-          p : Δ̂ ≡ Δ̂
-          p = Con-∃! ((Γ₀ , Γ₁) ▷ (A₀ , A₁)) Δ̂ Δᵉ
-      in πᴰ Γ̂ Â {!B̂!} , {!!}
+      let (Â , Aᵉ) = rec (ty (A₀ , A₁)) (<π₀-2 _ _ _) Γᵉ
+          (B̂ , Bᵉ) = rec (ty (B₀ , B₁)) (<π₀-3 _ _ _) (e▷ Γᵉ Aᵉ)
+      in πᴰ Γ̂ Â B̂ , eπ Γᵉ Aᵉ (e▷ Γᵉ Aᵉ) Bᵉ
+
+    Con-∃ : ∀ Γ → Σ (Conᴰ Γ) (ElimCon Γ)
+    Con-∃ Γ = Wf-ind _<_ <-wf ConTy-∃-Type ConTy-∃-step (con Γ)
+
+    Ty-∃ : ∀ {Γ Γ̂} (A : Ty Γ) → ElimCon Γ Γ̂ → Σ (Tyᴰ Γ̂ A) (ElimTy Γ̂ A)
+    Ty-∃ A = Wf-ind _<_ <-wf ConTy-∃-Type ConTy-∃-step (ty A)
+
+    -- Con-∃! : ∀ (Γ : Con) → ∀ Γ̂ → ElimCon Γ Γ̂ → proj₁ (Con-∃ Γ) ≡ Γ̂
+    -- Ty-∃! : ∀ {Γ Γ̂} (A : Ty Γ) → (Γᵉ : ElimCon Γ Γ̂) → ∀ (Â : Tyᴰ Γ̂ A) → proj₁ (Ty-∃ A Γᵉ) ≡ Â
+
+    -- isContrElimCon : ∀ Γ → isContr (Σ _ (ElimCon Γ))
+    -- isContrElimTy : ∀ {Γ Γ̂} (A : Ty Γ) → (Γᵉ : ElimCon Γ Γ̂) → isContr (Σ _ (ElimTy Γ̂ A))
