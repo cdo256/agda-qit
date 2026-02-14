@@ -192,6 +192,7 @@ module Erased where
     ConTy-∃-Type : ConTy → Set
     ConTy-∃-Type (con Γ) = Σ (Conᴰ Γ) (ElimCon Γ)
     ConTy-∃-Type (ty {Γ} A) = ∀ {Γ̂} → ElimCon Γ Γ̂ → Σ (Tyᴰ Γ̂ A) (ElimTy Γ̂ A)
+
     ConTy-∃-step : ∀ x → (∀ y → y < x → ConTy-∃-Type y) → ConTy-∃-Type x
     ConTy-∃-step (con (∙₀ , ∙₁)) rec = ∙ᴰ , e∙
     ConTy-∃-step (con (Γ₀ ▷₀ A₀ , Γ₁ ▷₁ A₁)) rec =
@@ -214,8 +215,33 @@ module Erased where
     Ty-∃ : ∀ {Γ Γ̂} (A : Ty Γ) → ElimCon Γ Γ̂ → Σ (Tyᴰ Γ̂ A) (ElimTy Γ̂ A)
     Ty-∃ A = Wf-ind _<_ <-wf ConTy-∃-Type ConTy-∃-step (ty A)
 
-    -- Con-∃! : ∀ (Γ : Con) → ∀ Γ̂ → ElimCon Γ Γ̂ → proj₁ (Con-∃ Γ) ≡ Γ̂
-    -- Ty-∃! : ∀ {Γ Γ̂} (A : Ty Γ) → (Γᵉ : ElimCon Γ Γ̂) → ∀ (Â : Tyᴰ Γ̂ A) → proj₁ (Ty-∃ A Γᵉ) ≡ Â
+    ConTy-∃!-Type : ConTy → Set
+    ConTy-∃!-Type (con Γ) = ∀ Γ̂ → ElimCon Γ Γ̂ → proj₁ (Con-∃ Γ) ≡ Γ̂
+    ConTy-∃!-Type (ty {Γ} A) =
+      ∀ {Γ̂} → (Γᵉ : ElimCon Γ Γ̂) → (Â : Tyᴰ Γ̂ A) → ElimTy Γ̂ A Â
+      → proj₁ (Ty-∃ A Γᵉ) ≡ Â
 
-    -- isContrElimCon : ∀ Γ → isContr (Σ _ (ElimCon Γ))
-    -- isContrElimTy : ∀ {Γ Γ̂} (A : Ty Γ) → (Γᵉ : ElimCon Γ Γ̂) → isContr (Σ _ (ElimTy Γ̂ A))
+    ConTy-∃!-step : ∀ x → (∀ y → y < x → ConTy-∃!-Type y) → ConTy-∃!-Type x
+    ConTy-∃!-step (con (∙₀ , ∙₁)) rec Γ̂ e∙ = ≡.refl
+    ConTy-∃!-step (con ((Γ₀ ▷₀ A₀) , (Γ₁ ▷₁ A₁))) rec Δ̂ (e▷ {Γ̂ = Γ̂} {Â = Â} Γᵉ Aᵉ) =
+      let Γ̂' , Γᵉ'  = Con-∃ ((Γ₀ ▷₀ A₀) , (Γ₁ ▷₁ A₁))
+          pΓ = rec (con (Γ₀ , Γ₁)) (<▷₀-1 _ _) Γ̂ Γᵉ
+          pA = rec (ty (A₀ , A₁)) (<▷₀-2 _ _) Γᵉ Â Aᵉ
+      in {!≡congp₂ _▷ᴰ_ {!!} {!!}!}
+
+    -- ConTy-∃!-step (ty {Γ₀ , Γ₁} (ι₀ Γ₀ , ι₁ Γ₁')) rec {Γ̂} Γᵉ
+    --   with isPropCon₁ Γ₁ Γ₁'
+    -- ... | ≡.refl = ιᴰ Γ̂ , eι Γᵉ 
+    -- ConTy-∃!-step (ty {Γ₀ , Γ₁} (π₀ Γ₀ A₀ B₀ , π₁ Γ₁' A₁ B₁)) rec {Γ̂} Γᵉ
+    --   with isPropCon₁ Γ₁ Γ₁'
+    -- ... | ≡.refl =
+    --   let (Â , Aᵉ) = rec (ty (A₀ , A₁)) (<π₀-2 _ _ _) Γᵉ
+    --       (B̂ , Bᵉ) = rec (ty (B₀ , B₁)) (<π₀-3 _ _ _) (e▷ Γᵉ Aᵉ)
+    --   in πᴰ Γ̂ Â B̂ , eπ Γᵉ Aᵉ (e▷ Γᵉ Aᵉ) Bᵉ
+
+    -- -- Con-∃! : ∀ (Γ : Con) → ∀ Γ̂ → (Γᵉ : ElimCon Γ Γ̂)
+    -- --        → proj₁ (Con-∃ Γ) ≡ Γ̂
+    -- -- Con-∃! Γ = Wf-ind _<_ <-wf {!ConTy-∃!-Type!} {!!} {!!}
+
+    -- -- Ty-∃! : ∀ {Γ Γ̂} (A : Ty Γ) → (Γᵉ : ElimCon Γ Γ̂) → (Â : Tyᴰ Γ̂ A) → (Aᵉ : ElimTy Γ̂ A Â)
+    -- --       → proj₁ (Ty-∃ A Γᵉ) ≡ Â
