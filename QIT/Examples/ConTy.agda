@@ -111,11 +111,23 @@ module Erased where
          → ElimTy Γ̂ A Â → (Δᵉ : ElimCon (Γ ▷ A) (Γ̂ ▷ᴰ Â))
          → ElimTy (Γ̂ ▷ᴰ Â) B B̂ → ElimTy Γ̂ (π Γ A B) (πᴰ Γ̂ Â B̂)
 
-    data ConTy₀ : Set ℓ0 where
+    ElimConΣ : (Γ : Con) → Set 
+    ElimConΣ Γ = Σ (Conᴰ Γ) (ElimCon Γ)
+
+    ElimConΣ≡ : {Γ : Con} (ΓΣ ΓΣ' : ElimConΣ Γ) → Set
+    ElimConΣ≡ (Γ̂ , _) (Γ̂' , _) = Γ̂ ≡ Γ̂'
+  
+    ElimTyΣ : {Γ : Con} (A : Ty Γ) → ElimConΣ Γ → Set
+    ElimTyΣ A (Γ̂ , _) = Σ (Tyᴰ Γ̂ A) (ElimTy Γ̂ A)
+
+    ElimTyΣ≡ : {Γ : Con} {A : Ty Γ} {ΓΣ ΓΣ' : ElimConΣ Γ} (p : ElimConΣ≡ ΓΣ ΓΣ') → {AΣ : ElimTyΣ A ΓΣ} {AΣ' : ElimTyΣ A ΓΣ'} → Set
+    ElimTyΣ≡ {ΓΣ = Γ̂ , _} {ΓΣ' = Γ̂' , _} ≡.refl = Γ̂ ≡ Γ̂'
+
+    data ConTy₀ : Set where
       con : Con₀ → ConTy₀
       ty : Ty₀ → ConTy₀
       
-    data ConTy : Set ℓ0 where
+    data ConTy : Set where
       con : Con → ConTy
       ty : {Γ : Con} → Ty Γ → ConTy
 
@@ -124,49 +136,98 @@ module Erased where
     ConTyFst (ty (A₀ , _)) = ty A₀
 
     mutual
-      Con-∃ : (Γ₀ : Con₀) (Γ₁ : Con₁ Γ₀) → Σ (Conᴰ (Γ₀ , Γ₁)) (ElimCon (Γ₀ , Γ₁))
-      Con-∃ ∙₀ ∙₁ = ∙ᴰ , e∙
-      Con-∃ (Γ₀ ▷₀ A₀) (Γ₁ ▷₁ A₁) =
-        let (Γ̂ , Γᵉ) = Con-∃ Γ₀ Γ₁
-            (Â , Aᵉ) = Ty-∃ A₀ A₁ Γ̂ Γᵉ
-        in (Γ̂ ▷ᴰ Â) , e▷ Γᵉ Aᵉ
+      Con-∃-∙ : ElimConΣ ∙
+      Con-∃-∙ = ∙ᴰ , e∙
+      Con-∃-▷ : (Γ : Con) (ΓΣ : ElimConΣ Γ)
+              → (A : Ty Γ) (AΣ : ElimTyΣ A ΓΣ)
+              → ElimConΣ (Γ ▷ A)
+      Con-∃-▷ Γ (Γ̂ , Γᵉ) A (Â , Aᵉ) =
+        (Γ̂ ▷ᴰ Â) , e▷ Γᵉ Aᵉ
 
-      Ty-∃ : {Γ₀ : Con₀} {Γ₁ : Con₁ Γ₀} (A₀ : Ty₀) (A₁ : Ty₁ Γ₀ A₀)
-            → (Γ̂ : Conᴰ (Γ₀ , Γ₁)) → ElimCon (Γ₀ , Γ₁) Γ̂ → Σ (Tyᴰ Γ̂ (A₀ , A₁)) (ElimTy Γ̂ (A₀ , A₁) )
-      Ty-∃ {Γ₀} {Γ₁} (ι₀ Γ₀) (ι₁ Γ₁') Γ̂ Γᵉ with isPropCon₁ Γ₁' Γ₁
-      ... | ≡.refl = ιᴰ Γ̂ , eι Γᵉ
-      Ty-∃ {Γ₀} {Γ₁} (π₀ Γ₀ A₀ B₀) (π₁ Γ₁' A₁ B₁) Γ̂ Γᵉ with isPropCon₁ Γ₁' Γ₁
-      ... | ≡.refl =
-        let (Â , Aᵉ) = Ty-∃ A₀ A₁ Γ̂ Γᵉ
-            (B̂ , Bᵉ) = Ty-∃ B₀ B₁ (Γ̂ ▷ᴰ Â) (e▷ Γᵉ Aᵉ)
-        in πᴰ Γ̂ Â B̂ , eπ Γᵉ Aᵉ (e▷ Γᵉ Aᵉ) Bᵉ
+      Ty-∃-ι : {Γ₀ : Con₀} (Γ₁ Γ₁' : Con₁ Γ₀) (pΓ₁ : Γ₁ ≡ Γ₁') (ΓΣ : ElimConΣ (Γ₀ , Γ₁))
+             → ElimTyΣ (ι (Γ₀ , Γ₁')) ΓΣ
+      Ty-∃-ι {Γ₀} Γ₁ .Γ₁ ≡.refl (Γ̂ , Γᵉ) = ιᴰ Γ̂ , eι Γᵉ
 
-    Ty-∃-irrel : ∀ {Γ₀ Γ₁ Γ̂} (A₀ : Ty₀) (A₁ : Ty₁ Γ₀ A₀) (Γᵉ Γᵉ' : ElimCon (Γ₀ , Γ₁) Γ̂)
-              → proj₁ (Ty-∃ A₀ A₁ Γ̂ Γᵉ) ≡ proj₁ (Ty-∃ A₀ A₁ Γ̂ Γᵉ')
-    Ty-∃-irrel {Γ̂ = Γ̂} (π₀ ._ A₀ B₀) (π₁ Γ₁' A₁ B₁) Γᵉ Γᵉ' 
-      with isPropCon₁ Γ₁' _ 
-    ... | ≡.refl = helper (Ty-∃ A₀ A₁ Γ̂ Γᵉ) (Ty-∃ A₀ A₁ Γ̂ Γᵉ') (Ty-∃-irrel A₀ A₁ Γᵉ Γᵉ')
-      where
-        helper : (resA resA' : Σ _ _) → (p : proj₁ resA ≡ proj₁ resA') → _
-        helper resA resA' ≡.refl = ≡.cong (πᴰ _ (proj₁ resA)) (Ty-∃-irrel B₀ B₁ _ _)
+      Ty-∃-π : {Γ₀ : Con₀} (Γ₁ Γ₁' : Con₁ Γ₀) (pΓ₁ : Γ₁ ≡ Γ₁') (ΓΣ : ElimConΣ (Γ₀ , Γ₁))
+             → (A : Ty (Γ₀ , Γ₁)) (AΣ : ElimTyΣ A ΓΣ)
+             → (ΔΣ : ElimConΣ ((Γ₀ , Γ₁) ▷ A))
+             → (B : Ty ((Γ₀ , Γ₁) ▷ A)) (BΣ : ElimTyΣ B (Con-∃-▷ (Γ₀ , Γ₁) ΓΣ A AΣ))
+             → ElimTyΣ (π (Γ₀ , Γ₁') A B) ΓΣ
+      Ty-∃-π Γ₁ .Γ₁ ≡.refl (Γ̂ , Γᵉ) A (Â , Aᵉ) (Δ̂ , Δᵉ) B (B̂ , Bᵉ) =
+             πᴰ Γ̂ Â B̂ , eπ Γᵉ Aᵉ (e▷ Γᵉ Aᵉ) Bᵉ
+             
+      Con-∃-rec : (Γ₀ : Con₀) (Γ₁ : Con₁ Γ₀)
+                → ElimConΣ (Γ₀ , Γ₁)
+      Con-∃-rec ∙₀ ∙₁ =
+        Con-∃-∙
+      Con-∃-rec (Γ₀ ▷₀ A₀) (Γ₁ ▷₁ A₁) =
+        Con-∃-▷ (Γ₀ , Γ₁) (Con-∃-rec Γ₀ Γ₁) (A₀ , A₁) (Ty-∃-rec A₀ A₁ (Con-∃-rec Γ₀ Γ₁))
 
-    mutual
-      Con-∃! : (Γ₀ : Con₀) (Γ₁ : Con₁ Γ₀) → ∀ Γ̂ → ElimCon (Γ₀ , Γ₁) Γ̂ → proj₁ (Con-∃ Γ₀ Γ₁) ≡ Γ̂
-      Con-∃! ∙₀ ∙₁ Γ̂ e∙ = ≡.refl
-      Con-∃! (Γ₀ ▷₀ A₀) (Γ₁ ▷₁ A₁) Δ̂ (e▷ {Γ̂ = Γ̂} {Â = Â} Γᵉ Aᵉ)
-        with Con-∃! Γ₀ Γ₁ Γ̂ Γᵉ | Ty-∃! A₀ A₁ Γ̂ Γᵉ Â Aᵉ
-      ... | ≡.refl | ≡.refl =
-        let (Γ̂' , Γᵉ') = Con-∃ Γ₀ Γ₁
-            (Â' , Aᵉ') = Ty-∃ A₀ A₁ Γ̂' Γᵉ'
-            in ≡.cong (Γ̂' ▷ᴰ_) (≡.sym (Ty-∃! A₀ A₁ Γ̂' Γᵉ Â' Aᵉ'))
+      Ty-∃-rec : {Γ₀ : Con₀} {Γ₁ : Con₁ Γ₀} (A₀ : Ty₀) (A₁ : Ty₁ Γ₀ A₀)
+               → (ΓΣ : ElimConΣ (Γ₀ , Γ₁)) → ElimTyΣ (A₀ , A₁) ΓΣ
+      Ty-∃-rec {Γ₀} {Γ₁} (ι₀ Γ₀) (ι₁ Γ₁') (Γ̂ , Γᵉ) =
+        Ty-∃-ι Γ₁ Γ₁' (isPropCon₁ Γ₁ Γ₁') (Γ̂ , Γᵉ)
+      Ty-∃-rec {Γ₀} {Γ₁} (π₀ Γ₀ A₀ B₀) (π₁ Γ₁' A₁ B₁) (Γ̂ , Γᵉ) =
+        Ty-∃-π Γ₁ Γ₁' (isPropCon₁ Γ₁ Γ₁') (Γ̂ , Γᵉ)
+               (A₀ , A₁) (Ty-∃-rec A₀ A₁ (Γ̂ , Γᵉ))
+               (Con-∃-rec (Γ₀ ▷₀ A₀) (Γ₁ ▷₁ A₁))
+               (B₀ , B₁) (Ty-∃-rec B₀ B₁ (Con-∃-▷ (Γ₀ , Γ₁) (Γ̂ , Γᵉ) (A₀ , A₁) (Ty-∃-rec A₀ A₁ (Γ̂ , Γᵉ))))
 
-      Ty-∃! : {Γ₀ : Con₀} {Γ₁ : Con₁ Γ₀} (A₀ : Ty₀) (A₁ : Ty₁ Γ₀ A₀)
-            → (Γ̂ : Conᴰ (Γ₀ , Γ₁)) → (Γᵉ : ElimCon (Γ₀ , Γ₁) Γ̂) 
-            → (Â : Tyᴰ Γ̂ (A₀ , A₁)) (Aᵉ : ElimTy Γ̂ (A₀ , A₁) Â)
-            → proj₁ (Ty-∃ A₀ A₁ Γ̂ Γᵉ) ≡ Â
-      Ty-∃! {Γ₀} {Γ₁} (ι₀ .Γ₀) (ι₁ Γ₁') Γ̂ Γᵉ _ (eι _) with isPropCon₁ Γ₁' Γ₁
-      ... | ≡.refl = ≡.refl
-      Ty-∃! {Γ₀} {Γ₁} (π₀ Γ₀ A₀ B₀) (π₁ Γ₁' A₁ B₁) Γ̂ Γᵉ _ (eπ Γᵉ' Aᵉ Δᵉ Bᵉ) with isPropCon₁ Γ₁' Γ₁
-      ... | ≡.refl with Ty-∃! A₀ A₁ Γ̂ Γᵉ _ Aᵉ
-      ... | ≡.refl with Ty-∃! B₀ B₁ (Γ̂ ▷ᴰ _) Δᵉ _ Bᵉ
-      ... | ≡.refl = {!!}
+
+    --   Ty-∃ : {Γ₀ : Con₀} {Γ₁ : Con₁ Γ₀} (A₀ : Ty₀) (A₁ : Ty₁ Γ₀ A₀)
+    --         → (Γ̂ : Conᴰ (Γ₀ , Γ₁)) → ElimCon (Γ₀ , Γ₁) Γ̂ → Σ (Tyᴰ Γ̂ (A₀ , A₁)) (ElimTy Γ̂ (A₀ , A₁) )
+    --   Ty-∃ {Γ₀} {Γ₁} (ι₀ Γ₀) (ι₁ Γ₁') Γ̂ Γᵉ with isPropCon₁ Γ₁' Γ₁
+    --   ... | ≡.refl = ιᴰ Γ̂ , eι Γᵉ
+    --   Ty-∃ {Γ₀} {Γ₁} (π₀ Γ₀ A₀ B₀) (π₁ Γ₁' A₁ B₁) Γ̂ Γᵉ with isPropCon₁ Γ₁' Γ₁
+    --   ... | ≡.refl =
+    --     let (Â , Aᵉ) = Ty-∃ A₀ A₁ Γ̂ Γᵉ
+    --         (B̂ , Bᵉ) = Ty-∃ B₀ B₁ (Γ̂ ▷ᴰ Â) (e▷ Γᵉ Aᵉ)
+    --     in πᴰ Γ̂ Â B̂ , eπ Γᵉ Aᵉ (e▷ Γᵉ Aᵉ) Bᵉ
+
+    -- -- mutual
+    -- --   Con-∃ : (Γ₀ : Con₀) (Γ₁ : Con₁ Γ₀) → Σ (Conᴰ (Γ₀ , Γ₁)) (ElimCon (Γ₀ , Γ₁))
+    -- --   Con-∃ ∙₀ ∙₁ = ∙ᴰ , e∙
+    -- --   Con-∃ (Γ₀ ▷₀ A₀) (Γ₁ ▷₁ A₁) =
+    -- --     let (Γ̂ , Γᵉ) = Con-∃ Γ₀ Γ₁
+    -- --         (Â , Aᵉ) = Ty-∃ A₀ A₁ Γ̂ Γᵉ
+    -- --     in (Γ̂ ▷ᴰ Â) , e▷ Γᵉ Aᵉ
+
+    -- --   Ty-∃ : {Γ₀ : Con₀} {Γ₁ : Con₁ Γ₀} (A₀ : Ty₀) (A₁ : Ty₁ Γ₀ A₀)
+    -- --         → (Γ̂ : Conᴰ (Γ₀ , Γ₁)) → ElimCon (Γ₀ , Γ₁) Γ̂ → Σ (Tyᴰ Γ̂ (A₀ , A₁)) (ElimTy Γ̂ (A₀ , A₁) )
+    -- --   Ty-∃ {Γ₀} {Γ₁} (ι₀ Γ₀) (ι₁ Γ₁') Γ̂ Γᵉ with isPropCon₁ Γ₁' Γ₁
+    -- --   ... | ≡.refl = ιᴰ Γ̂ , eι Γᵉ
+    -- --   Ty-∃ {Γ₀} {Γ₁} (π₀ Γ₀ A₀ B₀) (π₁ Γ₁' A₁ B₁) Γ̂ Γᵉ with isPropCon₁ Γ₁' Γ₁
+    -- --   ... | ≡.refl =
+    -- --     let (Â , Aᵉ) = Ty-∃ A₀ A₁ Γ̂ Γᵉ
+    -- --         (B̂ , Bᵉ) = Ty-∃ B₀ B₁ (Γ̂ ▷ᴰ Â) (e▷ Γᵉ Aᵉ)
+    -- --     in πᴰ Γ̂ Â B̂ , eπ Γᵉ Aᵉ (e▷ Γᵉ Aᵉ) Bᵉ
+
+    -- -- Ty-∃-irrel : ∀ {Γ₀ Γ₁ Γ̂} (A₀ : Ty₀) (A₁ : Ty₁ Γ₀ A₀) (Γᵉ Γᵉ' : ElimCon (Γ₀ , Γ₁) Γ̂)
+    -- --           → proj₁ (Ty-∃ A₀ A₁ Γ̂ Γᵉ) ≡ proj₁ (Ty-∃ A₀ A₁ Γ̂ Γᵉ')
+    -- -- Ty-∃-irrel {Γ̂ = Γ̂} (π₀ ._ A₀ B₀) (π₁ Γ₁' A₁ B₁) Γᵉ Γᵉ' 
+    -- --   with isPropCon₁ Γ₁' _ 
+    -- -- ... | ≡.refl = helper (Ty-∃ A₀ A₁ Γ̂ Γᵉ) (Ty-∃ A₀ A₁ Γ̂ Γᵉ') (Ty-∃-irrel A₀ A₁ Γᵉ Γᵉ')
+    -- --   where
+    -- --     helper : (resA resA' : Σ _ _) → (p : proj₁ resA ≡ proj₁ resA') → _
+    -- --     helper resA resA' ≡.refl = ≡.cong (πᴰ _ (proj₁ resA)) (Ty-∃-irrel B₀ B₁ _ _)
+
+    -- -- mutual
+    -- --   Con-∃! : (Γ₀ : Con₀) (Γ₁ : Con₁ Γ₀) → ∀ Γ̂ → ElimCon (Γ₀ , Γ₁) Γ̂ → proj₁ (Con-∃ Γ₀ Γ₁) ≡ Γ̂
+    -- --   Con-∃! ∙₀ ∙₁ Γ̂ e∙ = ≡.refl
+    -- --   Con-∃! (Γ₀ ▷₀ A₀) (Γ₁ ▷₁ A₁) Δ̂ (e▷ {Γ̂ = Γ̂} {Â = Â} Γᵉ Aᵉ)
+    -- --     with Con-∃! Γ₀ Γ₁ Γ̂ Γᵉ | Ty-∃! A₀ A₁ Γ̂ Γᵉ Â Aᵉ
+    -- --   ... | ≡.refl | ≡.refl =
+    -- --     let (Γ̂' , Γᵉ') = Con-∃ Γ₀ Γ₁
+    -- --         (Â' , Aᵉ') = Ty-∃ A₀ A₁ Γ̂' Γᵉ'
+    -- --         in ≡.cong (Γ̂' ▷ᴰ_) (≡.sym (Ty-∃! A₀ A₁ Γ̂' Γᵉ Â' Aᵉ'))
+
+    -- --   Ty-∃! : {Γ₀ : Con₀} {Γ₁ : Con₁ Γ₀} (A₀ : Ty₀) (A₁ : Ty₁ Γ₀ A₀)
+    -- --         → (Γ̂ : Conᴰ (Γ₀ , Γ₁)) → (Γᵉ : ElimCon (Γ₀ , Γ₁) Γ̂) 
+    -- --         → (Â : Tyᴰ Γ̂ (A₀ , A₁)) (Aᵉ : ElimTy Γ̂ (A₀ , A₁) Â)
+    -- --         → proj₁ (Ty-∃ A₀ A₁ Γ̂ Γᵉ) ≡ Â
+    -- --   Ty-∃! {Γ₀} {Γ₁} (ι₀ .Γ₀) (ι₁ Γ₁') Γ̂ Γᵉ _ (eι _) with isPropCon₁ Γ₁' Γ₁
+    -- --   ... | ≡.refl = ≡.refl
+    -- --   Ty-∃! {Γ₀} {Γ₁} (π₀ Γ₀ A₀ B₀) (π₁ Γ₁' A₁ B₁) Γ̂ Γᵉ _ (eπ Γᵉ' Aᵉ Δᵉ Bᵉ) with isPropCon₁ Γ₁' Γ₁
+    -- --   ... | ≡.refl with Ty-∃! A₀ A₁ Γ̂ Γᵉ _ Aᵉ
+    -- --   ... | ≡.refl with Ty-∃! B₀ B₁ (Γ̂ ▷ᴰ _) Δᵉ _ Bᵉ
+    -- --   ... | ≡.refl = {!!}
