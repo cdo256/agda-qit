@@ -191,18 +191,12 @@ module Erased where
                (A₀ , A₁) (Â , Aᵉ)
                (Δ̂ , e▷ {Γ̂ = Γ̂'} {Â = Â'} Γᵉ' Aᵉ') ≡.refl ≡.refl =
         ≡.dcong₂ _▷ᴰ_ (Con-∃!-rec Γ₀ Γ₁ (Γ̂' , Γᵉ')) (Ty-∃!-rec (Γ̂' , Γᵉ') A₀ A₁ (Â' , Aᵉ'))
-
-      -- Ty-∃-irrel-ι : {Γ₀ : Con₀} {Γ₁ Γ₁' : Con₁ Γ₀} (pΓ₁ : Γ₁ ≡ Γ₁')
-      --              → (ppΓ₁ : isPropCon₁ Γ₁ Γ₁' ≡ pΓ₁)
-      --              → (ΓΣ ΓΣ' : ElimConΣ (Γ₀ , Γ₁))
-      --              → (pΓ : ElimConΣ≡ ΓΣ ΓΣ')
-      --              → ElimTyΣ≡ ΓΣ ΓΣ' pΓ
-      --                         (Ty-∃-rec (ι₀ Γ₀) (ι₁ Γ₁) ΓΣ)
-      --                         (Ty-∃-rec (ι₀ Γ₀) (ι₁ Γ₁) ΓΣ')
-      -- Ty-∃-irrel-ι {Γ₀} {Γ₁} {Γ₁} ≡.refl ppΓ₁ (Γ̂ , Γᵉ) (Γ̂ , Γᵉ') ≡.refl = {!!}
-      -- --   with isPropCon₁ Γ₁ Γ₁
-      -- -- ... | ≡.refl = ≡.refl
       
+
+      Ty-∃-ι-q-irrel : {Γ₀ : Con₀} {Γ₁ Γ₁' : Con₁ Γ₀} (q : Γ₁ ≡ Γ₁') (ΓΣ : ElimConΣ (Γ₀ , Γ₁))
+                    → proj₁ (Ty-∃-ι Γ₁ Γ₁' q ΓΣ) ≡ subst (λ ○ → Tyᴰ ○ ?) ? {!ιᴰ (proj₁ ΓΣ)!}
+      Ty-∃-ι-q-irrel ≡.refl (Γ̂ , Γᵉ) = ≡.refl
+
       Ty-∃-ι-irrel
         : {Γ₀ : Con₀} {Γ₁ Γ₁' : Con₁ Γ₀} 
         → (q : Γ₁ ≡ Γ₁') 
@@ -219,11 +213,32 @@ module Erased where
                  (Con-∃!-rec Γ₀ Γ₁ (Γ̂' , Γᵉ))
                  (Ty-∃!-rec (Γ̂' , Γᵉ) A₀ A₁ (Â' , Aᵉ))
 
+      Ty-∃!-ι
+        : (Γ₀ : Con₀) (Γ₁ Γ₁' : Con₁ Γ₀) (pΓ : Γ₁ ≡ Γ₁') (ΓΣ : ElimConΣ (Γ₀ , Γ₁))
+        → (AΣ : ElimTyΣ (ι (Γ₀ , Γ₁')) ΓΣ)
+        → ElimTyΣ≡ (Con-∃ (Γ₀ , Γ₁)) ΓΣ (Con-∃!-rec Γ₀ Γ₁ ΓΣ)
+                   (Ty-∃ (ι (Γ₀ , Γ₁'))) AΣ
+      Ty-∃!-ι Γ₀ Γ₁ Γ₁ ≡.refl (Γ̂ , Γᵉ) (Â , Aᵉ) =
+        subst (λ ○ → Tyᴰ ○ (ι₀ Γ₀ , ι₁ Γ₁)) (Con-∃!-rec Γ₀ Γ₁ (Γ̂ , Γᵉ))
+              (proj₁ (Ty-∃ (ι₀ Γ₀ , ι₁ Γ₁)))
+          ≡⟨ Ty-∃-irrel (ι₀ Γ₀) (ι₁ Γ₁) (Con-∃ (Γ₀ , Γ₁)) (Γ̂ , Γᵉ) (Con-∃!-rec Γ₀ Γ₁ (Γ̂ , Γᵉ)) ⟩
+        proj₁ (Ty-∃-rec (ι₀ Γ₀) (ι₁ Γ₁) (Γ̂ , Γᵉ))
+          ≡⟨ ≡.refl ⟩
+        proj₁ (Ty-∃-ι Γ₁ Γ₁ (isPropCon₁ Γ₁ Γ₁) (Γ̂ , Γᵉ))
+          ≡⟨ {!!} ⟩
+        proj₁ (ιᴰ Γ̂ , eι Γᵉ)
+          ≡⟨ ≡.refl ⟩
+        ιᴰ Γ̂
+          ≡⟨ {!!} ⟩
+        Â ∎
+        where open ≡.≡-Reasoning
+ 
       Ty-∃!-rec : {Γ₀ : Con₀} {Γ₁ : Con₁ Γ₀} (ΓΣ : ElimConΣ (Γ₀ , Γ₁))
                 → (A₀ : Ty₀) (A₁ : Ty₁ Γ₀ A₀) (AΣ : ElimTyΣ (A₀ , A₁) ΓΣ)
                 → ElimTyΣ≡ (Con-∃ (Γ₀ , Γ₁)) ΓΣ (Con-∃!-rec Γ₀ Γ₁ ΓΣ)
                            (Ty-∃ (A₀ , A₁)) AΣ
-      Ty-∃!-rec (Γ̂ , Γᵉ) (ι₀ Γ₀) (ι₁ Γ₁) (Â , Aᵉ) = {!!}
+      Ty-∃!-rec {Γ₀} {Γ₁} (Γ̂ , Γᵉ) (ι₀ Γ₀) (ι₁ Γ₁') (Â , Aᵉ) =
+        Ty-∃!-ι Γ₀ Γ₁ Γ₁' (isPropCon₁ Γ₁ Γ₁') (Γ̂ , Γᵉ) (Â , Aᵉ)
       Ty-∃!-rec (Δ̂ , Δᵉ) (π₀ Γ₀ A₀ B₀) (π₁ Γ₁ A₁ B₁) (Â , eπ Γᵉ' Aᵉ' Δᵉ' Bᵉ') = {!!}
 
       Con-∃!-▷-step
