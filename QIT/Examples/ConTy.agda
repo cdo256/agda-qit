@@ -194,7 +194,8 @@ module Erased where
       
 
       Ty-∃-ι-q-irrel : {Γ₀ : Con₀} {Γ₁ Γ₁' : Con₁ Γ₀} (q : Γ₁ ≡ Γ₁') (ΓΣ : ElimConΣ (Γ₀ , Γ₁))
-                    → proj₁ (Ty-∃-ι Γ₁ Γ₁' q ΓΣ) ≡ subst (λ ○ → Tyᴰ ○ ?) ? {!ιᴰ (proj₁ ΓΣ)!}
+                    → proj₁ (Ty-∃-ι Γ₁ Γ₁' q ΓΣ)
+                    ≡ subst (λ ○ → Tyᴰ (proj₁ ΓΣ) (ι₀ Γ₀ , ι₁ ○)) q (ιᴰ (proj₁ ΓΣ))
       Ty-∃-ι-q-irrel ≡.refl (Γ̂ , Γᵉ) = ≡.refl
 
       Ty-∃-ι-irrel
@@ -214,24 +215,27 @@ module Erased where
                  (Ty-∃!-rec (Γ̂' , Γᵉ) A₀ A₁ (Â' , Aᵉ))
 
       Ty-∃!-ι
-        : (Γ₀ : Con₀) (Γ₁ Γ₁' : Con₁ Γ₀) (pΓ : Γ₁ ≡ Γ₁') (ΓΣ : ElimConΣ (Γ₀ , Γ₁))
+        : (Γ₀ : Con₀) (Γ₁ Γ₁' : Con₁ Γ₀) (pΓ : Γ₁ ≡ Γ₁')
+        → (ΓΣ : ElimConΣ (Γ₀ , Γ₁))
         → (AΣ : ElimTyΣ (ι (Γ₀ , Γ₁')) ΓΣ)
         → ElimTyΣ≡ (Con-∃ (Γ₀ , Γ₁)) ΓΣ (Con-∃!-rec Γ₀ Γ₁ ΓΣ)
                    (Ty-∃ (ι (Γ₀ , Γ₁'))) AΣ
-      Ty-∃!-ι Γ₀ Γ₁ Γ₁ ≡.refl (Γ̂ , Γᵉ) (Â , Aᵉ) =
+      Ty-∃!-ι Γ₀ Γ₁ Γ₁ ≡.refl (Γ̂ , Γᵉ) (Â , Aᵉ@(eι Γᵉ')) =
         subst (λ ○ → Tyᴰ ○ (ι₀ Γ₀ , ι₁ Γ₁)) (Con-∃!-rec Γ₀ Γ₁ (Γ̂ , Γᵉ))
               (proj₁ (Ty-∃ (ι₀ Γ₀ , ι₁ Γ₁)))
           ≡⟨ Ty-∃-irrel (ι₀ Γ₀) (ι₁ Γ₁) (Con-∃ (Γ₀ , Γ₁)) (Γ̂ , Γᵉ) (Con-∃!-rec Γ₀ Γ₁ (Γ̂ , Γᵉ)) ⟩
         proj₁ (Ty-∃-rec (ι₀ Γ₀) (ι₁ Γ₁) (Γ̂ , Γᵉ))
           ≡⟨ ≡.refl ⟩
         proj₁ (Ty-∃-ι Γ₁ Γ₁ (isPropCon₁ Γ₁ Γ₁) (Γ̂ , Γᵉ))
-          ≡⟨ {!!} ⟩
-        proj₁ (ιᴰ Γ̂ , eι Γᵉ)
-          ≡⟨ ≡.refl ⟩
+          ≡⟨ Ty-∃-ι-q-irrel (isPropCon₁ Γ₁ Γ₁) (Γ̂ , Γᵉ) ⟩
+        subst (λ ○ → Tyᴰ Γ̂ (ι₀ Γ₀ , ι₁ ○)) (isPropCon₁ Γ₁ Γ₁) (ιᴰ Γ̂)
+          ≡⟨ ≡.cong (λ □ → subst (λ ○ → Tyᴰ Γ̂ (ι₀ Γ₀ , ι₁ ○)) □ (ιᴰ Γ̂))
+                    (isSetSet (isPropCon₁ Γ₁ Γ₁) ≡.refl) ⟩
         ιᴰ Γ̂
-          ≡⟨ {!!} ⟩
+          ≡⟨ ≡.refl ⟩
         Â ∎
-        where open ≡.≡-Reasoning
+        where
+        open ≡.≡-Reasoning
  
       Ty-∃!-rec : {Γ₀ : Con₀} {Γ₁ : Con₁ Γ₀} (ΓΣ : ElimConΣ (Γ₀ , Γ₁))
                 → (A₀ : Ty₀) (A₁ : Ty₁ Γ₀ A₀) (AΣ : ElimTyΣ (A₀ , A₁) ΓΣ)

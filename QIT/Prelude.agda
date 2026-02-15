@@ -138,3 +138,6 @@ isContr A = Σ A λ x → ∀ y → x ≡ y
   → ((x : A) → isProp (B x)) → {u v : Σ A B}
   → (p : u .proj₁ ≡ v .proj₁) → u ≡ v
 Σ≡Prop pB {x , u} {x , v} ≡.refl = ≡.cong (x ,_) (pB x u v)
+
+isSetSet : ∀ {ℓA} {A : Set ℓA} {x : A} (p q : x ≡ x) → p ≡ q
+isSetSet ≡.refl ≡.refl = ≡.refl
