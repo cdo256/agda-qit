@@ -149,12 +149,12 @@ module Erased where
              → ElimTyΣ (ι (Γ₀ , Γ₁')) ΓΣ
       Ty-∃-ι {Γ₀} Γ₁ .Γ₁ ≡.refl (Γ̂ , Γᵉ) = ιᴰ Γ̂ , eι Γᵉ
 
-      Ty-∃-π : {Γ₀ : Con₀} (Γ₁ Γ₁' : Con₁ Γ₀) (pΓ₁ : Γ₁ ≡ Γ₁') (ΓΣ : ElimConΣ (Γ₀ , Γ₁))
-             → (A : Ty (Γ₀ , Γ₁)) (AΣ : ElimTyΣ A ΓΣ)
+      Ty-∃-π : {Γ₀ : Con₀} {Γ₁ Γ₁' : Con₁ Γ₀} (pΓ₁ : Γ₁ ≡ Γ₁') (ΓΣ : ElimConΣ (Γ₀ , Γ₁))
+             → {A : Ty (Γ₀ , Γ₁)} (AΣ : ElimTyΣ A ΓΣ)
              → (ΔΣ : ElimConΣ ((Γ₀ , Γ₁) ▷ A))
-             → (B : Ty ((Γ₀ , Γ₁) ▷ A)) (BΣ : ElimTyΣ B (Con-∃-▷ ΓΣ AΣ))
+             → {B : Ty ((Γ₀ , Γ₁) ▷ A)} (BΣ : ElimTyΣ B (Con-∃-▷ ΓΣ AΣ))
              → ElimTyΣ (π (Γ₀ , Γ₁') A B) ΓΣ
-      Ty-∃-π Γ₁ .Γ₁ ≡.refl (Γ̂ , Γᵉ) A (Â , Aᵉ) (Δ̂ , Δᵉ) B (B̂ , Bᵉ) =
+      Ty-∃-π ≡.refl (Γ̂ , Γᵉ) (Â , Aᵉ) (Δ̂ , Δᵉ) (B̂ , Bᵉ) =
              πᴰ Γ̂ Â B̂ , eπ Γᵉ Aᵉ (e▷ Γᵉ Aᵉ) Bᵉ
              
       Con-∃-rec : (Γ₀ : Con₀) (Γ₁ : Con₁ Γ₀)
@@ -169,10 +169,10 @@ module Erased where
       Ty-∃-rec {Γ₀} {Γ₁} (ι₀ Γ₀) (ι₁ Γ₁') (Γ̂ , Γᵉ) =
         Ty-∃-ι Γ₁ Γ₁' (isPropCon₁ Γ₁ Γ₁') (Γ̂ , Γᵉ)
       Ty-∃-rec {Γ₀} {Γ₁} (π₀ Γ₀ A₀ B₀) (π₁ Γ₁' A₁ B₁) (Γ̂ , Γᵉ) =
-        Ty-∃-π Γ₁ Γ₁' (isPropCon₁ Γ₁ Γ₁') (Γ̂ , Γᵉ)
-               (A₀ , A₁) (Ty-∃-rec A₀ A₁ (Γ̂ , Γᵉ))
+        Ty-∃-π (isPropCon₁ Γ₁ Γ₁') (Γ̂ , Γᵉ)
+               (Ty-∃-rec A₀ A₁ (Γ̂ , Γᵉ))
                (Con-∃-rec (Γ₀ ▷₀ A₀) (Γ₁ ▷₁ A₁))
-               (B₀ , B₁) (Ty-∃-rec B₀ B₁ (Con-∃-▷ (Γ̂ , Γᵉ) (Ty-∃-rec A₀ A₁ (Γ̂ , Γᵉ))))
+               (Ty-∃-rec B₀ B₁ (Con-∃-▷ (Γ̂ , Γᵉ) (Ty-∃-rec A₀ A₁ (Γ̂ , Γᵉ))))
 
     Con-∃ : (Γ : Con) → ElimConΣ Γ
     Con-∃ (Γ₀ , Γ₁) = Con-∃-rec Γ₀ Γ₁
@@ -243,7 +243,8 @@ module Erased where
                            (Ty-∃ (A₀ , A₁)) AΣ
       Ty-∃!-rec {Γ₀} {Γ₁} (Γ̂ , Γᵉ) (ι₀ Γ₀) (ι₁ Γ₁') (Â , Aᵉ) =
         Ty-∃!-ι Γ₀ Γ₁ Γ₁' (isPropCon₁ Γ₁ Γ₁') (Γ̂ , Γᵉ) (Â , Aᵉ)
-      Ty-∃!-rec (Δ̂ , Δᵉ) (π₀ Γ₀ A₀ B₀) (π₁ Γ₁ A₁ B₁) (Â , eπ Γᵉ' Aᵉ' Δᵉ' Bᵉ') = {!!}
+      Ty-∃!-rec (Δ̂ , Δᵉ) (π₀ Γ₀ A₀ B₀) (π₁ Γ₁ A₁ B₁) (Â , eπ Γᵉ' Aᵉ' Δᵉ' Bᵉ') =
+        {!Ty-∃!-π!}
 
       Con-∃!-▷-step
         : {Γ₀ : Con₀} {Γ₁ Γ₁' : Con₁ Γ₀}
@@ -270,8 +271,8 @@ module Erased where
                          (Con-∃!-▷-step q ΓΣ ΓΣ' p A AΣ AΣ' pA)
                          BΣ BΣ')
         → ElimTyΣ≡ ΓΣ ΓΣ' p
-                   (Ty-∃-π Γ₁ Γ₁' q ΓΣ A AΣ (Con-∃-▷ ΓΣ AΣ) B BΣ)
-                   (Ty-∃-π Γ₁ Γ₁' q ΓΣ' A AΣ' (Con-∃-▷ ΓΣ' AΣ') B BΣ')
+                   (Ty-∃-π q ΓΣ AΣ (Con-∃-▷ ΓΣ AΣ) BΣ)
+                   (Ty-∃-π q ΓΣ' AΣ' (Con-∃-▷ ΓΣ' AΣ') BΣ')
       Ty-∃-π-irrel
         ≡.refl (Γ̂ , Γᵉ) (.Γ̂ , Γᵉ') ≡.refl A (Â , Aᵉ) (.Â , Aᵉ')
         ≡.refl B (B̂ , Bᵉ) (.B̂ , Bᵉ') ≡.refl = ≡.refl
@@ -288,34 +289,60 @@ module Erased where
                        (Ty-∃-rec A₀ A₁ (Γ̂ , Γᵉ'))
                        (Ty-∃-irrel A₀ A₁ (Γ̂ , Γᵉ) (Γ̂ , Γᵉ') ≡.refl)))
 
-      -- Ty-∃!-ι : (Γ : Con) (ΓΣ : ElimConΣ Γ)
-      --         → (pΓ : ElimConΣ≡ (Con-∃ Γ) ΓΣ)
-      --         → (AΣ : ElimTyΣ (ι Γ) ΓΣ)
-      --         → ElimTyΣ≡ (Con-∃ Γ) ΓΣ pΓ (Ty-∃ (ι Γ)) AΣ 
-      -- Ty-∃!-ι (Γ₀ , Γ₁) (Γ̂ , Γᵉ) ≡.refl (Â , eι {Γ̂ = Γ̂} Γᵉ') =
-      --   proj₁ (Ty-∃ (ι (Γ₀ , Γ₁)))
-      --     ≡⟨ ≡.refl ⟩
-      --   proj₁ (Ty-∃-rec (ι₀ Γ₀) (ι₁ Γ₁) (Con-∃ (Γ₀ , Γ₁)))
-      --     ≡⟨ ≡.refl ⟩
-      --   proj₁ (Ty-∃-rec (ι₀ Γ₀) (ι₁ Γ₁) (Γ̂ , {!!}))
-      --     ≡⟨ {!!} ⟩
-      --   ιᴰ Γ̂ ∎
-      --   where open ≡.≡-Reasoning
+      Ty-∃-π-q-irrel : {Γ₀ : Con₀} {Γ₁ Γ₁' : Con₁ Γ₀} (q : Γ₁ ≡ Γ₁') (ΓΣ : ElimConΣ (Γ₀ , Γ₁))
+                      (A : Ty (Γ₀ , Γ₁)) (AΣ : ElimTyΣ A ΓΣ)
+                      (ΔΣ : ElimConΣ ((Γ₀ , Γ₁) ▷ A))
+                      (B : Ty ((Γ₀ , Γ₁) ▷ A)) (BΣ : ElimTyΣ B (Con-∃-▷ ΓΣ AΣ))
+                    → proj₁ (Ty-∃-π q ΓΣ AΣ ΔΣ BΣ)
+                    ≡ subst (λ ○ → Tyᴰ (proj₁ ΓΣ) (π₀ Γ₀ (proj₁ A) (proj₁ B) , π₁ ○ (proj₂ A) (proj₂ B))) q (πᴰ (proj₁ ΓΣ) (proj₁ AΣ) (proj₁ BΣ))
+      Ty-∃-π-q-irrel ≡.refl ΓΣ A AΣ ΔΣ B BΣ = ≡.refl
 
-      -- -- Ty-∃!-rec (Γ̂ , Γᵉ) A₀ A₁ (Â , eι Γᵉ₁) = {!!}
-      -- -- Ty-∃!-rec (Γ̂ , Γᵉ) A₀ A₁ (Â , eπ Γᵉ' Aᵉ Bᵉ Cᵉ) = {!!}
+      trans-ElimTyΣ : {Γ : Con} {A : Ty Γ} (ΓΣ ΓΣ' : ElimConΣ Γ)
+                    → (p : ElimConΣ≡ ΓΣ ΓΣ') → ElimTyΣ A ΓΣ → ElimTyΣ A ΓΣ'
+      trans-ElimTyΣ (Γ̂ , Γᵉ) (.Γ̂ , Γᵉ') ≡.refl (Â , Aᵉ) = Â , Aᵉ
 
-      -- -- -- Ty-∃!-rec : {Γ₀ : Con₀} {Γ₁ : Con₁ Γ₀} (ΓΣ : ElimConΣ (Γ₀ , Γ₁))
-      -- -- --           → ElimConΣ≡ (Con-∃ (Γ₀ , Γ₁)) ΓΣ
-      -- -- --           → (A₀ : Ty₀) {A₁ : Ty₁ Γ₀ A₀} (AΣ : ElimTyΣ (A₀ , A₁) ΓΣ)
-      -- -- --           → ElimTyΣ≡ (Con-∃ (Γ₀ , Γ₁)) ΓΣ (Con-∃!-rec Γ₀ Γ₁ ΓΣ) (Ty-∃ (A₀ , A₁)) AΣ
-      -- -- --           → ElimTyΣ≡ (Con-∃ ((Γ₀ , Γ₁) ▷ (A₀ , A₁))) {!!} {!!} {!!} {!!}
+      trans-ElimTyΣ-refl : {Γ : Con} {A : Ty Γ} (ΓΣ : ElimConΣ Γ) 
+                         → (AΣ : ElimTyΣ A ΓΣ) → trans-ElimTyΣ ΓΣ ΓΣ ≡.refl AΣ ≡ AΣ
+      trans-ElimTyΣ-refl ΓΣ AΣ = ≡.refl
 
-      -- -- -- -- mutual
-      -- -- -- --   Con-∃! ∙₀ ∙₁ Γ̂ e∙ = ≡.refl
-      -- -- -- --   Con-∃! (Γ₀ ▷₀ A₀) (Γ₁ ▷₁ A₁) Δ̂ (e▷ Γᵉ Aᵉ) = {!!}
-
-      -- -- -- --   -- Ty-∃! : {Γ₀ : Con₀} {Γ₁ : Con₁ Γ₀} (A₀ : Ty₀) (A₁ : Ty₁ Γ₀ A₀)
-      -- -- -- --   --       → (Γ̂ : Conᴰ (Γ₀ , Γ₁)) → (Γᵉ : ElimCon (Γ₀ , Γ₁) Γ̂) 
-      -- -- -- --   --       → (Â : Tyᴰ Γ̂ (A₀ , A₁)) (Aᵉ : ElimTy Γ̂ (A₀ , A₁) Â)
-      -- -- -- --   --       → proj₁ (Ty-∃ A₀ A₁ Γ̂ Γᵉ) ≡ Â
+      Ty-∃!-π
+        : {Γ₀ : Con₀} {Γ₁ Γ₁' : Con₁ Γ₀} (q : Γ₁ ≡ Γ₁')
+        → (ΓΣ : ElimConΣ (Γ₀ , Γ₁))
+        → (A : Ty (Γ₀ , Γ₁)) (B : Ty ((Γ₀ , Γ₁) ▷ A))
+        → (AΣ : ElimTyΣ A ΓΣ) (ΔΣ : ElimConΣ ((Γ₀ , Γ₁) ▷ A)) (BΣ : ElimTyΣ B ΔΣ)
+        → (pA : ElimTyΣ≡ (Con-∃ (Γ₀ , Γ₁)) ΓΣ (Con-∃!-rec Γ₀ Γ₁ ΓΣ) (Ty-∃ A) AΣ)
+        → (pΔ : ElimConΣ≡ (Con-∃ ((Γ₀ , Γ₁) ▷ A)) ΔΣ)
+        → (pB : ElimTyΣ≡ (Con-∃ ((Γ₀ , Γ₁) ▷ A)) ΔΣ pΔ (Ty-∃ B) BΣ)
+        → ElimTyΣ≡ (Con-∃ (Γ₀ , Γ₁)) ΓΣ (Con-∃!-rec Γ₀ Γ₁ ΓΣ)
+                   (Ty-∃ (π (Γ₀ , Γ₁') A B))
+                   (Ty-∃-π q ΓΣ AΣ ΔΣ (Ty-∃-rec (proj₁ B) (proj₂ B) (Con-∃-▷ ΓΣ AΣ)))
+      Ty-∃!-π {Γ₀} {Γ₁} {Γ₁'} ≡.refl ΓΣ A B AΣ ΔΣ BΣ ≡.refl ≡.refl ≡.refl =
+        let pΓ = Con-∃!-rec Γ₀ Γ₁ ΓΣ
+        in 
+        subst (λ ○ → Tyᴰ ○ (π (Γ₀ , Γ₁') A B)) pΓ (proj₁ (Ty-∃ (π (Γ₀ , Γ₁') A B)))
+          ≡⟨ Ty-∃-irrel (π₀ Γ₀ (proj₁ A) (proj₁ B)) (π₁ Γ₁' (proj₂ A) (proj₂ B)) (Con-∃ (Γ₀ , Γ₁)) ΓΣ pΓ ⟩
+        proj₁ (Ty-∃-rec (π₀ Γ₀ (proj₁ A) (proj₁ B)) (π₁ Γ₁' (proj₂ A) (proj₂ B)) ΓΣ)
+          ≡⟨ ≡.refl ⟩
+        proj₁ (Ty-∃-π (isPropCon₁ Γ₁ Γ₁') ΓΣ (Ty-∃-rec (proj₁ A) (proj₂ A) ΓΣ) ΔΣ
+              (Ty-∃-rec (proj₁ B) (proj₂ B) (Con-∃-▷ ΓΣ (Ty-∃-rec (proj₁ A) (proj₂ A) ΓΣ ))))
+          ≡⟨ Ty-∃-π-q-irrel (isPropCon₁ Γ₁ Γ₁') ΓΣ A (Ty-∃-rec (proj₁ A) (proj₂ A) ΓΣ) (Con-∃-rec _ _) B (Ty-∃-rec (proj₁ B) (proj₂ B) (Con-∃-▷ ΓΣ (Ty-∃-rec (proj₁ A) (proj₂ A) ΓΣ))) ⟩
+        subst (λ ○ → Tyᴰ (proj₁ ΓΣ) (π₀ Γ₀ (proj₁ A) (proj₁ B) , π₁ ○ (proj₂ A) (proj₂ B))) (isPropCon₁ Γ₁ Γ₁) (πᴰ (proj₁ ΓΣ) (proj₁ (Ty-∃-rec (proj₁ A) (proj₂ A) ΓΣ)) (proj₁ (Ty-∃-rec (proj₁ B) (proj₂ B) ((Con-∃-▷ ΓΣ (Ty-∃-rec (proj₁ A) (proj₂ A) ΓΣ))))))
+          ≡⟨ substDefEq (λ ○ → Tyᴰ (proj₁ ΓΣ) (π₀ Γ₀ (proj₁ A) (proj₁ B) , π₁ ○ (proj₂ A) (proj₂ B))) (isPropCon₁ Γ₁ Γ₁) (πᴰ (proj₁ ΓΣ) (proj₁ (Ty-∃-rec (proj₁ A) (proj₂ A) ΓΣ)) (proj₁ (Ty-∃-rec (proj₁ B) (proj₂ B) ((Con-∃-▷ ΓΣ (Ty-∃-rec (proj₁ A) (proj₂ A) ΓΣ)))))) ⟩
+        πᴰ (proj₁ ΓΣ) (proj₁ (Ty-∃-rec (proj₁ A) (proj₂ A) ΓΣ)) (proj₁ (Ty-∃-rec (proj₁ B) (proj₂ B) ((Con-∃-▷ ΓΣ (Ty-∃-rec (proj₁ A) (proj₂ A) ΓΣ)))))
+          ≡⟨ ≡.dcong₂ (πᴰ (proj₁ ΓΣ)) r s ⟩
+        --   ≡⟨ ≡.cong₂ {!πᴰ (proj₁ ΓΣ)!} pA {!≡.trans (Ty-∃-irrel (proj₁ B) (proj₂ B) _ _ _) pB!} ⟩
+        πᴰ (proj₁ ΓΣ) (proj₁ AΣ) (proj₁ (Ty-∃-rec (proj₁ B) (proj₂ B)
+          (Con-∃-▷ ΓΣ _))) ∎
+        where
+        open ≡.≡-Reasoning
+        r : proj₁ (Ty-∃-rec (proj₁ A) (proj₂ A) ΓΣ)
+          ≡ subst (λ ○ → Tyᴰ ○ A) (Con-∃!-rec Γ₀ Γ₁ ΓΣ) (proj₁ (Ty-∃ A))
+        r = ≡.sym (Ty-∃-irrel (proj₁ A) (proj₂ A) (Con-∃ (Γ₀ , Γ₁)) ΓΣ (Con-∃!-rec Γ₀ Γ₁ ΓΣ))
+        s : subst (λ z → Tyᴰ (proj₁ ΓΣ ▷ᴰ z) B) r (proj₁ (Ty-∃-rec (proj₁ B) (proj₂ B) (Con-∃-▷ ΓΣ (Ty-∃-rec (proj₁ A) (proj₂ A) ΓΣ))))
+          ≡ proj₁ (Ty-∃-rec (proj₁ B) (proj₂ B) (Con-∃-▷ ΓΣ (trans-ElimTyΣ ΓΣ ΓΣ ≡.refl (subst (λ ○ → Tyᴰ ○ A) (Con-∃!-rec Γ₀ Γ₁ ΓΣ) (proj₁ (Ty-∃ A)) , _))))
+        s =
+          subst (λ z → Tyᴰ (proj₁ ΓΣ ▷ᴰ z) B) r (proj₁ (Ty-∃-rec (proj₁ B) (proj₂ B) (Con-∃-▷ ΓΣ (Ty-∃-rec (proj₁ A) (proj₂ A) ΓΣ))))
+            ≡⟨ {!!} ⟩
+          proj₁ (Ty-∃-rec (proj₁ B) (proj₂ B) (Con-∃-▷ ΓΣ (trans-ElimTyΣ ΓΣ ΓΣ ≡.refl (subst (λ ○ → Tyᴰ ○ A) (Con-∃!-rec Γ₀ Γ₁ ΓΣ) (proj₁ (Ty-∃ A)) , _))))
+            ≡⟨ {!!} ⟩
+          proj₁ (Ty-∃-rec (proj₁ B) (proj₂ B) (Con-∃-▷ ΓΣ (trans-ElimTyΣ ΓΣ ΓΣ ≡.refl (subst (λ ○ → Tyᴰ ○ A) (Con-∃!-rec Γ₀ Γ₁ ΓΣ) (proj₁ (Ty-∃ A)) , _)))) ∎

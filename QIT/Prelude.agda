@@ -141,3 +141,7 @@ isContr A = Σ A λ x → ∀ y → x ≡ y
 
 isSetSet : ∀ {ℓA} {A : Set ℓA} {x : A} (p q : x ≡ x) → p ≡ q
 isSetSet ≡.refl ≡.refl = ≡.refl
+
+substDefEq : ∀ {ℓA ℓP} {A : Set ℓA} (P : A → Set ℓP)
+           → ∀ {x} (p : x ≡ x) (y : P x) → subst P p y ≡ y
+substDefEq P ≡.refl y = ≡.refl
