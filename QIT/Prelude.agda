@@ -27,6 +27,10 @@ import Data.Product
 module × = Data.Product
 open × using (_×_; Σ; Σ-syntax; _,_; proj₁; proj₂) public
 
+import Agda.Builtin.Sigma
+{-# DISPLAY Agda.Builtin.Sigma.Σ.fst = proj₁ #-}
+{-# DISPLAY Agda.Builtin.Sigma.Σ.snd = proj₂ #-}
+
 -- Sum types - represents disjoint union and logical disjunction.
 import Data.Sum
 module ⊎ = Data.Sum

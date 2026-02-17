@@ -317,6 +317,10 @@ module Erased where
                       (≡.cong₂ _,_ p (≅.≅-to-subst-≡ r)) u ≡ v
     ≅-to-subst-fiber ≡.refl ≅.refl ≅.refl ≅.refl = ≡.refl
 
+    Σ-lift : {A : Set} {B : A → Set} {x y : A} {u : B x} {v : B y}
+          → (p : x ≡ y) → subst B p u ≡ v → (x , u) ≡ (y , v)
+    Σ-lift ≡.refl ≡.refl = ≡.refl
+
     r̂ : Elim D
     r̂ = record
       { conᴱ = {!!} 
@@ -327,46 +331,30 @@ module Erased where
       ; πᴱ = {!!} }
       where
       open Rec≡ h∘r≡id
-      c-helper : (Γ : Con) (Γ' : Con) (p : Γ' ≡ proj₁ (r.conᴿ Γ)) → D.Conᴰ Γ'
-      c-helper Γ ._ ≡.refl = proj₂ (r.conᴿ Γ)
-
       c : (Γ : Con) → D.Conᴰ Γ
-      c Γ = c-helper Γ Γ (≡.sym (con≡ Γ))
+      c Γ = subst D.Conᴰ (con≡ Γ) (proj₂ (r.conᴿ Γ))
 
-      -- 2. Define type construction via a non-circular helper
-      t-helper : (Γ : Con) (Γ' : Con) (p : Γ' ≡ proj₁ (r.conᴿ Γ))
-               → (A : Ty Γ) (A' : Ty Γ') (q : A' ≅ r.tyᴿ A)
-               → D.Tyᴰ (c Γ') A'
-      t-helper Γ ._ ≡.refl A ._ ≅.refl = proj₂ (r.tyᴿ A)
-
+      -- 2. Type construction using double transport
+      -- We need to transport across the context path AND the type path.
       t : {Γ : Con} (A : Ty Γ) → D.Tyᴰ (c Γ) A
-      -- t {Γ} A = t-helper Γ (proj₁ (r.conᴿ Γ)) (con≡ Γ) A (proj₁ (r.tyᴿ A)) (≅.sym (ty≅ Γ A))
---       c : (Γ : Con) → D.Conᴰ Γ
---       c Γ with con≡ Γ
---       ... | ≡.refl = proj₂ (r.conᴿ Γ)
+      t {Γ} A = 
+        let 
+          -- The path for the context index
+          p = ≡.sym (con≡ Γ)
+          -- The path for the type index (from heterogeneous to homogeneous)
+          -- Note: ty≅ Γ A : r.tyᴿ A ≅ A
+          -- We need to extract the path between the second components
+          -- q : subst (λ γ → Ty (proj₁ (r.conᴿ γ))) p (proj₁ (r.tyᴿ A))
+          --   ≡ (proj₁ A , ≡.subst₂ Ty₁ (≡.cong proj₁ {!!}) ≡.refl (proj₂ A))
+          q : ≡.subst (λ x → x) (≅.≅-to-type-≡ (ty≅ Γ A)) (Rec.tyᴿ h∘r A) ≡
+               Rec.tyᴿ idRec A
+          q = ≅.≅-to-subst-≡ (ty≅ Γ A) 
+        in ≡.dsubst₂ (λ Γ A → D.Tyᴰ (c Γ) A) {!!} {!!} {!proj₂ (r.tyᴿ A)!}
+        -- subst (λ (idx : Σ Con Ty) → D.Tyᴰ (proj₁ idx) (proj₂ idx))
+        --       (Σ-lift p q)
+        --       (proj₂ (r.tyᴿ A))
 
---       -- Using with-abstraction to unify proj₁ (r.conᴿ Γ) with Γ
---       -- and proj₁ (r.tyᴿ A) with A.
---       t : {Γ : Con} (A : Ty Γ) → D.Tyᴰ (c Γ) A
---       t {Γ} A with con≡ Γ | ty≡ Γ A
---       ... | ≡.refl | ≅.refl = proj₂ (r.tyᴿ A)
 
--- --       c : ∀ Γ → D.Conᴰ Γ
--- --       t : ∀ {Γ} (A : Ty Γ) → D.Tyᴰ (c Γ) A
--- --       c Γ = subst D.Conᴰ (con≡ Γ) (proj₂ (r.conᴿ Γ))
--- --       -- t {Γ} A =
--- --       --   ≅.subst (D.Tyᴰ (c Γ)) (ty≅ Γ A) {!proj₂ (r.tyᴿ Γ A)!}
--- --       -- t {Γ} A = ≅.≅-to-subst-≡ {!≅.trans (≅.sym (ty≅ Γ A)) (Σ-proj₂-≅ {!ty≅ Γ A!})!}
--- --       t {Γ} A = 
--- --         let -- Path from initiality: (proj₁ (r.tyᴿ A) , proj₂ (r.tyᴿ A)) ≅ (A₀ , A₁)
--- --             eq-total : Rec.tyᴿ h∘r A ≅ Rec.tyᴿ idRec A
--- --             eq-total = ty≅ Γ A 
--- --             -- -- Extract the index path for Con and the path for Ty index
--- --             eq-con = ≅.≅-to-type-≡ (Σ-proj₁-≅ {!eq-total!}) 
--- --             -- eq-ty  = Σ-proj₁-≅ (Σ-proj₂-≅ eq-total)
--- --             -- -- Extract the fiber equality
--- --             -- eq-fiber = Σ-proj₂-≅ (Σ-proj₂-≅ eq-total)
--- --         in {!≅-to-subst-fiber (con≡ Γ) {!≅.≅-to-≡ {!≡.refl!}!} {!eq-ty!} {!eq-fiber!}!}
 
 --   module PropElim (D : DisplayedAlgebra) where
 --     open DisplayedAlgebra D
