@@ -13,6 +13,10 @@ import Relation.Binary.PropositionalEquality
 module ≡ = Relation.Binary.PropositionalEquality
 open ≡ public using (_≡_; subst) public
 
+import Relation.Binary.HeterogeneousEquality 
+module ≅ = Relation.Binary.HeterogeneousEquality 
+open ≅ public using (_≅_) public
+
 -- Empty type - represents logical falsehood and impossible cases.
 import Data.Empty
 module ⊥ = Data.Empty
@@ -145,3 +149,4 @@ isSetSet ≡.refl ≡.refl = ≡.refl
 substDefEq : ∀ {ℓA ℓP} {A : Set ℓA} (P : A → Set ℓP)
            → ∀ {x} (p : x ≡ x) (y : P x) → subst P p y ≡ y
 substDefEq P ≡.refl y = ≡.refl
+
