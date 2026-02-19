@@ -14,8 +14,8 @@ module ≡ = Relation.Binary.PropositionalEquality
 open ≡ public using (_≡_; subst) public
 
 import Relation.Binary.HeterogeneousEquality 
-module ≅ = Relation.Binary.HeterogeneousEquality 
-open ≅ public using (_≅_) public
+module ≣ = Relation.Binary.HeterogeneousEquality 
+open ≣ public using () renaming (_≅_ to _≣_)
 
 -- Empty type - represents logical falsehood and impossible cases.
 import Data.Empty

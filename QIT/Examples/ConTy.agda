@@ -4,7 +4,6 @@ open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Relation.Subset
 open import QIT.Relation.Base
-open import QIT.Relation.WellFounded
 
 module Plain where
   data Con : Set
@@ -124,24 +123,24 @@ module Erased where
       module s = Rec s
     field
       con≡ : ∀ Γ → r.conᴿ Γ ≡ s.conᴿ Γ
-      ty≅ : ∀ Γ → (A : Ty Γ) → r.tyᴿ {Γ} A ≅ s.tyᴿ {Γ} A
+      ty≣ : ∀ Γ → (A : Ty Γ) → r.tyᴿ {Γ} A ≣ s.tyᴿ {Γ} A
 
   reflRec≡ : {A : Algebra} {r : Rec A} → Rec≡ A r r
   reflRec≡ = record
     { con≡ = λ _ → ≡.refl
-    ; ty≅ = λ _ _ → ≅.refl
+    ; ty≣ = λ _ _ → ≣.refl
     }
 
   symRec≡ : {A : Algebra} {r s : Rec A} → Rec≡ A r s → Rec≡ A s r
   symRec≡ p = record
     { con≡ = λ Γ → ≡.sym (Rec≡.con≡ p Γ)
-    ; ty≅ = λ Γ A → ≅.sym (Rec≡.ty≅ p Γ A)
+    ; ty≣ = λ Γ A → ≣.sym (Rec≡.ty≣ p Γ A)
     }
 
   transRec≡ : {A : Algebra} {r s t : Rec A} → Rec≡ A r s → Rec≡ A s t → Rec≡ A r t
   transRec≡ p q = record
     { con≡ = λ Γ → ≡.trans (Rec≡.con≡ p Γ) (Rec≡.con≡ q Γ)
-    ; ty≅ = λ Γ A → ≅.trans (Rec≡.ty≅ p Γ A) (Rec≡.ty≅ q Γ A)
+    ; ty≣ = λ Γ A → ≣.trans (Rec≡.ty≣ p Γ A) (Rec≡.ty≣ q Γ A)
     }
 
   record Elim (D : DisplayedAlgebra) : Set₁ where
@@ -163,24 +162,24 @@ module Erased where
       module s = Elim s
     field
       con≡ : ∀ Γ → r.conᴱ Γ ≡ s.conᴱ Γ
-      ty≅ : ∀ Γ → (A : Ty Γ) → r.tyᴱ {Γ} A ≅ s.tyᴱ {Γ} A
+      ty≣ : ∀ Γ → (A : Ty Γ) → r.tyᴱ {Γ} A ≣ s.tyᴱ {Γ} A
 
   reflElim≡ : {D : DisplayedAlgebra} {r : Elim D} → Elim≡ D r r
   reflElim≡ = record
     { con≡ = λ _ → ≡.refl
-    ; ty≅ = λ _ _ → ≅.refl
+    ; ty≣ = λ _ _ → ≣.refl
     }
 
   symElim≡ : {D : DisplayedAlgebra} {r s : Elim D} → Elim≡ D r s → Elim≡ D s r
   symElim≡ p = record
     { con≡ = λ Γ → ≡.sym (Elim≡.con≡ p Γ)
-    ; ty≅ = λ Γ A → ≅.sym (Elim≡.ty≅ p Γ A)
+    ; ty≣ = λ Γ A → ≣.sym (Elim≡.ty≣ p Γ A)
     }
 
   transElim≡ : {D : DisplayedAlgebra} {r s t : Elim D} → Elim≡ D r s → Elim≡ D s t → Elim≡ D r t
   transElim≡ p q = record
     { con≡ = λ Γ → ≡.trans (Elim≡.con≡ p Γ) (Elim≡.con≡ q Γ)
-    ; ty≅ = λ Γ A → ≅.trans (Elim≡.ty≅ p Γ A) (Elim≡.ty≅ q Γ A)
+    ; ty≣ = λ Γ A → ≣.trans (Elim≡.ty≣ p Γ A) (Elim≡.ty≣ q Γ A)
     }
 
   ∃!Elim : DisplayedAlgebra → Set₁
@@ -304,32 +303,32 @@ module Erased where
     h∘r≡id : Rec≡ B h∘r idRec
     h∘r≡id = transRec≡ (symRec≡ (proj₂ (rec B) h∘r)) (proj₂ (rec B) idRec)
 
-    Σ-proj₁-≅ : ∀ {A : Set} {B : A → Set} {x y : Σ A B} 
-              → x ≅ y → proj₁ x ≅ proj₁ y
-    Σ-proj₁-≅ ≅.refl = ≅.refl
+    Σ-proj₁-≣ : ∀ {A : Set} {B : A → Set} {x y : Σ A B} 
+              → x ≣ y → proj₁ x ≣ proj₁ y
+    Σ-proj₁-≣ ≣.refl = ≣.refl
     
-    Σ-proj₂-≅ : ∀ {A : Set} {B : A → Set} {x y : Σ A B} 
-              → x ≅ y → proj₂ x ≅ proj₂ y
-    Σ-proj₂-≅ ≅.refl = ≅.refl
+    Σ-proj₂-≣ : ∀ {A : Set} {B : A → Set} {x y : Σ A B} 
+              → x ≣ y → proj₂ x ≣ proj₂ y
+    Σ-proj₂-≣ ≣.refl = ≣.refl
 
-    -- This is the "fiber" version of your ≅-to-subst-≡
-    ≅-to-subst-fiber : {Γ Γ' : Con} (p : Γ ≡ Γ') 
-                      {Γᴰ : D.Conᴰ Γ} {Γᴰ' : D.Conᴰ Γ'} (q : Γᴰ ≅ Γᴰ')
-                      {A : Ty Γ} {A' : Ty Γ'} (r : A ≅ A')
+    -- This is the "fiber" version of your ≣-to-subst-≡
+    ≣-to-subst-fiber : {Γ Γ' : Con} (p : Γ ≡ Γ') 
+                      {Γᴰ : D.Conᴰ Γ} {Γᴰ' : D.Conᴰ Γ'} (q : Γᴰ ≣ Γᴰ')
+                      {A : Ty Γ} {A' : Ty Γ'} (r : A ≣ A')
                       {u : D.Tyᴰ Γᴰ A} {v : D.Tyᴰ Γᴰ' A'}
-                     → u ≅ v → ≡.subst (λ (γ , α) → D.Tyᴰ γ α)
-                      (≡.cong₂ _,_ p (≅.≅-to-subst-≡ r)) u ≡ v
-    ≅-to-subst-fiber ≡.refl ≅.refl ≅.refl ≅.refl = ≡.refl
+                     → u ≣ v → ≡.subst (λ (γ , α) → D.Tyᴰ γ α)
+                      (≡.cong₂ _,_ p (≣.≅-to-subst-≡ r)) u ≡ v
+    ≣-to-subst-fiber ≡.refl ≣.refl ≣.refl ≣.refl = ≡.refl
 
     Σ-lift : {A : Set} {B : A → Set} {x y : A} {u : B x} {v : B y}
           → (p : x ≡ y) → subst B p u ≡ v → (x , u) ≡ (y , v)
     Σ-lift ≡.refl ≡.refl = ≡.refl
     
     transport-fiber : {Γ Γ' : Con} (pΓ : Γ' ≡ Γ)
-                    → {A : Ty Γ} {A' : Ty Γ'} (pA : A' ≅ A)
+                    → {A : Ty Γ} {A' : Ty Γ'} (pA : A' ≣ A)
                     → {Γᴰ : D.Conᴰ Γ'} (u : D.Tyᴰ Γᴰ A')
                     → D.Tyᴰ (subst D.Conᴰ pΓ Γᴰ) A
-    transport-fiber ≡.refl ≅.refl u = u
+    transport-fiber ≡.refl ≣.refl u = u
 
     r̂ : Elim D
     r̂ = record
@@ -342,16 +341,16 @@ module Erased where
       where
       open ≡.≡-Reasoning
       open Rec≡ h∘r≡id
-      p : ∀ Γ → h∘r.conᴿ Γ ≅ Γ
-      p Γ = ≅.≡-to-≅ (con≡ Γ)
-      q : ∀ {Γ} A → h∘r.tyᴿ {Γ} A ≅ A
-      q {Γ} A = ty≅ Γ A
+      p : ∀ Γ → h∘r.conᴿ Γ ≣ Γ
+      p Γ = ≣.≡-to-≅ (con≡ Γ)
+      q : ∀ {Γ} A → h∘r.tyᴿ {Γ} A ≣ A
+      q {Γ} A = ty≣ Γ A
 
       c : (Γ : Con) → D.Conᴰ Γ
       c Γ = subst D.Conᴰ (con≡ Γ) (proj₂ (r.conᴿ Γ))
 
       t : {Γ : Con} (A : Ty Γ) → D.Tyᴰ (c Γ) A
-      t {Γ} A = transport-fiber (con≡ Γ) (ty≅ Γ A) (proj₂ (r.tyᴿ A))
+      t {Γ} A = transport-fiber (con≡ Γ) (ty≣ Γ A) (proj₂ (r.tyᴿ A))
       p' : proj₂ (r.conᴿ ∙) ≡ subst D.Conᴰ (≡.sym (con≡ ∙)) D.∙ᴰ
       --- Unification error
       -- p' with r.∙ᴿ
