@@ -118,6 +118,21 @@ isProp A = ∀ (x y : A) → x ≡ y
 isContr : ∀ {ℓA} → Set ℓA → Set ℓA
 isContr A = Σ A λ x → ∀ y → x ≡ y
 
+≡substp₂ : ∀ {ℓa ℓb ℓc} {A : Set ℓa} {B : A → Set ℓb} (C : (a : A) → B a → Set ℓc)
+        → {a₁ a₂ : A} {b₁ : B a₁} {b₂ : B a₂}
+        → (p : a₁ ≡ a₂)
+        → (q : ≡.subst B p b₁ ≡ b₂)
+        → C a₁ b₁ → C a₂ b₂
+≡substp₂ C ≡.refl ≡.refl x = x
+
+≡congp₂ : ∀ {ℓa ℓb ℓc} {A : Set ℓa} {B : A → Set ℓb} {C : (a : A) → B a → Set ℓc}
+        → (f : (a : A) → (b : B a) → C a b)
+        → {a₁ a₂ : A} {b₁ : B a₁} {b₂ : B a₂}
+        → (p : a₁ ≡ a₂)
+        → (q : ≡.subst B p b₁ ≡ b₂)
+        → ≡substp₂ C p q (f a₁ b₁) ≡ f a₂ b₂
+≡congp₂ f ≡.refl ≡.refl = ≡.refl
+
 ≡cong₃ : ∀ {ℓA ℓB ℓC ℓD} {A : Set ℓA} {B : Set ℓB} {C : Set ℓC} {D : Set ℓD}
       → (f : A → B → C → D) → ∀ {u v w x y z} → u ≡ v → w ≡ x → y ≡ z → f u w y ≡ f v x z
 ≡cong₃ f ≡.refl ≡.refl ≡.refl = ≡.refl
@@ -125,3 +140,17 @@ isContr A = Σ A λ x → ∀ y → x ≡ y
 ≡subst₃ : ∀ {ℓA ℓB ℓC ℓR} {A : Set ℓA} {B : Set ℓB} {C : Set ℓC}
         → (R : A → B → C → Set ℓR) → ∀ {u v w x y z} → u ≡ v → w ≡ x → y ≡ z → R u w y → R v x z
 ≡subst₃ f ≡.refl ≡.refl ≡.refl a = a
+
+Σ≡Prop
+  : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB}
+  → ((x : A) → isProp (B x)) → {u v : Σ A B}
+  → (p : u .proj₁ ≡ v .proj₁) → u ≡ v
+Σ≡Prop pB {x , u} {x , v} ≡.refl = ≡.cong (x ,_) (pB x u v)
+
+isSetSet : ∀ {ℓA} {A : Set ℓA} {x : A} (p q : x ≡ x) → p ≡ q
+isSetSet ≡.refl ≡.refl = ≡.refl
+
+substDefEq : ∀ {ℓA ℓP} {A : Set ℓA} (P : A → Set ℓP)
+           → ∀ {x} (p : x ≡ x) (y : P x) → subst P p y ≡ y
+substDefEq P ≡.refl y = ≡.refl
+
