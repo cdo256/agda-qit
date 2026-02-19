@@ -14,13 +14,13 @@ module _ {ℓA ℓR} {A : Set ℓA} (R : BinaryRel A ℓR) where
   Transitive : Prop (ℓA ⊔ ℓR)
   Transitive = ∀ {x y z} → R x y → R y z → R x z
 
-  WfRec : (A → Set (ℓA ⊔ ℓR)) → (A → Set (ℓA ⊔ ℓR))
+  WfRec : (A → Prop (ℓA ⊔ ℓR)) → (A → Prop (ℓA ⊔ ℓR))
   WfRec P x = ∀ y → R y x → P y
 
-  data Acc (x : A) : Set (ℓA ⊔ ℓR) where
+  data Acc (x : A) : Prop (ℓA ⊔ ℓR) where
     acc : (rs : WfRec Acc x) → Acc x
 
-  WellFounded : Set _
+  WellFounded : Prop _
   WellFounded = ∀ x → Acc x
 
   record IsEquivalence : Prop (ℓR ⊔ ℓA) where
