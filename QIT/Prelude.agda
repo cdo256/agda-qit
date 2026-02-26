@@ -11,7 +11,7 @@ open import Level public using (Level; _⊔_; Lift; lift; lower)
 -- Propositional equality - the basic definitional equality in Agda.
 import Relation.Binary.PropositionalEquality
 module ≡ = Relation.Binary.PropositionalEquality
-open ≡ public using (_≡_; subst) public
+open ≡ public using (_≡_; _≢_; subst) public
 
 import Relation.Binary.HeterogeneousEquality 
 module ≣ = Relation.Binary.HeterogeneousEquality 
@@ -157,3 +157,8 @@ substDefEq P ≡.refl y = ≡.refl
 subst-const : ∀ {ℓA ℓB ℓP} {A : Set ℓA} {B : Set ℓB} (P : Set ℓP)
             → ∀ {x : B} (z : P) (p : x ≡ x) → subst (λ _ → P) p z ≡ z
 subst-const P z ≡.refl = ≡.refl
+
+subst-uip : ∀ {ℓ} {A : Set ℓ} {P : A → Set} {x : A} {p q : x ≡ x} 
+            (h : p ≡ q) (u : P x) 
+          → subst P p u ≡ subst P q u
+subst-uip ≡.refl u = ≡.refl

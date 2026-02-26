@@ -1,4 +1,4 @@
-module QIT.Examples.WFTree (S : Set) (P : S → Set) where
+module QIT.Examples.WFTree where
 
 open import QIT.Prelude
 open import QIT.Prop
@@ -23,8 +23,9 @@ record WFTree : Set₁ where
     ↑≺ : ∀ x → x ≡.≢ ∙ → ↑ x ≺ x
     trans : Transitive _≺_
 
-open import Data.Bool as 𝟚
-  hiding (T; if_then_else_; _∨_) renaming (Bool to 𝟚) 
+import Data.Bool as 𝟚
+open 𝟚
+  using (true; false) renaming (Bool to 𝟚) 
 open import QIT.Mobile.Base 𝟚
 
 fork : T → T → T
@@ -65,58 +66,70 @@ _ = ≡.refl
 _ : ↑ π2 ≡ π1
 _ = ≡.refl
 
-module _ ( _≟ˢ_ : Discrete Sᵀ) ( _≟ᵗ_ : ∀ {s} → Discrete (Pᵀ s)) where
-  record StepInj {a} {i j : Pᵀ a} {f : Pᵀ a → T} {s t p q π₁ π₂}
+module _ ( _≟ᵗ_ : ∀ {s} → Discrete (Pᵀ s)) where
+  record StepInj {a f i j s t p q π₁ π₂}
     (r : step {a} {f} i s p π₁ ≡ step j t q π₂) : Set where
     field
       index : i ≡ j
-      tree : s ≡ t
-      π : subst Path tree π₁ ≡ π₂
+      tree  : s ≡ t
+      π     : subst Path tree π₁ ≡ π₂
 
-  step-inj : ∀ {a} {i j : Pᵀ a} {f : Pᵀ a → T} {s t p q π₁ π₂} (r : step {a} {f} i s p π₁ ≡ step j t q π₂) → StepInj r
+  step-inj : ∀ {a f i j s t p q π₁ π₂} 
+           → (r : step {a} {f} i s p π₁ ≡ step j t q π₂) → StepInj r
   step-inj ≡.refl = record { index = ≡.refl ; tree = ≡.refl ; π = ≡.refl }
 
+  -- We define a helper that uses matching on refl to force K-unification
+  -- of the proof witnesses p and q.
+  step-cong : ∀ {a f i s t p q π₁ π₂} 
+            → (s≡t : s ≡ t) 
+            → (π-eq : subst Path s≡t π₁ ≡ π₂)
+            → step {a} {f} i s p π₁ ≡ step i t q π₂
+  step-cong {p = p} {q = q} ≡.refl ≡.refl with isSetSet p q
+  ... | ≡.refl = ≡.refl
+
   _≟ᵖ_ : ∀ {t} → Discrete (Path t)
-  root _ ≟ᵖ root _ = yes ≡.refl
+  root t ≟ᵖ root .t = yes ≡.refl
   root _ ≟ᵖ step _ _ _ _ = no (λ ())
   step _ _ _ _ ≟ᵖ root _ = no (λ ())
-  step {a} {f} i s p π₁ ≟ᵖ step {a} {f} j t q π₂
-    with (i ≟ᵗ j)
-  ... | no i≠j = no λ r → i≠j (step-inj r .StepInj.index)
-  ... | yes ≡.refl with (≡.subst Path (≡.trans p (≡.sym q)) π₁ ≟ᵖ  π₂)
-  ... | no π₁≠π₂ = no λ v → π₁≠π₂ let
-    w = step-inj v .StepInj.π
-    u : ≡.trans p (≡.sym q) ≡ step-inj v .StepInj.tree
-    u = isSetSet (≡.trans p (≡.sym q)) (step-inj v .StepInj.tree)
-    in ≡.trans (≡.cong (λ ○ → subst Path ○ π₁) u) w
-  ... | yes ≡.refl = yes {!w (≡.trans p (≡.sym q))!}
-    where
+  step {a} {f} i s p π₁ ≟ᵖ step {a} {f} j t q π₂ with i ≟ᵗ j
+  ... | no i≠j = no (λ r → i≠j (step-inj r .StepInj.index))
+  ... | yes ≡.refl with ≡.trans p (≡.sym q)
+  ... | ≡.refl with π₁ ≟ᵖ π₂
+  ... | yes ≡.refl = yes (step-cong ≡.refl ≡.refl)
+  ... | no π₁≠π₂ = no λ r → π₁≠π₂ (r' r)
+    where 
     open ≡.≡-Reasoning
-    w : (s≡t : s ≡ t) (p≡q : subst (λ ○ → ○ ≡ f i) s≡t p ≡ q) → step i s p π₁ ≡ step i t q (subst Path s≡t π₁)
-    w ≡.refl ≡.refl =
-      step i s p π₁
-        ≡⟨ ≡.refl ⟩
-      step i t p π₁
-        ≡⟨ ≡.dcong₂ (step i t) (isSetSet p q) v ⟩
-      step i t q (subst Path ≡.refl π₁) ∎
-      where
-      v : subst (λ _ → Path s) (isSetSet p q) π₁ ≡ subst Path ≡.refl π₁
-      v = ≡.cong (λ ○ → subst (λ _ → Path s) ○ π₁) (isSetSet (isSetSet p p) ≡.refl)
+    r' : ∀ r → π₁ ≡ π₂
+    r' r = begin
+      π₁
+        ≡⟨ ≡.sym (subst-uip (isSetSet (step-inj r .StepInj.tree) ≡.refl) π₁) ⟩
+      subst Path (step-inj r .StepInj.tree) π₁
+        ≡⟨ step-inj r .StepInj.π ⟩
+      π₂ ∎
 
--- module _ (t : T) where
---   data _≺_ : Path t → Path t → Prop where
---     ≺step : ∀ x y → x ≺ y → ¬ (x ≡p ↑ y) → (x ≺ ↑ y)
---     ↑≺ : ∀ x → x ≡.≢ root _ → ↑ x ≺ x
---     trans : Transitive _≺_
+  module _ (t : T) where
+    data _≤_ : Path t → Path t → Prop where
+      ≤refl : ∀ {x} → x ≤ x
+      ≤step : ∀ {x y} → ↑ x ≤ x → x ≤ y → ↑ x ≤ y
 
+    ≤trans : ∀ {x y z} → x ≤ y → y ≤ z → x ≤ z
+    ≤trans ≤refl q = q
+    ≤trans (≤step p q) r = ≤step p (≤trans q r)
 
---   W→WFTree : WFTree
---   W→WFTree = record
---     { A = Path t 
---     ; ∙ = root _
---     ; ↑ = ↑
---     ; _≺_ = _≺_
---     ; ≺step = λ x y π → {!!}
---     ; ↑≺ = ↑≺
---     ; trans = trans
---     }
+    data _<_ : Path t → Path t → Prop where
+      <step : ∀ {x y} → x ≢ root _ → ↑ x < x → x ≤ y → ↑ x < y
+
+    <step' : (x y : Path t) → x < y → (x ≡p ↑ y) ∨ (x < ↑ y)
+    <step' _ y (<step {u} u≢root ↑u<u u≤y) with {!x!} ≟ᵖ {!!}
+    ... | w = {!!}
+
+    W→WFTree : WFTree
+    W→WFTree = record
+      { A = Path t 
+      ; ∙ = root _
+      ; ↑ = ↑
+      ; _≺_ = _<_
+      ; ≺step = {!≺step!}
+      ; ↑≺ = {!↑≺!}
+      ; trans = {!<trans!}
+      }

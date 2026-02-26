@@ -87,6 +87,9 @@ infix 6 ¬_
 ¬_ : ∀ {ℓ} (X : Prop ℓ) → Prop ℓ
 ¬ X = X → ⊥p
 
+_≢p_ : ∀ {ℓ} {A : Set ℓ} (x y : A) → Prop ℓ
+x ≢p y = ¬ (x ≡p y)
+
 -- Conjunction for propositions.
 module ∧ {ℓ ℓ'} (A : Prop ℓ) (B : Prop ℓ') where
   infixr 5 _∧_
