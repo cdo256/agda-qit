@@ -18,7 +18,7 @@ record Box {ℓ} (P : Prop ℓ) : Set ℓ where
   constructor box
   field unbox : P
 
-open Box
+open Box public
 
 -- Propositional truncation: makes types proof-irrelevant.
 -- ∥ A ∥ says "there exists an element of A, but we don't care which one".
@@ -87,18 +87,26 @@ infix 6 ¬_
 ¬_ : ∀ {ℓ} (X : Prop ℓ) → Prop ℓ
 ¬ X = X → ⊥p
 
+_≢p_ : ∀ {ℓ} {A : Set ℓ} (x y : A) → Prop ℓ
+x ≢p y = ¬ (x ≡p y)
+
 -- Conjunction for propositions.
-module ∧ {ℓ ℓ'} (A : Prop ℓ) (B : Prop ℓ') where
+module ∧ {ℓ ℓ'} where
+  infixr 5 _∧ᵖ_
   infixr 5 _∧_
   infixr 4 _,_
-  record _∧_ : Prop (ℓ ⊔ ℓ') where
+  record _∧ᵖ_ (A : Prop ℓ) (B : A → Prop ℓ') : Prop (ℓ ⊔ ℓ') where
     constructor _,_
     field
       fst : A
-      snd : B
-  open _∧_ public
+      snd : B fst
+  open _∧ᵖ_ public
 
-open ∧ public using (_∧_; _,_)
+  _∧_ : (A : Prop ℓ) (B : Prop ℓ') → Prop (ℓ ⊔ ℓ') 
+  A ∧ B = A ∧ᵖ λ _ → B
+
+
+open ∧ public using (_∧ᵖ_; _∧_; _,_)
 
 -- Disjunction for propositions.
 module ∨ {ℓ ℓ'} (A : Prop ℓ) (B : Prop ℓ') where
@@ -113,3 +121,4 @@ open ∨ public using (_∨_)
 infix 3 _⇔_
 _⇔_ : ∀ {ℓ ℓ'} (A : Prop ℓ) (B : Prop ℓ') → Prop (ℓ ⊔ ℓ')
 A ⇔ B = (A → B) ∧ (B → A)
+
