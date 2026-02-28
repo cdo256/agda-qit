@@ -48,7 +48,6 @@ data Subst where
   _,_ : ∀ {Γ Δ} {A : Ty Δ} → (σ : Subst Γ Δ) → (t : Tm (A [ σ ]))
       → Subst Γ (Δ ▷ A)
 
-  
 ι [ σ ] = ι
 𝟙 [ σ ] = 𝟙 
 Σ̇ A B [ σ ] = Σ̇ {!!} {!!}
