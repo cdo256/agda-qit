@@ -11,7 +11,7 @@ open import Level public using (Level; _⊔_; Lift; lift; lower)
 -- Propositional equality - the basic definitional equality in Agda.
 import Relation.Binary.PropositionalEquality
 module ≡ = Relation.Binary.PropositionalEquality
-open ≡ public using (_≡_; subst) public
+open ≡ public using (_≡_; _≢_; subst) public
 
 import Relation.Binary.HeterogeneousEquality 
 module ≣ = Relation.Binary.HeterogeneousEquality 
@@ -147,10 +147,18 @@ isContr A = Σ A λ x → ∀ y → x ≡ y
   → (p : u .proj₁ ≡ v .proj₁) → u ≡ v
 Σ≡Prop pB {x , u} {x , v} ≡.refl = ≡.cong (x ,_) (pB x u v)
 
-isSetSet : ∀ {ℓA} {A : Set ℓA} {x : A} (p q : x ≡ x) → p ≡ q
+isSetSet : ∀ {ℓA} {A : Set ℓA} {x y : A} (p q : x ≡ y) → p ≡ q
 isSetSet ≡.refl ≡.refl = ≡.refl
 
 substDefEq : ∀ {ℓA ℓP} {A : Set ℓA} (P : A → Set ℓP)
            → ∀ {x} (p : x ≡ x) (y : P x) → subst P p y ≡ y
 substDefEq P ≡.refl y = ≡.refl
 
+subst-const : ∀ {ℓA ℓB ℓP} {A : Set ℓA} {B : Set ℓB} (P : Set ℓP)
+            → ∀ {x : B} (z : P) (p : x ≡ x) → subst (λ _ → P) p z ≡ z
+subst-const P z ≡.refl = ≡.refl
+
+subst-uip : ∀ {ℓ} {A : Set ℓ} {P : A → Set} {x : A} {p q : x ≡ x} 
+            (h : p ≡ q) (u : P x) 
+          → subst P p u ≡ subst P q u
+subst-uip ≡.refl u = ≡.refl
