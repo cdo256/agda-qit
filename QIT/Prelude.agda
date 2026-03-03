@@ -51,7 +51,7 @@ subst-id ≡.refl b = ≡.refl
 
 -- Bijections between sets - one-to-one correspondences with explicit inverses.
 module ↔ where
-  record _↔_ (X Y : Set) : Set where
+  record _↔_ {ℓX ℓY} (X : Set ℓX) (Y : Set ℓY) : Set (ℓX ⊔ ℓY) where
     field
       to : X → Y
       from : Y → X
