@@ -36,7 +36,7 @@ import Data.Sum
 module ⊎ = Data.Sum
 open ⊎ using (_⊎_; inj₁; inj₂) public
 
-open import Data.Unit public
+open import Data.Unit hiding (_≟_) public
 
 postulate
   -- Function extensionality: if functions are pointwise equal, they are equal.
@@ -162,3 +162,5 @@ subst-uip : ∀ {ℓ} {A : Set ℓ} {P : A → Set} {x : A} {p q : x ≡ x}
             (h : p ≡ q) (u : P x) 
           → subst P p u ≡ subst P q u
 subst-uip ≡.refl u = ≡.refl
+
+open import Function.Base using (case_of_; case_returning_of_) public
