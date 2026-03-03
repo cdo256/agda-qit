@@ -1,5 +1,5 @@
 {-# OPTIONS --type-in-type #-}
-module QIT.QIIT where
+module QIT.QIIT.Attempt2 where
 
 open import QIT.Prelude
 open import QIT.Prop
@@ -30,7 +30,7 @@ mutual
     ; _∘_ = {!!}
     ; equiv⁰ = {!!}
     ; equiv⃗ = {!!}
-    ; substᵒ = {!!}
+    ; subst⁰ = {!!}
     ; subst-resp-≈⃗ = {!!}
     ; subst-refl = {!!}
     ; subst-trans = {!!}

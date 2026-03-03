@@ -145,47 +145,47 @@ Category≈→Category C = record
 
 -- A functor between setoid-enriched categories (objects + homs are setoids,
 -- with explicit transport on homs), preserving everything up to ≈⃗.
-record Functor≈
-  {o₁ ℓ₁ eo₁ eℓ₁ o₂ ℓ₂ eo₂ eℓ₂ : Level}
-  (C : Category≈ o₁ ℓ₁ eo₁ eℓ₁)
-  (D : Category≈ o₂ ℓ₂ eo₂ eℓ₂)
-  : Set (lsuc (o₁ ⊔ ℓ₁ ⊔ eo₁ ⊔ eℓ₁ ⊔ o₂ ⊔ ℓ₂ ⊔ eo₂ ⊔ eℓ₂)) where
-  eta-equality
+-- record Functor≈
+--   {o₁ ℓ₁ eo₁ eℓ₁ o₂ ℓ₂ eo₂ eℓ₂ : Level}
+--   (C : Category≈ o₁ ℓ₁ eo₁ eℓ₁)
+--   (D : Category≈ o₂ ℓ₂ eo₂ eℓ₂)
+--   : Set (lsuc (o₁ ⊔ ℓ₁ ⊔ eo₁ ⊔ eℓ₁ ⊔ o₂ ⊔ ℓ₂ ⊔ eo₂ ⊔ eℓ₂)) where
+--   eta-equality
 
-  private
-    module C = Category≈ C
-    module D = Category≈ D
+--   private
+--     module C = Category≈ C
+--     module D = Category≈ D
 
-  infix  4 _≈F₀_ _≈F₁_
+--   infix  4 _≈F₀_ _≈F₁_
 
-  field
-    -- Object and morphism maps
-    F₀ : C.Obj → D.Obj
-    F₁ : ∀ {A B} → (A C.⇒ B) → (F₀ A D.⇒ F₀ B)
+--   field
+--     -- Object and morphism maps
+--     F₀ : C.Obj → D.Obj
+--     F₁ : ∀ {A B} → (A C.⇒ B) → (F₀ A D.⇒ F₀ B)
 
-    -- Respect the setoid equalities
-    F₀-resp-≈⁰ :
-      ∀ {A B} → A C.≈⁰ B → F₀ A D.≈⁰ F₀ B
+--     -- Respect the setoid equalities
+--     F₀-resp-≈⁰ :
+--       ∀ {A B} → A C.≈⁰ B → F₀ A D.≈⁰ F₀ B
 
-    F₁-resp-≈⃗ :
-      ∀ {A B} {f g : A C.⇒ B} →
-      f C.≈⃗ g → F₁ f D.≈⃗ F₁ g
+--     F₁-resp-≈⃗ :
+--       ∀ {A B} {f g : A C.⇒ B} →
+--       f C.≈⃗ g → F₁ f D.≈⃗ F₁ g
 
-    -- Preserve identities and composition up to ≈⃗
-    F-id :
-      ∀ {A} → F₁ (C.id {A}) D.≈⃗ D.id {F₀ A}
+--     -- Preserve identities and composition up to ≈⃗
+--     F-id :
+--       ∀ {A} → F₁ (C.id {A}) D.≈⃗ D.id {F₀ A}
 
-    F-∘ :
-      ∀ {A B C'} (g : B C.⇒ C') (f : A C.⇒ B) →
-      F₁ (g C.∘ f) D.≈⃗ (F₁ g) D.∘ (F₁ f)
+--     F-∘ :
+--       ∀ {A B C'} (g : B C.⇒ C') (f : A C.⇒ B) →
+--       F₁ (g C.∘ f) D.≈⃗ (F₁ g) D.∘ (F₁ f)
 
-    -- Compatibility with transport (reindexing along ≈⁰)
-    --
-    -- Given p : A ≈⁰ B and q : C ≈⁰ D, you can transport a morphism
-    -- f : A ⇒ C to subst⁰ p q f : B ⇒ D in C.
-    -- Functoriality should commute with this transport, up to ≈⃗ in D.
-    F-subst⁰ :
-      ∀ {A B C' D'} (p : A C.≈⁰ B) (q : C' C.≈⁰ D') (f : A C.⇒ C') →
-      F₁ (C.subst⁰ p q f)
-        D.≈⃗
-      D.subst⁰ (F₀-resp-≈⁰ p) (F₀-resp-≈⁰ q) (F₁ f)
+--     -- Compatibility with transport (reindexing along ≈⁰)
+--     --
+--     -- Given p : A ≈⁰ B and q : C ≈⁰ D, you can transport a morphism
+--     -- f : A ⇒ C to subst⁰ p q f : B ⇒ D in C.
+--     -- Functoriality should commute with this transport, up to ≈⃗ in D.
+--     F-subst⁰ :
+--       ∀ {A B C' D'} (p : A C.≈⁰ B) (q : C' C.≈⁰ D') (f : A C.⇒ C') →
+--       F₁ (C.subst⁰ p q f)
+--         D.≈⃗
+--       D.subst⁰ (F₀-resp-≈⁰ p) (F₀-resp-≈⁰ q) (F₁ f)
