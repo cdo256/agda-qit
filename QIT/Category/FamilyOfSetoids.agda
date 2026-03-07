@@ -168,18 +168,6 @@ module FamCat {ℓU ℓU' ℓT ℓT' : Level} where
     ; ∘-resp-≈ = comp-resp-≋
     }
     where
-      refl-assoc : ∀ {A B C D} {f : Hom A B} {g : Hom B C} {h : Hom C D}
-        → ∀ {x : ⟨ Fam.U A ⟩} {bx : ⟨ Fam.T A x ⟩}
-        → Setoid._≈_ (Fam.T D (Hom.map h .to (Hom.map g .to (Hom.map f .to x))))
-          (Fam.reindex D (Setoid.refl (Fam.U D)) .to
-           (Hom.transport h (Hom.map g .to (Hom.map f .to x)) .to
-            (Hom.transport g (Hom.map f .to x) .to
-             (Hom.transport f x .to bx))))
-          (Hom.transport h (Hom.map g .to (Hom.map f .to x)) .to
-           (Hom.transport g (Hom.map f .to x) .to
-            (Hom.transport f x .to bx)))
-      refl-assoc {D = D} = reindex-refl D
-
       assoc : {A B C D : Fam'} {f : Hom A B} {g : Hom B C} {h : Hom C D} →
         comp (comp h g) f ≋ comp h (comp g f)
       assoc {A} {B} {C} {D} {f} {g} {h} = feq
