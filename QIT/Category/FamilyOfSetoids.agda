@@ -7,29 +7,30 @@ open import QIT.Setoid
 open import QIT.Category.Base hiding (_[_≈_])
 open import QIT.Relation.Binary using (IsEquivalence)
 
-module _ {ℓU ℓU' ℓT ℓT' : Level} where
+record Fam (ℓU ℓU' ℓT ℓT' : Level) : Set (lsuc (ℓU ⊔ ℓU' ⊔ ℓT ⊔ ℓT')) where
+  constructor fam
+  field
+    U : Setoid ℓU ℓU'
+  module U = Setoid U
   open ≈.Hom
-  record Fam : Set (lsuc (ℓU ⊔ ℓU' ⊔ ℓT ⊔ ℓT')) where
-    constructor fam
-    field
-      U : Setoid ℓU ℓU'
-    module U = Setoid U
-    open ≈.Hom
-    field
-      T : ⟨ U ⟩ → Setoid ℓT ℓT'
-      reindex : {x y : ⟨ U ⟩} (p : U [ x ≈ y ]) → ≈.Hom (T y) (T x)
-      reindex-refl : {x : ⟨ U ⟩} {bx : ⟨ T x ⟩}
-        → T x [ reindex U.refl .to bx ≈ bx ]
-      reindex-sym-sect : {x y : ⟨ U ⟩} (p : x U.≈ y) (bx : ⟨ T x ⟩)
-        → T x [ reindex p .to (reindex (U.sym p) .to bx) ≈ bx ]
-      reindex-sym-retr : {x y : ⟨ U ⟩} (p : x U.≈ y) (by : ⟨ T y ⟩)
-        → T y [ reindex (U.sym p) .to (reindex p .to by) ≈ by ]
-      reindex-trans : {x y z : ⟨ U ⟩} (p : y U.≈ x) (q : z U.≈ y) (bx : ⟨ T x ⟩)
-        → T z [ reindex q .to (reindex p .to bx) ≈ reindex (U.trans q p) .to bx ]
+  field
+    T : ⟨ U ⟩ → Setoid ℓT ℓT'
+    reindex : {x y : ⟨ U ⟩} (p : U [ x ≈ y ]) → ≈.Hom (T y) (T x)
+    reindex-refl : {x : ⟨ U ⟩} {bx : ⟨ T x ⟩}
+      → T x [ reindex U.refl .to bx ≈ bx ]
+    reindex-sym-sect : {x y : ⟨ U ⟩} (p : x U.≈ y) (bx : ⟨ T x ⟩)
+      → T x [ reindex p .to (reindex (U.sym p) .to bx) ≈ bx ]
+    reindex-sym-retr : {x y : ⟨ U ⟩} (p : x U.≈ y) (by : ⟨ T y ⟩)
+      → T y [ reindex (U.sym p) .to (reindex p .to by) ≈ by ]
+    reindex-trans : {x y z : ⟨ U ⟩} (p : y U.≈ x) (q : z U.≈ y) (bx : ⟨ T x ⟩)
+      → T z [ reindex q .to (reindex p .to bx) ≈ reindex (U.trans q p) .to bx ]
+open Fam
 
-  open Fam
-
-  record Hom (B B' : Fam) : Set (ℓU ⊔ ℓU' ⊔ ℓT ⊔ ℓT') where
+module FamCat {ℓU ℓU' ℓT ℓT' : Level} where
+  private
+    Fam' = Fam ℓU ℓU' ℓT ℓT'
+  open ≈.Hom
+  record Hom (B B' : Fam') : Set (ℓU ⊔ ℓU' ⊔ ℓT ⊔ ℓT') where
     constructor fhom
     open Setoid (U B) using (_≈_)
     field
@@ -52,11 +53,11 @@ module _ {ℓU ℓU' ℓT ℓT' : Level} where
           in (reindex B (≈map {x}) ≈.∘ g.transport x)
           ≈h (f.transport x)
 
-  fam-id : {A : Fam} → Hom A A
+  fam-id : {A : Fam'} → Hom A A
   fam-id {A} = fhom ≈.idHom (λ _ → ≈.idHom)
     λ {x} p {bx} → Setoid.refl (T A x)
 
-  comp : {A B C : Fam} → Hom B C → Hom A B → Hom A C
+  comp : {A B C : Fam'} → Hom B C → Hom A B → Hom A C
   comp {B = B} {C = C} (fhom gmap gtrans gcoh) (fhom fmap ftrans fcoh) =
     fhom (gmap ≈.∘ fmap)
          (λ x → gtrans (fmap .to x) ≈.∘ ftrans x)
@@ -114,7 +115,7 @@ module _ {ℓU ℓU' ℓT ℓT' : Level} where
     module A = Fam A
     module B = Fam B
 
-  comp-resp-≋ : {A B C : Fam} {f h : Hom B C} {g i : Hom A B} →
+  comp-resp-≋ : {A B C : Fam'} {f h : Hom B C} {g i : Hom A B} →
       f ≋ h → g ≋ i → comp f g ≋ comp h i
   comp-resp-≋ {A} {B} {C} {f} {h} {g} {i} (feq f≈h t-f≈h) (feq g≈i t-g≈i) =
     feq (≈.∘-resp-≈ {A = Fam.U A} {B = Fam.U B} {C = Fam.U C} {g₁ = f.map} {g₂ = h.map} {f₁ = g.map} {f₂ = i.map} f≈h g≈i)
@@ -149,7 +150,7 @@ module _ {ℓU ℓU' ℓT ℓT' : Level} where
 
   Cat : Category (lsuc (ℓU ⊔ ℓU' ⊔ ℓT ⊔ ℓT')) (ℓU ⊔ ℓU' ⊔ ℓT ⊔ ℓT') (ℓU ⊔ ℓU' ⊔ ℓT ⊔ ℓT')
   Cat = record
-    { Obj = Fam
+    { Obj = Fam'
     ; _⇒_ = Hom
     ; _≈_ = _≋_
     ; id = fam-id
@@ -179,7 +180,7 @@ module _ {ℓU ℓU' ℓT ℓT' : Level} where
             (Hom.transport f x .to bx)))
       refl-assoc {D = D} = reindex-refl D
 
-      assoc : {A B C D : Fam} {f : Hom A B} {g : Hom B C} {h : Hom C D} →
+      assoc : {A B C D : Fam'} {f : Hom A B} {g : Hom B C} {h : Hom C D} →
         comp (comp h g) f ≋ comp h (comp g f)
       assoc {A} {B} {C} {D} {f} {g} {h} = feq
         (≈.∘-assoc (Hom.map h) (Hom.map g) (Hom.map f))
@@ -188,22 +189,24 @@ module _ {ℓU ℓU' ℓT ℓT' : Level} where
             {x = Hom.map h .to (Hom.map g .to (Hom.map f .to x))}
             {bx = Hom.transport h _ .to (Hom.transport g _ .to (Hom.transport f x .to bx))})
 
-      identityˡ : {A B : Fam} {f : Hom A B} → comp fam-id f ≋ f
+      identityˡ : {A B : Fam'} {f : Hom A B} → comp fam-id f ≋ f
       identityˡ {B = B} {f} = feq
         (λ {x} → Setoid.refl (U B) {x = Hom.map f .to x})
         (λ {x} {bx} →
           reindex-refl B {x = Hom.map f .to x} {bx = Hom.transport f x .to bx})
 
-      identityʳ : {A B : Fam} {f : Hom A B} → comp f fam-id ≋ f
+      identityʳ : {A B : Fam'} {f : Hom A B} → comp f fam-id ≋ f
       identityʳ {B = B} {f} = feq
         (λ {x} → Setoid.refl (U B) {x = Hom.map f .to x})
         (λ {x} {bx} →
           reindex-refl B {x = Hom.map f .to x} {bx = Hom.transport f x .to bx})
 
-      identity² : {A : Fam} → comp fam-id fam-id ≋ fam-id
+      identity² : {A : Fam'} → comp fam-id fam-id ≋ fam-id
       identity² {A} = feq
         (λ {x} → Setoid.refl (U A) {x = x})
         (λ {x} {bx} → reindex-refl A {x = x} {bx = bx})
 
+open FamCat public hiding (Cat)
+
 FamilyOfSetoids : ∀ ℓU ℓU' ℓT ℓT' → Category (lsuc (ℓU ⊔ ℓU' ⊔ ℓT ⊔ ℓT')) (ℓU ⊔ ℓU' ⊔ ℓT ⊔ ℓT') (ℓU ⊔ ℓU' ⊔ ℓT ⊔ ℓT')
-FamilyOfSetoids ℓU ℓU' ℓT ℓT' = Cat {ℓU} {ℓU'} {ℓT} {ℓT'}
+FamilyOfSetoids ℓU ℓU' ℓT ℓT' = FamCat.Cat {ℓU} {ℓU'} {ℓT} {ℓT'}
