@@ -1,8 +1,6 @@
-module Automata.DFA where
+module Automata.PDA where
 
 open import QIT.Prelude hiding (if_then_else_)
-open import QIT.Prop
-open import QIT.Relation.Subset
 open import QIT.Relation.Nullary 
 open import Data.Maybe as Maybe
 open import Data.List as List
@@ -13,11 +11,14 @@ open import Automata.Lang
 record DFA (∑ : FinSet ℓ0) : Set₁ where
   field
     Q : Set
+    Γ : FinSet ℓ0
 
+  Γ₀ = proj₁ Γ
   ∑₀ = proj₁ ∑ 
+  Γₑ = Maybe Γ₀
 
   field
-    δ : Q × ∑₀ → Q
+    δ : Q × ∑₀ × Γₑ → Q × Γₑ
     q₀ : Q
     F : Q → Bool
 
@@ -28,18 +29,20 @@ record DFA (∑ : FinSet ℓ0) : Set₁ where
     constructor mkConfig
     field
       q : Q
+      γ : List Γ₀
       w : List ∑₀
 
   initial : List ∑₀ → Config
   initial w = record
     { q = q₀
+    ; γ = []
     ; w = w }
 
   step : Config → Config ⊎ Bool
   step cfg = case w of
     λ{ [] → if F q then inj₂ true else inj₂ false
-    ; (u ∷ w) → let q' = δ (q , u) in
-      inj₁ (mkConfig q' w) }
+    ; (u ∷ w) → let (q' , γ') = δ (q , u , head γ) in
+      inj₁ (mkConfig q' (γ' ?∷ tail? γ) w) }
     where
     open Config cfg
 
@@ -49,22 +52,17 @@ record DFA (∑ : FinSet ℓ0) : Set₁ where
   ... | inj₁ cfg' = step cfg'
   ... | inj₂ b = inj₂ b
 
-Accepts : {∑ : FinSet ℓ0} → ∑ *ᴸ → DFA ∑ → Prop₁
-Accepts w dfa =
-  ∃ λ n → simulate n (initial w) ≡p inj₂ true
+Accepts? : {∑ : FinSet ℓ0} → DFA ∑ → Lang ∑ → Set₁
+Accepts? dfa w = Σ ℕ λ n → simulate n (initial w) ≡ inj₂ true
   where
   open DFA dfa
-  
-accepts : {∑ : FinSet ℓ0} → ∑ *ᴸ → DFA ∑ → Bool
-accepts w dfa = case simulate (length w) (initial w) of
+
+accepts : {∑ : FinSet ℓ0} → DFA ∑ → Lang ∑ → Bool
+accepts dfa w = case simulate (length w) (initial w) of
   λ{(inj₂ true) → true
   ; _ → false }
   where
   open DFA dfa
 
-DecidesLang : {∑ : FinSet ℓ0} → Lang ∑ → DFA ∑ → Prop₁
-DecidesLang L dfa =
-  ∀ w → L w ⇔ Accepts w dfa
-
 isRegular : {∑ : FinSet ℓ0} → Lang ∑ → Set₁
-isRegular {∑} L = ΣP (DFA ∑) (DecidesLang L)
+isRegular {∑} w = Σ (DFA ∑) λ dfa → Accepts? dfa w
