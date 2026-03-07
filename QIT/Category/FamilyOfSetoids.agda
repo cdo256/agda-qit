@@ -65,13 +65,13 @@ module _ {ℓU ℓU' ℓT ℓT' : Level} where
            gtrans (fmap .to x) .cong (fcoh p {bx}) ⟨≈⟩
            gcoh (fmap .cong p) {ftrans y .to bx}
 
-  ≈≈-refl : ∀ {A B} → {f : Hom A B} → f ≋ f
-  ≈≈-refl {A} {B} {f} = feq (≈.≈h-refl {f = f.map})
+  ≋-refl : ∀ {A B} → {f : Hom A B} → f ≋ f
+  ≋-refl {A} {B} {f} = feq (≈.≈h-refl {f = f.map})
     λ {x} {bx} → reindex-refl B {f.to x} {f .Hom.transport x .to bx}
     where module f = Hom f
 
-  ≈≈-sym : ∀ {A B} → {f g : Hom A B} → f ≋ g → g ≋ f
-  ≈≈-sym {A} {B} {f} {g} (feq ≈map ≈fibre) =
+  ≋-sym : ∀ {A B} → {f g : Hom A B} → f ≋ g → g ≋ f
+  ≋-sym {A} {B} {f} {g} (feq ≈map ≈fibre) =
     feq (≈.≈h-sym {f = f.map} {g = g.map} ≈map)
     λ {x} {bx} →
       let open ≈.≈syntax {S = T B (g.to x)} in
@@ -90,8 +90,8 @@ module _ {ℓU ℓU' ℓT ℓT' : Level} where
     module A = Fam A
     module B = Fam B
 
-  ≈≈-trans : ∀ {A B} → {f g h : Hom A B} → f ≋ g → g ≋ h → f ≋ h
-  ≈≈-trans {A} {B} {f} {g} {h} (feq ≈map1 ≈fibre1) (feq ≈map2 ≈fibre2) =
+  ≋-trans : ∀ {A B} → {f g h : Hom A B} → f ≋ g → g ≋ h → f ≋ h
+  ≋-trans {A} {B} {f} {g} {h} (feq ≈map1 ≈fibre1) (feq ≈map2 ≈fibre2) =
     feq (≈.≈h-trans {S = Fam.U A} {T = Fam.U B} {f = f.map} {g = g.map} {h = h.map} ≈map1 ≈map2)
     λ {x} {bx} →
       let open ≈.≈syntax {S = T B (f.to x)} in
@@ -114,9 +114,9 @@ module _ {ℓU ℓU' ℓT ℓT' : Level} where
     module A = Fam A
     module B = Fam B
 
-  comp-resp-≈ : {A B C : Fam} {f h : Hom B C} {g i : Hom A B} →
+  comp-resp-≋ : {A B C : Fam} {f h : Hom B C} {g i : Hom A B} →
       f ≋ h → g ≋ i → comp f g ≋ comp h i
-  comp-resp-≈ {A} {B} {C} {f} {h} {g} {i} (feq f≈h t-f≈h) (feq g≈i t-g≈i) =
+  comp-resp-≋ {A} {B} {C} {f} {h} {g} {i} (feq f≈h t-f≈h) (feq g≈i t-g≈i) =
     feq (≈.∘-resp-≈ {A = Fam.U A} {B = Fam.U B} {C = Fam.U C} {g₁ = f.map} {g₂ = h.map} {f₁ = g.map} {f₂ = i.map} f≈h g≈i)
         λ {x} {bx} →
           let u = g.to x in
@@ -155,16 +155,16 @@ module _ {ℓU ℓU' ℓT ℓT' : Level} where
     ; id = fam-id
     ; _∘_ = comp
     ; assoc     = λ {A B C D f g h} → assoc {f = f} {g} {h}
-    ; sym-assoc = λ {A B C D f g h} → ≈≈-sym (assoc {f = f} {g} {h})
+    ; sym-assoc = λ {A B C D f g h} → ≋-sym (assoc {f = f} {g} {h})
     ; identityˡ = λ {A B f} → identityˡ {f = f}
     ; identityʳ = λ {A B f} → identityʳ {f = f}
     ; identity² = λ {A} → identity² {A}
     ; equiv = record
-      { refl = ≈≈-refl
-      ; sym = ≈≈-sym
-      ; trans = ≈≈-trans
+      { refl = ≋-refl
+      ; sym = ≋-sym
+      ; trans = ≋-trans
       }
-    ; ∘-resp-≈ = comp-resp-≈
+    ; ∘-resp-≈ = comp-resp-≋
     }
     where
       refl-assoc : ∀ {A B C D} {f : Hom A B} {g : Hom B C} {h : Hom C D}
