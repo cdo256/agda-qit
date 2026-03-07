@@ -77,8 +77,8 @@ module _ {ℓU ℓU' ℓT ℓT' : Level} where
       let open ≈.≈syntax {S = T B (g.to x)} in
       let open Setoid (T B (g.to x)) in
       let p = ≈map {x} in
-        (reindex B _ ≈.∘ f.transport x) .to bx
-          ≈⟨ sym (B.reindex (Setoid.sym (U B) p) .cong ≈fibre) ⟩
+        (reindex B (Setoid.sym (U B) p) ≈.∘ f.transport x) .to bx
+          ≈⟨ sym (B.reindex (Setoid.sym (U B) p) .cong (≈fibre {x} {bx})) ⟩
         B .reindex (Setoid.sym (U B) p) .to
           (B .reindex p .to
           (g.transport x .to bx))
@@ -92,54 +92,60 @@ module _ {ℓU ℓU' ℓT ℓT' : Level} where
 
   ≈≈-trans : ∀ {A B} → {f g h : Hom A B} → f ≋ g → g ≋ h → f ≋ h
   ≈≈-trans {A} {B} {f} {g} {h} (feq ≈map1 ≈fibre1) (feq ≈map2 ≈fibre2) =
-    feq (≈.≈h-trans {S = A.U} {T = B.U} ≈map1 ≈map2)
+    feq (≈.≈h-trans {S = Fam.U A} {T = Fam.U B} {f = f.map} {g = g.map} {h = h.map} ≈map1 ≈map2)
     λ {x} {bx} →
-      let trans = Setoid.trans (T B (Hom.map f .to x)) in
-      let sym = Setoid.sym (T B (Hom.map f .to x)) in
-
-      let step1 = reindex-trans B (≈map2 {x}) (≈map1 {x}) (Hom.transport h x .to bx) in
-      -- reindex p1 (reindex p2 (h.trans)) ≈ reindex (trans p1 p2) (h.trans)
-
-      let step2 = reindex B (≈map1 {x}) .cong (≈fibre2 {x} {bx}) in
-      -- reindex p1 (reindex p2 (h.trans)) ≈ reindex p1 (g.trans)
-
-      let step3 = ≈fibre1 {x} {bx} in
-      -- reindex p1 (g.trans) ≈ f.trans
-
-      trans (sym step1) (trans step2 step3)
+      let open ≈.≈syntax {S = T B (f.to x)} in
+      let open Setoid (T B (f.to x)) in
+      let p1 = ≈map1 {x} in
+      let p2 = ≈map2 {x} in
+        (reindex B (Setoid.trans (U B) p1 p2) ≈.∘ h.transport x) .to bx
+          ≈⟨ sym (reindex-trans B p2 p1 (h.transport x .to bx)) ⟩
+        reindex B p1 .to
+          (reindex B p2 .to
+          (h.transport x .to bx))
+          ≈⟨ reindex B p1 .cong (≈fibre2 {x} {bx}) ⟩
+        reindex B p1 .to (g.transport x .to bx)
+          ≈⟨ ≈fibre1 {x} {bx} ⟩
+        f.transport x .to bx ∎
     where
     module f = Hom f
     module g = Hom g
+    module h = Hom h
     module A = Fam A
     module B = Fam B
 
   comp-resp-≈ : {A B C : Fam} {f h : Hom B C} {g i : Hom A B} →
       f ≋ h → g ≋ i → comp f g ≋ comp h i
   comp-resp-≈ {A} {B} {C} {f} {h} {g} {i} (feq f≈h t-f≈h) (feq g≈i t-g≈i) =
-    feq (≈.∘-resp-≈ f≈h g≈i)
+    feq (≈.∘-resp-≈ {A = Fam.U A} {B = Fam.U B} {C = Fam.U C} {g₁ = f.map} {g₂ = h.map} {f₁ = g.map} {f₂ = i.map} f≈h g≈i)
         λ {x} {bx} →
-          let u = Hom.map g .to x in
-          let v = Hom.map i .to x in
-          let p_g = g≈i {x} in -- p_g : g x ≈ i x
-          let p_f = Hom.map f .cong p_g in -- p_f : f (g x) ≈ f (i x)
-          let p_fh = f≈h {v} in -- p_fh : f (i x) ≈ h (i x)
-
-          let trans = Setoid.trans (T C (Hom.map f .to u)) in
-          let sym = Setoid.sym (T C (Hom.map f .to u)) in
-
-          -- 1. reindex (trans p_fh p_f) (...) ≈ reindex p_f (reindex p_fh (...))
-          let step1 = reindex-trans C p_fh p_f (Hom.transport h v .to (Hom.transport i x .to bx)) in
-
-          -- 2. reindex p_f (reindex p_fh (h.trans (i x) (...))) ≈ reindex p_f (f.trans (i x) (...))
-          let step2 = reindex C p_f .cong (t-f≈h {v} {Hom.transport i x .to bx}) in
-
-          -- 3. reindex p_f (f.trans (i x) (...)) ≈ f.trans (g x) (reindex p_g (...))
-          let step3 = Hom.transport-coh f p_g {Hom.transport i x .to bx} in
-
-          -- 4. f.trans (g x) (reindex p_g (i.trans x bx)) ≈ f.trans (g x) (g.trans x bx)
-          let step4 = Hom.transport f u .cong (t-g≈i {x} {bx}) in
-
-          trans (sym step1) (trans step2 (trans (sym step3) step4))
+          let u = g.to x in
+          let v = i.to x in
+          let p_g = g≈i {x} in
+          let p_f = f.cong p_g in
+          let p_fh = f≈h {v} in
+          let open ≈.≈syntax {S = T C (f.to u)} in
+          let open Setoid (T C (f.to u)) in
+            (reindex C (Setoid.trans (U C) p_f p_fh) ≈.∘ (h.transport v ≈.∘ i.transport x)) .to bx
+              ≈⟨ sym (reindex-trans C p_fh p_f (h.transport v .to (i.transport x .to bx))) ⟩
+            reindex C p_f .to
+              (reindex C p_fh .to
+              (h.transport v .to
+              (i.transport x .to bx)))
+              ≈⟨ reindex C p_f .cong (t-f≈h {v} {i.transport x .to bx}) ⟩
+            reindex C p_f .to (f.transport v .to (i.transport x .to bx))
+              ≈⟨ sym (f.transport-coh p_g {i.transport x .to bx}) ⟩
+            f.transport u .to (reindex B p_g .to (i.transport x .to bx))
+              ≈⟨ f.transport u .cong (t-g≈i {x} {bx}) ⟩
+            f.transport u .to (g.transport x .to bx) ∎
+    where
+    module f = Hom f
+    module g = Hom g
+    module h = Hom h
+    module i = Hom i
+    module A = Fam A
+    module B = Fam B
+    module C = Fam C
 
   Cat : Category (lsuc (ℓU ⊔ ℓU' ⊔ ℓT ⊔ ℓT')) (ℓU ⊔ ℓU' ⊔ ℓT ⊔ ℓT') (ℓU ⊔ ℓU' ⊔ ℓT ⊔ ℓT')
   Cat = record
@@ -148,11 +154,11 @@ module _ {ℓU ℓU' ℓT ℓT' : Level} where
     ; _≈_ = _≋_
     ; id = fam-id
     ; _∘_ = comp
-    ; assoc     = λ {A B C D f g h} → feq ≈.≈h-refl (refl-assoc {A} {B} {C} {D} {f} {g} {h})
-    ; sym-assoc = λ {A B C D f g h} → feq ≈.≈h-refl (refl-assoc {A} {B} {C} {D} {f} {g} {h})
-    ; identityˡ = λ {A B f} → feq ≈.≈h-refl (λ {x} {bx} → reindex-refl B {Hom.map f .to x} {Hom.transport f x .to bx})
-    ; identityʳ = λ {A B f} → feq ≈.≈h-refl (λ {x} {bx} → reindex-refl B {Hom.map f .to x} {Hom.transport f x .to bx})
-    ; identity² = λ {A} → feq ≈.≈h-refl (λ {x} {bx} → reindex-refl A {x} {bx})
+    ; assoc     = λ {A B C D f g h} → assoc {f = f} {g} {h}
+    ; sym-assoc = λ {A B C D f g h} → ≈≈-sym (assoc {f = f} {g} {h})
+    ; identityˡ = λ {A B f} → identityˡ {f = f}
+    ; identityʳ = λ {A B f} → identityʳ {f = f}
+    ; identity² = λ {A} → identity² {A}
     ; equiv = record
       { refl = ≈≈-refl
       ; sym = ≈≈-sym
@@ -171,9 +177,33 @@ module _ {ℓU ℓU' ℓT ℓT' : Level} where
           (Hom.transport h (Hom.map g .to (Hom.map f .to x)) .to
            (Hom.transport g (Hom.map f .to x) .to
             (Hom.transport f x .to bx)))
-      refl-assoc {A} {B} {C} {D} {f} {g} {h} {x} {bx} =
-        reindex-refl D {Hom.map h .to (Hom.map g .to (Hom.map f .to x))}
-                       {Hom.transport h _ .to (Hom.transport g _ .to (Hom.transport f x .to bx))}
+      refl-assoc {D = D} = reindex-refl D
+
+      assoc : {A B C D : Fam} {f : Hom A B} {g : Hom B C} {h : Hom C D} →
+        comp (comp h g) f ≋ comp h (comp g f)
+      assoc {A} {B} {C} {D} {f} {g} {h} = feq
+        (≈.∘-assoc (Hom.map h) (Hom.map g) (Hom.map f))
+        (λ {x} {bx} →
+          reindex-refl D
+            {x = Hom.map h .to (Hom.map g .to (Hom.map f .to x))}
+            {bx = Hom.transport h _ .to (Hom.transport g _ .to (Hom.transport f x .to bx))})
+
+      identityˡ : {A B : Fam} {f : Hom A B} → comp fam-id f ≋ f
+      identityˡ {B = B} {f} = feq
+        (λ {x} → Setoid.refl (U B) {x = Hom.map f .to x})
+        (λ {x} {bx} →
+          reindex-refl B {x = Hom.map f .to x} {bx = Hom.transport f x .to bx})
+
+      identityʳ : {A B : Fam} {f : Hom A B} → comp f fam-id ≋ f
+      identityʳ {B = B} {f} = feq
+        (λ {x} → Setoid.refl (U B) {x = Hom.map f .to x})
+        (λ {x} {bx} →
+          reindex-refl B {x = Hom.map f .to x} {bx = Hom.transport f x .to bx})
+
+      identity² : {A : Fam} → comp fam-id fam-id ≋ fam-id
+      identity² {A} = feq
+        (λ {x} → Setoid.refl (U A) {x = x})
+        (λ {x} {bx} → reindex-refl A {x = x} {bx = bx})
 
 FamilyOfSetoids : ∀ ℓU ℓU' ℓT ℓT' → Category (lsuc (ℓU ⊔ ℓU' ⊔ ℓT ⊔ ℓT')) (ℓU ⊔ ℓU' ⊔ ℓT ⊔ ℓT') (ℓU ⊔ ℓU' ⊔ ℓT ⊔ ℓT')
 FamilyOfSetoids ℓU ℓU' ℓT ℓT' = Cat {ℓU} {ℓU'} {ℓT} {ℓT'}
