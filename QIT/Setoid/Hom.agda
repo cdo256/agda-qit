@@ -66,11 +66,13 @@ module _ {ℓS ℓS' ℓT ℓT'} {S : Setoid ℓS ℓS'} {T : Setoid ℓT ℓT'}
     ; trans = λ {f g h} → ≈h-trans {f = f} {g = g} {h = h}
     }
 
+-- Exponential object
 HomSetoid : ∀ {ℓS ℓS' ℓT ℓT'} (S : Setoid ℓS ℓS') (T : Setoid ℓT ℓT') → Setoid (ℓS ⊔ ℓS' ⊔ ℓT ⊔ ℓT') (ℓS ⊔ ℓT')
 HomSetoid S T = record
   { Carrier = Hom S T
   ; _≈_ = _≈h_
   ; isEquivalence = ≈h-isEquivalence }
+_⇨_ = HomSetoid
 
 -- Composition of setoid homomorphisms: (f ∘ g)(x) = f(g(x)).
 -- Congruence follows from both f and g preserving equivalence.
