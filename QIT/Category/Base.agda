@@ -34,7 +34,7 @@ record Category (o ℓ e : Level) : Set (lsuc (o ⊔ ℓ ⊔ e)) where
 
   module Equiv {A B : Obj} = Binary.IsEquivalence (equiv {A} {B})
 
-  open Equiv
+  open Equiv public
 
   ∘-resp-≈ˡ : ∀ {A B C} {f h : B ⇒ C} {g : A ⇒ B} → f ≈ h → f ∘ g ≈ h ∘ g
   ∘-resp-≈ˡ pf = ∘-resp-≈ pf refl
