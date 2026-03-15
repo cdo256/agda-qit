@@ -40,16 +40,16 @@ Preorder S ℓR = Σ (BinaryRel S ℓR) IsPreorder
 module _ {ℓA} (A : Set ℓA) where
   private
     R : BinaryRel A ℓA
-    R = _≡p_
+    R = _≡_
 
-  isEquiv-≡p : IsEquivalence (_≡p_ {A = A})
-  isEquiv-≡p = record { refl = ∣ refl ∣ ; sym = sym ; trans = trans }
+  isEquiv-≡p : IsEquivalence (_≡_ {A = A})
+  isEquiv-≡p = record { refl = ≡.refl ; sym = sym ; trans = trans }
     where
     open _≡_
     sym : Symmetric R
-    sym ∣ refl ∣ = ∣ refl ∣
+    sym ≡.refl = ≡.refl
     trans : Transitive R
-    trans ∣ refl ∣ ∣ refl ∣ = ∣ refl ∣
+    trans ≡.refl ≡.refl = ≡.refl
 
 module _ {ℓA ℓB ℓR} {A : Set ℓA} {B : Set ℓB}
   (R : BinaryRel A ℓR) (f : B → A)

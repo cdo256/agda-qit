@@ -24,9 +24,9 @@ infixr 4 _,_
 ΣP≡' : ∀ {a b} {A : Set a} {B : A → Prop b}
     → (a1 a2 : A) → a1 ≡ a2
     → ∀ (b1 : B a1) (b2 : B a2) → _≡_ {A = ΣP A B} (a1 , b1) (a2 , b2)
-ΣP≡' {a} {b} {A = A} {B = B} a1 a2 p = ≡.J C p λ b1 b2 → ≡.refl
+ΣP≡' {a} {b} {A = A} {B = B} a1 a2 p = ≡.Jp C p λ b1 b2 → ≡.refl
   where
-  C : ∀ a2 → a1 ≡ a2 → Set (a ⊔ b)
+  C : ∀ a2 → a1 ≡ a2 → Prop (a ⊔ b)
   C a2 p = ∀ (b1 : B a1) (b2 : B a2) → _≡_ {A = ΣP A B} (a1 , b1) (a2 , b2)
 
 ΣP≡ : ∀ {a b} {A : Set a} {B : A → Prop b}
