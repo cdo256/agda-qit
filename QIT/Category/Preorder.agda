@@ -21,14 +21,14 @@ PreorderCat : Category ℓA ℓ≤ ℓ≤
 PreorderCat = record
   { Obj = A
   ; _⇒_ = _≤ˢ_
-  ; _≈_ = _≡p_
+  ; _≈_ = _≡_
   ; id = box ≤.refl
   ; _∘_ = λ g f → box (≤.trans (f .unbox) (g .unbox))
-  ; assoc = reflp
-  ; sym-assoc = reflp
-  ; identityˡ = reflp
-  ; identityʳ = reflp
-  ; identity² = reflp
+  ; assoc = ≡.refl
+  ; sym-assoc = ≡.refl
+  ; identityˡ = ≡.refl
+  ; identityʳ = ≡.refl
+  ; identity² = ≡.refl
   ; equiv = λ {A B} → isEquiv-≡p (A ≤ˢ B)
   ; ∘-resp-≈ = λ{ reflp reflp → reflp }
   }
