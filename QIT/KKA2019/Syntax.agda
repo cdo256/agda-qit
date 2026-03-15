@@ -1,6 +1,6 @@
 open import QIT.Prelude hiding (_,_)
 
-module QIT.KKA2019.Syntax {ℓ : Level} where
+module QIT.KKA2019.Syntax where
 
 interleaved mutual
   infix 10 _≈ᵀ_ _≈ᵗ_ _≈ˢ_
@@ -8,13 +8,13 @@ interleaved mutual
   infixl 25 _[_]ᵀ _[_]ᵗ
   infixr 30 _,_ 
   infixr 30 _∘_ 
-  data Con : Set (lsuc ℓ)
-  data Sub : Con → Con → Set (lsuc ℓ)
-  data _≈ˢ_ : ∀ {Γ Δ} → Sub Γ Δ → Sub Γ Δ → Set (lsuc ℓ)
-  data Ty : Con → Set (lsuc ℓ)
-  data _≈ᵀ_ : ∀ {Γ} → Ty Γ → Ty Γ → Prop (lsuc ℓ)
-  data Tm : (Γ : Con) → Ty Γ → Set (lsuc ℓ)
-  data _≈ᵗ_ : ∀ {Γ} {A B : Ty Γ} → Tm Γ A → Tm Γ B → Prop (lsuc ℓ)
+  data Con : Set
+  data Sub : Con → Con → Set
+  data _≈ˢ_ : ∀ {Γ Δ} → Sub Γ Δ → Sub Γ Δ → Set
+  data Ty : Con → Set
+  data _≈ᵀ_ : ∀ {Γ} → Ty Γ → Ty Γ → Prop
+  data Tm : (Γ : Con) → Ty Γ → Set
+  data _≈ᵗ_ : ∀ {Γ} {A B : Ty Γ} → Tm Γ A → Tm Γ B → Prop
 
   variable
     Γ Δ Θ Ξ : Con
@@ -81,9 +81,42 @@ interleaved mutual
     coe : A ≈ᵀ B → Tm Γ A → Tm Γ B
     reflect : ∀ {Γ A} → (s t : Tm Γ A) → (w : Tm Γ (Id A s t)) → s ≈ᵗ t
 
-module Nat where
-  sig : Con
-  sig =
-    ∙ ▷ U -- N
-      ▷ El vz -- z
-      ▷ Πⁱ (coe (U[] wk) vz) (El (vs vz)) [ wk ]ᵀ -- s
+record Code : Set₁ where
+  field
+    Con₀ : Set
+    Ty₀ : Con₀ → Set
+    Sub₀ : Con₀ → Con₀ → Set
+    Tm₀ : (Γ : Con₀) → Ty₀ Γ → Set
+    
+record Algebra : Set₂ where
+  field
+    Conᴬ : Con → Set₁
+    Tyᴬ : Ty Γ → (Conᴬ Γ) → Set₁
+    Subᴬ : Sub Γ Δ → Conᴬ Γ → Conᴬ Δ
+    Tmᴬ : Tm Γ A → (Γ̇ : Conᴬ Γ) → Tyᴬ A Γ̇
+
+open Algebra
+  
+Cons : (Ω : Con) (ν : Sub Ω Γ) → Algebra
+Cons Ω ν .Conᴬ ∙ = ⊤*
+Cons Ω ν .Conᴬ (Γ ▷ A) = Σ (Cons Ω ν .Conᴬ Γ) λ Γ̇ → Cons Ω ν .Conᴬ Γ
+Cons Ω ν .Tyᴬ U Γ̇ = {!Tm Ω {!El ?!}!}
+Cons Ω ν .Tyᴬ {Γ} (El a) Γ̇ = let w = Cons Ω ν .Tmᴬ a Γ̇ in {!!}
+Cons Ω ν .Tyᴬ (Πⁱ a B) Γ̇ = {!!}
+Cons Ω ν .Tyᴬ (A [ σ ]ᵀ) Γ̇ = {!!}
+Cons Ω ν .Tyᴬ (Πⁱ[] a A) Γ̇ = {!!}
+Cons Ω ν .Tyᴬ (Id A x x₁) Γ̇ = {!!}
+Cons {Γ = Γ} Ω ν .Subᴬ {Γ = Γ'} {Δ} σ Γᴬ = let w = Cons Ω ({!!} ∘ ν) .Conᴬ {!!} in {!!}
+Cons Ω ν .Tmᴬ = {!!}
+--   field
+--     Conᴬ : (Γ : Con) → Conᴬ {!!} {!!}
+-- --     Tyᴬ : Ty Γ → (Conᴬ Γ) → Set
+-- --     Subᴬ : Sub Γ Δ → Conᴬ Γ → Conᴬ Δ
+-- --     Tmᴬ : Tm Γ A → (Γ̇ : Conᴬ Γ) → Tyᴬ A Γ̇
+
+-- -- module Nat where
+-- --   sig : Con
+-- --   sig =
+-- --     ∙ ▷ U -- N
+-- --       ▷ El vz -- z
+-- --       ▷ Πⁱ (coe (U[] wk) vz) (El (vs vz)) [ wk ]ᵀ -- s

@@ -94,6 +94,10 @@ open ↔ using (_↔_) public
 absurd* : ∀ {ℓ ℓ'} {A : Set ℓ} → ⊥* {ℓ = ℓ'} → A
 absurd* ()
 
+-- Empty type at arbitrary universe levels.
+⊤* : ∀ {ℓ} → Set ℓ
+⊤* {ℓ} = Lift ℓ ⊤
+
 -- Decidability type - constructive decision procedures.
 data Dec {ℓA} (A : Set ℓA) : Set ℓA where
   yes : A → Dec A
