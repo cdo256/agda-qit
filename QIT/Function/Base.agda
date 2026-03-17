@@ -10,7 +10,7 @@ variable
 
 Surjective : ∀ {A : Set ℓA} {B : Set ℓB}
            → (A → B) → Prop _
-Surjective f = ∀ y → ∃ λ x → f x ≡p y
+Surjective f = ∀ y → ∃ λ x → f x ≡ y
 
 Surjection : (A : Set ℓA) (B : Set ℓB) → Set _
 Surjection A B = ΣP (A → B) Surjective

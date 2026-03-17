@@ -29,7 +29,7 @@ PreorderCat = record
   ; identityˡ = ≡.refl
   ; identityʳ = ≡.refl
   ; identity² = ≡.refl
-  ; equiv = λ {A B} → isEquiv-≡p (A ≤ˢ B)
-  ; ∘-resp-≈ = λ{ reflp reflp → reflp }
+  ; equiv = λ {A B} → isEquiv-≡ (A ≤ˢ B)
+  ; ∘-resp-≈ = λ{ ≡.refl ≡.refl → ≡.refl }
   }
   where open Box

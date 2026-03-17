@@ -77,17 +77,16 @@ _/≡ : ∀ {ℓ} (B : Set ℓ) → Setoid ℓ ℓ
 _/≡ B = record
   { Carrier = B
   ; _≈_ = _≡_
-  ; isEquivalence = isEquiv-≡p B }
+  ; isEquivalence = isEquiv-≡ B }
 
 -- If x ≡ y then x ≈ y in any setoid containing them.
 ≡→≈ : ∀ {ℓ ℓ'} → (A : Setoid ℓ ℓ') → {x y : ⟨ A ⟩} → x ≡ y → A [ x ≈ y ]
 ≡→≈ A {x} p = ≡.substp (λ ○ → x ≈ ○) p refl
   where open Setoid A
 
--- If x ≡ y then x ≈ y in any setoid containing them.
+-- Compatibility alias (≡p→≈ is now the same as ≡→≈)
 ≡p→≈ : ∀ {ℓ ℓ'} → (A : Setoid ℓ ℓ') → {x y : ⟨ A ⟩} → x ≡ y → A [ x ≈ y ]
-≡p→≈ A {x} p = ≡.substp (λ ○ → x ≈ ○) p refl
-  where open Setoid A
+≡p→≈ = ≡→≈
 
 -- Lift a setoid to higher universe levels.
 -- This allows us to transport setoids from lower levels to higher levels,

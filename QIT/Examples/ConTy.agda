@@ -4,6 +4,7 @@ open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Relation.Subset
 open import QIT.Relation.Base
+open import QIT.Relation.Nullary
 
 module Plain where
   data Con : Set

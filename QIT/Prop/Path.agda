@@ -1,3 +1,5 @@
+{-# OPTIONS --injective-type-constructors #-}
+
 module QIT.Prop.Path where
 
 infix 4 _≡_
