@@ -18,7 +18,7 @@ DiscreteCat≈ Ã = record
   -- we only have identity arrows, so any pair of arrows between the
   -- same pair of objects must be equal. In other words, in a discrete
   -- category, all hom-sets are propositional.
-  ; _≈⃗_ = λ _ _ → ∥ ⊤ ∥ 
+  ; _≈⃗_ = λ _ _ → ∥ ⊤ ∥
   ; id = box refl
   ; _∘_ = λ p q → box (trans (unbox q) (unbox p))
   ; equiv⁰ = isEquivalence
@@ -45,16 +45,16 @@ DiscreteCat : ∀ {ℓA} → Set ℓA → Category ℓA ℓA ℓA
 DiscreteCat A = record
   { Obj = A
   ; _⇒_ = _≡_
-  ; _≈_ = _≡p_
+  ; _≈_ = _≡_
   ; id = ≡.refl
   ; _∘_ = λ p q → ≡.trans q p
-  ; assoc = λ {f = f} → ∣ ≡.sym (≡.trans-assoc f) ∣ 
-  ; sym-assoc = λ {f = f} → ∣ ≡.trans-assoc f ∣ 
-  ; identityˡ = λ {f = f} → ∣ ≡.trans-reflʳ f ∣ 
-  ; identityʳ = reflp 
-  ; identity² = reflp
-  ; equiv = λ {a b} → isEquiv-≡p (a ≡ b)
-  ; ∘-resp-≈ = λ{ reflp reflp → reflp }
+  ; assoc = refl
+  ; sym-assoc = refl
+  ; identityˡ = refl
+  ; identityʳ = refl
+  ; identity² = refl
+  ; equiv = λ {a b} → isEquiv-≡ (a ≡ b)
+  ; ∘-resp-≈ = λ{ ≡.refl ≡.refl → ≡.refl }
   }
 
 ⊤Cat : Category ℓ0 ℓ0 ℓ0

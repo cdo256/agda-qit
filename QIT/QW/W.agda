@@ -25,12 +25,12 @@ T̃ : Setoid (ℓS ⊔ ℓP) (ℓS ⊔ ℓP)
 T̃ = T /≡
 
 -- Congruence: sup respects equivalence in the functor interpretation
-α-cong : ∀ {sf} {tg} → F.ob T̃ [ sf ≈ tg ] → sup sf ≡p sup tg
-α-cong {s , f} {s , g} (F-Ob.mk≈ꟳ ≡.refl snd≈) = q (funExtp snd≈)
+α-cong : ∀ {sf} {tg} → F.ob T̃ [ sf ≈ tg ] → sup sf ≡ sup tg
+α-cong {s , f} {s , g} (F-Ob.mk≈ꟳ ≡.refl snd≈) = q (≡.funExt snd≈)
   where
   open F-Ob T̃
-  q : f ≡p g → sup (s , f) ≡p sup (s , g)
-  q reflp = reflp
+  q : f ≡ g → sup (s , f) ≡ sup (s , g)
+  q ≡.refl = ≡.refl
 T-α : ≈.Hom (F.ob T̃) T̃
 T-α = record
   { to = sup
@@ -54,7 +54,7 @@ module Rec (Yβ : Algebra) where
   rec₀ (W.sup (s , f)) =
     β.to (s , λ i → rec₀ (f i))
   rec-cong : ∀ {x y} → T̃ [ x ≈ y ] → Y [ rec₀ x ≈ rec₀ y ]
-  rec-cong reflp = ≡→≈ Y ≡.refl
+  rec-cong ≡.refl = ≡→≈ Y ≡.refl
   rec : ≈.Hom T̃ Y
   rec = record { to = rec₀ ; cong = rec-cong }
   rec-comm : (β ≈.∘ F.hom rec) ≈h (rec ≈.∘ T-α)
@@ -64,9 +64,9 @@ module Rec (Yβ : Algebra) where
   unique f {sup (s , g)} =
     f.hom .to (W.sup (s , g))
       ≈⟨ sym f.comm ⟩
-    β.to (s , λ i → f.hom .to (g i)) 
+    β.to (s , λ i → f.hom .to (g i))
       ≈⟨ β.cong (F-Ob.mk≈ꟳ ≡.refl λ i → unique f {g i}) ⟩
-    β.to (s , λ i → rec₀ (g i)) 
+    β.to (s , λ i → rec₀ (g i))
       ≈⟨ refl ⟩
     rec₀ (W.sup (s , g)) ∎
     where

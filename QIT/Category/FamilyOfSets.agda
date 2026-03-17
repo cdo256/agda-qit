@@ -175,10 +175,10 @@ module FamCat {ℓU ℓT : Level} where
     ; identity² = λ {A} → identity² {A}
     ; equiv = record
       { refl = ∣ ≋-refl ∣
-      ; sym = λ { reflp → reflp }
-      ; trans = λ { reflp reflp → reflp }
+      ; sym = λ { ≡.refl → ≡.refl }
+      ; trans = λ { ≡.refl ≡.refl → ≡.refl }
       }
-    ; ∘-resp-≈ = λ { reflp reflp → reflp }
+    ; ∘-resp-≈ = λ { ≡.refl ≡.refl → ≡.refl }
     }
     where
     open ≡.≡-Reasoning

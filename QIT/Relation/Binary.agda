@@ -42,8 +42,8 @@ module _ {ℓA} (A : Set ℓA) where
     R : BinaryRel A ℓA
     R = _≡_
 
-  isEquiv-≡p : IsEquivalence (_≡_ {A = A})
-  isEquiv-≡p = record { refl = ≡.refl ; sym = sym ; trans = trans }
+  isEquiv-≡ : IsEquivalence (_≡_ {A = A})
+  isEquiv-≡ = record { refl = ≡.refl ; sym = sym ; trans = trans }
     where
     open _≡_
     sym : Symmetric R
