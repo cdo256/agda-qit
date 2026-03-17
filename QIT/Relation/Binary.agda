@@ -23,6 +23,15 @@ module _ {ℓA ℓR} {A : Set ℓA} (R : BinaryRel A ℓR) where
   WellFounded : Set _
   WellFounded = ∀ x → Acc x
 
+  WfRecp : (A → Prop (ℓA ⊔ ℓR)) → (A → Prop (ℓA ⊔ ℓR))
+  WfRecp P x = ∀ y → R y x → P y
+
+  data Accp (x : A) : Prop (ℓA ⊔ ℓR) where
+    acc : (rs : WfRecp Accp x) → Accp x
+
+  WellFoundedp : Prop _
+  WellFoundedp = ∀ x → Accp x
+
   record IsEquivalence : Prop (ℓR ⊔ ℓA) where
     field
       refl  : Reflexive

@@ -166,13 +166,13 @@ child≤ s f i = <→≤ (<sup i (≤refl (f i)))
 --
 -- The proof uses the fact that a < step selects a child, so we can
 -- recurse structurally down the tree.
-iswf< : WellFounded _<_
+iswf< : WellFoundedp _<_
 iswf< α = acc λ β β<α → p α β (<→≤ β<α)
   where
-  p : ∀ α β → β ≤ α → Acc _<_ β
+  p : ∀ α β → β ≤ α → Accp _<_ β
   p (sup (_ , f)) β β≤α = acc q
     where
-    q : WfRec _<_ (Acc _<_) β
+    q : WfRecp _<_ (Accp _<_) β
     q γ γ<β with ≤< β≤α γ<β
     ... | <sup i γ≤fi = p (f i) γ γ≤fi
 
