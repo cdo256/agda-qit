@@ -30,11 +30,12 @@ open Sig sig
 open import QIT.Container.Functor Sᵀ Pᵀ ℓ0 (lsuc ℓ0)
 
 open F-Ob
+open DepthPreserving depth-preserving
 
 ϕ : ≈.Hom (Colim (F ∘ D)) (F.ob (Colim D))
 ϕ = record { to = ϕ₀ ; cong = ϕ-cong }
 ψ : ≈.Hom (F.ob (Colim D)) (Colim (F ∘ D))
-ψ = record { to = ψ₀ ; cong = ψ-cong {!!} }
+ψ = record { to = ψ₀ ; cong = ψ-cong }
 
 θ₀ : ⟨ Colim (F ∘ D) ⟩ → ⟨ Colim D ⟩
 θ₀ (α , a , f) = β , t , t≤β
@@ -120,16 +121,16 @@ theorem ∣ iso ∣ = ∣ record
     open Alg Yβ renaming (X to Y; α to β; sat to Ysat)
     module Y = Setoid Y
     module β = ≈.Hom β
-    c : Lift ℓ0 T → ⟨ Y ⟩
-    c (lift (sup (s , f))) = β.to (s , λ i → c (lift (f i)))
+    c : T → ⟨ Y ⟩
+    c (sup (s , f)) = β.to (s , λ i → c (f i))
     r₀ : Colim₀ D → ⟨ Y ⟩
-    r₀ (_ , t , _) = c (lift t)
+    r₀ (_ , t , _) = c t
     r-cong : ∀ {x y} → Colim D [ x ≈ y ] → Y [ r₀ x ≈ r₀ y ]
     r-cong {α , (s1 , α≤s1)} {α , (s2 , α≤s2)} (≈lstage α p) = r-cong-stage p
       where
       r-cong-stage : ∀ {α ŝ t̂} → α ⊢ ŝ ≈ᵇ t̂ → r₀ (α , ŝ) Y.≈ r₀ (α , t̂)
       r-cong-stage {α} {ŝ} {t̂} (≈pcong a μ f g u) = β.cong (mk≈ꟳ ≡.refl λ i → r-cong-stage (u i))
-      r-cong-stage {α} {ŝ} {t̂} (≈psat e ϕ₁ l≤α r≤α) = Ysat e (λ z → c {!ϕ₁ z!})
+      r-cong-stage {α} {ŝ} {t̂} (≈psat e ϕ₁ l≤α r≤α) = Ysat e (λ z → c (lower (ϕ₁ z)))
       r-cong-stage {α} {ŝ} {t̂} ≈prefl = Y.refl
       r-cong-stage {α} {ŝ} {t̂} (≈psym p) = Y.sym (r-cong-stage p)
       r-cong-stage {α} {ŝ} {t̂} (≈ptrans p q) = Y.trans (r-cong-stage p) (r-cong-stage q)
@@ -148,7 +149,7 @@ theorem ∣ iso ∣ = ∣ record
       r₀ (sup (ιˢ l , λ _ → ⊥ᶻ) , sup (l , λ()) , sup≤sup λ ())
         ≈⟨ refl ⟩
       r₀ (θ₀ (⊥ᶻ , l , λ()))
-        ≈⟨ {!refl!} ⟩
+        ≈⟨ r-cong (θ-cong (ψ-cong {!!})) ⟩
       r₀ (θ₀ (ψ₀ (l , f))) ∎
       where
       open Setoid Y

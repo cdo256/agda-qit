@@ -121,7 +121,7 @@ open ≈s hiding (s~t; s≈t)
 
 -- Under the depth-preserving assumption, we can prove cocontinuity.
 -- The assumption ensures equivalent elements have compatible ordinal bounds.
-module _ (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ŝ .fst ~ᵀ t̂ .fst) where
+module DepthPreserving (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ŝ .fst ~ᵀ t̂ .fst) where
 
   -- Tighten stage-level relations to strong tree equivalences.
   ≈ᵇ→≈ˢ : ∀ {α ŝ t̂} → D̃ α [ ŝ ≈ t̂ ]
@@ -234,3 +234,4 @@ module _ (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ŝ .fst 
       ; linv = linv
       ; rinv = rinv
       }
+open DepthPreserving using (depthPrserving→cocontinuous) public
