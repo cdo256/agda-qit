@@ -7,6 +7,10 @@ import QIT.Prelude
 import QIT.Fin.Base
 import QIT.Function.Base
 import QIT.Prop.Base
+import QIT.Prop.Logic
+import QIT.Prop.Path
+import QIT.Prop.Properties
+import QIT.Prop.Unannotated
 import QIT.Prop
 import QIT.Set.Base
 
@@ -33,6 +37,8 @@ import QIT.Category.Discrete
 -- import QIT.Category.FamilyOfSets -- ConstructorDoesNotFitInData
 import QIT.Category.FamilyOfSetoids
 -- import QIT.Category.WithFamilies -- incomplete
+import QIT.Category.Terminal
+import QIT.Category.Initial
 import QIT.Functor.Base
 import QIT.Functor.Composition
 import QIT.NatTrans
