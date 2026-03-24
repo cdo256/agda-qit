@@ -18,19 +18,19 @@ module _ {ℓA} where
   FinSet : Set (lsuc ℓA)
   FinSet = Σ (Set ℓA) isFinite
 
+  -- Discrete types - equality is decidable.
+  Discrete : ∀ {ℓA} (A : Set ℓA) → Set ℓA
+  Discrete A = ∀ (x y : A) → Dec (Box (x ≡ y))
+
   isFinite→Discrete : (A : Set ℓA) → isFinite A → Discrete A
   isFinite→Discrete A (n , f) x y =
     case (i ≟Fin j) of
-      λ{(no ¬p) → no (λ q → ¬p (≡.cong from q) )
-      ; (yes p) → yes (≡.trans (≡.sym (linv x)) (≡.trans (≡.cong to p) (linv y))) }  
+      λ{(no ¬p) → no (λ q → ¬p (box (≡.cong from (unbox q))) )
+      ; (yes (box p)) → yes (box (≡.trans (≡.sym (linv x)) (≡.trans (≡.cong to p) (linv y)))) }  
     where
     open _↔_ f
     i = from x
     j = from y
-
-  -- Discrete types - equality is decidable.
-  Discrete : ∀ {ℓA} (A : Set ℓA) → Set ℓA
-  Discrete A = ∀ (x y : A) → Dec (x ≡ y)
 
   -- Conditional expression based on decidability.
   infixr 3 if_then_else_
@@ -41,11 +41,11 @@ module _ {ℓA} where
   const : ∀ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} (a : A) → B → A
   const a _ = a
 
-  isProp : ∀ {ℓA} → Set ℓA → Set ℓA
+  isProp : ∀ {ℓA} → Set ℓA → Prop ℓA
   isProp A = ∀ (x y : A) → x ≡ y
 
-  isContr : ∀ {ℓA} → Set ℓA → Set ℓA
-  isContr A = Σ A λ x → ∀ y → x ≡ y
+  isContr : ∀ {ℓA} → Set ℓA → Prop ℓA
+  isContr A = ∃ λ (x : A) → ∀ y → x ≡ y
 
   Σ≡Prop
     : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB}
@@ -53,5 +53,8 @@ module _ {ℓA} where
     → (p : u .proj₁ ≡ v .proj₁) → u ≡ v
   Σ≡Prop pB {x , u} {x , v} ≡.refl = ≡.cong (x ,_) (pB x u v)
 
-  isSetSet : ∀ {ℓA} {A : Set ℓA} {x y : A} (p q : x ≡ y) → p ≡ q
+  isPropProp : ∀ {ℓA} {A : Prop ℓA} (x y : A) → x ≡ᵖ y
+  isPropProp _ _ = ≡.refl
+
+  isSetSet : ∀ {ℓA} {A : Set ℓA} {x y : A} (p q : x ≡ y) → p ≡ᵖ q
   isSetSet ≡.refl ≡.refl = ≡.refl

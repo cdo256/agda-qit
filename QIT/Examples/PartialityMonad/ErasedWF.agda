@@ -1,4 +1,4 @@
-module QIT.Examples.PartialityMonad.ErasedWF1 where
+module QIT.Examples.PartialityMonad.ErasedWF where
 
 open import QIT.Prelude renaming (⊤ to ⊤'; ⊥ to ⊥')
 open import QIT.Prop
@@ -8,7 +8,7 @@ open ℕ using (ℕ; zero; suc)
 import Data.Bool as 𝔹
 open 𝔹 using (Bool; false; true)
 
-open import QIT.Examples.PartialityMonad.Erased1
+open import QIT.Examples.PartialityMonad.Erased
 
 interleaved mutual
   data Seq1 : Seq0 → Set

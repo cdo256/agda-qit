@@ -4,7 +4,6 @@ open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Relation.Base
 open import QIT.Relation.Subset
-open import QIT.Function.Base 
 
 -- Discrete types - equality is decidable.
 Discrete : ∀ {ℓA} (A : Set ℓA) → Set ℓA

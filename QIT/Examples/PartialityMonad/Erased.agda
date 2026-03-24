@@ -1,4 +1,4 @@
-module QIT.Examples.PartialityMonad.Erased1 where
+module QIT.Examples.PartialityMonad.Erased where
 
 open import QIT.Prelude renaming (⊤ to ⊤'; ⊥ to ⊥')
 open import QIT.Prop
