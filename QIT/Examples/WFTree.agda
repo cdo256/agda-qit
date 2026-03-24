@@ -107,29 +107,29 @@ module _ ( _≟ᵗ_ : ∀ {s} → Discrete (Pᵀ s)) where
         ≡⟨ step-inj r .StepInj.π ⟩
       π₂ ∎
 
-  module _ (t : T) where
-    data _≤_ : Path t → Path t → Prop where
-      ≤refl : ∀ {x} → x ≤ x
-      ≤step : ∀ {x y} → ↑ x ≤ x → x ≤ y → ↑ x ≤ y
+  -- module _ (t : T) where
+  --   data _≤_ : Path t → Path t → Prop where
+  --     ≤refl : ∀ {x} → x ≤ x
+  --     ≤step : ∀ {x y} → ↑ x ≤ x → x ≤ y → ↑ x ≤ y
 
-    ≤trans : ∀ {x y z} → x ≤ y → y ≤ z → x ≤ z
-    ≤trans ≤refl q = q
-    ≤trans (≤step p q) r = ≤step p (≤trans q r)
+  --   ≤trans : ∀ {x y z} → x ≤ y → y ≤ z → x ≤ z
+  --   ≤trans ≤refl q = q
+  --   ≤trans (≤step p q) r = ≤step p (≤trans q r)
 
-    data _<_ : Path t → Path t → Prop where
-      <step : ∀ {x y} → x ≢ root _ → ↑ x < x → x ≤ y → ↑ x < y
+  --   data _<_ : Path t → Path t → Prop where
+  --     <step : ∀ {x y} → x ≢ root _ → ↑ x < x → x ≤ y → ↑ x < y
 
-    <step' : (x y : Path t) → x < y → (x ≡p ↑ y) ∨ (x < ↑ y)
-    <step' _ y (<step {u} u≢root ↑u<u u≤y) with {!x!} ≟ᵖ {!!}
-    ... | w = {!!}
+  --   <step' : (x y : Path t) → x < y → (x ≡p ↑ y) ∨ (x < ↑ y)
+  --   <step' _ y (<step {u} u≢root ↑u<u u≤y) with {!x!} ≟ᵖ {!!}
+  --   ... | w = {!!}
 
-    W→WFTree : WFTree
-    W→WFTree = record
-      { A = Path t 
-      ; ∙ = root _
-      ; ↑ = ↑
-      ; _≺_ = _<_
-      ; ≺step = {!≺step!}
-      ; ↑≺ = {!↑≺!}
-      ; trans = {!<trans!}
-      }
+  --   W→WFTree : WFTree
+  --   W→WFTree = record
+  --     { A = Path t 
+  --     ; ∙ = root _
+  --     ; ↑ = ↑
+  --     ; _≺_ = _<_
+  --     ; ≺step = {!≺step!}
+  --     ; ↑≺ = {!↑≺!}
+  --     ; trans = {!<trans!}
+  --     }

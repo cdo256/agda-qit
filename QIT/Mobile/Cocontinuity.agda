@@ -24,10 +24,10 @@ open import QIT.QW.StageColimit sig using (joinTerms; αˡ; tˡ; t≤αˡ)
 open import QIT.Container.Functor Sᵀ Pᵀ ℓ0 (lsuc ℓ0)
 open F-Ob
 
--- Diagram and _∘ᴰ_ are imported from Stage
+-- Diagram and _∘_ are imported from Stage
 module F = Functor F
 module D = Functor D
-module F∘D = Functor (F ∘ᴰ D)
+module F∘D = Functor (F ∘ D)
 
 depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ιᶻ (ŝ .fst) ≤≥ ιᶻ (t̂ .fst)
 depth-preserving α (s , s≤α) (t , t≤α) (≈pcong a μ f g r) =

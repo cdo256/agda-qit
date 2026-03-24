@@ -28,28 +28,28 @@ module FamCat {ℓU ℓT : Level} where
     constructor fhom
     field
       map : U A → U B                              -- Base map
-      transport : (x : U A) → T A x → T B (map x)  -- Fiber map
+      transport : {x : U A} → T A x → T B (map x)  -- Fiber map
 
   open Hom
 
   -- Morphism equality: pointwise equality on both base and fibers
-  record _≋_ {A B : Fam'} (f g : Hom A B) : Set (ℓU ⊔ ℓT) where
+  record _≡ꟳ_ {A B : Fam'} (f g : Hom A B) : Prop (ℓU ⊔ ℓT) where
     constructor feq
     field
-      ≈map : ∀ (x : U A) → map f x ≡ map g x
-      ≈transport : ∀ (x : U A) (y : T A x)
-                 → ≡.subst (T B) (≈map x) (transport f x y)
-                 ≡ transport g x y
+      ≡map : ∀ (x : U A) → map f x ≡ map g x
+      ≡transport : ∀ {x : U A} (y : T A x)
+                 → ≡.subst (T B) (≡map x) (transport f y)
+                 ≡ transport g y
 
   -- Identity morphism
   fam-id : {A : Fam'} → Hom A A
-  fam-id = fhom (λ x → x) (λ _ ax → ax)
+  fam-id = fhom (λ x → x) (λ ax → ax)
 
   -- Composition of morphisms
   comp : {A B C : Fam'} → Hom B C → Hom A B → Hom A C
   comp g f = fhom
     (λ x → map g (map f x))
-    (λ x ax → transport g (map f x) (transport f x ax))
+    (λ {x} ax → transport g (transport f ax))
 
   -- Helper lemmas for substitution
   private
@@ -63,72 +63,67 @@ module FamCat {ℓU ℓT : Level} where
                → ≡.subst P (≡.cong f p) u ≡ ≡.subst (λ a → P (f a)) p u
     subst-cong f P ≡.refl u = ≡.refl
 
-
-
   -- Equivalence relation on morphisms
-  ≋-refl : ∀ {A B} {f : Hom A B} → f ≋ f
-  ≋-refl {A} {B} {f} =
+  ≡ꟳ-refl : ∀ {A B} {f : Hom A B} → f ≡ꟳ f
+  ≡ꟳ-refl {A} {B} {f} =
     feq r r̂
     where
     open ≡.≡-Reasoning
     open ≡
     r : (x : U A) → map f x ≡ map f x
     r _ = ≡.refl
-    r̂ : ∀ (x : U A) (y : T A x)
-                → ≡.subst (T B) (r x) (transport f x y)
-                ≡ transport f x y
-    r̂ x ax = refl
+    r̂ : ∀ {x : U A} (y : T A x)
+                → ≡.subst (T B) (r x) (transport f y)
+                ≡ transport f y
+    r̂ ax = refl
 
-  ≋-sym : ∀ {A B} {f g : Hom A B} → f ≋ g → g ≋ f
-  ≋-sym {A} {B} {f} {g} (feq p p̂) =
+  ≡ꟳ-sym : ∀ {A B} {f g : Hom A B} → f ≡ꟳ g → g ≡ꟳ f
+  ≡ꟳ-sym {A} {B} {f} {g} (feq p p̂) =
     feq r r̂
     where
     open ≡.≡-Reasoning
     open ≡
     r : (x : U A) → map g x ≡ map f x
     r x = sym (p x)
-    r̂ : ∀ (x : U A) (y : T A x)
-                → ≡.subst (T B) (r x) (transport g x y)
-                ≡ transport f x y
-    r̂ x y =
-      subst (T B) (r x) (transport g x y)
-        ≡⟨ cong (subst (T B) (r x)) (sym (p̂ x y)) ⟩
-      subst (T B) (r x) (subst (T B) (p x) (transport f x y))
-        ≡⟨ subst² (T B) (p x) (r x) (transport f x y) ⟩
-      subst (T B) (trans (p x) (r x)) (transport f x y)
-        ≡⟨ cong (λ q → subst (T B) q (transport f x y))
+    r̂ : ∀ {x : U A} (y : T A x)
+      → ≡.subst (T B) (r x) (transport g y)
+      ≡ transport f y
+    r̂ {x} y =
+      subst (T B) (r x) (transport g y)
+        ≡⟨ cong (subst (T B) (r x)) (sym (p̂ y)) ⟩
+      subst (T B) (r x) (subst (T B) (p x) (transport f y))
+        ≡⟨ subst² (T B) (p x) (r x) (transport f y) ⟩
+      subst (T B) (trans (p x) (r x)) (transport f y)
+        ≡⟨ cong (λ q → subst (T B) q (transport f y))
                  (≡.trans-symʳ (p x)) ⟩
-      subst (T B) refl (transport f x y)
+      subst (T B) refl (transport f y)
         ≡⟨ refl ⟩
-      transport f x y ∎
+      transport f y ∎
 
-
-  ≋-trans : ∀ {A B} {f g h : Hom A B} → f ≋ g → g ≋ h → f ≋ h
-  ≋-trans {A} {B} {f} {g} {h} (feq p p̂) (feq q q̂) =
+  ≡ꟳ-trans : ∀ {A B} {f g h : Hom A B} → f ≡ꟳ g → g ≡ꟳ h → f ≡ꟳ h
+  ≡ꟳ-trans {A} {B} {f} {g} {h} (feq p p̂) (feq q q̂) =
     feq r r̂
     where
     open ≡.≡-Reasoning
     open ≡
     r : (x : U A) → map f x ≡ map h x
     r x = trans (p x) (q x)
-    r̂ : ∀ (x : U A) (y : T A x)
-                → ≡.subst (T B) (r x) (transport f x y)
-                ≡ transport h x y
-    r̂ x y =
-      subst (T B) (r x) (transport f x y)
-        ≡⟨ sym (subst² (T B) (p x) (q x) (transport f x y)) ⟩
-      subst (T B) (q x) (subst (T B) (p x) (transport f x y))
-        ≡⟨ cong (subst (T B) (q x)) (p̂ x y) ⟩
-      subst (T B) (q x) (transport g x y)
-        ≡⟨ q̂ x y ⟩
-      transport h x y ∎
-
-
+    r̂ : ∀ {x : U A} (y : T A x)
+                → ≡.subst (T B) (r x) (transport f y)
+                ≡ transport h y
+    r̂ {x} y =
+      subst (T B) (r x) (transport f y)
+        ≡⟨ sym (subst² (T B) (p x) (q x) (transport f y)) ⟩
+      subst (T B) (q x) (subst (T B) (p x) (transport f y))
+        ≡⟨ cong (subst (T B) (q x)) (p̂ y) ⟩
+      subst (T B) (q x) (transport g y)
+        ≡⟨ q̂ y ⟩
+      transport h y ∎
 
   -- Composition respects morphism equality
-  comp-resp-≋ : {A B C : Fam'} {f h : Hom B C} {g i : Hom A B} →
-    f ≋ h → g ≋ i → comp f g ≋ comp h i
-  comp-resp-≋ {A} {B} {C} {f} {h} {g} {i} (feq p p̂) (feq q q̂) =
+  comp-resp-≡ꟳ : {A B C : Fam'} {f h : Hom B C} {g i : Hom A B} →
+    f ≡ꟳ h → g ≡ꟳ i → comp f g ≡ꟳ comp h i
+  comp-resp-≡ꟳ {A} {B} {C} {f} {h} {g} {i} (feq p p̂) (feq q q̂) =
     feq r r̂
     where
     open ≡.≡-Reasoning
@@ -136,72 +131,79 @@ module FamCat {ℓU ℓT : Level} where
     r : (x : U A) → map f (map g x) ≡ map h (map i x)
     r x = trans (cong (map f) (q x)) (p (map i x))
 
-    -- Helper: after substituting along q x, we can apply p̂
-    step : ∀ x y → subst (λ a → T C (map f a)) (q x) (transport f (map g x) (transport g x y))
-                 ≡ transport f (map i x) (transport i x y)
-    step x y with q x | q̂ x y
-    ... | refl | refl = refl
+    -- Naturality of transport with respect to substitution
+    -- We use subst eliminator by defining the motive properly
+    transport-nat : ∀ x y →
+      subst (λ a → T C (map f a)) (q x) (transport f (transport g y))
+      ≡ transport f (subst (T B) (q x) (transport g y))
+    transport-nat x y = subst
+      (λ b → ∀ (eq : map g x ≡ b) →
+        subst (λ a → T C (map f a)) eq (transport f (transport g y))
+        ≡ transport f (subst (T B) eq (transport g y)))
+      (q x)
+      (λ { refl → refl })
+      (q x)
 
-    r̂ : ∀ (x : U A) (y : T A x)
-                → ≡.subst (T C) (r x) (transport f (map g x) (transport g x y))
-                ≡ transport h (map i x) (transport i x y)
-    r̂ x y =
-      subst (T C) (r x) (transport f (map g x) (transport g x y))
+    r̂ : ∀ {x : U A} (y : T A x)
+                → ≡.subst (T C) (r x) (transport f (transport g y))
+                ≡ transport h (transport i y)
+    r̂ {x} y =
+      subst (T C) (r x) (transport f (transport g y))
         ≡⟨ sym (subst² (T C) (cong (map f) (q x)) (p (map i x))
-                  (transport f (map g x) (transport g x y))) ⟩
+                  (transport f (transport g y))) ⟩
       subst (T C) (p (map i x)) (subst (T C) (cong (map f) (q x))
-        (transport f (map g x) (transport g x y)))
+        (transport f (transport g y)))
         ≡⟨ cong (subst (T C) (p (map i x)))
-                (subst-cong (map f) (T C) (q x) (transport f (map g x) (transport g x y))) ⟩
+                (subst-cong (map f) (T C) (q x) (transport f (transport g y))) ⟩
       subst (T C) (p (map i x)) (subst (λ a → T C (map f a)) (q x)
-        (transport f (map g x) (transport g x y)))
-        ≡⟨ cong (subst (T C) (p (map i x))) (step x y) ⟩
-      subst (T C) (p (map i x)) (transport f (map i x) (transport i x y))
-        ≡⟨ p̂ (map i x) (transport i x y) ⟩
-      transport h (map i x) (transport i x y) ∎
+        (transport f (transport g y)))
+        ≡⟨ cong (subst (T C) (p (map i x))) (transport-nat x y) ⟩
+      subst (T C) (p (map i x)) (transport f (subst (T B) (q x) (transport g y)))
+        ≡⟨ cong (λ z → subst (T C) (p (map i x)) (transport f z)) (q̂ y) ⟩
+      subst (T C) (p (map i x)) (transport f (transport i y))
+        ≡⟨ p̂ (transport i y) ⟩
+      transport h (transport i y) ∎
 
   -- The category of families of sets
   Cat : Category (lsuc (ℓU ⊔ ℓT)) (ℓU ⊔ ℓT) (ℓU ⊔ ℓT)
   Cat = record
     { Obj = Fam'
     ; _⇒_ = Hom
-    ; _≈_ = λ f g → ∥ f ≋ g ∥
+    ; _≈_ = λ f g → f ≡ꟳ g
     ; id = fam-id
     ; _∘_ = comp
     ; assoc = λ {A B C D f g h} → assoc {A} {B} {C} {D} {f} {g} {h}
-    ; sym-assoc = λ {A B C D f g h} → ∣ ≋-sym (untrunc (assoc {A} {B} {C} {D} {f} {g} {h})) ∣
+    ; sym-assoc = λ {A B C D f g h} → feq (λ _ → refl) (λ _ → refl)
     ; identityˡ = λ {A B f} → identityˡ {A} {B} {f}
     ; identityʳ = λ {A B f} → identityʳ {A} {B} {f}
     ; identity² = λ {A} → identity² {A}
     ; equiv = record
-      { refl = ∣ ≋-refl ∣
-      ; sym = λ { reflp → reflp }
-      ; trans = λ { reflp reflp → reflp }
+      { refl = ≡ꟳ-refl
+      ; sym = λ { p → ≡ꟳ-sym p }
+      ; trans = λ {  p   q  →  ≡ꟳ-trans p q  }
       }
-    ; ∘-resp-≈ = λ { reflp reflp → reflp }
+    ; ∘-resp-≈ = λ {  p   q  →  comp-resp-≡ꟳ p q  }
     }
     where
     open ≡.≡-Reasoning
     open ≡
-    untrunc : ∀ {ℓ} {A : Set ℓ} → ∥ A ∥ → A
-    untrunc ∣ x ∣ = x
 
     -- Associativity of composition
     assoc : {A B C D : Fam'} {f : Hom A B} {g : Hom B C} {h : Hom C D} →
-      ∥ comp (comp h g) f ≋ comp h (comp g f) ∥
-    assoc {A} {B} {C} {D} {f} {g} {h} = ∣ feq (λ x → refl) (λ x y → refl) ∣
+      comp (comp h g) f ≡ꟳ comp h (comp g f)
+    assoc {A} {B} {C} {D} {f} {g} {h} = feq (λ _ → refl) (λ _ → refl)
 
     -- Left identity
-    identityˡ : {A B : Fam'} {f : Hom A B} → ∥ comp fam-id f ≋ f ∥
-    identityˡ {A} {B} {f} = ∣ feq (λ x → refl) (λ x y → refl) ∣
+    identityˡ : {A B : Fam'} {f : Hom A B} → comp fam-id f ≡ꟳ f
+    identityˡ {A} {B} {f} = feq (λ _ → refl) (λ _ → refl)
 
     -- Right identity
-    identityʳ : {A B : Fam'} {f : Hom A B} → ∥ comp f fam-id ≋ f ∥
-    identityʳ {A} {B} {f} = ∣ feq (λ x → refl) (λ x y → refl) ∣
+    identityʳ : {A B : Fam'} {f : Hom A B} → comp f fam-id ≡ꟳ f
+    identityʳ {A} {B} {f} = feq (λ _ → refl) (λ _ → refl)
 
     -- Identity composition
-    identity² : {A : Fam'} → ∥ comp fam-id fam-id ≋ fam-id {A} ∥
-    identity² {A} = ∣ feq (λ x → refl) (λ x y → refl) ∣
+    identity² : {A : Fam'} → comp fam-id fam-id ≡ꟳ fam-id {A}
+    identity² {A} = feq (λ _ → refl) (λ _ → refl)
 
 open FamCat public hiding (Cat)
 

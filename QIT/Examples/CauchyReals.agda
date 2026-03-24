@@ -1,6 +1,6 @@
 module QIT.Examples.CauchyReals where
 
-open import QIT.Prelude renaming (⊤ to ⊤'; ⊥ to ⊥') hiding (_≟_)
+open import QIT.Prelude renaming (⊤ to ⊤'; ⊥ to ⊥')
 open import QIT.Prop
 open import QIT.Relation.Subset
 import Data.Nat as ℕ

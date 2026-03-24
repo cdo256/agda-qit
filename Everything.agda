@@ -1,7 +1,14 @@
 module Everything where
 
+module Everything where
+
 -- Base
 import QIT.Prelude
+import QIT.Fin.Base
+import QIT.Function.Base
+import QIT.Prop.Base
+import QIT.Prop
+import QIT.Set.Base
 
 -- Relations
 import QIT.Relation.Base
@@ -9,6 +16,8 @@ import QIT.Relation.Binary
 import QIT.Relation.IndexedBinary
 import QIT.Relation.Subset
 import QIT.Relation.Plump
+import QIT.Relation.Nullary
+import QIT.Relation.WellFounded
 import QIT.Relation.Tests
 import QIT.Relation
 
@@ -16,10 +25,19 @@ import QIT.Relation
 import QIT.Category.Base
 import QIT.Category.Preorder
 import QIT.Category.Set
+import QIT.Category.Morphism
+import QIT.Category.Slice
 import QIT.Category.Setoid
+import QIT.Category.SetoidEnriched
+import QIT.Category.Discrete
+-- import QIT.Category.FamilyOfSets -- ConstructorDoesNotFitInData
+import QIT.Category.FamilyOfSetoids
+-- import QIT.Category.WithFamilies -- incomplete
 import QIT.Functor.Base
 import QIT.Functor.Composition
+import QIT.NatTrans
 import QIT.Algebra.Base
+import QIT.Algebra.Lift
 
 -- Category of Setoids
 import QIT.Setoid.Base
@@ -48,10 +66,25 @@ import QIT.QW
 import QIT.Mobile.Base
 import QIT.Mobile.Cocontinuity
 
+-- Extended Type Theories
+import QIT.IFT.Base
+import QIT.IIT.Base
+-- import QIT.IIT.Codes -- incomplete
+-- import QIT.QIIT -- very incomplete
+
+-- Kaposi-Kovacs-Altenkirch Syntax
+import QIT.KKA2019.Syntax
+import QIT.KK2020.Level
+-- import QIT.KK2020.Syntax -- incomplete
+
 -- Examples
+import QIT.Examples.CauchyReals
+import QIT.Examples.ConTy
 import QIT.Examples.HoleList
 import QIT.Examples.ListBag
+import QIT.Examples.PartialityMonad
 import QIT.Examples.RotTree
+import QIT.Examples.SGL
+import QIT.Examples.T
 import QIT.Examples.Trunc
-import QIT.Examples.CauchyReals
--- import QIT.Examples.PartialityMonad
+import QIT.Examples.WFTree

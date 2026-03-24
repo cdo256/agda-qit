@@ -1,6 +1,6 @@
 module QIT.Examples.PartialityMonad where
 
-open import QIT.Prelude renaming (⊤ to ⊤'; ⊥ to ⊥') hiding (_≟_)
+open import QIT.Prelude renaming (⊤ to ⊤'; ⊥ to ⊥')
 open import QIT.Prop
 open import QIT.Relation.Subset
 import Data.Nat as ℕ
@@ -89,9 +89,3 @@ module _ {X : Set} (enc : (X → Seq) → X) (unenc : X → (X → Seq)) where
     field
       halts : Halts M
       accepts : ∀ N → η true ≈ ⨆ (M (enc N)) ⇔ Halts N
-
-  H : X → Seq
-  H x = a , {!!}
-    where
-    a : ℕ → PM
-    a i = {!!}

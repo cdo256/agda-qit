@@ -102,3 +102,11 @@ LiftSetoid ℓl ℓl' A = record
     ; trans = λ (liftp p) (liftp q) → liftp (Setoid.trans A p q)
     }
   }
+
+record ∃! {ℓS ℓS' ℓP} (S : Setoid ℓS ℓS')
+    (P : ⟨ S ⟩ → Prop ℓP) : Set (ℓS ⊔ ℓS' ⊔ ℓP) where
+  open Setoid S
+  field
+    x : ⟨ S ⟩
+    ex : P x
+    uniq : ∀ y → P y → x ≈ y

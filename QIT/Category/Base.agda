@@ -49,6 +49,10 @@ record Category (o ℓ e : Level) : Set (lsuc (o ⊔ ℓ ⊔ e)) where
     ; isEquivalence = equiv
     }
 
+  ∃!hom : ∀ {ℓP A B} → (P : A ⇒ B → Prop ℓP) → Set (ℓ ⊔ e ⊔ ℓP)
+  ∃!hom = ∃! hom-setoid
+
+
   -- When a category is quantified, it is convenient to refer to the levels from a module,
   -- so we do not have to explicitly quantify over a category when universe levels do not
   -- play a big part in a proof (which is the case probably all the time).
@@ -60,6 +64,7 @@ record Category (o ℓ e : Level) : Set (lsuc (o ⊔ ℓ ⊔ e)) where
 
   e-level : Level
   e-level = e
+
 
 module _ {o ℓ e : Level} where
 
@@ -77,3 +82,20 @@ module _ {o ℓ e : Level} where
 
   _[_∘_] : (C : Category o ℓ e) → ∀ {X Y Z} (f : C [ Y , Z ]) → (g : C [ X , Y ]) → C [ X , Z ]
   _[_∘_] = Category._∘_
+
+  _op : (C : Category o ℓ e) → Category o ℓ e
+  C op = record
+    { Obj = Obj
+    ; _⇒_ = λ A B → B ⇒ A
+    ; _≈_ = _≈_
+    ; id = id
+    ; _∘_ = λ g f → f ∘ g
+    ; assoc = sym-assoc
+    ; sym-assoc = assoc
+    ; identityˡ = identityʳ
+    ; identityʳ = identityˡ
+    ; identity² = identity²
+    ; equiv = equiv
+    ; ∘-resp-≈ = λ p q → ∘-resp-≈ q p
+    }
+    where open Category C

@@ -156,8 +156,6 @@ record Functor≈
     module C = Category≈ C
     module D = Category≈ D
 
-  infix  4 _≈F₀_ _≈F₁_
-
   field
     -- Object and morphism maps
     F₀ : C.Obj → D.Obj
