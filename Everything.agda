@@ -24,7 +24,7 @@ import QIT.Relation.WellFounded
 import QIT.Relation.Tests
 import QIT.Relation
 
--- -- Category
+-- Category
 import QIT.Category.Base
 import QIT.Category.Preorder
 import QIT.Category.Set
@@ -38,9 +38,15 @@ import QIT.Category.FamilyOfSetoids
 -- import QIT.Category.WithFamilies -- incomplete
 import QIT.Category.Terminal
 import QIT.Category.Initial
+
+-- Functor
 import QIT.Functor.Base
 import QIT.Functor.Composition
+
+-- Natural Transformation
 import QIT.NatTrans
+
+-- Algebra
 import QIT.Algebra.Base
 import QIT.Algebra.Lift
 
@@ -73,7 +79,7 @@ import QIT.Mobile.Base
 import QIT.Mobile.Cocontinuity
 
 -- Extended Type Theories
-import QIT.IIT.Base
+import QIT.IIT.Cont1
 -- import QIT.IIT.Codes -- incomplete
 -- import QIT.QIIT -- very incomplete
 
