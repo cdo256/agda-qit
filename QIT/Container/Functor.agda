@@ -18,34 +18,29 @@ module F-Ob (A : Setoid ℓA ℓA') where
 
   -- Technical equivalence relation for container elements.
   -- We need fst≡ to be definitional equality to enable substitution in snd≈.
-  record _≈ꟳ'_ (x y : ⟦ S ◁ P ⟧ ⟨ A ⟩) : Set (ℓS ⊔ ℓP ⊔ ℓA') where
+  record _≈ꟳ_ (x y : ⟦ S ◁ P ⟧ ⟨ A ⟩) : Prop (ℓS ⊔ ℓP ⊔ ℓA') where
     pattern
-    constructor mk≈ꟳ'
+    constructor mk≈ꟳ
     field
       fst≡ : x .proj₁ ≡ y .proj₁
       snd≈ : ∀ p → (x .proj₂) p ≈ (y .proj₂) (≡.subst P fst≡ p)
 
-  -- Truncated equivalence relation to ensure it's a proposition.
-  -- Pattern synonym makes the truncation transparent for pattern matching.
-  _≈ꟳ_ = Trunc₂ _≈ꟳ'_
-  pattern mk≈ꟳ fst≡ snd≈ = ∣ mk≈ꟳ' fst≡ snd≈ ∣
+  mk≈ꟳ' : ∀ {s : S} {f g : P s → ⟨ A ⟩}
+    → ((i : P s) → f i ≈ g i)
+    → (s , f) ≈ꟳ (s , g)
+  mk≈ꟳ' {s} {f} {g} f≈g = mk≈ꟳ ≡.refl f≈g
 
   -- Prove equivalence relation laws for ≈ꟳ
   ≈frefl : Reflexive _≈ꟳ_
-  ≈frefl = mk≈ꟳ ≡.refl (λ p → refl)
+  ≈frefl {s , f} = mk≈ꟳ' λ _ → refl
 
   ≈fsym : Symmetric _≈ꟳ_
-  ≈fsym {x} {y} (mk≈ꟳ ≡.refl snd≈) =
-    mk≈ꟳ ≡.refl λ p → sym (snd≈ p)
+  ≈fsym {s , f} {s , g} (mk≈ꟳ ≡.refl f≈g) =
+    mk≈ꟳ ≡.refl λ i → sym (f≈g i)
 
   ≈ftrans : Transitive _≈ꟳ_
-  ≈ftrans {x = x} {y} {z} (mk≈ꟳ ≡.refl snd≈1) (mk≈ꟳ ≡.refl snd≈2) =
-    mk≈ꟳ ≡.refl v
-    where
-    u : ∀ p → x .proj₂ p ≈ z .proj₂ p
-    u p = trans (snd≈1 p) (snd≈2 p)
-    v : ∀ p → x .proj₂ p ≈ z .proj₂ p
-    v p = substp (λ ○ → x .proj₂ p ≈ z .proj₂ ○) ≡.refl (u p)
+  ≈ftrans {s , f} {s , g} {s , h} (mk≈ꟳ ≡.refl f≈g) (mk≈ꟳ ≡.refl g≈h) =
+    mk≈ꟳ ≡.refl λ i → trans (f≈g i) (g≈h i)
 
   -- The setoid F A with container elements and pointwise equivalence
   ob : Setoid (ℓS ⊔ ℓP ⊔ ℓA) (ℓS ⊔ ℓP ⊔ ℓA')
@@ -64,7 +59,7 @@ F = record
   ; hom = hom
   ; id = id
   ; comp = comp
-  ; resp = λ z → F-Ob.mk≈ꟳ ≡.refl λ _ → z }
+  ; resp = λ {y = Y} z → F-Ob.mk≈ꟳ' Y λ _ → z }
   where
   -- Morphism part of the functor: lift homomorphisms f : A → B to F f : F A → F B.
   -- Apply f pointwise to the function part while preserving the shape.
@@ -94,7 +89,7 @@ F = record
 
   -- F preserves identity: F(id) ≈ id
   id : {S : Setoid ℓA ℓA'} → hom {A = S} ≈.idHom ≈h ≈.idHom
-  id {S} {s , f} = F-Ob.mk≈ꟳ ≡.refl λ p → S.refl {f p}
+  id {S} {s , f} = F-Ob.mk≈ꟳ' S λ _ → S.refl
     where
     module S = ≈.Setoid S
 
@@ -109,7 +104,7 @@ F = record
 
     comp : hom (g ≈.∘ f) ≈h (hom g ≈.∘ hom f)
     comp =
-      mk≈ꟳ ≡.refl λ p → (≈.Hom.cong g) (≈.Hom.cong f f.S.refl)
+      mk≈ꟳ' U λ i → (≈.Hom.cong g) (≈.Hom.cong f f.S.refl)
 
   open Comp using (comp) public
 
@@ -127,6 +122,6 @@ F = record
     open Hom hiding (hom)
 
     resp : hom f ≈h hom g
-    resp = mk≈ꟳ ≡.refl λ _ → f≈g
+    resp = mk≈ꟳ' T λ _ → f≈g
 
   open Resp using (resp) public

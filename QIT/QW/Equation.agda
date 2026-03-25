@@ -51,11 +51,11 @@ ExprAlg V = record
   open F-Ob Ẽ
   β : ⟦ S ◁ P ⟧ (Expr V) → Expr V
   β (s , f) = supᴱ s f
-  β-cong : ∀ {sf tg} → (p : sf ≈ꟳ tg) → (β sf ≡p β tg)
-  β-cong {s , f} {s , g} (mk≈ꟳ ≡.refl snd≈) = congp (λ ○ → β (s , ○)) f≡g
+  β-cong : ∀ {sf tg} → (p : sf ≈ꟳ tg) → (β sf ≡ β tg)
+  β-cong {s , f} {s , g} (mk≈ꟳ ≡.refl snd≈) = ≡.cong (λ ○ → β (s , ○)) f≡g
     where
-    f≡g : f ≡p g
-    f≡g = funExtp snd≈
+    f≡g : f ≡ g
+    f≡g = ≡.funExt snd≈
 
 -- An equation equates two expressions over the same set of variables.
 -- This is the basic unit of equational specification: lhs ≈ rhs.

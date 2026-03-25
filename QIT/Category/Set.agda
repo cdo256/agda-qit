@@ -11,14 +11,14 @@ SetCat : ∀ ℓA → Category (lsuc ℓA) (ℓA) ℓA
 SetCat ℓA = record
   { Obj = Set ℓA
   ; _⇒_ = λ X Y → (X → Y)
-  ; _≈_ = _≡p_
+  ; _≈_ = _≡_
   ; id = λ x → x
   ; _∘_ = _∘_
-  ; assoc = reflp
-  ; sym-assoc = reflp
-  ; identityˡ = reflp
-  ; identityʳ = reflp
-  ; identity² = reflp
-  ; equiv = λ {A B} → isEquiv-≡p (A → B)
-  ; ∘-resp-≈ = λ{ reflp reflp → reflp }
+  ; assoc = ≡.refl
+  ; sym-assoc = ≡.refl
+  ; identityˡ = ≡.refl
+  ; identityʳ = ≡.refl
+  ; identity² = ≡.refl
+  ; equiv = λ {A B} → isEquiv-≡ (A → B)
+  ; ∘-resp-≈ = λ{ ≡.refl ≡.refl → ≡.refl }
   }

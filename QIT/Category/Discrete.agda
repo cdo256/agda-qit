@@ -44,17 +44,17 @@ DiscreteCat≈ Ã = record
 DiscreteCat : ∀ {ℓA} → Set ℓA → Category ℓA ℓA ℓA
 DiscreteCat A = record
   { Obj = A
-  ; _⇒_ = _≡_
-  ; _≈_ = _≡p_
-  ; id = ≡.refl
-  ; _∘_ = λ p q → ≡.trans q p
-  ; assoc = λ {f = f} → ∣ ≡.sym (≡.trans-assoc f) ∣ 
-  ; sym-assoc = λ {f = f} → ∣ ≡.trans-assoc f ∣ 
-  ; identityˡ = λ {f = f} → ∣ ≡.trans-reflʳ f ∣ 
-  ; identityʳ = reflp 
-  ; identity² = reflp
-  ; equiv = λ {a b} → isEquiv-≡p (a ≡ b)
-  ; ∘-resp-≈ = λ{ reflp reflp → reflp }
+  ; _⇒_ = λ x y → Box (x ≡ y)
+  ; _≈_ = _≡_
+  ; id = box ≡.refl
+  ; _∘_ = λ (box p) (box q) → box (≡.trans q p)
+  ; assoc = ≡.isPropBox _ _
+  ; sym-assoc = ≡.isPropBox _ _
+  ; identityˡ = ≡.isPropBox _ _
+  ; identityʳ = ≡.isPropBox _ _ 
+  ; identity² = ≡.isPropBox _ _
+  ; equiv = λ {a b} → isEquiv-≡ (Box (a ≡ b))
+  ; ∘-resp-≈ = λ _ _ → ≡.isPropBox _ _
   }
 
 ⊤Cat : Category ℓ0 ℓ0 ℓ0
