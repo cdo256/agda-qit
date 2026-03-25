@@ -55,6 +55,7 @@ import QIT.Setoid
 -- -- Containers
 import QIT.Container.Base
 import QIT.Container.Functor
+import QIT.Container.Indexed
 
 -- QW type definition
 import QIT.QW.W
@@ -72,7 +73,6 @@ import QIT.Mobile.Base
 import QIT.Mobile.Cocontinuity
 
 -- Extended Type Theories
-import QIT.IFT.Base
 import QIT.IIT.Base
 -- import QIT.IIT.Codes -- incomplete
 -- import QIT.QIIT -- very incomplete

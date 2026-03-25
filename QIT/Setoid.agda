@@ -35,4 +35,4 @@ module ≈ where
   open import QIT.Setoid.Hom public
   open import QIT.Setoid.Iso public
 
-open ≈ using (Setoid; ⟨_⟩; _/≡; _≈h_; _[_≈_]; _≅_; ≡p→≈; ≡→≈) public
+open ≈ using (Setoid; ⟨_⟩; _/≡; _≈h_; _[_≈_]; _≅_; ≡→≈) public
