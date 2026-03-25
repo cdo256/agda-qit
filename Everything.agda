@@ -99,3 +99,6 @@ import QIT.Examples.SGL
 import QIT.Examples.T
 import QIT.Examples.Trunc
 import QIT.Examples.WFTree
+import QIT.Examples.Lambda
+import QIT.Examples.Surreal
+
