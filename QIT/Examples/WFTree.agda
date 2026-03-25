@@ -5,6 +5,7 @@ open import QIT.Prop
 open import QIT.Relation.Base
 open import QIT.Relation.Subset
 open import QIT.Relation.Binary
+open import QIT.Relation.Nullary
 open import QIT.Relation.WellFounded
 open import QIT.Container.Base
 
@@ -16,11 +17,11 @@ record WFTree : Set₁ where
     _≺_ : A → A → Prop -- is parent of
 
   _≪_ : A → A → Prop
-  x ≪ y = (x ≡p y) ∨ x ≺ y
+  x ≪ y = (x ≡ y) ∨ x ≺ y
 
   field
     ≺step : ∀ x y → x ≺ y → x ≪ ↑ y
-    ↑≺ : ∀ x → x ≡.≢ ∙ → ↑ x ≺ x
+    ↑≺ : ∀ x → x ≢ ∙ → ↑ x ≺ x
     trans : Transitive _≺_
 
 import Data.Bool as 𝟚
@@ -68,7 +69,7 @@ _ = ≡.refl
 
 module _ ( _≟ᵗ_ : ∀ {s} → Discrete (Pᵀ s)) where
   record StepInj {a f i j s t p q π₁ π₂}
-    (r : step {a} {f} i s p π₁ ≡ step j t q π₂) : Set where
+    (r : step {a} {f} i s p π₁ ≡ step j t q π₂) : Prop where
     field
       index : i ≡ j
       tree  : s ≡ t
@@ -87,24 +88,22 @@ module _ ( _≟ᵗ_ : ∀ {s} → Discrete (Pᵀ s)) where
   step-cong {p = p} {q = q} ≡.refl ≡.refl with isSetSet p q
   ... | ≡.refl = ≡.refl
 
-  _≟ᵖ_ : ∀ {t} → Discrete (Path t)
-  root t ≟ᵖ root .t = yes ≡.refl
-  root _ ≟ᵖ step _ _ _ _ = no (λ ())
-  step _ _ _ _ ≟ᵖ root _ = no (λ ())
+  _≟ᵖ_ : ∀ {t} → Discreteᵖ (Path t)
+  root t ≟ᵖ root .t = ∣ yes ≡.refl ∣
+  root _ ≟ᵖ step _ _ _ _ = ∣ no (λ ()) ∣
+  step _ _ _ _ ≟ᵖ root _ = ∣ no (λ ()) ∣
   step {a} {f} i s p π₁ ≟ᵖ step {a} {f} j t q π₂ with i ≟ᵗ j
-  ... | no i≠j = no (λ r → i≠j (step-inj r .StepInj.index))
+  ... | no i≠j = ∣ no (λ r → i≠j (step-inj r .StepInj.index)) ∣
   ... | yes ≡.refl with ≡.trans p (≡.sym q)
   ... | ≡.refl with π₁ ≟ᵖ π₂
-  ... | yes ≡.refl = yes (step-cong ≡.refl ≡.refl)
-  ... | no π₁≠π₂ = no λ r → π₁≠π₂ (r' r)
+  ... | ∣ yes ≡.refl ∣ = ∣ yes (step-cong ≡.refl ≡.refl) ∣
+  ... | ∣ no π₁≠π₂ ∣ = ∣ no (λ r → π₁≠π₂ (r' r)) ∣
     where 
     open ≡.≡-Reasoning
     r' : ∀ r → π₁ ≡ π₂
     r' r = begin
       π₁
-        ≡⟨ ≡.sym (subst-uip (isSetSet (step-inj r .StepInj.tree) ≡.refl) π₁) ⟩
-      subst Path (step-inj r .StepInj.tree) π₁
-        ≡⟨ step-inj r .StepInj.π ⟩
+        ≡⟨ step-inj {p = p} {q} r .StepInj.π ⟩
       π₂ ∎
 
   -- module _ (t : T) where

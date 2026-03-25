@@ -23,6 +23,8 @@
 module QIT.Mobile.Base (I : Set) where
 
 open import QIT.Prelude
+open import QIT.Prop
+open import QIT.Function.Base
 open import QIT.Container.Base
 open import QIT.QW
 
@@ -51,7 +53,7 @@ Fᵀ X = Σ Sᵀ λ s → Pᵀ s → X
 -- (impossible) children. This follows because ⊥* → T has a unique element.
 leaf≡leaf : ∀ (f g : ⊥* → T) → sup (l , f) ≡ sup (l , g)
 leaf≡leaf f g =
-  ≡.cong (λ ○ → sup (l , ○)) (funExt λ ())
+  ≡.cong (λ ○ → sup (l , ○)) (≡.funExt λ ())
 
 -- Bijection action on I-indexed functions.
 -- Given a function α : I → T and a bijection π : I ↔ I,

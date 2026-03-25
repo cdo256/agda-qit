@@ -13,9 +13,9 @@ open import Level public using (Level; _⊔_; Lift; lift; lower)
 -- module ≡ = Relation.Binary.PropositionalEquality
 -- open ≡ public using (_≡_; _≢_; subst) public
 
-import Relation.Binary.HeterogeneousEquality 
-module ≣ = Relation.Binary.HeterogeneousEquality 
-open ≣ public using () renaming (_≅_ to _≣_)
+-- import Relation.Binary.HeterogeneousEquality 
+-- module ≣ = Relation.Binary.HeterogeneousEquality 
+-- open ≣ public using () renaming (_≅_ to _≣_)
 
 -- Empty type - represents logical falsehood and impossible cases.
 import Data.Empty
@@ -38,13 +38,11 @@ open ⊎ using (_⊎_; inj₁; inj₂) public
 
 open import Data.Unit hiding (_≟_) public
 
--- Empty type at arbitrary universe levels.
+-- Unit type at arbitrary universe levels.
 ⊤* : ∀ {ℓ} → Set ℓ
 ⊤* {ℓ} = Lift ℓ ⊤
 
--- Decidability type - constructive decision procedures.
-data Dec {ℓA} (A : Set ℓA) : Set ℓA where
-  yes : A → Dec A
-  no : (A → ⊥) → Dec A
+-- Empty type at arbitrary universe levels.
+⊥* : ∀ {ℓ} → Set ℓ
+⊥* {ℓ} = Lift ℓ ⊥ 
 
-open import Function.Base using (case_of_; case_returning_of_) public

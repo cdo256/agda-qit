@@ -34,7 +34,6 @@ substp₂ C {a1} {a2} {b1} {b2} p q x =
     (substp (C a1) q x)
 
 
-
 -- substp for Set-valued families that return Props (like equivalence relations)
 substp-Set : ∀ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} (C : B → Prop ℓA)
            → {b1 b2 : B} (p : b1 ≡ b2)
@@ -45,9 +44,13 @@ cong : ∀ {a b} {A : Set a} {B : Set b} (f : A → B)
       → ∀ {x y} → x ≡ y → f x ≡ f y
 cong f refl = refl
 
-substDefEq : ∀ {ℓA ℓP} {A : Set ℓA} (P : A → Set ℓP)
-           → ∀ {x} (p : x ≡ x) (y : P x) → subst P p y ≡ y
-substDefEq P = subst-id
+cong₂ : ∀ {a b c} {A : Set a} {B : Set b} {C : Set c} (f : A → B → C) 
+      → ∀ {a1 a2 b1 b2} → a1 ≡ a2 → b1 ≡ b2 → f a1 b1 ≡ f a2 b2
+cong₂ f refl refl = refl
+
+cong₃ : ∀ {a b c d} {A : Set a} {B : Set b} {C : Set c} {D : Set d} (f : A → B → C → D) 
+      → ∀ {a1 a2 b1 b2 c1 c2} → a1 ≡ a2 → b1 ≡ b2 → c1 ≡ c2 → f a1 b1 c1 ≡ f a2 b2 c2
+cong₃ f refl refl refl = refl
 
 data _≡ᵖ_ {ℓA} {A : Prop ℓA} (x y : A) : Prop (lsuc ℓA) where
    refl : ∀ {x} → x ≡ᵖ y
@@ -66,3 +69,33 @@ isPropBox (box p) (box q) = r refl
   where
   r : p ≡ᵖ q → box p ≡ box q
   r refl = refl
+
+module ≡-Reasoning {ℓ} {A : Set ℓ} where
+  infix 1 begin_
+  begin_ : ∀ {x y : A} → x ≡ y → x ≡ y
+  begin p = p
+
+  infixr 2 step-≡
+  step-≡ : ∀ (x : A) {y z} → y ≡ z → x ≡ y → x ≡ z
+  step-≡ _ q p = trans p q
+  syntax step-≡ x q p = x ≡⟨ p ⟩ q
+
+  infix 3 _∎
+  _∎ : ∀ (x : A) → x ≡ x
+  x ∎ = refl
+
+subst-subst : ∀ {ℓA ℓP} {A : Set ℓA} {P : A → Set ℓP} {x y z : A}
+            → (x≡y : x ≡ y) {y≡z : y ≡ z} {p : P x}
+            → subst P y≡z (subst P x≡y p) ≡ subst P (trans x≡y y≡z) p
+subst-subst refl = refl
+
+dcong : ∀ {a b} {A : Set a} {B : A → Set b} (f : (x : A) → B x) {x y}
+      → (p : x ≡ y) → subst B p (f x) ≡ f y
+dcong f refl = refl
+
+dcong₂ : ∀ {a b c} {A : Set a} {B : A → Set b} {C : Set c}
+         (f : (x : A) → B x → C) {x₁ x₂ y₁ y₂}
+       → (p : x₁ ≡ x₂) → subst B p y₁ ≡ y₂
+       → f x₁ y₁ ≡ f x₂ y₂
+dcong₂ f refl refl = refl
+

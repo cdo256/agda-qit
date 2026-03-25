@@ -28,41 +28,19 @@ module F-Ob (A : Setoid ℓA ℓA') where
   mk≈ꟳ' : ∀ {s : S} {f g : P s → ⟨ A ⟩}
     → ((i : P s) → f i ≈ g i)
     → (s , f) ≈ꟳ (s , g)
-    -- → f i ≈ g (≡.subst P ≡.refl i)
-  mk≈ꟳ' {s} {f} {g} f≈g = mk≈ꟳ ≡.refl λ i → ≡.substp (λ ○ → f i ≈ g ○) (≡.sym (≡.subst-id _ i)) (f≈g i)
-
-  private
-    -- Since subst-id is not definitional, we use a helper to go back
-    -- and forth between the two forms.
-    enunifyF : ∀ {s : S} {f g : P s → ⟨ A ⟩}
-      → ((i : P s) → f i ≈ g (≡.subst P ≡.refl i))
-      → (i : P s) → f i ≈ g i
-    enunifyF {s} {f} {g} f≈g' i =
-      ≡.substp (λ ○ → f i ≈ g ○) (≡.subst-id _ i) (f≈g' i)
+  mk≈ꟳ' {s} {f} {g} f≈g = mk≈ꟳ ≡.refl f≈g
 
   -- Prove equivalence relation laws for ≈ꟳ
   ≈frefl : Reflexive _≈ꟳ_
   ≈frefl {s , f} = mk≈ꟳ' λ _ → refl
 
   ≈fsym : Symmetric _≈ꟳ_
-  ≈fsym {s , f} {s , g} (mk≈ꟳ ≡.refl snd≈) =
-    mk≈ꟳ' g≈f
-    where
-    f≈g : ∀ i → f i ≈ g i
-    f≈g i = enunifyF snd≈ i
-    g≈f : ∀ i → g i ≈ f i
-    g≈f i = sym (f≈g i)
+  ≈fsym {s , f} {s , g} (mk≈ꟳ ≡.refl f≈g) =
+    mk≈ꟳ ≡.refl λ i → sym (f≈g i)
 
   ≈ftrans : Transitive _≈ꟳ_
-  ≈ftrans {s , f} {s , g} {s , h} (mk≈ꟳ ≡.refl snd≈1) (mk≈ꟳ ≡.refl snd≈2) =
-    mk≈ꟳ' f≈h
-    where
-    f≈g : ∀ i → f i ≈ g i
-    f≈g i = enunifyF snd≈1 i
-    g≈h : ∀ i → g i ≈ h i
-    g≈h i = enunifyF snd≈2 i
-    f≈h : ∀ i → f i ≈ h i
-    f≈h i = trans (f≈g i) (g≈h i)
+  ≈ftrans {s , f} {s , g} {s , h} (mk≈ꟳ ≡.refl f≈g) (mk≈ꟳ ≡.refl g≈h) =
+    mk≈ꟳ ≡.refl λ i → trans (f≈g i) (g≈h i)
 
   -- The setoid F A with container elements and pointwise equivalence
   ob : Setoid (ℓS ⊔ ℓP ⊔ ℓA) (ℓS ⊔ ℓP ⊔ ℓA')

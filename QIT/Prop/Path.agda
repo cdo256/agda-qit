@@ -6,6 +6,8 @@ infix 4 _≡_
 data _≡_ {ℓ} {A : Set ℓ} : (x y : A) → Prop ℓ where
   refl : ∀ {x} → x ≡ x
 
+{-# BUILTIN REWRITE _≡_ #-}
+
 postulate
   funExt : ∀ {ℓA ℓB} → {A : Set ℓA} {B : A → Set ℓB} {f g : ∀ x → B x}
           → (∀ x → f x ≡ g x) → f ≡ g
@@ -19,6 +21,9 @@ postulate
   J : ∀ {ℓA ℓB} {A : Set ℓA} {x : A}
     → (B : (y : A) → x ≡ y → Set ℓB)
     → {y : A} (p : x ≡ y) → B x refl → B y p
+
+
+{-# REWRITE subst-id #-}
 
 Jp : ∀ {ℓA ℓB} {A : Set ℓA} {x : A}
   → (B : (y : A) → x ≡ y → Prop ℓB)

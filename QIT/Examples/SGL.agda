@@ -3,6 +3,7 @@ module QIT.Examples.SGL where
 open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Relation.Subset
+open import QIT.Function.Base
 
 record Graph : Set₁ where
   field

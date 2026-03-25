@@ -10,6 +10,7 @@ open import QIT.Mobile.Base I
 open import QIT.Setoid as ≈
 open import QIT.Container.Base
 open import QIT.Relation.Plump Sᵀ Pᵀ
+open import QIT.Function.Base
 open import QIT.Functor.Base
 open import QIT.Functor.Composition
 open import QIT.Category.Base hiding (_[_≈_]; _[_,_]; _[_∘_])
