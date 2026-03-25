@@ -101,4 +101,5 @@ import QIT.Examples.Trunc
 import QIT.Examples.WFTree
 import QIT.Examples.Lambda
 import QIT.Examples.Surreal
+import QIT.Examples.PartialityMonad
 
