@@ -38,5 +38,5 @@ module _ {ℓA ℓB ℓR} {A : Set ℓA} {B : Set ℓB}
 
     wfProj-lift : ∀ {a} → Acc R a
                 → ∀ {x} → f x ≡ a → Acc S x
-    wfProj-lift (acc rs) {x} ≡.refl =
-      acc (λ y syx → wfProj-lift (rs (f y) syx) ≡.refl)
+    wfProj-lift (acc rs) {x} p =
+      acc (λ y syx → wfProj-lift (rs (f y) (subst (R (f y)) p syx)) ≡.refl)

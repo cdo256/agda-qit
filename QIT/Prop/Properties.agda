@@ -60,3 +60,9 @@ subst-uip : ∀ {ℓ} {A : Set ℓ} {P : A → Set} {x : A} {p q : x ≡ x}
             (h : p ≡ᵖ q) (u : P x)
           → subst P p u ≡ subst P q u
 subst-uip refl u = refl
+
+isPropBox : ∀ {ℓ} {P : Prop ℓ} (p q : Box P) → p ≡ q
+isPropBox (box p) (box q) = r refl
+  where
+  r : p ≡ᵖ q → box p ≡ box q
+  r refl = refl

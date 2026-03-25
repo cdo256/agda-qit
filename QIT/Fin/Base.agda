@@ -7,9 +7,7 @@ open import QIT.Relation.Subset
 open import QIT.Relation.Nullary
 open import QIT.Function.Base 
 open import Data.Fin as Fin hiding (_≟_; pred) public
-open import Data.Fin.Properties as Fin hiding (suc-injective)
 open import Data.Nat hiding (_≟_)
--- open import Data.Nat.Properties using () renaming (suc-injective to ℕ-suc-injective)
 
 ℕ-suc-injective : ∀ {m n} → suc m ≡ suc n → m ≡ n
 ℕ-suc-injective = ≡.cong pred

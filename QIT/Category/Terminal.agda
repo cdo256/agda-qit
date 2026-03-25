@@ -5,6 +5,7 @@ open import QIT.Set.Base
 open import QIT.Setoid
 open import QIT.Relation.Binary
 open import QIT.Relation.Subset
+open import QIT.Relation.Nullary
 open import QIT.Category.Base
 open import QIT.Category.SetoidEnriched
 
@@ -16,8 +17,8 @@ private
 module _ (C : Category ℓCo ℓCh ℓCe) where
   open Category C
 
-  isWeaklyTerminal :  (x : Obj) → Set (ℓCo ⊔ ℓCh)
-  isWeaklyTerminal x = ∀ (y : Obj) → y ⇒ x
+  isWeaklyTerminal :  (x : Obj) → Prop (ℓCo ⊔ ℓCh)
+  isWeaklyTerminal x = ∀ (y : Obj) → ∥ y ⇒ x ∥
 
-  isTerminal : (x : Obj) → Set (ℓCo ⊔ ℓCh)
+  isTerminal : (x : Obj) → Prop (ℓCo ⊔ ℓCh)
   isTerminal x = ∀ y → isContr (y ⇒ x)  

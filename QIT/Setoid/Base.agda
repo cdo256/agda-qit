@@ -76,18 +76,14 @@ module ≈syntax {ℓ ℓ'} {S : Setoid ℓ ℓ'} where
 _/≡ : ∀ {ℓ} (B : Set ℓ) → Setoid ℓ ℓ
 _/≡ B = record
   { Carrier = B
-  ; _≈_ = _≡p_
-  ; isEquivalence = isEquiv-≡p B }
+  ; _≈_ = _≡_
+  ; isEquivalence = isEquiv-≡ B }
 
 -- If x ≡ y then x ≈ y in any setoid containing them.
 ≡→≈ : ∀ {ℓ ℓ'} → (A : Setoid ℓ ℓ') → {x y : ⟨ A ⟩} → x ≡ y → A [ x ≈ y ]
-≡→≈ A {x} p = substp (λ ○ → x ≈ ○) p refl
+≡→≈ A {x} p = unbox (subst (λ ○ → Box (x ≈ ○)) p (box refl))
   where open Setoid A
 
--- If x ≡ y then x ≈ y in any setoid containing them.
-≡p→≈ : ∀ {ℓ ℓ'} → (A : Setoid ℓ ℓ') → {x y : ⟨ A ⟩} → x ≡p y → A [ x ≈ y ]
-≡p→≈ A {x} ∣ p ∣ = substp (λ ○ → x ≈ ○) p refl
-  where open Setoid A
 
 -- Lift a setoid to higher universe levels.
 -- This allows us to transport setoids from lower levels to higher levels,

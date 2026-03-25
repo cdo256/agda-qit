@@ -10,7 +10,6 @@ import QIT.Prop.Base
 import QIT.Prop.Logic
 import QIT.Prop.Path
 import QIT.Prop.Properties
-import QIT.Prop.Unannotated
 import QIT.Prop
 import QIT.Set.Base
 
@@ -25,72 +24,72 @@ import QIT.Relation.WellFounded
 import QIT.Relation.Tests
 import QIT.Relation
 
--- Category
-import QIT.Category.Base
-import QIT.Category.Preorder
-import QIT.Category.Set
-import QIT.Category.Morphism
-import QIT.Category.Slice
-import QIT.Category.Setoid
-import QIT.Category.SetoidEnriched
-import QIT.Category.Discrete
--- import QIT.Category.FamilyOfSets -- ConstructorDoesNotFitInData
-import QIT.Category.FamilyOfSetoids
--- import QIT.Category.WithFamilies -- incomplete
-import QIT.Category.Terminal
-import QIT.Category.Initial
-import QIT.Functor.Base
-import QIT.Functor.Composition
-import QIT.NatTrans
-import QIT.Algebra.Base
-import QIT.Algebra.Lift
+-- -- Category
+-- import QIT.Category.Base
+-- import QIT.Category.Preorder
+-- import QIT.Category.Set
+-- import QIT.Category.Morphism
+-- import QIT.Category.Slice
+-- import QIT.Category.Setoid
+-- import QIT.Category.SetoidEnriched
+-- import QIT.Category.Discrete
+-- -- import QIT.Category.FamilyOfSets -- ConstructorDoesNotFitInData
+-- import QIT.Category.FamilyOfSetoids
+-- -- import QIT.Category.WithFamilies -- incomplete
+-- import QIT.Category.Terminal
+-- import QIT.Category.Initial
+-- import QIT.Functor.Base
+-- import QIT.Functor.Composition
+-- import QIT.NatTrans
+-- import QIT.Algebra.Base
+-- import QIT.Algebra.Lift
 
--- Category of Setoids
-import QIT.Setoid.Base
-import QIT.Setoid.Indexed
-import QIT.Setoid.Hom
-import QIT.Setoid.Iso
-import QIT.Setoid.Sigma
-import QIT.Setoid
+-- -- Category of Setoids
+-- import QIT.Setoid.Base
+-- import QIT.Setoid.Indexed
+-- import QIT.Setoid.Hom
+-- import QIT.Setoid.Iso
+-- import QIT.Setoid.Sigma
+-- import QIT.Setoid
 
--- Containers
-import QIT.Container.Base
-import QIT.Container.Functor
+-- -- Containers
+-- import QIT.Container.Base
+-- import QIT.Container.Functor
 
--- QW type definition
-import QIT.QW.W
-import QIT.QW.Equation
-import QIT.QW.Signature
-import QIT.QW.Algebra
-import QIT.QW.Stage
-import QIT.QW.StageColimit
-import QIT.QW.Colimit
-import QIT.QW.Cocontinuity
-import QIT.QW
+-- -- QW type definition
+-- import QIT.QW.W
+-- import QIT.QW.Equation
+-- import QIT.QW.Signature
+-- import QIT.QW.Algebra
+-- import QIT.QW.Stage
+-- import QIT.QW.StageColimit
+-- import QIT.QW.Colimit
+-- import QIT.QW.Cocontinuity
+-- import QIT.QW
 
--- Mobile construction
-import QIT.Mobile.Base
-import QIT.Mobile.Cocontinuity
+-- -- Mobile construction
+-- import QIT.Mobile.Base
+-- import QIT.Mobile.Cocontinuity
 
--- Extended Type Theories
-import QIT.IFT.Base
-import QIT.IIT.Base
--- import QIT.IIT.Codes -- incomplete
--- import QIT.QIIT -- very incomplete
+-- -- Extended Type Theories
+-- import QIT.IFT.Base
+-- import QIT.IIT.Base
+-- -- import QIT.IIT.Codes -- incomplete
+-- -- import QIT.QIIT -- very incomplete
 
--- Kaposi-Kovacs-Altenkirch Syntax
-import QIT.KKA2019.Syntax
-import QIT.KK2020.Level
--- import QIT.KK2020.Syntax -- incomplete
+-- -- Kaposi-Kovacs-Altenkirch Syntax
+-- import QIT.KKA2019.Syntax
+-- import QIT.KK2020.Level
+-- -- import QIT.KK2020.Syntax -- incomplete
 
--- Examples
-import QIT.Examples.CauchyReals
-import QIT.Examples.ConTy
-import QIT.Examples.HoleList
-import QIT.Examples.ListBag
-import QIT.Examples.PartialityMonad
-import QIT.Examples.RotTree
-import QIT.Examples.SGL
-import QIT.Examples.T
-import QIT.Examples.Trunc
-import QIT.Examples.WFTree
+-- -- Examples
+-- import QIT.Examples.CauchyReals
+-- import QIT.Examples.ConTy
+-- import QIT.Examples.HoleList
+-- import QIT.Examples.ListBag
+-- import QIT.Examples.PartialityMonad
+-- import QIT.Examples.RotTree
+-- import QIT.Examples.SGL
+-- import QIT.Examples.T
+-- import QIT.Examples.Trunc
+-- import QIT.Examples.WFTree

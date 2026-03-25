@@ -34,7 +34,7 @@ idHom {S = S} = record
      → Hom (X /≡) Y
 ≡Hom {Y = Y} f = record
   { to = f
-  ; cong = λ p → ≡p→≈ Y (congp f p) }
+  ; cong = λ p → ≡→≈ Y (≡.cong f p) }
 
 -- Equivalence relation on homomorphisms: pointwise equivalence in codomain.
 -- Two homomorphisms f, g are equivalent if f(x) ≈_T g(x) for all x.
