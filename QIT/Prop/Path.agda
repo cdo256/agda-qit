@@ -2,6 +2,8 @@
 
 module QIT.Prop.Path where
 
+open import QIT.Prelude
+
 infix 4 _≡_
 data _≡_ {ℓ} {A : Set ℓ} : (x y : A) → Prop ℓ where
   refl : ∀ {x} → x ≡ x

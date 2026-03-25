@@ -39,3 +39,9 @@ infixr 4 _,_
 
 substΣP : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB} {a1 a2 : A} (p : a1 ≡ a2) (b : B a1) → Σ A B
 substΣP {B = B} {a2 = a2} p b = a2 , subst B p b
+
+Singleton : ∀ {ℓA} {A : Set ℓA} (a : A) → Set ℓA
+Singleton {A = A} a = ΣP A (_≡ a)
+
+inspect : ∀ {ℓA} {A : Set ℓA} (x : A) → Singleton x
+inspect x = x , ≡.refl
