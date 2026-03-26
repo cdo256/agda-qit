@@ -9,33 +9,33 @@ import Data.Bool as 𝔹
 open 𝔹 using (Bool; false; true)
 
 open import QIT.Examples.PartialityMonad.Erased
-open import QIT.Examples.PartialityMonad.ErasedWF
+open import QIT.Examples.PartialityMonad.WellFormed
 
 Seq : Set
 Seq = Σ Seq0 Seq1
 
-PM : Set
-PM = Σ PM0 PM1
+A⊥ : Set
+A⊥ = Σ A⊥0 A⊥1
 
-_≤_ : PM → PM → Set
+_≤_ : A⊥ → A⊥ → Set
 (x0 , x1) ≤ (y0 , y1) = Σ ≤0 (λ p0 → x0 ≤1 y0 ⊣ p0)
 
-_≈_ : PM → PM → Set
+_≈_ : A⊥ → A⊥ → Set
 (x0 , x1) ≈ (y0 , y1) = Σ ≈0 (λ e0 → x0 ≈1 y0 ⊣ e0)
 
-η : Bool → PM
+η : Bool → A⊥
 η b = η0 b , η1 b
 
-⊥ : PM
+⊥ : A⊥
 ⊥ = ⊥0 , ⊥1
 
-⨆ : Seq → PM
+⨆ : Seq → A⊥
 ⨆ (a0 , a1) = ⨆0 a0 , ⨆1 a1
 
-⟦_⟧ : Seq → ℕ → PM
+⟦_⟧ : Seq → ℕ → A⊥
 ⟦ a0 , a1 ⟧ n = ⟦ a0 ⟧0 n , ⟦ a1 ⟧1 n
 
-_⸴_ : (f : ℕ → PM) → ((i : ℕ) → f i ≤ f (suc i)) → Seq
+_⸴_ : (f : ℕ → A⊥) → ((i : ℕ) → f i ≤ f (suc i)) → Seq
 f ⸴ f≤ =
   ( (λ i → proj₁ (f i)) ,0 (λ i → proj₁ (f≤ i)) )
   ,

@@ -11,15 +11,15 @@ open 𝔹 using (Bool; false; true)
 
 data I0 : Set where
   iSeq0 : I0
-  iPM0 : I0
+  iA⊥0 : I0
   i≤0 : I0
   i≈0 : I0
 
 data S0 : I0 → Set where
-  sη0        : Bool → S0 iPM0
-  s⊥0        : S0 iPM0
-  s⨆0        : S0 iPM0
-  s⟦⟧0       : ℕ → S0 iPM0
+  sη0        : Bool → S0 iA⊥0
+  s⊥0        : S0 iA⊥0
+  s⨆0        : S0 iA⊥0
+  s⟦⟧0       : ℕ → S0 iA⊥0
   s,0        : S0 iSeq0
   s≤refl0    : S0 i≤0
   s≤trans0   : S0 i≤0
@@ -63,29 +63,29 @@ child0 : ∀ {i} {s : S0 i} → P0 s → I0
 child0 p⨆-seq          = iSeq0
 child0 p⟦⟧-seq         = iSeq0
 
-child0 (p,0-pm _)      = iPM0
+child0 (p,0-pm _)      = iA⊥0
 child0 (p,0-≤  _)      = i≤0
 
-child0 p≤refl-x        = iPM0
+child0 p≤refl-x        = iA⊥0
 
-child0 p≤trans-x       = iPM0
-child0 p≤trans-y       = iPM0
-child0 p≤trans-z       = iPM0
+child0 p≤trans-x       = iA⊥0
+child0 p≤trans-y       = iA⊥0
+child0 p≤trans-z       = iA⊥0
 child0 p≤trans-p       = i≤0
 child0 p≤trans-q       = i≤0
 
-child0 p⊥≤-x           = iPM0
+child0 p⊥≤-x           = iA⊥0
 
 child0 p≤⨆-seq         = iSeq0
 
 child0 p⨆≤-seq         = iSeq0
-child0 p⨆≤-x           = iPM0
+child0 p⨆≤-x           = iA⊥0
 child0 (p⨆≤-step _)    = i≤0
 
 child0 pinc-seq        = iSeq0
 
-child0 p≈antisym-x     = iPM0
-child0 p≈antisym-y     = iPM0
+child0 p≈antisym-x     = iA⊥0
+child0 p≈antisym-y     = iA⊥0
 child0 p≈antisym-p     = i≤0
 child0 p≈antisym-q     = i≤0
 

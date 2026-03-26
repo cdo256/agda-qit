@@ -27,25 +27,26 @@ module _ {ℓ} {I : Set ℓ} (C : ICont I) where
       → ∀ i (w : IW i) → M i w
   elim M α i (isup i (s , f)) = α i s f (λ (p : P s) → elim M α (J p) (f p))
 
-Fin : ICont ℕ
-Fin = icont S P J
-  where
-  S : ℕ → Set
-  S zero = ⊥
-  S (suc x) = ⊤ ⊎ ⊤
-  P : ∀ {i} → S i → Set
-  P {suc i} (inj₁ tt) = ⊥ -- fzero
-  P {suc i} (inj₂ tt) = ⊤ -- fsuc
-  J : ∀ {i} {s : S i} → P s → ℕ
-  J {suc i} {inj₂ tt} tt = i
+module Examples where
+  Fin : ICont ℕ
+  Fin = icont S P J
+    where
+    S : ℕ → Set
+    S zero = ⊥
+    S (suc x) = ⊤ ⊎ ⊤
+    P : ∀ {i} → S i → Set
+    P {suc i} (inj₁ tt) = ⊥ -- fzero
+    P {suc i} (inj₂ tt) = ⊤ -- fsuc
+    J : ∀ {i} {s : S i} → P s → ℕ
+    J {suc i} {inj₂ tt} tt = i
 
-Vec : (A : Set) → ICont ℕ
-Vec A = icont S P J
-  where
-  S : ℕ → Set
-  S zero = ⊥
-  S (suc x) = A
-  P : ∀ {i} → S i → Set
-  P {suc i} a = ⊤
-  J : ∀ {i} {s : S i} → P s → ℕ
-  J {suc i} {a} tt = i
+  Vec : (A : Set) → ICont ℕ
+  Vec A = icont S P J
+    where
+    S : ℕ → Set
+    S zero = ⊥
+    S (suc x) = A
+    P : ∀ {i} → S i → Set
+    P {suc i} a = ⊤
+    J : ∀ {i} {s : S i} → P s → ℕ
+    J {suc i} {a} tt = i
