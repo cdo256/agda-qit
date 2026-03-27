@@ -28,6 +28,12 @@ interleaved mutual
     ⨆≤ : ∀ a x → (∀ i → ⟦ a ⟧ i ≤ x) → ⨆ a ≤ x
     inc : (a : Seq) → ∀ i → ⟦ a ⟧ i ≤ ⟦ a ⟧ (suc i)
     ≈antisym : ∀ {x y} → x ≤ y → y ≤ x → x ≈ y
+    η,⟦⟧ : ∀ f f≤ i → ⟦ f , f≤ ⟧ i ≈ f i
+    ≈sym : ∀ {x y} → x ≈ y → y ≈ x
+    ≈trans : ∀ {x y z} → x ≈ y → y ≈ z → x ≈ z
+    ≤cong : ∀ {x x' y y'} → x ≈ x' → y ≈ y' → x ≤ y → x' ≤ y'
+    ≈→≤ : ∀ {x y} → x ≈ y → x ≤ y
+    
 
 record Algebra : Set₁ where
   infix 4 _≤ᴬ_ _≈ᴬ_
@@ -53,14 +59,56 @@ record Algebra : Set₁ where
     ⨆≤ᴬ : ∀ a x → (∀ i → ⟦ a ⟧ᴬ i ≤ᴬ x) → ⨆ᴬ a ≤ᴬ x
     incᴬ : (a : Seqᴬ) → ∀ i → ⟦ a ⟧ᴬ i ≤ᴬ ⟦ a ⟧ᴬ (suc i)
     ≈antisymᴬ : ∀ {x y} → x ≤ᴬ y → y ≤ᴬ x → x ≈ᴬ y
+    --TODO η,⟦⟧ : ∀ f f≤ i → ⟦ f , f≤ ⟧ i ≈ f i
+
+record Rec (A : Algebra) : Set₁ where
+  open Algebra A
+
+  field
+    Seqᴿ : Seq → Seqᴬ
+    A⊥ᴿ  : A⊥ → A⊥ᴬ
+    ≤ᴿ   : ∀ {x y} → x ≤ y → A⊥ᴿ x ≤ᴬ A⊥ᴿ y
+    ≈ᴿ   : ∀ {x y} → x ≈ y → A⊥ᴿ x ≈ᴬ A⊥ᴿ y
+    ηᴿ : ∀ b →
+      A⊥ᴿ (η b) ≡ ηᴬ b
+    ⊥ᴿ :
+      A⊥ᴿ ⊥ ≡ ⊥ᴬ
+    ⨆ᴿ : ∀ a →
+      A⊥ᴿ (⨆ a) ≡ ⨆ᴬ (Seqᴿ a)
+    ⟦_⟧ᴿ : ∀ a i →
+      A⊥ᴿ (⟦ a ⟧ i) ≡ ⟦ Seqᴿ a ⟧ᴬ i
+    _,_ᴿ : ∀ f p →
+      Seqᴿ (f , p) ≡ ((λ i → A⊥ᴿ (f i)) ,ᴬ (λ i → ≤ᴿ (p i)))
+    ≤reflᴿ : ∀ {x} →
+      ≤ᴿ (≤refl {x}) ≡ ≤reflᴬ
+    ≤transᴿ : ∀ {x y z} (p : x ≤ y) (q : y ≤ z) →
+      ≤ᴿ (≤trans p q) ≡ ≤transᴬ (≤ᴿ p) (≤ᴿ q)
+    ⊥≤ᴿ : ∀ {x} →
+      subst (λ z → z ≤ᴬ A⊥ᴿ x) ⊥ᴿ (≤ᴿ (⊥≤ {x}))
+        ≡ ⊥≤ᴬ
+    ≤⨆ᴿ : ∀ a i →
+      ≡.subst₂ _≤ᴬ_ (⟦ a ⟧ᴿ i) (⨆ᴿ a) (≤ᴿ (≤⨆ a i))
+        ≡ ≤⨆ᴬ (Seqᴿ a) i
+    ⨆≤ᴿ : ∀ a x (p : ∀ i → ⟦ a ⟧ i ≤ x) →
+      subst (λ z → z ≤ᴬ A⊥ᴿ x) (⨆ᴿ a) (≤ᴿ (⨆≤ a x p))
+        ≡ ⨆≤ᴬ (Seqᴿ a) (A⊥ᴿ x)
+            (λ i → subst (λ z → z ≤ᴬ A⊥ᴿ x) (⟦ a ⟧ᴿ i) (≤ᴿ (p i)))
+    incᴿ : ∀ a i →
+      ≡.subst₂ _≤ᴬ_ (⟦ a ⟧ᴿ i) (⟦ a ⟧ᴿ (suc i)) (≤ᴿ (inc a i))
+        ≡ incᴬ (Seqᴿ a) i
+    ≈antisymᴿ : ∀ {x y} (p : x ≤ y) (q : y ≤ x) →
+      ≈ᴿ (≈antisym p q) ≡ ≈antisymᴬ (≤ᴿ p) (≤ᴿ q)
   
 
 module Properties where
-  ≤cong : ∀ {x x' y y'} → x ≈ x' → y ≈ y' → x ≤ y → x' ≤ y'
-  ≤cong (≈antisym x≤x' x'≤x) (≈antisym y≤y' y'≤y) x≤y = ≤trans x'≤x (≤trans x≤y y≤y')
   ≈refl : ∀ {x} → x ≈ x
   ≈refl = ≈antisym ≤refl ≤refl
-  ≈sym : ∀ {x y} → x ≈ y → y ≈ x
-  ≈sym (≈antisym p q) = ≈antisym q p
-  ≈trans : ∀ {x y z} → x ≈ y → y ≈ z → x ≈ z
-  ≈trans (≈antisym p q) (≈antisym r s) = ≈antisym (≤trans p r) (≤trans s q)
+  ≤cong⨆ : ∀ {f g : ℕ → A⊥} {f≤ g≤} → (∀ i → f i ≤ g i) → ⨆ (f , f≤) ≤ ⨆ (g , g≤)
+  ≤cong⨆ {f} {g} {f≤} {g≤} p = ⨆≤ (f , f≤) (⨆ (g , g≤))
+    λ i → ≤cong (≈sym (η,⟦⟧ f f≤ i))
+                ≈refl
+                (≤trans (p i)
+                (≤trans (≈→≤ (≈sym (η,⟦⟧ g g≤ i)))
+                        (≤⨆ (g , g≤) i)))
+  ≈cong⨆ : ∀ {f g : ℕ → A⊥} {f≤ g≤} → (∀ i → f i ≈ g i) → ⨆ (f , f≤) ≈ ⨆ (g , g≤)
+  ≈cong⨆ {f} {g} {f≤} {g≤} p = ≈antisym (≤cong⨆ (λ i → ≈→≤ (p i))) (≤cong⨆ (λ i → ≈→≤ (≈sym (p i))))
