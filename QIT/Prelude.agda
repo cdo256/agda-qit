@@ -8,15 +8,6 @@ module QIT.Prelude where
 open import Level public using (Level; _⊔_; Lift; lift; lower)
   renaming (suc to lsuc; zero to ℓ0)
 
--- Propositional equality - the basic definitional equality in Agda.
--- import Relation.Binary.PropositionalEquality
--- module ≡ = Relation.Binary.PropositionalEquality
--- open ≡ public using (_≡_; _≢_; subst) public
-
--- import Relation.Binary.HeterogeneousEquality 
--- module ≣ = Relation.Binary.HeterogeneousEquality 
--- open ≣ public using () renaming (_≅_ to _≣_)
-
 -- Empty type - represents logical falsehood and impossible cases.
 import Data.Empty
 module ⊥ = Data.Empty
@@ -25,9 +16,10 @@ open ⊥ using (⊥) public
 -- Product types - both dependent (Σ) and non-dependent (_×_).
 import Data.Product
 module × = Data.Product
-open × using (_×_; Σ; Σ-syntax; _,_; proj₁; proj₂) public
+open import Agda.Builtin.Sigma
+open × using (_×_; Σ; Σ-syntax; proj₁; proj₂) public
 
-import Agda.Builtin.Sigma
+open import Agda.Builtin.Sigma public using (_,_)
 {-# DISPLAY Agda.Builtin.Sigma.Σ.fst = proj₁ #-}
 {-# DISPLAY Agda.Builtin.Sigma.Σ.snd = proj₂ #-}
 
