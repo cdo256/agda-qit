@@ -48,8 +48,7 @@ module Mob2 where
   W0 : Set
   W0 = W S0 P0
 
-  data S1 : W0 → Set where
-    sl1 : S1 (sup (sl0 , λ {(pl0 ())}))  
-    sm1 : (f : Bool → W0) → S1 (sup (sm0 , λ {(pm0 x) → f x}))
-    -- m1 : (x0 y0 : M0) → M1 x0 → M1 y0 → M1 (m0 x0 y0)
-    -- p1 : (x0 y0 : M0) → M1 x0 → M1 y0 → x0 ~1 y0 ∶ p0 x0 y0
+  -- data S1 : W0 → Set where
+  --   sl1 : S1 (sup (sl0 , λ {(pl0 ())}))  
+  --   sm1 : (f : Bool → W0) → S1 (sup (sm0 , λ {(pm0 x) → f x}))
+  --   sp1 : (x0 y0 : M0) → M1 x0 → M1 y0 → x0 ~1 y0 ∶ p0 x0 y0
