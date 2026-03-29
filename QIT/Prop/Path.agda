@@ -31,3 +31,13 @@ Jp : ∀ {ℓA ℓB} {A : Set ℓA} {x : A}
   → (B : (y : A) → x ≡ y → Prop ℓB)
   → {y : A} (p : x ≡ y) → B x refl → B y p
 Jp B refl x = x
+
+
+open import Agda.Builtin.Equality public
+  renaming (_≡_ to _≡ˢ_; refl to reflˢ)
+
+≡ˢ→≡ : ∀ {ℓA} {A : Set ℓA} {x y : A} → x ≡ˢ y → x ≡ y
+≡ˢ→≡ reflˢ = refl
+
+≡→≡ˢ : ∀ {ℓA} {A : Set ℓA} {x y : A} → x ≡ y → x ≡ˢ y
+≡→≡ˢ {x = x} {y} p = J (λ y p → x ≡ˢ y) p reflˢ

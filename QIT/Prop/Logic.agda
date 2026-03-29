@@ -10,6 +10,15 @@ private
 
 data ⊥p : Prop where
 
+⊥p* : ∀ {ℓ} → Prop ℓ
+⊥p* {ℓ} = LiftP ℓ ⊥p
+
+data ⊤p : Prop where
+  tt : ⊤p
+
+⊤p* : ∀ {ℓ} → Prop ℓ
+⊤p* {ℓ} = LiftP ℓ ⊤p
+
 absurdp : {A : Prop} → ⊥p → A
 absurdp ()
 
