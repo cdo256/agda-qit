@@ -84,26 +84,56 @@ _≈_ : A⊥ → A⊥ → Set
 ≈antisym {(x0 , x1)} {(y0 , y1)} (p0 , p1) (q0 , q1) =
   ≈antisym0 x0 y0 p0 q0 , ≈antisym1 x1 y1 p1 q1
 
+≈proj1 : ∀ {x y} → x ≈ y → x ≤ y
+≈proj1 (≈antisym0 _ _ p0 q0 , ≈antisym1 _ _ p1 q1) = p0 , p1
+≈proj2 : ∀ {x y} → x ≈ y → y ≤ x
+≈proj2 (≈antisym0 _ _ p0 q0 , ≈antisym1 _ _ p1 q1) = q0 , q1
+
+
 ≈refl : ∀ {x} → x ≈ x
 ≈refl {x} = ≈antisym {x} {x} (≤refl {x}) (≤refl {x})
 
 ≈sym : ∀ {x y} → x ≈ y → y ≈ x
-≈sym {x , x0} {y}
-  (≈antisym0 _ _ p0 q0 , ≈antisym1 x1 y1 p1 q1)
-  = ≈antisym {y} {x} (q0 , q1) (p0 , p1)
+≈sym {x} {y} x≈y = ≈antisym {y} {x} y≤x x≤y
+  where
+  x≤y = ≈proj1 {x} {y} x≈y
+  y≤x = ≈proj2 {x} {y} x≈y
 
 ≈trans : ∀ {x y z} → x ≈ y → y ≈ z → x ≈ z
-≈trans {x} {y} {z}
-  (≈antisym0 _ _ p0 q0 , ≈antisym1 p1 q1)
-  (≈antisym0 _ _ r0 s0 , ≈antisym1 r1 s1)
-  = ≈antisym {x} {z} (≤trans {x} {y} {z} (p0 , p1) (r0 , r1))
-                     (≤trans {z} {y} {x} (s0 , s1) (q0 , q1))
+≈trans {x} {y} {z} x≈y y≈z =
+  ≈antisym {x} {z} (≤trans {x} {y} {z} x≤y y≤z)
+                   (≤trans {z} {y} {x} z≤y y≤x)
+  where
+  x≤y = ≈proj1 {x} {y} x≈y
+  y≤x = ≈proj2 {x} {y} x≈y
+  y≤z = ≈proj1 {y} {z} y≈z
+  z≤y = ≈proj2 {y} {z} y≈z
 
 ≤cong : ∀ {x x' y y'} → x ≈ x' → y ≈ y' → x ≤ y → x' ≤ y'
-≤cong {x} {x'} {y} {y'}
-  (≈antisym0 _ _ x≤x' x'≤x , ≈antisym1 p q)
-  (≈antisym0 _ _ y≤y' y'≤y , ≈antisym1 r s)
-  x≤y
-  = ≤trans {x'} {x} {y'} (x'≤x , q)
-    (≤trans {x} {y} {y'} x≤y (y≤y' , r))
+≤cong {x} {x'} {y} {y'} x≈x' y≈y' x≤y =
+  ≤trans {x'} {x} {y'} x'≤x (≤trans {x} {y} {y'} x≤y y≤y')
+  where
+  x≤x' = ≈proj1 {x} {x'} x≈x'
+  x'≤x = ≈proj2 {x} {x'} x≈x'
+  y≤y' = ≈proj1 {y} {y'} y≈y'
+  y'≤y = ≈proj2 {y} {y'} y≈y'
 
+≤cong⨆ : {a b : ℕ → A⊥}
+        → {a-inc : ∀ i → a i ≤ a (suc i)}
+        → {b-inc : ∀ i → b i ≤ b (suc i)}
+        → (p : ∀ i → a i ≤ b i)
+        → ⨆ a a-inc ≤ ⨆ b b-inc
+≤cong⨆ {a} {b} {a-inc} {b-inc} p =
+  ⨆≤ a a-inc (⨆ b b-inc)
+    (λ i → ≤trans {a i} {b i} {⨆ b b-inc} (p i) (≤⨆ b b-inc i))
+
+≈cong⨆ : {a b : ℕ → A⊥}
+        → {a-inc : ∀ i → a i ≤ a (suc i)}
+        → {b-inc : ∀ i → b i ≤ b (suc i)}
+        → (p : ∀ i → a i ≈ b i)
+        → ⨆ a a-inc ≈ ⨆ b b-inc
+≈cong⨆ {a} {b} {a-inc} {b-inc} p =
+  ≈antisym
+    {⨆ a a-inc} {⨆ b b-inc}
+    (≤cong⨆ {a} {b} {a-inc} {b-inc} λ i → ≈proj1 {a i} {b i} (p i))
+    (≤cong⨆ {b} {a} {b-inc} {a-inc} λ i → ≈proj2 {a i} {b i} (p i))

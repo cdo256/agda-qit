@@ -45,11 +45,47 @@ record Algebra : Set₁ where
   
 
 module Properties where
-  ≤cong : ∀ {x x' y y'} → x ≈ x' → y ≈ y' → x ≤ y → x' ≤ y'
-  ≤cong (≈antisym x≤x' x'≤x) (≈antisym y≤y' y'≤y) x≤y = ≤trans x'≤x (≤trans x≤y y≤y')
+  ≈proj1 : ∀ {x y} → x ≈ y → x ≤ y
+  ≈proj1 (≈antisym p q) = p
+  ≈proj2 : ∀ {x y} → x ≈ y → y ≤ x
+  ≈proj2 (≈antisym p q) = q
+
   ≈refl : ∀ {x} → x ≈ x
   ≈refl = ≈antisym ≤refl ≤refl
   ≈sym : ∀ {x y} → x ≈ y → y ≈ x
-  ≈sym (≈antisym p q) = ≈antisym q p
+  ≈sym x≈y = ≈antisym y≤x x≤y
+    where
+    x≤y = ≈proj1 x≈y
+    y≤x = ≈proj2 x≈y
   ≈trans : ∀ {x y z} → x ≈ y → y ≈ z → x ≈ z
-  ≈trans (≈antisym p q) (≈antisym r s) = ≈antisym (≤trans p r) (≤trans s q)
+  ≈trans x≈y y≈z = ≈antisym (≤trans x≤y y≤z) (≤trans z≤y y≤x)
+    where
+    x≤y = ≈proj1 x≈y
+    y≤x = ≈proj2 x≈y
+    y≤z = ≈proj1 y≈z
+    z≤y = ≈proj2 y≈z
+
+  ≤cong : ∀ {x x' y y'} → x ≈ x' → y ≈ y' → x ≤ y → x' ≤ y'
+  ≤cong x≈x' y≈y' x≤y = ≤trans x'≤x (≤trans x≤y y≤y')
+    where
+    x≤x' = ≈proj1 x≈x'
+    x'≤x = ≈proj2 x≈x'
+    y≤y' = ≈proj1 y≈y'
+    y'≤y = ≈proj2 y≈y'
+
+  ≤cong⨆ : {a b : ℕ → A⊥}
+         → {a-inc : ∀ i → a i ≤ a (suc i)}
+         → {b-inc : ∀ i → b i ≤ b (suc i)}
+         → (p : ∀ i → a i ≤ b i)
+         → ⨆ a a-inc ≤ ⨆ b b-inc
+  ≤cong⨆ p =
+    ⨆≤ _ _ _ (λ i → ≤trans {z = {!!}} (p i) (≤⨆ _ _ i))
+
+  ≈cong⨆ : {a b : ℕ → A⊥}
+         → {a-inc : ∀ i → a i ≤ a (suc i)}
+         → {b-inc : ∀ i → b i ≤ b (suc i)}
+         → (p : ∀ i → a i ≈ b i)
+         → ⨆ a a-inc ≈ ⨆ b b-inc
+  ≈cong⨆ p =
+    ≈antisym (≤cong⨆ λ i → ≈proj1 (p i))
+             (≤cong⨆ λ i → ≈proj2 (p i))
