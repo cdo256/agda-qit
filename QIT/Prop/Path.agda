@@ -32,7 +32,6 @@ Jp : ∀ {ℓA ℓB} {A : Set ℓA} {x : A}
   → {y : A} (p : x ≡ y) → B x refl → B y p
 Jp B refl x = x
 
-
 open import Agda.Builtin.Equality public
   renaming (_≡_ to _≡ˢ_; refl to reflˢ)
 

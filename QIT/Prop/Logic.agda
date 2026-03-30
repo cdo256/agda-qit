@@ -52,7 +52,7 @@ open ∧ public using (_∧ᵖ_; _∧_; _,_)
 
 -- Disjunction for propositions.
 module ∨ {ℓ ℓ'} (A : Prop ℓ) (B : Prop ℓ') where
-  infixr 4 _∨_
+  infixr 3 _∨_
   data _∨_ : Prop (ℓ ⊔ ℓ') where
     inl : A → _∨_
     inr : B → _∨_
@@ -63,3 +63,11 @@ open ∨ public using (_∨_)
 infix 3 _⇔_
 _⇔_ : ∀ {ℓ ℓ'} (A : Prop ℓ) (B : Prop ℓ') → Prop (ℓ ⊔ ℓ')
 A ⇔ B = (A → B) ∧ (B → A)
+
+postulate
+  propExt : ∀ {ℓA} → {A B : Prop ℓA}
+          → A ⇔ B → A ≡ B
+
+P∧Q→P≡Q : ∀ {ℓP} {P Q : Prop ℓP} → P ∧ Q → P ≡ Q
+P∧Q→P≡Q (p , q) = propExt ((λ _ → q) , (λ _ → p))
+
