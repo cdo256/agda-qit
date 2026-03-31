@@ -52,9 +52,6 @@ cong₃ : ∀ {a b c d} {A : Set a} {B : Set b} {C : Set c} {D : Set d} (f : A �
       → ∀ {a1 a2 b1 b2 c1 c2} → a1 ≡ a2 → b1 ≡ b2 → c1 ≡ c2 → f a1 b1 c1 ≡ f a2 b2 c2
 cong₃ f refl refl refl = refl
 
-data _≡ᵖ_ {ℓA} {A : Prop ℓA} (x y : A) : Prop (lsuc ℓA) where
-   refl : ∀ {x} → x ≡ᵖ y
-
 prop-subst : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Prop ℓB}
            → {x y : A} → (p : x ≡ y) → B x → B y
 prop-subst refl x = x
@@ -63,12 +60,6 @@ subst-uip : ∀ {ℓ} {A : Set ℓ} {P : A → Set} {x : A} {p q : x ≡ x}
             (h : p ≡ᵖ q) (u : P x)
           → subst P p u ≡ subst P q u
 subst-uip refl u = refl
-
-isPropBox : ∀ {ℓ} {P : Prop ℓ} (p q : Box P) → p ≡ q
-isPropBox (box p) (box q) = r refl
-  where
-  r : p ≡ᵖ q → box p ≡ box q
-  r refl = refl
 
 module ≡-Reasoning {ℓ} {A : Set ℓ} where
   infix 1 begin_
@@ -99,3 +90,8 @@ dcong₂ : ∀ {a b c} {A : Set a} {B : A → Set b} {C : Set c}
        → f x₁ y₁ ≡ f x₂ y₂
 dcong₂ f refl refl = refl
 
+isPropBox : ∀ {ℓ} {P : Prop ℓ} (p q : Box P) → p ≡ q
+isPropBox (box p) (box q) = r refl
+  where
+  r : p ≡ᵖ q → box p ≡ box q
+  r refl = refl

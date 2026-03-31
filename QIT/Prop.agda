@@ -2,6 +2,7 @@ module QIT.Prop where
 
 open import QIT.Prop.Base public
 open import QIT.Prop.Logic public
+open import QIT.Prop.Data public
 
 module ≡ where
   open import QIT.Prop.Path public

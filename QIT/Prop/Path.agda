@@ -8,6 +8,10 @@ infix 4 _≡_
 data _≡_ {ℓ} {A : Set ℓ} : (x y : A) → Prop ℓ where
   refl : ∀ {x} → x ≡ x
 
+data _≡ᵖ_ {ℓA} {A : Prop ℓA} (x y : A) : Prop (lsuc ℓA) where
+   refl : ∀ {x} → x ≡ᵖ y
+
+
 {-# BUILTIN REWRITE _≡_ #-}
 
 postulate
