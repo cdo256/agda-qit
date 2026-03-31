@@ -79,7 +79,7 @@ module Properties where
          → (p : ∀ i → a i ≤ b i)
          → ⨆ a a-inc ≤ ⨆ b b-inc
   ≤cong⨆ p =
-    ⨆≤ _ _ _ (λ i → ≤trans {z = {!!}} (p i) (≤⨆ _ _ i))
+    ⨆≤ _ _ _ (λ i → ≤trans (p i) (≤⨆ _ _ i))
 
   ≈cong⨆ : {a b : ℕ → A⊥}
          → {a-inc : ∀ i → a i ≤ a (suc i)}

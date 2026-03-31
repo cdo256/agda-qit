@@ -9,9 +9,12 @@ import QIT.Function.Base
 import QIT.Prop.Base
 import QIT.Prop.Logic
 import QIT.Prop.Path
+import QIT.Prop.Data
 import QIT.Prop.Properties
 import QIT.Prop
 import QIT.Set.Base
+import QIT.Relation.SetQuotient
+
 
 -- Relations
 import QIT.Relation.Base
@@ -58,6 +61,7 @@ import QIT.Setoid.Iso
 import QIT.Setoid.Sigma
 import QIT.Setoid
 
+
 -- -- Containers
 import QIT.Container.Base
 import QIT.Container.Functor
@@ -89,7 +93,7 @@ import QIT.KK2020.Level
 -- import QIT.KK2020.Syntax -- incomplete
 
 -- Examples
-import QIT.Examples.CauchyReals
+-- import QIT.Examples.CauchyReals
 import QIT.Examples.ConTy
 import QIT.Examples.HoleList
 import QIT.Examples.ListBag
@@ -103,3 +107,10 @@ import QIT.Examples.Lambda
 import QIT.Examples.Surreal
 import QIT.Examples.PartialityMonad
 
+-- Topology
+import QIT.Topology.Base
+import QIT.Topology.BishopReals
+import QIT.Topology.Category
+import QIT.Topology.Constructions
+import QIT.Topology.Examples
+import QIT.Topology.Subset

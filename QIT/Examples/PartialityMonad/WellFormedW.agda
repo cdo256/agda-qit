@@ -32,7 +32,7 @@ data S1 : I1 → Set where
         → S1 (i≤1 (a0 i) (⨆0 a0 a-inc0) (≤⨆0 a0 a-inc0 i))
   s⨆≤1 : ∀ a0 a-inc0 x0
         → (p0 : (i : ℕ) → ≤0)
-        → S1 (i≤1 (⨆0 a0 a-inc0) x0 (⨆≤0 a0 a-inc0 x0 p0))
+        → S1 (i≤1 (⨆0 a0 a-inc0) x0 (⨆≤0 x0 a0 a-inc0 p0))
   s≈antisym1 : ∀ x0 y0
               (p0 : ≤0) (q0 : ≤0)
             → S1 (i≈1 x0 y0 (≈antisym0 x0 y0 p0 q0))
