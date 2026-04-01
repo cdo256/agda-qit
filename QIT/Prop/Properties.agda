@@ -95,3 +95,7 @@ isPropBox (box p) (box q) = r refl
   where
   r : p ≡ᵖ q → box p ≡ box q
   r refl = refl
+
+funExt⁻ : ∀ {ℓA ℓB} → {A : Set ℓA} {B : A → Set ℓB} {f g : ∀ x → B x}
+        → f ≡ g → (∀ x → f x ≡ g x)
+funExt⁻ refl _ = refl

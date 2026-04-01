@@ -4,6 +4,8 @@ open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Relation.Base
 open import QIT.Relation.Subset
+import Data.Bool as Bool
+open Bool using (Bool; true; false)
 
 -- Decidability type - constructive decision procedures.
 data Dec {ℓA} (A : Set ℓA) : Set ℓA where
@@ -14,6 +16,13 @@ data Dec {ℓA} (A : Set ℓA) : Set ℓA where
 data Decᵖ {ℓA} (A : Prop ℓA) : Set ℓA where
   yes : A → Decᵖ A
   no : (A → ⊥p) → Decᵖ A
+
+data True : Bool → Prop where
+  true : True true
+
+True? : ∀ b → Decᵖ (True b)
+True? false = no (λ ())
+True? true = yes true
 
 open import Function.Base using (case_of_; case_returning_of_) public
 

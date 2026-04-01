@@ -21,15 +21,16 @@ postulate
   subst-id : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB}
            → {x : A} (p : x ≡ x) (b : B x)
            → subst B p b ≡ b
-  subst-const : ∀ {ℓA ℓB ℓP} {A : Set ℓA} {B : Set ℓB} (P : Set ℓP)
-              → ∀ {x : B} (z : P) (p : x ≡ x)
-              → subst (λ _ → P) p z ≡ z
+  subst-const : ∀ {ℓA ℓB} {A : Set ℓA} (B : Set ℓB)
+              → ∀ {x y : A} (z : B) (p : x ≡ y)
+              → subst (λ _ → B) p z ≡ z
   J : ∀ {ℓA ℓB} {A : Set ℓA} {x : A}
     → (B : (y : A) → x ≡ y → Set ℓB)
     → {y : A} (p : x ≡ y) → B x refl → B y p
 
 
 {-# REWRITE subst-id #-}
+{-# REWRITE subst-const #-}
 
 Jp : ∀ {ℓA ℓB} {A : Set ℓA} {x : A}
   → (B : (y : A) → x ≡ y → Prop ℓB)
@@ -44,3 +45,4 @@ open import Agda.Builtin.Equality public
 
 ≡→≡ˢ : ∀ {ℓA} {A : Set ℓA} {x y : A} → x ≡ y → x ≡ˢ y
 ≡→≡ˢ {x = x} {y} p = J (λ y p → x ≡ˢ y) p reflˢ
+
