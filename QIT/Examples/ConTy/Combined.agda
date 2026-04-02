@@ -1,5 +1,5 @@
 {-# OPTIONS --allow-unsolved-metas #-}
-module QIT.Examples.ConTy where
+module QIT.Examples.ConTy.Base where
 
 open import QIT.Prelude
 open import QIT.Prop

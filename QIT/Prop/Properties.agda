@@ -99,3 +99,42 @@ isPropBox (box p) (box q) = r refl
 funExt⁻ : ∀ {ℓA ℓB} → {A : Set ℓA} {B : A → Set ℓB} {f g : ∀ x → B x}
         → f ≡ g → (∀ x → f x ≡ g x)
 funExt⁻ refl _ = refl
+
+reflʰ : ∀ {ℓA ℓB} {A : Set ℓA} (B : A → Set ℓB)
+      → {a₁ a₂ : A}
+      → {x : B a₁}
+      → subst B refl x ≡ x
+reflʰ B = refl
+  
+symʰ : ∀ {ℓA ℓB} {A : Set ℓA} (B : A → Set ℓB)
+     → {a₁ a₂ : A} (p : a₁ ≡ a₂)
+     →  {x : B a₁} {y : B a₂}
+     → subst B p x ≡ y
+     → subst B (sym p) y ≡ x
+symʰ B refl r = sym r
+
+transʰ : ∀ {ℓA ℓB} {A : Set ℓA} (B : A → Set ℓB)
+     → {a₁ a₂ a₃ : A} (p : a₁ ≡ a₂) (q : a₂ ≡ a₃)
+     → {x : B a₁} {y : B a₂} {z : B a₃}
+     → subst B p x ≡ y
+     → subst B q y ≡ z
+     → subst B (trans p q) x ≡ z
+transʰ B refl refl r s  = trans r s
+
+congʰ : ∀ {ℓA ℓB ℓC} {A : Set ℓA} (B : A → Set ℓB)
+      → {a₁ a₂ : A} (pa : a₁ ≡ a₂)
+      → {b₁ : B a₁} {b₂ : B a₂}
+      → {C : A → Set ℓC}
+      → (f : ∀ {a} → B a → C a)
+      → subst B pa b₁ ≡ b₂
+      → subst C pa (f b₁) ≡ f b₂
+congʰ B refl f bp = cong f bp
+
+-- Probably doesn't need to be postulated.
+postulate
+  substʰ : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : A → Set ℓB}
+         → {a₁ a₂ : A} (pa : a₁ ≡ a₂)
+         → {b₁ : B a₁} {b₂ : B a₂}
+         → {C : ∀ {a} → B a → Set ℓC}
+         → subst B pa b₁ ≡ b₂
+         → C b₁ → C b₂
