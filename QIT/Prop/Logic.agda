@@ -19,7 +19,9 @@ data ⊤p : Prop where
 ⊤p* : ∀ {ℓ} → Prop ℓ
 ⊤p* {ℓ} = LiftP ℓ ⊤p
 
-absurdp : {A : Prop} → ⊥p → A
+pattern tt* = liftp tt 
+
+absurdp : ∀ {ℓ ℓ'} {A : Set ℓ} → ⊥p* {ℓ'} → A
 absurdp ()
 
 ⊥→⊥p : ⊥ → ⊥p
