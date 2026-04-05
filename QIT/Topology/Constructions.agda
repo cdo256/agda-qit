@@ -79,8 +79,19 @@ _∨ᵀ_
    → (Y : Space· ℓ𝓥 ℓ𝓟 ℓ𝓞')
    → Space· {!ℓ𝓤 ⊔ ℓ𝓥!} {!ℓ𝓟!} {!ℓ𝓤 ⊔ ℓ𝓥 ⊔ lsuc ℓ𝓟 ⊔ ℓ𝓞 ⊔ ℓ𝓞'!}
 _∨ᵀ_ {ℓ𝓤} {ℓ𝓥} {ℓ𝓟} {ℓ𝓞} {ℓ𝓞'} (X , x) (Y , y) =
-  Z , {!!}   
+  {!!} , {!!}   
   where
-  Z : Space (ℓ𝓤 ⊔ ℓ𝓥 ⊔ ℓ𝓟) ℓ𝓟
-       (ℓ𝓤 ⊔ ℓ𝓥 ⊔ ℓ𝓟 ⊔ lsuc ℓ𝓟 ⊔ (ℓ𝓤 ⊔ ℓ𝓥 ⊔ lsuc ℓ𝓟 ⊔ ℓ𝓞 ⊔ ℓ𝓞'))
-  Z = (X ⊔ᵀ Y) /ᵀ [ (true , lift x) ∷ (false , lift y) ∷ [] ]ᴾ
+  Z = (X ⊔ᵀ Y)
+  module Z = Space Z
+  Q : 𝓟 _ Z.𝓤
+  Q z = z ≡ (true , lift x) ∨ z ≡ (false , lift y) 
+  Z/Q : Space _ _ _
+  Z/Q = Z /ᵀ {!Q!}
+--   Q : 𝓟 _ (X⊔ ⊔ᵀ Y)
+--   Q = ?
+--   Z : Space (ℓ𝓤 ⊔ ℓ𝓥 ⊔ ℓ𝓟) ℓ𝓟
+--        (ℓ𝓤 ⊔ ℓ𝓥 ⊔ ℓ𝓟 ⊔ lsuc ℓ𝓟 ⊔ (ℓ𝓤 ⊔ ℓ𝓥 ⊔ lsuc ℓ𝓟 ⊔ ℓ𝓞 ⊔ ℓ𝓞'))
+--   Z = (X ⊔ᵀ Y) /ᵀ Q
+
+
+-- -- [ (true , lift x) ∷ (false , lift y) ∷ [] ]ᴾ

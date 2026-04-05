@@ -1,4 +1,4 @@
-module QIT.Topology.Base where
+module QIT.Topology.PointSet where
 
 open import QIT.Prelude
 open import QIT.Prop
