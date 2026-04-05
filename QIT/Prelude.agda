@@ -11,7 +11,7 @@ open import Level public using (Level; _⊔_; Lift; lift; lower)
 -- Empty type - represents logical falsehood and impossible cases.
 import Data.Empty
 module ⊥ = Data.Empty
-open ⊥ using (⊥) public
+open ⊥ using (⊥) renaming (⊥-elim to absurd) public
 
 -- Product types - both dependent (Σ) and non-dependent (_×_).
 import Data.Product
