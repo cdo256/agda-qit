@@ -29,18 +29,20 @@ import QIT.Relation.BarInduction
 
 -- Category
 import QIT.Category.Base
-import QIT.Category.Preorder
-import QIT.Category.Set
+import QIT.Category.Strict
+import QIT.Category.SetoidEnriched
 import QIT.Category.Morphism
 import QIT.Category.Slice
-import QIT.Category.Setoid
-import QIT.Category.SetoidEnriched
-import QIT.Category.Discrete
--- import QIT.Category.FamilyOfSets -- ConstructorDoesNotFitInData
-import QIT.Category.FamilyOfSetoids
--- import QIT.Category.WithFamilies -- incomplete
-import QIT.Category.Terminal
 import QIT.Category.Initial
+import QIT.Category.Terminal
+
+-- Specific Categories
+import QIT.Category.Discrete
+import QIT.Category.Preorder
+import QIT.Category.Set
+import QIT.Category.Setoid
+import QIT.Category.FamilyOfSetoids
+
 
 -- Functor
 import QIT.Functor.Base

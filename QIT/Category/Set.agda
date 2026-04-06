@@ -4,14 +4,14 @@ open import QIT.Relation.Base
 open import QIT.Set.Base
 open import QIT.Relation.Binary
 open import QIT.Category.Base
+open import QIT.Category.Strict
 
 module QIT.Category.Set where
 
-SetCat : ∀ ℓA → Category (lsuc ℓA) (ℓA) ℓA
-SetCat ℓA = record
+SetStrCat : ∀ ℓA → StrictCategory (lsuc ℓA) ℓA
+SetStrCat ℓA = record
   { Obj = Set ℓA
   ; _⇒_ = λ X Y → (X → Y)
-  ; _≈_ = _≡_
   ; id = λ x → x
   ; _∘_ = _∘_
   ; assoc = ≡.refl
@@ -19,6 +19,7 @@ SetCat ℓA = record
   ; identityˡ = ≡.refl
   ; identityʳ = ≡.refl
   ; identity² = ≡.refl
-  ; equiv = λ {A B} → isEquiv-≡ (A → B)
-  ; ∘-resp-≈ = λ{ ≡.refl ≡.refl → ≡.refl }
   }
+
+SetCat : ∀ ℓA → Category (lsuc ℓA) ℓA ℓA
+SetCat ℓA = StrictCategory→Category (SetStrCat ℓA)

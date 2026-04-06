@@ -1,6 +1,7 @@
 module QIT.Category.Base where
 
 open import QIT.Prelude
+open import QIT.Prop
 open import QIT.Relation
 open import QIT.Setoid.Base hiding (_[_≈_])
 
