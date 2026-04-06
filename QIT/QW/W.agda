@@ -2,7 +2,7 @@ open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Setoid
 open import QIT.Container.Base
-open import QIT.Functor.Base
+open import QIT.Setoid.Functor.Base
 
 -- Define quotient W-types: W-types equipped with a quotient relation.
 -- This extends ordinary W-types with equations, allowing us to quotient
