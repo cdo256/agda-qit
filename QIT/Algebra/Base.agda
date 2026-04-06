@@ -7,7 +7,7 @@ open import QIT.Functor.Base
 -- Define algebras over setoid endofunctors. An algebra for a functor F
 -- is a setoid X equipped with a structure map α : F X → X. This is the
 -- foundation for defining initial algebras and recursive data types.
-module QIT.Algebra.Base {ℓCo ℓCh} {C : Category ℓCo ℓCh} (F : Functor C C) where
+module QIT.Algebra.Base {ℓCo ℓCh} {C : StrictCategory ℓCo ℓCh} (F : Functor C C) where
 
 
 -- Define an algebra over a setoid endofunctor.

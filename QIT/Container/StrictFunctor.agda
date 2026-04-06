@@ -20,4 +20,6 @@ F = record
   ; hom = λ g (s , f) → s , (λ z → g (f z))
   ; id = ≡.refl
   ; comp = λ _ _ → ≡.refl 
+  ; resp = λ {x} {y} {f} {g} p →
+    ≡.cong (λ g (s , f) → s , λ i → g (f i)) p
   }
