@@ -43,13 +43,10 @@ import QIT.Category.Set
 import QIT.Category.Setoid
 import QIT.Category.FamilyOfSetoids
 
-
 -- Functor
 import QIT.Functor.Base
 import QIT.Functor.Composition
-
--- Natural Transformation
-import QIT.NatTrans
+import QIT.Functor.NatTrans
 
 -- Category of Setoids
 import QIT.Setoid.Base

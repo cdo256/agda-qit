@@ -3,7 +3,7 @@ open import QIT.Category.Base
 open import QIT.Functor.Base
 open import QIT.Category.Morphism
 
-module QIT.NatTrans
+module QIT.Functor.NatTrans
   {ℓCo} {ℓCh} {ℓCe} {ℓDo} {ℓDh} {ℓDe}
   {C : Category ℓCo ℓCh ℓCe}
   {D : Category ℓDo ℓDh ℓDe}
