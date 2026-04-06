@@ -3,6 +3,7 @@ open import QIT.Prop
 open import QIT.Setoid
 open import QIT.Container.Base
 open import QIT.Functor.Base
+open import QIT.Set.Base
 
 -- Define quotient W-types: W-types equipped with a quotient relation.
 -- This extends ordinary W-types with equations, allowing us to quotient
@@ -10,31 +11,15 @@ open import QIT.Functor.Base
 -- quotient inductive types (QITs) with both constructors and equations.
 module QIT.QW.W {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
 
-open import QIT.Container.Functor S P (ℓS ⊔ ℓP) (ℓS ⊔ ℓP)
+open import QIT.Container.StrictFunctor S P (ℓS ⊔ ℓP)
 
 module F = Functor F
 
-open import QIT.Setoid.Algebra.Base F as Alg
+open import QIT.Algebra.Base F
 
 -- Underlying W-type: trees with shapes S and positions P
 T : Set (ℓS ⊔ ℓP)
 T = W S P
-
--- View T as a setoid with propositional equality (without a quotient)
-T̃ : Setoid (ℓS ⊔ ℓP) (ℓS ⊔ ℓP)
-T̃ = T /≡
-
--- Congruence: sup respects equivalence in the functor interpretation
-α-cong : ∀ {sf} {tg} → F.ob T̃ [ sf ≈ tg ] → sup sf ≡ sup tg
-α-cong {s , f} {s , g} (F-Ob.mk≈ꟳ ≡.refl f≈g) = q (≡.funExt f≈g)
-  where
-  open F-Ob T̃
-  q : f ≡ g → sup (s , f) ≡ sup (s , g)
-  q ≡.refl = ≡.refl
-T-α : ≈.Hom (F.ob T̃) T̃
-T-α = record
-  { to = sup
-  ; cong = α-cong }
 
 -- T forms an algebra for the container functor F.
 -- The structure map is just the W-type constructor sup.
@@ -42,43 +27,35 @@ T-α = record
 -- We use this algebra to define properties on T before the quotient.
 T-alg : Algebra
 T-alg = record
-  { X = T̃
-  ; α = T-α }
+  { X = T
+  ; α = sup }
 
 module Rec (Yβ : Algebra) where
   open Algebra
   open ≈.Hom
   open Algebra Yβ renaming (X to Y; α to β)
-  module β = ≈.Hom β
-  rec₀ : ⟨ T̃ ⟩ → ⟨ Y ⟩
-  rec₀ (W.sup (s , f)) =
-    β.to (s , λ i → rec₀ (f i))
-  rec-cong : ∀ {x y} → T̃ [ x ≈ y ] → Y [ rec₀ x ≈ rec₀ y ]
-  rec-cong ≡.refl = ≡→≈ Y ≡.refl
-  rec : ≈.Hom T̃ Y
-  rec = record { to = rec₀ ; cong = rec-cong }
-  rec-comm : (β ≈.∘ F.hom rec) ≈h (rec ≈.∘ T-α)
-  rec-comm = Setoid.refl Y
+  rec : T → Y
+  rec (sup (s , f)) =
+    β (s , λ i → rec (f i))
 
-  unique : ∀ (f : Alg.Hom T-alg Yβ) → f .Alg.Hom.hom ≈h rec
-  unique f {sup (s , g)} =
-    f.hom .to (W.sup (s , g))
-      ≈⟨ sym f.comm ⟩
-    β.to (s , λ i → f.hom .to (g i)) 
-      ≈⟨ β.cong (F-Ob.mk≈ꟳ ≡.refl λ (i : P s) → unique f {g i}) ⟩
-    β.to (s , λ i → rec₀ (g i)) 
-      ≈⟨ refl ⟩
-    rec₀ (W.sup (s , g)) ∎
+  unique : ∀ (f : Hom T-alg Yβ) → ∀ {x} → f .Hom.hom x ≡ rec x
+  unique f {sup (s , g)} = begin
+    f.hom (sup (s , g))
+      ≡⟨ ≡.sym f.comm ⟩
+    β (s , λ i → f.hom (g i)) 
+      ≡⟨ ≡.cong β (≡.cong (λ ○ → s , ○) (≡.funExt λ (i : P s) → unique f {g i})) ⟩
+    β (s , λ i → rec (g i))
+      ≡⟨ ≡.refl ⟩
+    rec (sup (s , g)) ∎
     where
-    open Setoid Y
-    open ≈.≈syntax {S = Y}
-    module f = Alg.Hom f
+    open ≡.≡-Reasoning
+    module f = Hom f
 
-isInitialT : Alg.IsInitial T-alg
+isInitialT : IsInitial T-alg
 isInitialT = record
   { rec = λ Yβ → record
     { hom = rec Yβ
-    ; comm = λ {x} → rec-comm Yβ {x} }
-  ; unique = unique }
+    ; comm = ≡.refl }
+  ; unique = λ Yβ f → unique Yβ f }
   where
   open Rec

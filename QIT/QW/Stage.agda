@@ -12,22 +12,27 @@ open Sig sig
 open import QIT.Relation.Subset
 open import QIT.Relation.Binary
 open import QIT.Container.Base
-open import QIT.Container.Functor S P (ℓS ⊔ ℓP ⊔ ℓV) (ℓS ⊔ ℓP ⊔ ℓV)
+open import QIT.Container.StrictFunctor S P (ℓS ⊔ ℓP ⊔ ℓV)
 open import QIT.Setoid
 open import QIT.Relation.Subset
 open import QIT.Relation.Plump S P
 open import QIT.QW.W S P
-open import QIT.Setoid.Algebra.Lift S P ℓV
+open import QIT.Algebra.Base F
+open import QIT.Algebra.Lift S P ℓV
 open import Data.Maybe
 open import QIT.QW.Equation S P ℓV
-open import QIT.Functor.Base
-open import QIT.Functor.Composition
 open import QIT.Category.Preorder
 open import QIT.Category.Setoid
+open import QIT.Category.Set
+open import QIT.Functor.Base
+open import QIT.Functor.Composition
 
 -- Diagram is a functor from a preorder category to setoids
+Diagram≈ : ∀ ℓD ℓD' → Set _
+Diagram≈ ℓD ℓD' = Functor (PreorderCat Z ≤p) (SetoidCat ℓD ℓD')
+
 Diagram : ∀ ℓD ℓD' → Set _
-Diagram ℓD ℓD' = Functor (PreorderCat Z ≤p) (SetoidCat ℓD ℓD')
+Diagram ℓD ℓD' = Functor (PreorderCat Z ≤p) (SetCat (ℓD ⊔ ℓD'))
 
 open Box
 
@@ -64,14 +69,14 @@ t ≤ᴱ α = ιᵉ t ≤ α
 -- as an assignment. Instead we use T-alg and require explicit proof
 -- on the ≈psat case.
 -- Lift T-alg to the higher universe levels needed in this module
-T-alg-lifted : AlgBig
-T-alg-lifted = liftAlgebra T-alg
+T-alg* : Algebra
+T-alg* = LiftAlgebra T-alg
 
-lhs' : ∀ (e : E) (ϕ : Assignment T-alg-lifted (Ξ e)) → T
-lhs' e ϕ = lower (assign T-alg-lifted ϕ (Ξ e .lhs))
+lhs' : ∀ (e : E) (ϕ : Assignment T-alg* (Ξ e)) → T
+lhs' e ϕ = lower (assign T-alg* ϕ (Ξ e .lhs))
 
-rhs' : ∀ (e : E) (ϕ : Assignment T-alg-lifted (Ξ e)) → T
-rhs' e ϕ = lower (assign T-alg-lifted ϕ (Ξ e .rhs))
+rhs' : ∀ (e : E) (ϕ : Assignment T-alg* (Ξ e)) → T
+rhs' e ϕ = lower (assign T-alg* ϕ (Ξ e .rhs))
 
 -- Stage-indexed equivalence relation: the quotient relation at each stage.
 -- This is built inductively using congruence, equation satisfaction,
@@ -84,7 +89,7 @@ data _⊢_≈ᵇ_ : (α : Z) → D₀ α → D₀ α → Prop (ℓS ⊔ ℓP ⊔
         → sup (ιˢ a , μ) ⊢ psup a μ f ≈ᵇ psup a μ g
 
   -- Equation satisfaction: enforce the equations from the signature
-  ≈psat : ∀ {α} (e : E) (ϕ : Assignment T-alg-lifted (Ξ e))
+  ≈psat : ∀ {α} (e : E) (ϕ : Assignment T-alg* (Ξ e))
         → (l≤α : lhs' e ϕ ≤ᵀ α)
         → (r≤α : rhs' e ϕ ≤ᵀ α)
         → α ⊢  (lhs' e ϕ , l≤α)
@@ -145,22 +150,11 @@ D : Diagram (ℓS ⊔ ℓP) (ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV)
 D = record
   { ob = D̃
   ; hom = hom
-  ; id = id
-  ; comp = comp
-  ; resp = λ _ → ≈prefl }
+  ; id = ≡.refl
+  ; comp = λ _ _ → ≡.refl }
   where
   -- Morphisms are weakening maps preserving equivalence
   hom : ∀ {α β} → Box (α ≤ β) → ≈.Hom (D̃ α) (D̃ β)
   hom {α} {β} (box α≤β) = record
     { to = pweaken α≤β
     ; cong = ≈pweaken α≤β }
-
-  -- Identity law: weakening by reflexivity is the identity
-  id : ∀ {α} → hom (box (≤refl α)) ≈h ≈.idHom
-  id {α} {ŝ} = ≈prefl
-
-  -- Composition law: weakening composes correctly
-  comp : ∀ {α β γ} (p : Box (α ≤ β)) (q : Box (β ≤ γ)) →
-      hom (box (≤≤ (q .unbox) (p .unbox))) ≈h (hom q ≈.∘ hom p)
-  comp {α} {β} {γ} (box p) (box q) {ŝ} =
-    ≈pweaken q (≈pweaken p (≈prefl {t̂ = ŝ}))

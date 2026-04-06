@@ -7,7 +7,6 @@ open import QIT.Relation.Binary
 open import QIT.Relation.Subset
 open import QIT.Relation.Nullary
 open import QIT.Category.Base
-open import QIT.Category.SetoidEnriched
 
 module QIT.Category.Initial where
 private

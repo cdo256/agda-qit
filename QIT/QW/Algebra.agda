@@ -12,10 +12,10 @@ open import QIT.QW.Signature
 module QIT.QW.Algebra {ℓS ℓP ℓE ℓV} (sig : Sig ℓS ℓP ℓE ℓV) where
 
 open Sig sig
-open import QIT.Container.Functor S P (ℓS ⊔ ℓP ⊔ ℓV) (ℓS ⊔ ℓP ⊔ ℓV) using (F)
+open import QIT.Container.StrictFunctor S P (ℓS ⊔ ℓP ⊔ ℓV) using (F)
 open import QIT.QW.Equation S P ℓV
 open import QIT.Functor.Base
-open import QIT.Setoid.Algebra.Base F as AlgBase hiding (Hom; IsInitial)
+open import QIT.Algebra.Base F as AlgBase hiding (Hom; IsInitial)
 
 -- A QIT algebra: a container algebra that satisfies the signature equations.
 -- This consists of a setoid with operations (container algebra) plus
@@ -47,7 +47,7 @@ record IsInitial (Xα : Alg) : Set (lsuc ℓS ⊔ lsuc ℓP ⊔ ℓE ⊔ lsuc �
     -- Recursor: canonical map to any QIT algebra
     rec : ∀ Yβ → Hom Xα Yβ
     -- Uniqueness: any homomorphism equals the recursor
-    unique : ∀ Yβ (f : Hom Xα Yβ) → f .alghom ≈h (rec Yβ) .alghom
+    unique : ∀ Yβ (f : Hom Xα Yβ) → f .alghom ≡ (rec Yβ) .alghom
 
 -- Package of initial QIT algebra: the algebra together with initiality proof.
 -- This represents the quotient inductive type defined by the signature.
