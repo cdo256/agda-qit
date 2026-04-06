@@ -1,14 +1,13 @@
 open import QIT.Prelude
 open import QIT.Prop
-
-open import QIT.Setoid.Category.Base
-open import QIT.Setoid.Functor.Base
 open import QIT.Container.Base hiding (sup)
+open import QIT.Category.Base
+open import QIT.Functor.Base
 
 -- Define algebras over setoid endofunctors. An algebra for a functor F
 -- is a setoid X equipped with a structure map α : F X → X. This is the
 -- foundation for defining initial algebras and recursive data types.
-module QIT.Setoid.Algebra.Base {ℓCo ℓCh ℓCe} {C : Category ℓCo ℓCh ℓCe} (F : Functor C C) where
+module QIT.Algebra.Base {ℓCo ℓCh} {C : Category ℓCo ℓCh} (F : Functor C C) where
 
 
 -- Define an algebra over a setoid endofunctor.
@@ -34,7 +33,7 @@ record Algebra : Set (ℓCo ⊔ ℓCh) where
 -- Homomorphism between F-algebras: a homomorphism of carriers that
 -- commutes with the structure maps. If f : X → Y is an algebra homomorphism,
 -- then f(α(fx)) = β(F(f)(fx)) for all fx : F X.
-record Hom (Xα Yβ : Algebra) : Set (ℓCo ⊔ ℓCh ⊔ ℓCe) where
+record Hom (Xα Yβ : Algebra) : Set (ℓCo ⊔ ℓCh) where
   constructor mkHom
   open Algebra Xα
   open Algebra Yβ renaming (X to Y; α to β)
@@ -42,12 +41,12 @@ record Hom (Xα Yβ : Algebra) : Set (ℓCo ⊔ ℓCh ⊔ ℓCe) where
     -- Underlying homomorphism between carriers
     hom : C [ X , Y ]
     -- Commutativity condition: the square commutes
-    comm : C [ (β C.∘ F.hom hom) ≈ (hom C.∘ α) ]
+    comm : (β C.∘ F.hom hom) ≡ (hom C.∘ α)
 
 -- An initial algebra has a unique homomorphism to every other algebra.
 -- This property characterizes recursive data types: the initial algebra
 -- gives the "freely generated" elements with no additional equations.
-record IsInitial (Xα : Algebra) : Set (ℓCo ⊔ ℓCh ⊔ ℓCe) where
+record IsInitial (Xα : Algebra) : Set (ℓCo ⊔ ℓCh) where
   constructor mkIsInitial
   open Algebra Xα
   open Hom
@@ -55,4 +54,4 @@ record IsInitial (Xα : Algebra) : Set (ℓCo ⊔ ℓCh ⊔ ℓCe) where
     -- Recursor: unique map to any algebra
     rec : ∀ Yβ → Hom Xα Yβ
     -- Uniqueness: any algebra homomorphism equals the recursor
-    unique : ∀ Yβ → (f : Hom Xα Yβ) → C [ f .hom ≈ rec Yβ .hom ]
+    unique : ∀ Yβ → (f : Hom Xα Yβ) → f .hom ≡ rec Yβ .hom

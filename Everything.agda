@@ -48,6 +48,10 @@ import QIT.Functor.Base
 import QIT.Functor.Composition
 import QIT.Functor.NatTrans
 
+-- Algebra
+import QIT.Algebra.Base
+import QIT.Algebra.Lift
+
 -- Category of Setoids
 import QIT.Setoid.Base
 import QIT.Setoid.Indexed
@@ -61,6 +65,7 @@ import QIT.Setoid
 -- Containers
 import QIT.Container.Base
 import QIT.Container.Functor
+import QIT.Container.StrictFunctor
 import QIT.Container.Indexed
 
 -- QW type definition
