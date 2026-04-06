@@ -1,7 +1,5 @@
 module Everything where
 
-module Everything where
-
 -- Base
 import QIT.Prelude
 import QIT.Fin.Base
@@ -49,8 +47,8 @@ import QIT.Functor.Composition
 import QIT.Functor.NatTrans
 
 -- Algebra
-import QIT.Algebra.Base
-import QIT.Algebra.Lift
+-- import QIT.Algebra.Base
+-- import QIT.Algebra.Lift
 
 -- Category of Setoids
 import QIT.Setoid.Base

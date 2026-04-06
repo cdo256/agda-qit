@@ -20,7 +20,7 @@ module ≡syntax {ℓ} {A : Set ℓ} where
   _∎ : ∀ (x : A) → x ≡ x
   x ∎ = ≡.refl
 
-infixr 1 _∘_
+infixr 5 _∘_
 _∘_ : ∀ {ℓA ℓB ℓC}
     → {A : Set ℓA} {B : Set ℓB} {C : Set ℓC}
     → (B → C) → (A → B) → (A → C)

@@ -1,8 +1,8 @@
 open import QIT.Prelude
 open import QIT.Prop
 
-open import QIT.Setoid.Category.Base
-open import QIT.Setoid.Functor.Base
+open import QIT.Category.Base
+open import QIT.Functor.Base
 open import QIT.Container.Base hiding (sup)
 
 -- Define algebras over setoid endofunctors. An algebra for a functor F
