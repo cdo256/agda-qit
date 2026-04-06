@@ -8,14 +8,14 @@ open import QIT.Prop
 module QIT.QW.Equation {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) (ℓV : Level) where
 
 open import QIT.Container.Base
-open import QIT.Container.Functor S P (ℓS ⊔ ℓP ⊔ ℓV) (ℓS ⊔ ℓP ⊔ ℓV)
+open import QIT.Container.StrictFunctor S P (ℓS ⊔ ℓP ⊔ ℓV)
 open import QIT.Setoid
 open import QIT.QW.W S P
 open import QIT.Functor.Base
 
 module Fᴱ = Functor F
 
-open import QIT.Setoid.Algebra.Base F as Alg
+open import QIT.Algebra.Base F as Alg
 
 -- Expressions over variables V: terms built from V and constructor signature (S,P).
 -- These are W-types over the extended signature (V ⊎ S, Pʰ) where:
@@ -41,21 +41,11 @@ pattern supᴱ s f = sup (inj₂ s , f)
 
 ExprAlg : (V : Set ℓV) → Algebra
 ExprAlg V = record
-  { X = Expr V /≡
-  ; α = record
-    { to = β
-    ; cong = β-cong } }
+  { X = Expr V
+  ; α = β }
   where
-  Ẽ : Setoid _ _
-  Ẽ = Expr V /≡
-  open F-Ob Ẽ
   β : ⟦ S ◁ P ⟧ (Expr V) → Expr V
   β (s , f) = supᴱ s f
-  β-cong : ∀ {sf tg} → (p : sf ≈ꟳ tg) → (β sf ≡ β tg)
-  β-cong {s , f} {s , g} (mk≈ꟳ ≡.refl snd≈) = ≡.cong (λ ○ → β (s , ○)) f≡g
-    where
-    f≡g : f ≡ g
-    f≡g = ≡.funExt snd≈
 
 -- An equation equates two expressions over the same set of variables.
 -- This is the basic unit of equational specification: lhs ≈ rhs.
@@ -74,24 +64,22 @@ record Equation : Set (lsuc ℓV ⊔ ℓS ⊔ ℓP) where
 -- equivalent elements under all variable assignments.
 module _ (Xα : Algebra) where
   open Algebra Xα
-  module X = Setoid X
 
   -- Evaluate an expression in the algebra given a variable assignment.
   -- Variables are replaced by their assignments, constructors are interpreted
   -- using the algebra's structure map.
-  assign : {V : Set ℓV} (ϕ : V → ⟨ X ⟩) (e : Expr V) → ⟨ X ⟩
-  assign ϕ = recW ⊎.[ (λ v _ → ϕ v) , (λ s f → α.to (s , f)) ]
-    where module α = ≈.Hom α
+  assign : {V : Set ℓV} (ϕ : V → X) (e : Expr V) → X
+  assign ϕ = recW ⊎.[ (λ v _ → ϕ v) , (λ s f → α (s , f)) ]
 
   -- Variable assignment for an equation: maps variables to algebra elements
   Assignment : Equation → Set (ℓS ⊔ ℓP ⊔ ℓV)
-  Assignment e = V → ⟨ X ⟩
+  Assignment e = V → X
     where open Equation e
 
   -- An equation is satisfied if lhs ≈ rhs under all variable assignments.
   -- This is universal quantification over all ways to instantiate variables.
   SatEq : Equation → Prop (ℓS ⊔ ℓP ⊔ ℓV)
-  SatEq e = ∀ (ϕ : Assignment e) → assign ϕ lhs X.≈ assign ϕ rhs
+  SatEq e = ∀ (ϕ : Assignment e) → assign ϕ lhs ≡ assign ϕ rhs
     where open Equation e
 
   -- Satisfaction of a collection of equations indexed by E.
@@ -105,33 +93,33 @@ module _ {V : Set ℓV} {Xα : Algebra}
          (h : Hom (ExprAlg V) Xα) where
   open Hom h
   open Algebra Xα
-  open Setoid X
-  module α = ≈.Hom α
+  open ≡
 
   assign-unique
-    : (ρ : V → ⟨ X ⟩)
-    → (vsat : ∀ v f → X [ ≈.Hom.to hom (varᴱ v {f}) ≈ ρ v ])
+    : (ρ : V → X)
+    → (vsat : ∀ v f → hom (varᴱ v {f}) ≡ ρ v)
     → (e : Expr V)
-    → X [ ≈.Hom.to hom e ≈ assign Xα ρ e ]
+    → hom e ≡ assign Xα ρ e
   assign-unique ρ vsat (varᴱ v {f}) = begin
-    ≈.Hom.to hom (varᴱ v {f})
-      ≈⟨ vsat v f ⟩
+    hom (varᴱ v {f})
+      ≡⟨ vsat v f ⟩
     ρ v
-      ≈⟨ refl ⟩
+      ≡⟨ refl ⟩
     assign Xα ρ (varᴱ v {f}) ∎
     where
-    open ≈.≈syntax {S = X}
+    open ≡.≡-Reasoning
   assign-unique ρ vsat (supᴱ s f) = begin
-    ≈.Hom.to hom (supᴱ s f)
-      ≈⟨ sym comm ⟩
-    α.to (Fh (s , f))
-      ≈⟨ α.cong (F-Ob.mk≈ꟳ ≡.refl λ i → refl) ⟩
-    α.to (s , λ i → ≈.Hom.to hom (f i))
-      ≈⟨ α.cong (F-Ob.mk≈ꟳ ≡.refl λ i → assign-unique ρ vsat (f i)) ⟩
-    α.to (s , (λ i → assign Xα ρ (f i)))
-      ≈⟨ refl ⟩
+    hom (supᴱ s f)
+      ≡⟨ sym (funExt⁻ comm (s , f)) ⟩
+    α (Fᴱ.hom hom (s , f))
+      ≡⟨ cong (λ ○ → α (s , ○)) (funExt λ x → assign-unique ρ vsat (f x)) ⟩
+    α (s , (λ i → assign Xα ρ (f i)))
+      ≡⟨ refl ⟩
     assign Xα ρ (supᴱ s f) ∎
     where
-    Fh : ⟨ Fᴱ.ob (Expr V /≡) ⟩ → ⟨ Fᴱ.ob X ⟩
-    Fh = ≈.Hom.to (Fᴱ.hom hom)
-    open ≈.≈syntax {S = X}
+    open ≡-Reasoning
+    q : (x : P s) → hom (f x) ≡ assign Xα ρ (f x)
+    q x =
+      hom (f x)
+        ≡⟨ assign-unique ρ vsat (f x) ⟩
+      assign Xα ρ (f x) ∎
