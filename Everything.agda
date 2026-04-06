@@ -49,20 +49,17 @@ import QIT.Functor.Composition
 -- Natural Transformation
 import QIT.NatTrans
 
--- Algebra
-import QIT.Algebra.Base
-import QIT.Algebra.Lift
-
 -- Category of Setoids
 import QIT.Setoid.Base
 import QIT.Setoid.Indexed
 import QIT.Setoid.Hom
 import QIT.Setoid.Iso
 import QIT.Setoid.Sigma
+import QIT.Setoid.Algebra.Base
+import QIT.Setoid.Algebra.Lift
 import QIT.Setoid
 
-
--- -- Containers
+-- Containers
 import QIT.Container.Base
 import QIT.Container.Functor
 import QIT.Container.Indexed

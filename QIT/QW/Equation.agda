@@ -15,7 +15,7 @@ open import QIT.Functor.Base
 
 module Fᴱ = Functor F
 
-open import QIT.Algebra.Base F as Alg
+open import QIT.Setoid.Algebra.Base F as Alg
 
 -- Expressions over variables V: terms built from V and constructor signature (S,P).
 -- These are W-types over the extended signature (V ⊎ S, Pʰ) where:

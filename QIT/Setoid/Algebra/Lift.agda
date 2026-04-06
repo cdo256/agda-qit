@@ -7,7 +7,7 @@ open import QIT.Prop
 --
 -- The key insight: instead of lifting the carrier, we create an adapter that translates
 -- between the low-level and high-level functor representations while preserving semantics.
-module QIT.Algebra.Lift
+module QIT.Setoid.Algebra.Lift
   {ℓS ℓP : Level} (S : Set ℓS) (P : S → Set ℓP)
   (ℓV : Level)  -- The additional level we need to accommodate
   where
@@ -20,8 +20,8 @@ open import QIT.Functor.Base
 import QIT.Container.Functor S P (ℓS ⊔ ℓP) (ℓS ⊔ ℓP) as FSmall
 import QIT.Container.Functor S P (ℓS ⊔ ℓP ⊔ ℓV) (ℓS ⊔ ℓP ⊔ ℓV) as FBig
 
-import QIT.Algebra.Base FSmall.F as AlgSmall
-import QIT.Algebra.Base FBig.F as AlgBig
+import QIT.Setoid.Algebra.Base FSmall.F as AlgSmall
+import QIT.Setoid.Algebra.Base FBig.F as AlgBig
 
 -- Type aliases for the algebra types
 AlgSmall = AlgSmall.Algebra

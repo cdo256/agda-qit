@@ -14,7 +14,7 @@ open import QIT.Container.Functor S P (ℓS ⊔ ℓP) (ℓS ⊔ ℓP)
 
 module F = Functor F
 
-open import QIT.Algebra.Base F as Alg
+open import QIT.Setoid.Algebra.Base F as Alg
 
 -- Underlying W-type: trees with shapes S and positions P
 T : Set (ℓS ⊔ ℓP)

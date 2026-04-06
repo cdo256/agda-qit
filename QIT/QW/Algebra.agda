@@ -15,7 +15,7 @@ open Sig sig
 open import QIT.Container.Functor S P (ℓS ⊔ ℓP ⊔ ℓV) (ℓS ⊔ ℓP ⊔ ℓV) using (F)
 open import QIT.QW.Equation S P ℓV
 open import QIT.Functor.Base
-open import QIT.Algebra.Base F as AlgBase hiding (Hom; IsInitial)
+open import QIT.Setoid.Algebra.Base F as AlgBase hiding (Hom; IsInitial)
 
 -- A QIT algebra: a container algebra that satisfies the signature equations.
 -- This consists of a setoid with operations (container algebra) plus
