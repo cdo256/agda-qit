@@ -1,7 +1,7 @@
 open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Relation.Subset
-open import QIT.Setoid hiding (_≅_)
+open import QIT.Setoid.Base 
 open import QIT.Relation.Binary
 open import QIT.Relation.Base
 open import QIT.Category.Base
@@ -25,6 +25,11 @@ record Iso (x y : Obj) : Set (ℓCh ⊔ ℓCe) where
     linv : f⁻¹ ∘ f ≈ id
     rinv : f ∘ f⁻¹ ≈ id
 
+IsoFlip : ∀ {x y} → Iso x y → Iso y x
+IsoFlip iso = record { f = f⁻¹ ; f⁻¹ = f ; linv = rinv ; rinv = linv }
+  where
+  open Iso iso
+
 _≅_ : ∀ x y → Prop (ℓCh ⊔ ℓCe)
 x ≅ y = ∥ Iso x y ∥
 
@@ -44,7 +49,7 @@ isEquivalenceIso = record
   ; trans = isTransitive
   }
   where
-  -- Every setoid is isomorphic to itself via identity functions
+  -- Every object is isomorphic to itself via the identity morphism
   isReflexive : Reflexive _≅_
   isReflexive {S} = ∣ p ∣
     where
@@ -65,9 +70,9 @@ isEquivalenceIso = record
     where
     module p = Iso p
     module q = Iso q
-    open ≈.≈syntax {S = hom-setoid}
-    linv : (p.f⁻¹ ∘ q.f⁻¹) ∘ q.f ∘ p.f ≈ id
+    linv : (p.f⁻¹ ∘ q.f⁻¹) ∘ (q.f ∘ p.f) ≈ id
     linv =
+      begin
       (p.f⁻¹ ∘ q.f⁻¹) ∘ (q.f ∘ p.f)
         ≈⟨ assoc ⟩
       p.f⁻¹ ∘ (q.f⁻¹ ∘ (q.f ∘ p.f))
@@ -79,23 +84,28 @@ isEquivalenceIso = record
       p.f⁻¹ ∘ p.f
         ≈⟨ p.linv ⟩
       id ∎
-    rinv : (q.f ∘ p.f) ∘ p.f⁻¹ ∘ q.f⁻¹ ≈ id
-    ring = {!!}
+      where open ≈syntax {S = hom-setoid}
+    rinv : (q.f ∘ p.f) ∘ (p.f⁻¹ ∘ q.f⁻¹) ≈ id
+    rinv =
+      begin
+      (q.f ∘ p.f) ∘ (p.f⁻¹ ∘ q.f⁻¹)
+        ≈⟨ assoc ⟩
+      q.f ∘ (p.f ∘ (p.f⁻¹ ∘ q.f⁻¹))
+        ≈⟨ ∘-resp-≈ʳ sym-assoc ⟩
+      q.f ∘ ((p.f ∘ p.f⁻¹) ∘ q.f⁻¹)
+        ≈⟨ ∘-resp-≈ʳ (∘-resp-≈ˡ p.rinv) ⟩
+      q.f ∘ (id ∘ q.f⁻¹)
+        ≈⟨ ∘-resp-≈ʳ identityˡ ⟩
+      q.f ∘ q.f⁻¹
+        ≈⟨ q.rinv ⟩
+      id ∎
+      where open ≈syntax {S = hom-setoid}
     r : Iso S U
     r = record { f = q.f ∘ p.f ; f⁻¹ = p.f⁻¹ ∘ q.f⁻¹ ; linv = linv ; rinv = rinv }
 
-
---   -- The setoid of setoids: setoids form a setoid under isomorphism
---   IsoSetoid : Setoid (lsuc ℓ ⊔ lsuc ℓ') (ℓ ⊔ ℓ')
---   IsoSetoid = record
---     { Carrier = Setoid ℓ ℓ'
---     ; _≈_ = _≅_
---     ; isEquivalence = isEquivalenceIso
---     }
-
-
--- IsMonic : ∀ {x y} (f : C [ x , y ]) → Prop (ℓCo ⊔ ℓCh ⊔ ℓCe) 
--- IsMonic {x} {y} f = ∀ z (g h : C [ z , x ]) → (f ∘ g) ≈ (f ∘ h) → g ≈ h 
-
--- IsEpic : ∀ {x y} (f : C [ x , y ]) → Prop (ℓCo ⊔ ℓCh ⊔ ℓCe) 
--- IsEpic {x} {y} f = ∀ z (g h : C [ y , z ]) → (g ∘ f) ≈ (h ∘ f) → g ≈ h 
+IsoSetoid : Setoid _ _
+IsoSetoid = record
+  { Carrier = Obj
+  ; _≈_ = _≅_
+  ; isEquivalence = isEquivalenceIso
+  }
