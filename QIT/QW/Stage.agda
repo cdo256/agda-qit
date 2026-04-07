@@ -182,7 +182,7 @@ D = record
   id {α} = ≡.funExt q
     where
     q : (t̃ : D̃ α /≈) → hom ≤p.id t̃ ≡ SetCat.id (λ s̃ → s̃) t̃ 
-    q = quot-elimp λ _ → ≡.refl
+    q = quot-elimp _ λ _ → ≡.refl
 
   comp : ∀ {α β γ} (f : Box (α ≤ β)) (g : Box (β ≤ γ))
        → hom (g ≤p.∘ f) ≡ (hom g SetCat.∘ hom f)
@@ -191,4 +191,4 @@ D = record
     q : (t̃ : D̃ α /≈)
       → hom (box g ≤p.∘ box f) t̃
       ≡ (hom (box g) SetCat.∘ hom (box f)) t̃
-    q = quot-elimp λ _ → ≡.refl
+    q = quot-elimp _ λ _ → ≡.refl

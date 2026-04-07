@@ -11,7 +11,6 @@ import QIT.Prop.Data
 import QIT.Prop.Properties
 import QIT.Prop
 import QIT.Set.Base
-import QIT.Relation.SetQuotient
 
 -- Relations
 import QIT.Relation.Base
@@ -22,8 +21,9 @@ import QIT.Relation.Plump
 import QIT.Relation.Nullary
 import QIT.Relation.WellFounded
 import QIT.Relation.Tests
-import QIT.Relation
 import QIT.Relation.BarInduction
+import QIT.Relation.SetQuotient
+import QIT.Relation
 
 -- Category
 import QIT.Category.Base
