@@ -15,6 +15,7 @@ open import QIT.Container.Base
 open import QIT.Container.StrictFunctor S P (ℓS ⊔ ℓP ⊔ ℓV)
 open import QIT.Setoid
 open import QIT.Relation.Subset
+open import QIT.Relation.SetQuotient
 open import QIT.Relation.Plump S P
 open import QIT.QW.W S P
 open import QIT.Algebra.Base F
@@ -24,15 +25,16 @@ open import QIT.QW.Equation S P ℓV
 open import QIT.Category.Preorder
 open import QIT.Category.Setoid
 open import QIT.Category.Set
+open import QIT.Category.Base
 open import QIT.Functor.Base
 open import QIT.Functor.Composition
 
 -- Diagram is a functor from a preorder category to setoids
-Diagram≈ : ∀ ℓD ℓD' → Set _
+Diagram≈ : ∀ ℓD ℓD' → Set (ℓS ⊔ ℓP ⊔ lsuc ℓD ⊔ lsuc ℓD')
 Diagram≈ ℓD ℓD' = Functor (PreorderCat Z ≤p) (SetoidCat ℓD ℓD')
 
-Diagram : ∀ ℓD ℓD' → Set _
-Diagram ℓD ℓD' = Functor (PreorderCat Z ≤p) (SetCat (ℓD ⊔ ℓD'))
+Diagram/≈ : ∀ ℓD ℓD' → Set (ℓS ⊔ ℓP ⊔ lsuc ℓD ⊔ lsuc ℓD')
+Diagram/≈ ℓD ℓD' = Functor (PreorderCat Z ≤p) (SetCat (ℓD ⊔ ℓD'))
 
 open Box
 
@@ -146,15 +148,47 @@ D̃ α = record
 -- The complete diagram: stages connected by weakening morphisms.
 -- This forms a cocone over the plump ordinal preorder, and the colimit
 -- will give us the final quotient inductive type.
-D : Diagram (ℓS ⊔ ℓP) (ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV)
-D = record
+D≈ : Diagram≈ (ℓS ⊔ ℓP) (ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV)
+D≈ = record
   { ob = D̃
   ; hom = hom
-  ; id = ≡.refl
-  ; comp = λ _ _ → ≡.refl }
-  where
+  ; id = ≈prefl
+  ; comp = λ _ _ → ≈prefl
+  ; resp = λ _ → ≈prefl }
+  module D≈ where
   -- Morphisms are weakening maps preserving equivalence
   hom : ∀ {α β} → Box (α ≤ β) → ≈.Hom (D̃ α) (D̃ β)
   hom {α} {β} (box α≤β) = record
     { to = pweaken α≤β
     ; cong = ≈pweaken α≤β }
+
+D : Diagram/≈ (ℓS ⊔ ℓP) (ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV)
+D = record
+  { ob = λ α → D̃ α /≈
+  ; hom = hom
+  ; id = id
+  ; comp = comp
+  ; resp = λ _ → ≡.refl }
+  where
+  module ≤p = Category (PreorderCat Z ≤p)
+  module SetoidCat = Category (SetoidCat (ℓS ⊔ ℓP) (ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV))
+  module SetCat = Category (SetCat (ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV))
+  open ≡.≡-Reasoning
+  hom : ∀ {α β} → Box (α ≤ β) → (D̃ α /≈) → D̃ β /≈
+  hom {α} {β} (box α≤β) = quot-rec (λ s → [ pweaken α≤β s ])
+    λ s t p → quot-rel (pweaken α≤β s) (pweaken α≤β t) (≈pweaken α≤β p)
+
+  id : ∀ {α} → hom (≤p.id {α}) ≡ SetCat.id λ x → x
+  id {α} = ≡.funExt q
+    where
+    q : (t̃ : D̃ α /≈) → hom ≤p.id t̃ ≡ SetCat.id (λ s̃ → s̃) t̃ 
+    q = quot-elimp λ _ → ≡.refl
+
+  comp : ∀ {α β γ} (f : Box (α ≤ β)) (g : Box (β ≤ γ))
+       → hom (g ≤p.∘ f) ≡ (hom g SetCat.∘ hom f)
+  comp {α} {β} {γ} (box f) (box g) = ≡.funExt q
+    where
+    q : (t̃ : D̃ α /≈)
+      → hom (box g ≤p.∘ box f) t̃
+      ≡ (hom (box g) SetCat.∘ hom (box f)) t̃
+    q = quot-elimp λ _ → ≡.refl
