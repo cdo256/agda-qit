@@ -88,6 +88,9 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
     ; isEquivalence = equiv
     }
 
+  Colim/≈ : Set (ℓI ⊔ ℓD ⊔ ℓD' ⊔ ℓ≤)
+  Colim/≈ = Colim /≈
+
   -- Cocones: setoids equipped with morphisms from each diagram object
   -- that commute with diagram morphisms. These are the "candidates" for
   -- being colimits - they represent ways to "collect" the diagram.

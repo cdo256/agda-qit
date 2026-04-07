@@ -27,8 +27,7 @@ private
 
 -- Container functor
 open import QIT.Container.Base
-open import QIT.Container.Functor S P ℓD ℓD'
-open F-Ob
+open import QIT.Container.StrictFunctor S P (ℓD ⊔ ℓD')
 
 -- Size control and staging
 open import QIT.Relation.Plump S P
@@ -48,32 +47,8 @@ T = W S P
 
 -- Extract the stage index from a colimit element.
 αˡ : ⟨ Colim D ⟩ → Z
-αˡ (α , t , t≤α) = α
+αˡ (α , t̂) = α
 
 -- Extract the underlying tree from a colimit element.
-tˡ : ⟨ Colim D ⟩ → T
-tˡ (α , t , t≤α) = t
-
--- The bounding property: every tree is bounded by its stage.
-t≤αˡ : (x : ⟨ Colim D ⟩) → tˡ x ≤ᵀ αˡ x
-t≤αˡ (α , t , t≤α) = t≤α
-
--- Join two colimit elements that are provably equal at a common upper bound.
--- Uses the standard "zigzag" pattern: step both elements to their join,
--- apply the proof there, then step back down.
-joinTerms : ∀ {x y : ⟨ Colim D ⟩}
-          → αˡ x ∨ᶻ αˡ y ⊢ (tˡ x , ≤≤ ∨ᶻ-l (t≤αˡ x)) ≈ᵇ (tˡ y , ≤≤ ∨ᶻ-r (t≤αˡ y))
-          → Colim D [ x ≈ y ]
-joinTerms {α , s , s≤α} {β , t , t≤β} p =
-  begin
-    (α , s , s≤α)
-      ≈⟨ ≈lstep ∨ᶻ-l (s , _) ⟩
-    (α ∨ᶻ β , (s , _))
-      ≈⟨ ≈lstage _ p ⟩
-    (α ∨ᶻ β , (t , _))
-      ≈⟨ ≈lsym (≈lstep ∨ᶻ-r (t , _)) ⟩
-    (β , t , t≤β) ∎
-  where
-  open ≈.Hom
-  open Setoid (Colim D)
-  open ≈.≈syntax {S = Colim D}
+tˡ : (x : ⟨ Colim D ⟩) → D̃ (αˡ x) /≈
+tˡ (α , t̂) = t̂
