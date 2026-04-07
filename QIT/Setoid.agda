@@ -32,7 +32,8 @@ module QIT.Setoid where
 
 module ≈ where
   open import QIT.Setoid.Base public
+  open import QIT.Setoid.Quotient public
   open import QIT.Setoid.Hom public
   open import QIT.Setoid.Iso public
 
-open ≈ using (Setoid; ⟨_⟩; _/≡; _≈h_; _[_≈_]; _≅_; ≡→≈) public
+open ≈ using (Setoid; ⟨_⟩; _/≡; _/≈; _≈h_; _[_≈_]; _≅_; ≡→≈) public

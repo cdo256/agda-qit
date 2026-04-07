@@ -58,6 +58,7 @@ import QIT.Setoid.Iso
 import QIT.Setoid.Sigma
 import QIT.Setoid.Algebra.Base
 import QIT.Setoid.Algebra.Lift
+import QIT.Setoid.Quotient
 import QIT.Setoid
 
 -- Containers
