@@ -9,7 +9,7 @@ module QIT.Setoid.Quotient where
 
 _/≈ : ∀ {ℓA ℓR} (Ã : Setoid ℓA ℓR) → Set (ℓA ⊔ ℓR)
 Ã /≈ = A Q./ _≈_
-  where 
+  where
   open Setoid Ã renaming (Carrier to A)
 
 module SetoidQuotient {ℓA ℓR} (Ã : Setoid ℓA ℓR) where
@@ -26,6 +26,21 @@ module SetoidQuotient {ℓA ℓR} (Ã : Setoid ℓA ℓR) where
     → (eq : {x y : A} → x ≈ y → f x ≡ f y)
     → Ã /≈ → B
   rec f eq = Q.quot-rec f λ _ _ → eq
+
+  rec₂
+    : ∀ {ℓB} {B : Set ℓB}
+    → (f : A → A → B)
+    → (eq : {x y z w : A} → x ≈ y → z ≈ w → f x z ≡ f y w)
+    → Ã /≈ → Ã /≈ → B
+  rec₂ {B = B} f eq = rec g g-cong
+    where
+    g : A → Ã /≈ → B
+    g x = rec (f x) (eq refl)
+    g-cong : ∀ {x y} → x ≈ y → g x ≡ g y
+    g-cong {x} {y} p =
+      ≡.funExt (Q.quot-elimp
+        (λ z → rec (f x) (eq refl) z ≡ rec (f y) (eq refl) z)
+        (λ a → eq p refl))
 
   elim
     : ∀ {ℓB} (B : Ã /≈ → Set ℓB)
