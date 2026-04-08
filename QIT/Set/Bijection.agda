@@ -24,9 +24,6 @@ module _ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} where
   IsBijection : (f : A → B) → Prop (ℓA ⊔ ℓB)
   IsBijection f = IsInjection f ∧ IsSurjection f
 
-  postulate
-    A!C : ∀ {ℓX} (X : Set ℓX) → isContr X → X
-
   Bijection→Iso : (f : A → B) → IsBijection f → Lift ℓB A ≅ Lift ℓA B
   Bijection→Iso f (inj , surj) = ∣ iso ∣
     where

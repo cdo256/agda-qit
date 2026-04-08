@@ -63,3 +63,6 @@ isContr A = ∃ {A = A} λ x → ∀ y → x ≡ y
 
 isSetSet : ∀ {ℓA} {A : Set ℓA} {x y : A} (p q : x ≡ y) → p ≡ᵖ q
 isSetSet ≡.refl ≡.refl = ≡.refl
+
+postulate
+  A!C : ∀ {ℓX} (X : Set ℓX) → isContr X → X
