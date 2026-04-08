@@ -88,6 +88,9 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
     ; isEquivalence = equiv
     }
 
+  Colim/≈ : Set (ℓI ⊔ ℓD ⊔ ℓD' ⊔ ℓ≤)
+  Colim/≈ = Colim /≈
+
   -- Cocones: setoids equipped with morphisms from each diagram object
   -- that commute with diagram morphisms. These are the "candidates" for
   -- being colimits - they represent ways to "collect" the diagram.
@@ -131,13 +134,13 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
       unique : ∀ C' → (F : ColimMorphism C C')
              → ∀ x̃ → F .apexHom x̃ ≡ hom C' .apexHom x̃
 
-  open isLimitingCocone
-
-  open ≈.Hom
-
   -- Proof that our construction satisfies the universal property
   module IsLimitingCocone (C' : Cocone) where
     module C' = Cocone C'
+
+    open isLimitingCocone
+
+    open ≈.Hom
 
     -- The mediating function: send (i,x) to inj_i(x) in C'
     f₀ : Colim₀ → C'.Apex
@@ -156,7 +159,7 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
       ≡.trans (isRespecting r) (isRespecting s)
 
     f : Colim /≈ → C'.Apex
-    f = quot-rec f₀ isRespecting
+    f = rec f₀ isRespecting
 
     -- The mediating morphism and proof it makes diagrams commute
     F : ColimMorphism LimitCocone C'
@@ -166,7 +169,7 @@ module QIT.QW.Colimit {ℓI} {ℓ≤}
     -- Uniqueness: any morphism must agree with f
     unq : (G : ColimMorphism LimitCocone C') →
           ∀ x̃ → G .apexHom x̃ ≡ f x̃
-    unq G = quot-elimp (λ x̃ → G .apexHom x̃ ≡ f x̃) λ (i , x) → q i x
+    unq G = elimp (λ x̃ → G .apexHom x̃ ≡ f x̃) λ (i , x) → q i x
       where
       q : ∀ i x → G .apexHom [ i , x ] ≡ C'.inj i x
       q i = ≡.funExt⁻ (G .commutes i)
