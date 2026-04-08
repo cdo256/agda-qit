@@ -36,6 +36,15 @@ Diagram≈ ℓD ℓD' = Functor (PreorderCat Z ≤p) (SetoidCat ℓD ℓD')
 Diagram/≈ : ∀ ℓD ℓD' → Set (ℓS ⊔ ℓP ⊔ lsuc ℓD ⊔ lsuc ℓD')
 Diagram/≈ ℓD ℓD' = Functor (PreorderCat Z ≤p) (SetCat (ℓD ⊔ ℓD'))
 
+_^_ : ∀ {ℓD ℓD'} → Diagram/≈ ℓD ℓD' → Set → Diagram/≈ ℓD ℓD'
+D ^ X = record
+  { ob   = λ α → X → D.ob α
+  ; hom  = λ p f x → D.hom p (f x)
+  ; id   = ≡.cong (λ h f x → h (f x)) D.id
+  ; comp = λ f g → ≡.cong (λ h k x → h (k x)) (D.comp f g)
+  ; resp = λ p → ≡.cong (λ h k x → h (k x)) (D.resp p) }
+  where module D = Functor D
+
 open Box
 
 -- Stage α: elements of the underlying W-type bounded by ordinal α.
@@ -181,7 +190,7 @@ D = record
   id : ∀ {α} → hom (≤p.id {α}) ≡ SetCat.id λ x → x
   id {α} = ≡.funExt q
     where
-    q : (t̃ : D̃ α /≈) → hom ≤p.id t̃ ≡ SetCat.id (λ s̃ → s̃) t̃ 
+    q : (t̃ : D̃ α /≈) → hom ≤p.id t̃ ≡ SetCat.id (λ s̃ → s̃) t̃
     q = quot-elimp _ λ _ → ≡.refl
 
   comp : ∀ {α β γ} (f : Box (α ≤ β)) (g : Box (β ≤ γ))
