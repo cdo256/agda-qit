@@ -50,6 +50,17 @@ Z/ = Z̃ /≈
 
 open SetoidQuotient Z̃
 
+-- The sup constructor for the original signature.
+-- This requires AC in general (to choose representatives of the children
+-- in Z/) so we postulate it as an axiom.
+postulate
+  sup/ : ⟦ Sᶻ ◁ Pᶻ ⟧ Z/ → Z/
+  -- Computation rule: sup/ reduces to the quotient injection when all
+  -- children are already representatives.  This is the key axiom that
+  -- connects the postulated sup/ to the underlying W-type constructor,
+  -- and is essential for any elimination principle over ≤/.
+  sup/-beta : ∀ (s : Sᶻ) (ξ : Pᶻ s → Z) → sup/ (s , λ i → [ ξ i ]) ≡ [ W.sup (s , ξ) ]
+
 -- -----------------------------------------------------------------------
 -- Lifted order relations
 --
@@ -75,33 +86,11 @@ _</_ = rec₂ _<_ <-cong
     propExt ((λ α<γ → ≤< γ≤δ (<≤ α<γ β≤α))
            , (λ β<δ → ≤< δ≤γ (<≤ β<δ α≤β)))
 
--- The sup constructor for the original signature.
--- This requires AC in general (to choose representatives of the children
--- in Z/) so we postulate it as an axiom.
-postulate
-  sup/ : ⟦ Sᶻ ◁ Pᶻ ⟧ Z/ → Z/
-
-  -- Computation rule: sup/ reduces to the quotient injection when all
-  -- children are already representatives.  This is the key axiom that
-  -- connects the postulated sup/ to the underlying W-type constructor,
-  -- and is essential for any elimination principle over ≤/.
-  sup/-beta : ∀ (s : Sᶻ) (ξ : Pᶻ s → Z) → sup/ (s , λ i → [ ξ i ]) ≡ [ W.sup (s , ξ) ]
-
 elim≤/ : ∀ {ℓX} (X : Z/ → Z/ → Prop ℓX)
       → ({s : Sᶻ} {f : Pᶻ s → Z/}
          → {α : Z/} (f<α : ∀ i → f i </ α)
          → X (sup/ (s , f)) α)
       → (∀ {α β} → α ≤/ β → X α β)
-
--- Proof strategy: eliminate β then α using nested elimp (both to Prop
--- targets, so no funExt over Prop-domains is needed).
---
--- When β = [b] and α = [W.sup(s, ξ)]:
---   p : [W.sup(s,ξ)] ≤/ [b]  =  W.sup(s,ξ) ≤ b  (by rec₂ rewrite)
---   r f<α : X (sup/ (s, λi → [ξi])) [b]   (r applied to f<α)
---   sup/-beta s ξ : sup/ (s, λi → [ξi]) ≡ [W.sup(s,ξ)]
---   prop-subst transports to X [W.sup(s,ξ)] [b]
--- Note: f<α : ∀ i → ξ i < b  ≡  ∀ i → [ξi] </ [b]  definitionally.
 elim≤/ X r {α} {β} p =
   elimp (λ β → α ≤/ β → X α β)
         (λ b →
@@ -110,14 +99,6 @@ elim≤/ X r {α} {β} p =
                       ≡.prop-subst {B = λ z → X z [ b ]} (sup/-beta s ξ) (r f<α) })
                 α)
         β p
-
-
--- -----------------------------------------------------------------------
--- elim</ : eliminator for the </ relation
---
--- Dual to elim≤/: every α </ β is witnessed by β = sup/(s,f) and some
--- index i with α ≤/ f i.  The proof follows the same pattern as elim≤/.
--- -----------------------------------------------------------------------
 
 elim</ : ∀ {ℓX} (X : Z/ → Z/ → Prop ℓX)
       → ({s : Sᶻ} {f : Pᶻ s → Z/}
@@ -141,7 +122,6 @@ elim</ X r {α} {β} p =
 -- f : Pᶻ s → Z/ (that would require knowing a representative for each
 -- child), so we postulate them as part of the interface of sup/.
 -- -----------------------------------------------------------------------
-
 postulate
   sup≤/ : {s : Sᶻ} {f : Pᶻ s → Z/} {α : Z/}
         → (∀ i → f i </ α)
@@ -174,8 +154,7 @@ postulate
 -- Each proof eliminates all three quotient arguments to representatives
 -- using nested elimp, then applies the corresponding raw Plump lemma
 -- with explicit implicit arguments.  Because no quotient-level mutual
--- recursion occurs (only the already-accepted raw lemmas are called),
--- no {-# TERMINATING #-} pragma is needed.
+-- recursion occurs, no {-# TERMINATING #-} pragma is needed.
 
 -- ≤≤ β≤γ (sup≤ f<β) = sup≤ (λ i → ≤< β≤γ (f<β i))
 ≤≤/ : {α β γ : Z/} → β ≤/ γ → α ≤/ β → α ≤/ γ
@@ -213,112 +192,97 @@ postulate
         α) β α<β
 
 <</ : {α β γ : Z/} → β </ γ → α </ β → α </ γ
-<</ {α = α} {β = β} {γ = γ} β<γ α<β = <≤/    β<γ {!<→≤/  α<β!}
+<</ {α} {β} {γ} β<γ α<β = <≤/  {α} {β} {γ} β<γ (<→≤/ {α} {β} α<β)
 
--- -- -----------------------------------------------------------------------
--- -- Lifted constructors
--- -- -----------------------------------------------------------------------
+-- -----------------------------------------------------------------------
+-- Lifted constructors
+-- -----------------------------------------------------------------------
 
--- -- Bottom element
--- ⊥/ : Z/
--- ⊥/ = [ ⊥ᶻ ]
+-- Bottom element
+⊥/ : Z/
+⊥/ = [ ⊥ᶻ ]
 
--- -- Successor: well-defined since sucᶻ α = sup(∨ˢ, λ _ → α) is
--- -- congruent w.r.t. ≤≥ by ≤≥-cong.
--- suc/ : Z/ → Z/
--- suc/ = rec (λ α → [ sucᶻ α ])
---            (λ α≤≥β → ≈[ ≤≥-cong ∨ˢ _ _ (λ _ → α≤≥β) ])
+_∨ᶻ/_ : {!Z/ → Z/!}
 
--- -- Binary join: well-defined since α ∨ᶻ γ = sup(∨ˢ, [α,γ]) is
--- -- congruent in both arguments by ≤≥-cong.
--- join : Z/ → Z/ → Z/
--- join = rec₂ (λ α β → [ α ∨ᶻ β ])
---             (λ αβ γδ → ≈[ ≤≥-cong ∨ˢ _ _
---               (λ { (lift (inj₁ tt)) → αβ
---                  ; (lift (inj₂ tt)) → γδ }) ])
+-- Successor: well-defined since sucᶻ α = sup(∨ˢ, λ _ → α) is
+-- congruent w.r.t. ≤≥ by ≤≥-cong.
+suc/ : Z/ → Z/
+suc/ = rec (λ α → [ sucᶻ α ])
+           (λ α≤≥β → ≈[ ≤≥-cong ∨ˢ _ _ (λ _ → α≤≥β) ])
 
--- -- Embedding of base trees
--- ι/ : W S P → Z/
--- ι/ t = [ ιᶻ t ]
+-- Binary join: well-defined since α ∨ᶻ γ = sup(∨ˢ, [α,γ]) is
+-- congruent in both arguments by ≤≥-cong.
+join : Z/ → Z/ → Z/
+join = rec₂ (λ α β → [ α ∨ᶻ β ])
+            (λ αβ γδ → ≈[ {!≤≥-cong ∨ˢ _ _
+              (λ { (lift (inj₁ tt)) → αβ
+                 ; (lift (inj₂ tt)) → γδ })!} ])
 
--- -- -----------------------------------------------------------------------
--- -- Axioms for sup/
--- --
--- -- These mirror the sup≤ and <sup constructors for the raw type.
--- -- They cannot be derived without knowing how sup/ acts on elements;
--- -- we postulate them as the interface of the extensional sup.
--- -- -----------------------------------------------------------------------
+-- Embedding of base trees
+ι/ : W S P → Z/
+ι/ t = [ ιᶻ t ]
 
--- postulate
---   sup≤/ : {s : S} {f : P s → Z/} {α : Z/}
---         → (∀ i → f i </ α)
---         → sup/ (s , f) ≤/ α
+-- -----------------------------------------------------------------------
+-- Derived order lemmas involving the lifted constructors
+-- -----------------------------------------------------------------------
 
---   <sup/ : {s : S} {f : P s → Z/} (i : P s) {α : Z/}
---         → α ≤/ f i
---         → α </ sup/ (s , f)
+-- Each child of sup/(s, ξ) is strictly below it.
+child≤/ : (s : Sᶻ) (ξ : Pᶻ s → Z/) (i : Pᶻ s) → ξ i ≤/ sup/ (s , ξ)
+child≤/ s ξ i = <→≤/ {ξ i} {sup/ (s , ξ)} (<sup/ {s} {ξ} i {ξ i} (≤refl/ (ξ i)))
 
--- -- -----------------------------------------------------------------------
--- -- Derived order lemmas involving the lifted constructors
--- -- -----------------------------------------------------------------------
+-- Congruence: pointwise ≤/ implies ≤/ on sup/.
+≤/cong : (s : Sᶻ) (μ τ : Pᶻ s → Z/) → (∀ i → μ i ≤/ τ i) → sup/ (s , μ) ≤/ sup/ (s , τ)
+≤/cong s μ τ r = sup≤/ {s} {μ} {sup/ (s , τ)} (λ i → <sup/ {s} {τ} i {μ i} (r i))
 
--- -- Each child of sup/(s, f) is strictly below it.
--- child≤/ : (s : S) (f : P s → Z/) (i : P s) → f i ≤/ sup/ (s , f)
--- child≤/ s f i = <→≤/ {f i} {sup/ (s , f)} (<sup/ {s} {f} i {f i} (≤refl/ (f i)))
+-- α </ suc/ α (the successor is strictly above α).
+<sucᶻ/ : ∀ α → α </ suc/ α
+<sucᶻ/ = elimp (λ α → α </ suc/ α) <sucᶻ
 
--- -- Congruence: pointwise ≤/ implies ≤/ on sup/.
--- ≤/cong : (s : S) (μ τ : P s → Z/) → (∀ i → μ i ≤/ τ i) → sup/ (s , μ) ≤/ sup/ (s , τ)
--- ≤/cong s μ τ r = sup≤/ {s} {μ} {sup/ (s , τ)} (λ i → <sup/ {s} {τ} i {μ i} (r i))
+-- Helper: α is strictly below any sup/ node with shape s when P s is inhabited.
+<sup/ᶻ : ∀ {s : Sᶻ} (α : Z/) → ∥ Pᶻ s ∥ → α </ sup/ (s , λ _ → α)
+<sup/ᶻ {s} α ∣ i ∣ = <sup/ {s} {λ _ → α} i {α} (≤refl/ α)
 
--- -- α </ suc/ α (the successor is strictly above α).
--- <sucᶻ/ : ∀ α → α </ suc/ α
--- <sucᶻ/ = elimp (λ α → α </ suc/ α) <sucᶻ
+-- Join inequalities
+-- Join inequalities: same opaqueness issue for multi-arg cases;
+-- postulate those, derive the ≤/ ones from <→≤/.
+join-l< : {α β : Z/} → α </ join α β
+join-l< {α} {β} = {!!}
+  where
+  w : α </ sup/ (∨ˢ , {!!})
+  w = <sup/ {!rec-beta!} ≤refl/
+postulate
+  join-r< : {α β : Z/} → β </ join α β
+  join≤/  : {α β γ : Z/} → α </ γ → β </ γ → join α β ≤/ γ
+  join-flip/ : {α β : Z/} → join β α ≤/ join α β
 
--- -- Helper: α is strictly below any sup/ node with shape s when P s is inhabited.
--- <sup/ᶻ : ∀ {s : S} (α : Z/) → ∥ P s ∥ → α </ sup/ (s , λ _ → α)
--- <sup/ᶻ {s} α ∣ i ∣ = <sup/ {s} {λ _ → α} i {α} (≤refl/ α)
+join-l : {α β : Z/} → α ≤/ join α β
+join-l {α} {β} = <→≤/ {α} {join α β} (join-l< {α} {β})
 
--- -- Join inequalities
--- -- Join inequalities: same opaqueness issue for multi-arg cases;
--- -- postulate those, derive the ≤/ ones from <→≤/.
--- join-l< : {α β : Z/} → α </ join α β
--- join-l< {α} {β} = {!!}
---   where
---   w : α </ sup/ ({!∨ˢ!} , {!!})
---   w = <sup/ {!rec-beta!} ≤refl/
--- postulate
---   join-r< : {α β : Z/} → β </ join α β
---   join≤/  : {α β γ : Z/} → α </ γ → β </ γ → join α β ≤/ γ
---   join-flip/ : {α β : Z/} → join β α ≤/ join α β
+join-r : {α β : Z/} → β ≤/ join α β
+join-r {α} {β} = <→≤/ {β} {join α β} (join-r< {α} {β})
 
--- join-l : {α β : Z/} → α ≤/ join α β
--- join-l {α} {β} = <→≤/ {α} {join α β} (join-l< {α} {β})
+-- -----------------------------------------------------------------------
+-- Preorder structure on Z/
+-- -----------------------------------------------------------------------
 
--- join-r : {α β : Z/} → β ≤/ join α β
--- join-r {α} {β} = <→≤/ {β} {join α β} (join-r< {α} {β})
+open import QIT.Relation.Binary using (IsPreorder; Preorder; WellFounded; Acc; WfRec; acc)
 
--- -- -----------------------------------------------------------------------
--- -- Preorder structure on Z/
--- -- -----------------------------------------------------------------------
+isPreorder-≤/ : IsPreorder _≤/_
+isPreorder-≤/ = record
+  { refl  = λ {x} → ≤refl/ x
+  ; trans = λ {x} {y} {z} p q → ≤≤/ {x} {y} {z} q p }
 
--- open import QIT.Relation.Binary using (IsPreorder; Preorder; WellFounded; Acc; WfRec; acc)
+≤p/ : Preorder Z/ _
+≤p/ = _≤/_ , isPreorder-≤/
 
--- isPreorder-≤/ : IsPreorder _≤/_
--- isPreorder-≤/ = record
---   { refl  = λ {x} → ≤refl/ x
---   ; trans = λ {x} {y} {z} p q → ≤≤/ {x} {y} {z} q p }
+-- Well-foundedness of _</_ on Z/.
+-- This requires induction on the quotient type and so is postulated.
+postulate
+  iswf</ : WellFounded _</_
 
--- ≤p/ : Preorder Z/ _
--- ≤p/ = _≤/_ , isPreorder-≤/
+-- -----------------------------------------------------------------------
+-- Effectiveness: the quotient is effective
+-- -----------------------------------------------------------------------
 
--- -- Well-foundedness of _</_ on Z/.
--- -- This requires induction on the quotient type and so is postulated.
--- postulate
---   iswf</ : WellFounded _</_
-
--- -- -----------------------------------------------------------------------
--- -- Effectiveness: the quotient is effective
--- -- -----------------------------------------------------------------------
-
--- effectiveness/ : ∀ α β → [ α ] ≡ [ β ] → α ≤≥ β
--- effectiveness/ = effectiveness
+effectiveness/ : ∀ α β → [ α ] ≡ [ β ] → α ≤≥ β
+effectiveness/ = effectiveness

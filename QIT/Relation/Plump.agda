@@ -141,13 +141,13 @@ mutual
 -- Helper: for any x and any inhabited P s, x is strictly below the
 -- one-node tree with shape ιˢ s and all children equal to x.
 -- This is used when we need "at least one branch exists" to witness <.
-<supᶻ : ∀ {s} x → ∥ P s ∥ → x < sup (ιˢ s , λ _ → x)
-<supᶻ x ∣ α ∣ = <sup α (≤refl x)
+<supᶻ : ∀ {s} β → ∥ P s ∥ → β < sup (ιˢ s , λ _ → β)
+<supᶻ β ∣ α ∣ = <sup α (≤refl β)
 
 -- α is strictly below sucᶻ α because sucᶻ α = sup(∨ˢ, _↦α), and we
 -- witness < using the left child.
 <sucᶻ : ∀ α → α < sucᶻ α
-<sucᶻ = λ α → <sup (lift (inj₁ tt)) (≤refl α)
+<sucᶻ α = <sup (lift (inj₁ tt)) (≤refl α)
 
 -- Lift the order to the base W-type T via the embedding ιᶻ.
 _<ᵀ_ : (W S P) → Z → Prop (ℓS ⊔ ℓP)
