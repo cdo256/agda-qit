@@ -188,9 +188,9 @@ D = record
     λ s t p → quot-rel (pweaken α≤β s) (pweaken α≤β t) (≈pweaken α≤β p)
 
   id : ∀ {α} → hom (≤p.id {α}) ≡ SetCat.id λ x → x
-  id {α} = ≡.funExt q
+  id {α} = q
     where
-    q : (t̃ : D̃ α /≈) → hom ≤p.id t̃ ≡ SetCat.id (λ s̃ → s̃) t̃
+    q : {t̃ : D̃ α /≈} → hom ≤p.id t̃ ≡ SetCat.id (λ s̃ → s̃) t̃
     q = quot-elimp _ λ _ → ≡.refl
 
   comp : ∀ {α β γ} (f : Box (α ≤ β)) (g : Box (β ≤ γ))
