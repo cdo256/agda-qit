@@ -121,13 +121,13 @@ mutual
 -- witnesses.
 mutual
   ≤≤ : {α β γ : Z} → β ≤ γ → α ≤ β → α ≤ γ
-  ≤≤ β≤γ (sup≤ f<α) = sup≤ λ i → ≤< β≤γ (f<α i)
+  ≤≤ β≤γ (sup≤ ξ<β) = sup≤ λ i → ≤< β≤γ (ξ<β i)
 
   ≤< : {α β γ : Z} → β ≤ γ → α < β → α < γ
-  ≤< (sup≤ f<α) (<sup i α≤fi) = <≤ (f<α i) α≤fi
+  ≤< (sup≤ ξ<γ) (<sup i α≤ξi) = <≤ (ξ<γ i) α≤ξi
 
   <≤ : {α β γ : Z} → β < γ → α ≤ β → α < γ
-  <≤ (<sup i α≤fi) α≤β = <sup i (≤≤ α≤fi α≤β)
+  <≤ (<sup i β≤ξi) α≤β = <sup i (≤≤ β≤ξi α≤β)
 
 -- Every strict inequality implies non-strict inequality.
 -- This is a derived lemma and is useful to treat < as giving a ≤-bound.
