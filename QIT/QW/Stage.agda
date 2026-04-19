@@ -19,7 +19,7 @@ open import QIT.Relation.Subset
 open import QIT.Relation.SetQuotient
 open import QIT.Relation.Plump S P
 open import QIT.QW.W S P
-open import QIT.Algebra.Base F
+open import QIT.Algebra F
 open import QIT.Algebra.Lift S P ℓV
 open import Data.Maybe
 open import QIT.QW.Equation S P ℓV

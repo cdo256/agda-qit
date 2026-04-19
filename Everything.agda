@@ -61,9 +61,9 @@ import QIT.Functor.NatTrans
 
 -- Algebra
 import QIT.Algebra.Base
--- import QIT.Algebra.Properties
+import QIT.Algebra.Properties
 import QIT.Algebra.Lift
--- import QIT.Algebra
+import QIT.Algebra
 
 -- Containers
 import QIT.Container.Base
