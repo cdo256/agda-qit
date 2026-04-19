@@ -202,7 +202,7 @@ postulate
 ⊥/ : Z/
 ⊥/ = [ ⊥ᶻ ]
 
-_∨ᶻ/_ : {!Z/ → Z/!}
+_∨ᶻ/_ : Z/ → Z/ → Z/
 
 -- Successor: well-defined since sucᶻ α = sup(∨ˢ, λ _ → α) is
 -- congruent w.r.t. ≤≥ by ≤≥-cong.
