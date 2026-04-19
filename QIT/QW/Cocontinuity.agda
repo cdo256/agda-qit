@@ -11,6 +11,7 @@ open import QIT.Category.Base hiding (_[_≈_]; _[_,_]; _[_∘_])
 open import QIT.Category.Preorder
 open import QIT.Category.Set
 open import QIT.Setoid.Quotient
+open import QIT.Set.Bijection
 open import QIT.QW.Signature
 
 -- Cocontinuous functors preserve colimits: F(colim D) ≅ colim(F ∘ D).
@@ -71,21 +72,21 @@ module PreservationByPowers (X : Set) where
   ϕ : Colim/≈ D^X → (X → Colim/≈ D)
   ϕ f̃ x = ColimD^X.map (Colim D) (λ f → ϕ₀ f x) (λ p → ϕ-cong p x) f̃
 
-  ϕ-inj≈ : ∀ {t̃ ũ} → (∀ x → Colim D [ ϕ₀ t̃ x ≈ ϕ₀ ũ x ]) → Colim D^X [ t̃ ≈ ũ ]
+  ϕ-inj≈ : ∀ {t̃ ũ} → (∀ x → Colim D [ ϕ₀ t̃ x ≈ ϕ₀ ũ x ])
+         → Colim D^X [ t̃ ≈ ũ ]
   ϕ-inj≈ {α , t̂} {β , û} p = {!!}
 
   ϕ-inj : ∀ {t̃ ũ} → (∀ x → ϕ t̃ x ≡ ϕ ũ x) → t̃ ≡ ũ
-  -- Does not unify (as expected)
   ϕ-inj {t̃} {ũ} = {!!}
 
   ϕ-surj≈ : (f : X → Colim/≈ D) → ∃ λ t̃ → ϕ t̃ ≡ f
-  ϕ-surj≈ f = ∣ ({!!} , {!!}) ∣
+  ϕ-surj≈ f = ∣ {!!} , {!!} ∣
 
   ϕ-surj : (f : X → Colim/≈ D) → ∃ λ t̃ → ϕ t̃ ≡ f
   ϕ-surj f = {!!}
 
   lemma : Colim/≈ D^X ≅ (X → Colim/≈ D)
-  lemma = {!Bijection→Iso!}
+  lemma = Bijection→Iso ϕ ((λ p → ϕ-inj (≡.funExt⁻ p)) , ϕ-surj)
 
 -- -- F, D, and F∘D modules are already defined in StageColimit
 

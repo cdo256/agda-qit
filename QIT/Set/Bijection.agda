@@ -11,9 +11,6 @@ open import QIT.Category.Set
 module QIT.Set.Bijection where
 
 module _ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} where
-  open import QIT.Category.Morphism (SetCat (ℓA ⊔ ℓB))
-
-  open Category (SetCat (ℓA ⊔ ℓB))
 
   IsInjection : (f : A → B) → Prop (ℓA ⊔ ℓB)
   IsInjection f = ∀ {x y} → f x ≡ f y → x ≡ y
@@ -24,7 +21,12 @@ module _ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} where
   IsBijection : (f : A → B) → Prop (ℓA ⊔ ℓB)
   IsBijection f = IsInjection f ∧ IsSurjection f
 
-  Bijection→Iso : (f : A → B) → IsBijection f → Lift ℓB A ≅ Lift ℓA B
+module _ {ℓX} {A B : Set ℓX} where
+  open import QIT.Category.Morphism (SetCat ℓX)
+
+  open Category (SetCat ℓX)
+
+  Bijection→Iso : (f : A → B) → IsBijection f → A ≅ B
   Bijection→Iso f (inj , surj) = ∣ iso ∣
     where
     T : B → Set _
@@ -39,9 +41,26 @@ module _ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} where
     f⁻¹ : B → A
     f⁻¹ y = fst (f⁻¹T y)
 
-    iso : Iso (Lift ℓB A) (Lift ℓA B)
+    iso : Iso A B
     iso = record
-      { f    = λ (lift x) → lift (f x)
-      ; f⁻¹  = λ (lift y) → lift (f⁻¹ y)
-      ; linv = λ {x} → ≡.cong lift (inj (snd (f⁻¹T (f (lower x)))))
-      ; rinv = λ {y} → ≡.cong lift ((snd (f⁻¹T (lower y)))) }
+      { f    = f
+      ; f⁻¹  = f⁻¹
+      ; linv = λ {x} → inj (snd (f⁻¹T (f x)))
+      ; rinv = λ {y} → (snd (f⁻¹T y)) }
+
+
+module _ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} where
+  open import QIT.Category.Morphism (SetCat (ℓA ⊔ ℓB))
+
+  open Category (SetCat (ℓA ⊔ ℓB))
+
+  HetBijection→Iso : (f : A → B) → IsBijection f → Lift ℓB A ≅ Lift ℓA B
+  HetBijection→Iso f (inj , surj) = Bijection→Iso f' (inj' , surj')
+    where
+    f' : Lift ℓB A → Lift ℓA B
+    f' (lift x) = lift (f x)
+    inj' : IsInjection f'
+    inj' {lift x} {lift y} p = ≡.cong lift (inj (≡.cong lower p))
+    surj' : IsSurjection f'
+    surj' (lift y) with surj y
+    ... | ∣ x , p ∣ = ∣ lift x , ≡.cong lift p ∣
