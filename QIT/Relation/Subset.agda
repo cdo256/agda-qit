@@ -37,6 +37,10 @@ infixr 4 _,_
 ∃ : ∀ {a b} {A : Set a} → (A → Prop b) → Prop (a ⊔ b)
 ∃ {A = A} B = ∥ ΣP A B ∥
 
+-- Logical existence on predicates.
+∃' : ∀ {a b} {A : Set a} → (A → Set b) → Prop (a ⊔ b)
+∃' {A = A} B = ∥ Σ A B ∥
+
 substΣP : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB} {a1 a2 : A} (p : a1 ≡ a2) (b : B a1) → Σ A B
 substΣP {B = B} {a2 = a2} p b = a2 , subst B p b
 

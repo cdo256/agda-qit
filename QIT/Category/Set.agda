@@ -8,8 +8,8 @@ open import QIT.Category.Strict
 
 module QIT.Category.Set where
 
-SetStrCat : ∀ ℓA → StrictCategory (lsuc ℓA) ℓA
-SetStrCat ℓA = record
+SetCat : ∀ ℓA → Category (lsuc ℓA) ℓA ℓA
+SetCat ℓA = record
   { Obj = Set ℓA
   ; _⇒_ = λ X Y → (X → Y)
   ; id = λ x → x
@@ -19,7 +19,7 @@ SetStrCat ℓA = record
   ; identityˡ = ≡.refl
   ; identityʳ = ≡.refl
   ; identity² = ≡.refl
+  ; _≈_ = _≡h_
+  ; equiv = isEquiv-≡h
+  ; ∘-resp-≈ = ∘-resp-≡h
   }
-
-SetCat : ∀ ℓA → Category (lsuc ℓA) ℓA ℓA
-SetCat ℓA = StrictCategory→Category (SetStrCat ℓA)

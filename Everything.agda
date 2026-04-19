@@ -24,6 +24,7 @@ import QIT.Relation.WellFounded
 import QIT.Relation.Tests
 import QIT.Relation.BarInduction
 import QIT.Relation.SetQuotient
+-- import QIT.Relation.WISC
 import QIT.Relation
 
 -- Category
@@ -60,7 +61,9 @@ import QIT.Functor.NatTrans
 
 -- Algebra
 import QIT.Algebra.Base
+-- import QIT.Algebra.Properties
 import QIT.Algebra.Lift
+-- import QIT.Algebra
 
 -- Containers
 import QIT.Container.Base

@@ -1,9 +1,11 @@
+
 open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Container.Base hiding (sup)
 open import QIT.Category.Base
 open import QIT.Category.Set
-open import QIT.Set.Base
+import QIT.Set.Base as Set
+open Set using (_≡h_) renaming (_∘_ to _∘ₛ_)
 open import QIT.Functor.Base
 
 -- Define algebras over setoid endofunctors. An algebra for a functor F
@@ -30,6 +32,7 @@ record Algebra : Set (lsuc ℓC) where
     -- Structure map: interprets F-structure as elements of X
     α : F.ob X → X
 
+
 -- Homomorphism between F-algebras: a homomorphism of carriers that
 -- commutes with the structure maps. If f : X → Y is an algebra homomorphism,
 -- then f(α(fx)) = β(F(f)(fx)) for all fx : F X.
@@ -41,7 +44,7 @@ record Hom (Xα Yβ : Algebra) : Set (lsuc ℓC) where
     -- Underlying homomorphism between carriers
     hom : X → Y
     -- Commutativity condition: the square commutes
-    comm : ∀ {x} → β (F.hom hom x) ≡ hom (α x)
+    comm : β ∘ₛ F.hom hom ≡h hom ∘ₛ α
 
 -- An initial algebra has a unique homomorphism to every other algebra.
 -- This property characterizes recursive data types: the initial algebra
@@ -54,4 +57,4 @@ record IsInitial (Xα : Algebra) : Set (lsuc ℓC) where
     -- Recursor: unique map to any algebra
     rec : ∀ Yβ → Hom Xα Yβ
     -- Uniqueness: any algebra homomorphism equals the recursor
-    unique : ∀ Yβ → (f : Hom Xα Yβ) → ∀ {x} → f .hom x ≡ rec Yβ .hom x
+    unique : ∀ Yβ → (f : Hom Xα Yβ) → f .hom ≡h rec Yβ .hom

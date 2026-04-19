@@ -20,5 +20,5 @@ F = record
   ; hom = λ g (s , f) → s , (λ z → g (f z))
   ; id = ≡.refl
   ; comp = λ _ _ → ≡.refl
-  ; resp = ≡.cong (λ h (s , z) → s , (λ w → h (z w)))
-  }
+  ; resp = λ {X} {Y} {f} {g} p →
+    λ {(s , h)} → ≡.cong (s ,_) (≡.funExt λ _ → p) }

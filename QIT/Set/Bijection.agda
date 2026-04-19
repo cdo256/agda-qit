@@ -43,5 +43,5 @@ module _ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} where
     iso = record
       { f    = λ (lift x) → lift (f x)
       ; f⁻¹  = λ (lift y) → lift (f⁻¹ y)
-      ; linv = ≡.funExt λ (lift x) → ≡.cong lift (inj (snd (f⁻¹T (f x))))
-      ; rinv = ≡.funExt λ (lift y) → ≡.cong lift (snd (f⁻¹T y)) }
+      ; linv = λ {x} → ≡.cong lift (inj (snd (f⁻¹T (f (lower x)))))
+      ; rinv = λ {y} → ≡.cong lift ((snd (f⁻¹T (lower y)))) }

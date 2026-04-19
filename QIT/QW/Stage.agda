@@ -14,6 +14,7 @@ open import QIT.Relation.Binary
 open import QIT.Container.Base
 open import QIT.Container.StrictFunctor S P (ℓS ⊔ ℓP ⊔ ℓV)
 open import QIT.Setoid
+open import QIT.Set.Base using (_≡h_)
 open import QIT.Relation.Subset
 open import QIT.Relation.SetQuotient
 open import QIT.Relation.Plump S P
@@ -40,9 +41,10 @@ _^_ : ∀ {ℓD ℓD'} → Diagram/≈ ℓD ℓD' → Set → Diagram/≈ ℓD �
 D ^ X = record
   { ob   = λ α → X → D.ob α
   ; hom  = λ p f x → D.hom p (f x)
-  ; id   = ≡.cong (λ h f x → h (f x)) D.id
-  ; comp = λ f g → ≡.cong (λ h k x → h (k x)) (D.comp f g)
-  ; resp = λ p → ≡.cong (λ h k x → h (k x)) (D.resp p) }
+  ; id   = ≡.funExt λ _ → D.id
+  ; comp = λ f g → ≡.funExt λ _ → (D.comp f g)
+  ; resp = λ p → ≡.funExt λ _ → (D.resp p)
+  }
   where module D = Functor D
 
 open Box
@@ -187,15 +189,15 @@ D = record
   hom {α} {β} (box α≤β) = quot-rec (λ s → [ pweaken α≤β s ])
     λ s t p → quot-rel (pweaken α≤β s) (pweaken α≤β t) (≈pweaken α≤β p)
 
-  id : ∀ {α} → hom (≤p.id {α}) ≡ SetCat.id λ x → x
-  id {α} = ≡.funExt q
+  id : ∀ {α} → hom (≤p.id {α}) ≡h SetCat.id
+  id {α} {t̃} = q t̃
     where
-    q : (t̃ : D̃ α /≈) → hom ≤p.id t̃ ≡ SetCat.id (λ s̃ → s̃) t̃
-    q = quot-elimp _ λ _ → ≡.refl
+    q : ∀ t̃ → hom {α} ≤p.id t̃ ≡ SetCat.id {D̃ α /≈} t̃
+    q  = quot-elimp (λ t̃ → hom ≤p.id t̃ ≡ SetCat.id t̃) (λ _ → ≡.refl)
 
   comp : ∀ {α β γ} (f : Box (α ≤ β)) (g : Box (β ≤ γ))
-       → hom (g ≤p.∘ f) ≡ (hom g SetCat.∘ hom f)
-  comp {α} {β} {γ} (box f) (box g) = ≡.funExt q
+       → hom (g ≤p.∘ f) ≡h (hom g SetCat.∘ hom f)
+  comp {α} {β} {γ} (box f) (box g) {t̃} = q t̃
     where
     q : (t̃ : D̃ α /≈)
       → hom (box g ≤p.∘ box f) t̃
