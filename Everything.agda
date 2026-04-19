@@ -11,6 +11,7 @@ import QIT.Prop.Data
 import QIT.Prop.Properties
 import QIT.Prop
 import QIT.Set.Base
+import QIT.Set.Bijection
 
 -- Relations
 import QIT.Relation.Base
@@ -34,6 +35,17 @@ import QIT.Category.Slice
 import QIT.Category.Initial
 import QIT.Category.Terminal
 
+-- Category of Setoids
+import QIT.Setoid.Base
+import QIT.Setoid.Indexed
+import QIT.Setoid.Hom
+import QIT.Setoid.Iso
+import QIT.Setoid.Sigma
+import QIT.Setoid.Algebra.Base
+import QIT.Setoid.Algebra.Lift
+import QIT.Setoid.Quotient
+import QIT.Setoid
+
 -- Specific Categories
 import QIT.Category.Discrete
 import QIT.Category.Preorder
@@ -47,19 +59,8 @@ import QIT.Functor.Composition
 import QIT.Functor.NatTrans
 
 -- Algebra
--- import QIT.Algebra.Base
--- import QIT.Algebra.Lift
-
--- Category of Setoids
-import QIT.Setoid.Base
-import QIT.Setoid.Indexed
-import QIT.Setoid.Hom
-import QIT.Setoid.Iso
-import QIT.Setoid.Sigma
-import QIT.Setoid.Algebra.Base
-import QIT.Setoid.Algebra.Lift
-import QIT.Setoid.Quotient
-import QIT.Setoid
+import QIT.Algebra.Base
+import QIT.Algebra.Lift
 
 -- Containers
 import QIT.Container.Base
@@ -75,42 +76,43 @@ import QIT.QW.Algebra
 import QIT.QW.Stage
 import QIT.QW.StageColimit
 import QIT.QW.Colimit
-import QIT.QW.Cocontinuity
-import QIT.QW
+-- import QIT.QW.Cocontinuity
+-- import QIT.QW
 
--- Mobile construction
-import QIT.Mobile.Base
-import QIT.Mobile.Cocontinuity
+-- -- Mobile construction
+-- import QIT.Mobile.Base
+-- import QIT.Mobile.Cocontinuity
 
--- Extended Type Theories
-import QIT.IIT.Cont1
--- import QIT.IIT.Codes -- incomplete
--- import QIT.QIIT -- very incomplete
+-- -- Extended Type Theories
+-- import QIT.IIT.Cont1
+-- -- import QIT.IIT.Codes -- incomplete
+-- -- import QIT.QIIT -- very incomplete
 
--- Kaposi-Kovacs-Altenkirch Syntax
-import QIT.KKA2019.Syntax
-import QIT.KK2020.Level
--- import QIT.KK2020.Syntax -- incomplete
+-- -- Kaposi-Kovacs-Altenkirch Syntax
+-- import QIT.KKA2019.Syntax
+-- import QIT.KK2020.Level
+-- -- import QIT.KK2020.Syntax -- incomplete
 
--- Examples
--- import QIT.Examples.CauchyReals
-import QIT.Examples.ConTy
-import QIT.Examples.HoleList
-import QIT.Examples.ListBag
-import QIT.Examples.PartialityMonad
-import QIT.Examples.RotTree
-import QIT.Examples.SGL
-import QIT.Examples.T
-import QIT.Examples.Trunc
-import QIT.Examples.WFTree
-import QIT.Examples.Lambda
-import QIT.Examples.Surreal
-import QIT.Examples.PartialityMonad
+-- -- Examples
+-- -- import QIT.Examples.CauchyReals
+-- import QIT.Examples.Plump
+-- import QIT.Examples.ConTy
+-- import QIT.Examples.HoleList
+-- import QIT.Examples.ListBag
+-- import QIT.Examples.PartialityMonad
+-- import QIT.Examples.RotTree
+-- import QIT.Examples.SGL
+-- import QIT.Examples.T
+-- import QIT.Examples.Trunc
+-- import QIT.Examples.WFTree
+-- import QIT.Examples.Lambda
+-- import QIT.Examples.Surreal
+-- import QIT.Examples.PartialityMonad
 
--- Topology
-import QIT.Topology.Base
-import QIT.Topology.BishopReals
-import QIT.Topology.Category
-import QIT.Topology.Constructions
-import QIT.Topology.Examples
-import QIT.Topology.Subset
+-- -- Topology
+-- import QIT.Topology.Base
+-- import QIT.Topology.BishopReals
+-- import QIT.Topology.Category
+-- import QIT.Topology.Constructions
+-- import QIT.Topology.Examples
+-- import QIT.Topology.Subset

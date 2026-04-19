@@ -1,5 +1,5 @@
 open import QIT.Prelude
-open import QIT.Prop
+open import QIT.Prop hiding (_,_)
 open import QIT.Setoid
 open import QIT.Functor.Base
 open import QIT.Category.Set
@@ -19,7 +19,6 @@ F = record
   { ob = ⟦ S ◁ P ⟧
   ; hom = λ g (s , f) → s , (λ z → g (f z))
   ; id = ≡.refl
-  ; comp = λ _ _ → ≡.refl 
-  ; resp = λ {x} {y} {f} {g} p →
-    ≡.cong (λ g (s , f) → s , λ i → g (f i)) p
+  ; comp = λ _ _ → ≡.refl
+  ; resp = ≡.cong (λ h (s , z) → s , (λ w → h (z w)))
   }
