@@ -15,46 +15,24 @@ open Plump public
            ; ≤≤ to ≤≤₀ ; ≤< to ≤<₀ ; <≤ to <≤₀
            ; sup≤ to sup≤₀ ; <sup to <sup₀)
 
-postulate
-  Z : Set (ℓS ⊔ ℓP)
-  _≤_ : Z → Z → Prop (ℓS ⊔ ℓP)
-  _<_ : Z → Z → Prop (ℓS ⊔ ℓP)
+open import QIT.Examples.Plump.Algebra Sᶻ Pᶻ
 
-  sup : ⟦ Sᶻ ◁ Pᶻ ⟧ Z → Z
+postulate
+  Zᴬ : Algebra (ℓS ⊔ ℓP)
+  recʰ : ∀ {ℓX} (Xᴬ : Algebra ℓX) → Hom Zᴬ Xᴬ
+  recʰ-unique : ∀ {ℓX} (Xᴬ : Algebra ℓX) → (fʰ : Hom Zᴬ Xᴬ) → recʰ Xᴬ ≈ʰ fʰ
+
+open Algebra Zᴬ
+module _ {ℓX} (Xᴬ : Algebra ℓX) where
+  open Hom (recʰ Xᴬ) public
+    renaming ( Zʰ to rec; supʰ to rec-β
+             ; <ʰ to rec<; ≤ʰ to rec≤ )
+  {-# REWRITE rec-β #-}
+  module _ (fʰ : Hom Zᴬ Xᴬ) where
+    open _≈ʰ_ (recʰ-unique Xᴬ fʰ) renaming (≈Zʰ to rec-unique)
 
 [_] : Z₀ → Z
 [ W.sup (s , ξ) ] = sup (s , λ i → [ ξ i ])
-
-postulate
-  ≈[_] : ∀ {α β} → α ≤≥₀ β → [ α ] ≡ [ β ]
-  elim
-    : ∀ {ℓB} (B : Z → Set ℓB)
-    → (f : ∀ a → B [ a ])
-    → (eq : {α β : Z₀} → (r : α ≤≥₀ β) → ≡.subst B ≈[ r ] (f α) ≡ f β)
-    → ∀ a → B a
-
-elimp
-  : ∀ {ℓB} (B : Z → Prop ℓB)
-  → (f : ∀ a → B [ a ])
-  → ∀ a → B a
-elimp B f a =
-  unbox (elim (λ α → Box (B α))
-        (λ α → box (f α)) (λ _ → ≡.refl) a)
-
-rec
-  : ∀ {ℓB} {B : Set ℓB}
-  → (f : Z₀ → B)
-  → (eq : {α β : Z₀} → α ≤≥₀ β → f α ≡ f β)
-  → Z → B
-rec {B = B} = elim λ _ → B
-
-recp
-  : ∀ {ℓB} (B : Prop ℓB)
-  → (f : Z₀ → B)
-  → Z → B
-recp B f a =
-  unbox (rec (λ α → box (f α))
-        (λ _ → ≡.refl) a)
 
 postulate
   elim≤ : ∀ {ℓB} (B : Z → Prop ℓB) {β : Z}
@@ -68,32 +46,11 @@ postulate
           → B (sup (s , ξ)))
         → (∀ {β} → α < β → B β)
 
-  sup≤ : {s : Sᶻ} {f : Pᶻ s → Z} {α : Z}
-        → (∀ i → f i < α)
-        → sup (s , f) ≤ α
-  <sup : {s : Sᶻ} {f : Pᶻ s → Z}
-        → (i : Pᶻ s) → {α : Z}
-        → α ≤ f i
-        → α < sup (s , f)
-
-≤refl : ∀ α → α ≤ α
-≤refl = elimp (λ α → α ≤ α) f
-  where
-  f : ∀ α → [ α ] ≤ [ α ]
-  f (W.sup (s , ξ)) = sup≤ λ i → <sup i (f (ξ i))
-
 <[_] : ∀ {α β} → α <₀ β → [ α ] < [ β ]
 ≤[_] : ∀ {α β} → α ≤₀ β → [ α ] ≤ [ β ]
 
 <[_] {α} {W.sup (s , ξ)} (<sup₀ i α≤ξi) = <sup i ≤[ α≤ξi ]
 ≤[_] {W.sup (s , ξ)} {β} (sup≤₀ ξ<α) = sup≤ (λ i → <[ ξ<α i ])
-
-postulate
-  ≤≤ : {α β γ : Z} → β ≤ γ → α ≤ β → α ≤ γ
-  ≤< : {α β γ : Z} → β ≤ γ → α < β → α < γ
-  <≤ : {α β γ : Z} → β < γ → α ≤ β → α < γ
-  << : {α β γ : Z} → β < γ → α < β → α < γ
-  <→≤ : {α β : Z} → α < β → α ≤ β
 
 -- Bottom element
 ⊥ᶻ : Z
@@ -150,7 +107,3 @@ isPreorder-≤ = record
 
 ≤p : Preorder Z _
 ≤p = _≤_ , isPreorder-≤
-
--- Well-foundedness of _<_ on Z.
-postulate
-  iswf< : WellFounded _<_

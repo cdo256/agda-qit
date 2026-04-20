@@ -99,7 +99,7 @@ import QIT.QW.Colimit
 
 -- -- Examples
 -- -- import QIT.Examples.CauchyReals
--- import QIT.Examples.Plump
+import QIT.Examples.Plump.Postulated
 -- import QIT.Examples.ConTy
 -- import QIT.Examples.HoleList
 -- import QIT.Examples.ListBag
