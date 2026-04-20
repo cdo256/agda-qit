@@ -3,6 +3,7 @@
 open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Container.Base
+open import Data.Nat.Base hiding (_⊔_)
 
 module QIT.Container.Properties where
 
@@ -24,6 +25,14 @@ module _ {ℓS ℓP} {S : Set ℓS} {P : S → Set ℓP} where
   data Path : W S P → Set (ℓS ⊔ ℓP) where
     here : ∀ x → Path x
     there : ∀ s f i → Path (f i) → Path (sup (s , f))
+
+  pathLength : ∀ {x} → Path x → ℕ
+  pathLength (here _) = 0
+  pathLength (there _ _ _ p) = suc (pathLength p)
+
+  pathLookup : ∀ {x} → Path x → W S P
+  pathLookup (here x) = x
+  pathLookup (there _ _ _ p) = pathLookup p
 
   recPath : ∀ {ℓA} (A : W S P → Set ℓA)
           → (rh : ∀ x → A x)

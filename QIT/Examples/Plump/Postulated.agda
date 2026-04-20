@@ -20,16 +20,18 @@ open import QIT.Examples.Plump.Algebra Sᶻ Pᶻ
 postulate
   Zᴬ : Algebra (ℓS ⊔ ℓP)
   recʰ : ∀ {ℓX} (Xᴬ : Algebra ℓX) → Hom Zᴬ Xᴬ
-  recʰ-unique : ∀ {ℓX} (Xᴬ : Algebra ℓX) → (fʰ : Hom Zᴬ Xᴬ) → recʰ Xᴬ ≈ʰ fʰ
+  recʰ-unique : ∀ {ℓX} (Xᴬ : Algebra ℓX)
+              → (fʰ : Hom Zᴬ Xᴬ) → recʰ Xᴬ ≈ʰ fʰ
 
-open Algebra Zᴬ
+open Algebra Zᴬ public
 module _ {ℓX} (Xᴬ : Algebra ℓX) where
   open Hom (recʰ Xᴬ) public
-    renaming ( Zʰ to rec; supʰ to rec-β
-             ; <ʰ to rec<; ≤ʰ to rec≤ )
+    renaming ( Zʰ to rec ; supʰ to rec-β
+             ; <ʰ to rec< ; ≤ʰ to rec≤ )
   {-# REWRITE rec-β #-}
   module _ (fʰ : Hom Zᴬ Xᴬ) where
-    open _≈ʰ_ (recʰ-unique Xᴬ fʰ) renaming (≈Zʰ to rec-unique)
+    open _≈ʰ_ (recʰ-unique Xᴬ fʰ)
+      renaming (≈Zʰ to rec-unique)
 
 [_] : Z₀ → Z
 [ W.sup (s , ξ) ] = sup (s , λ i → [ ξ i ])
