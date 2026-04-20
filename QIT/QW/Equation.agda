@@ -8,6 +8,7 @@ open import QIT.Prop
 module QIT.QW.Equation {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) (ℓV : Level) where
 
 open import QIT.Container.Base
+open import QIT.Container.Properties
 open import QIT.Container.StrictFunctor S P (ℓS ⊔ ℓP ⊔ ℓV)
 open import QIT.Setoid
 open import QIT.QW.W S P

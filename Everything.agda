@@ -80,7 +80,7 @@ import QIT.QW.Algebra
 import QIT.QW.Stage
 import QIT.QW.StageColimit
 import QIT.QW.Colimit
-import QIT.QW.Cocontinuity
+-- import QIT.QW.Cocontinuity
 -- import QIT.QW
 
 -- -- Mobile construction
