@@ -56,6 +56,8 @@ understood. In particular, it is unclear which features of a QIT
 genuinely require choice, and which arise from limitations of existing
 proof techniques.
 
+% TODO: Rewrite
+
 In this work we isolate two structural properties of quotient systems
 that explains this distinction: \emph{locality} and the tighter property
 of \emph{depth-delta}. Intuitively, locality measures how deeply one
@@ -72,23 +74,6 @@ doesn't change the subtree relation, we can say that it is in a class of
 depth-preserving QW types, along with the classical definition of
 multi-sets as a QW type over a list.
 
-Our key observation is that this boundedness of inspection depth is
-exactly what is needed to recover the Fiore--Pitts--Steenkamp
-construction constructively. We sketch a proof that for QW signatures
-whose equations are bounded by a fixed ordinal \(\alpha\), cocontinuity
-of the associated polynomial functor can be proved without any appeal to
-any choice principle. As a consequence, we obtain a fully constructive
-construction of infinite mobiles as an initial QIT, contrary to previous
-expectations, which we have formalized in Agda
-\cite{vezzosi2021-cubical-agda-dependently}.
-
-This leads to our central research question:
-
-\begin{quote}
-	Which quotient-W types can be constructed fully constructively, without
-	assuming any form of choice?
-\end{quote}
-
 We propose bounded locality as a criterion separating constructible QITs
 from genuinely non-constructive ones, and we develop a framework for
 expressing and exploiting this boundedness in the construction of
@@ -97,20 +82,7 @@ initial QW-algebras.
 
 \section{Motivation (R2)}\label{motivation}
 
-Quotient Inductive Types (QITs) are a central mechanism for specifying
-datatypes equipped with identifications in set-truncated Homotopy Type
-Theory \cite{hott2013-book}. They support a wide range of fundamental
-constructions, including the HoTT reals \cite{hott2013-book}, partiality
-monads \cite{altenkirch2017-partiality-monad}, and ordinal-like
-structures \footnote{TODO: Citaiton}.
-
-Despite their expressive power, QITs present significant foundational
-difficulties. Shulman and Lumsdaine established a no-go theorem showing
-that certain QITs, including Brower's standard definition of the countable
-ordinals, cannot be constructed using quotients alone
-\cite{lumsdaine2020-semantics-higher-inductive}. This suggests that some
-form of infinitary principle or choice is unavoidable in a constructive
-metatheory, at least in the general case.
+%TODO: Change
 
 Fiore, Pitts, and Steenkamp subsequently showed that a broad class of
 QITs, which they call Quotient-W Types (QW types), admit an Initial
@@ -147,26 +119,9 @@ class of QITs can be exhibited constructively.
 %TODO: Define WISC?
 
 
-\section{Introduction (R3)}
-
-Quotient inductive types (QITs) were introduced as a set-level
-fragment of higher inductive types suitable for internalising syntax
-in type theory~\cite{altenkirch2016-qit}. In a UIP or set-truncated
-setting, the higher structure collapses, but the idea of specifying
-data together with identifications remains, leading to quotient
-inductive types with initial-algebra semantics and elimination by
-initiality rather than by quotienting raw syntax
-afterwards~\cite{altenkirch2018-qiit,kaposi2019-constructing,kovacs2020-large}. This
-talk focuses on a basic obstruction in that picture: although a QIT
-may at first seem to be just an ordinary inductive type quotiented by
-equations, extensional quotienting forgets information that
-constructors may still need. This tension becomes especially visible
-in the infinitary case, where known general constructions appeal to
-weak choice principles. Using a simple running example, I explain why
-this happens and why weak quotients and setoid-style presentations
-suggest a different constructive moral.
-
 \section{Background (R1)}\label{background}
+
+%NOTE: Use as buffer based on word-count to fill remaining words.
 
 We briefly recall the framework of quotient-W types introduced by Fiore,
 Pitts, and Steenkamp \cite{fiore2022-quotients-inductive-types}. A QW
@@ -232,7 +187,7 @@ path constructors, making it much simpler than the other 'hard' cases we
 surveyed, while still being considered as challenging from a constructability
 standpoint.
 
-We define *mobiles* as well-founded trees quotiented by permutation at each
+We define \emph{mobiles} as well-founded trees quotiented by permutation at each
 level. (TODO: Figures). Specifically,
 
 $$
@@ -249,20 +204,6 @@ branching index set $I$ and $\mathsf{Mobile}$'s. This has a clean, natural
 presentation that fits in three lines, unlike others which require auxillary
 data types, or stronger recursion semantics. %TODO: Terminology?
 
-
-\section{Case Study: Infinite Mobiles (R1)}\label{case-study-infinite-mobiles}
-
-Our formalisation in Agda proves that in the case of mobiles, the
-defining equations are provably \emph{depth-preserving}, since all
-variables on the left appear at the same depth on the right. This is
-enough to show that depth is preserved in the quotient type, and that if
-two terms are equal then they can be proven in the stage bounded by
-either ordinal.
-
-As a result, the main theorem yields a fully constructive construction
-of infinite mobiles as an initial QIT. This provides a concrete example
-of a genuinely infinitary quotient type that does \emph{not} require
-choice, contrary to previous assumptions.
 
 \section{Main Idea (R2)}\label{main-idea}
 
@@ -337,7 +278,6 @@ appeal to choice.
 %cones, yielding cocontinuity without choice.
 
 
-
 \section{Constructing QITs (R3)}
 
 A quotient inductive type is not
@@ -357,47 +297,6 @@ Altenkirch, Capriotti, Dijkstra, Kraus and Nordvall
 Forsberg~\cite{altenkirch2018-qiit}, and later extended to finitary and
 large/infinitary signature languages by Kaposi, Kov\'acs and
 collaborators~\cite{kaposi2019-constructing,kovacs2020-large}.
-
-\section{The lifting problem (R3)}
-
-The central example of the talk is the type of \emph{mobiles}: countably
-branching trees in which permuting the children does not change the
-resulting element. Writing $M$ for the desired quotient type, one may
-present it schematically by constructors
-\[
-\ell : M,
-\qquad
-n : (\mathbb{N}\to M)\to M,
-\qquad
-\mathsf{perm}_\pi(f) : n(f\circ \pi)=n(f)
-\]
-for each permutation $\pi : \mathrm{Perm}(\mathbb{N})$.
-
-The naive construction starts from the raw $W$-type $W$ of ordered
-countably branching trees and forms a quotient $W/{\sim}$ by the
-permutation equations. At first glance this looks exactly right. But the
-problem appears as soon as we ask for the constructor on the quotient.
-The leaf constructor lifts immediately by sending $\ell_W$ to its
-equivalence class. For the node constructor, however, we would need to
-define
-\[
-n_{\sim} : (W/\sim)^{\mathbb{N}} \to W/\sim.
-\]
-The obvious route is: given a family of quotient elements, choose a raw
-tree representing each one, apply the raw constructor in $W$, and then
-quotient again. But this requires choosing representatives.
-
-This is the basic lifting problem:
-
-\begin{quote}
-a quotient gives equivalence classes, but a constructor wants
-representatives.
-\end{quote}
-
-That is the conceptual centre of the talk. It explains why quotient
-classes alone are not enough: a QIT must still support elimination, and
-that means the constructors must be well defined on quotient elements,
-not just on chosen representatives.
 
 
 \section{Locality Principle (R1)}\label{locality-principle}
@@ -470,44 +369,6 @@ non-constructivity in inductive definitions.
 Future directions include formalising the locality theorem stated above,
 and extending the analysis to indexed QW types
 \cite{altenkirch2018-quotient-inductive-inductive}.
-
-
-\section{Conclusion (R2)}\label{conclusion}
-
-We identify bounded locality as a structural criterion characterising
-which quotient-W types admit fully constructive constructions. This
-explains when choice principles such as WISC are genuinely necessary,
-and when they can be avoided. Our results show that many infinitary
-quotients previously thought to require choice are, in fact,
-constructible in a purely constructive setting.
-
-Our work builds on the QW framework of Fiore, Pitts, and Steenkamp
-\cite{fiore2022-quotients-inductive-types}, and complements the no-go
-results of Shulman and Lumsdaine
-\cite{lumsdaine2020-semantics-higher-inductive}. It is also related to
-Pitts and Steenkamp's notion of infinitary inflation
-\cite{steenkamp2021-phd-thesis}, which similarly isolates sources of
-non-constructivity in inductive definitions.
-
-Future directions include formalising the locality theorem stated above,
-and extending the analysis to indexed QW types
-\cite{altenkirch2018-quotient-inductive-inductive}.
-
-
-\section{Conclusion (R3)}
-
-The aim of the talk is not to present a completed new construction,
-but to sharpen the conceptual picture. Using mobiles as a simple
-infinitary example, I argue that quotient inductive types are
-difficult because extensional quotients erase witness data and then
-require something choice-like when that data must later be
-recovered. The stagewise construction of Fiore, Pitts and Steenkamp
-shows how far this can be repaired using weak choice, while weak
-quotients suggest a different constructive moral: do not forget the
-witness data too early. The price, however, is that dependent type
-theory must then carry coherent transport explicitly. In this sense,
-the real issue is not whether we quotient, but what information our
-notion of equality is allowed to forget.
 
 
 \begin{thebibliography}{10}
