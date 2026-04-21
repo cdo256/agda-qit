@@ -16,8 +16,8 @@ open import QIT.Container.StrictFunctor S P (ℓS ⊔ ℓP ⊔ ℓV)
 open import QIT.Setoid
 open import QIT.Set.Base using (_≡h_)
 open import QIT.Relation.Subset
-open import QIT.Relation.SetQuotient
-open import QIT.Relation.Plump S P
+open import QIT.Relation.SetQuotient as SQ
+open import QIT.Plump.Postulated S P as Z
 open import QIT.QW.W S P
 open import QIT.Algebra F
 open import QIT.Algebra.Lift S P ℓV
@@ -29,6 +29,8 @@ open import QIT.Category.Set
 open import QIT.Category.Base
 open import QIT.Functor.Base
 open import QIT.Functor.Composition
+
+open Z hiding (sup)
 
 -- Diagram is a functor from a preorder category to setoids
 Diagram≈ : ∀ ℓD ℓD' → Set (ℓS ⊔ ℓP ⊔ lsuc ℓD ⊔ lsuc ℓD')
@@ -56,23 +58,13 @@ D₀ α = ΣP T (_≤ᵀ α)
 
 -- Constructor for stage elements: build a tree with given shape and children.
 -- The ordinal bound is computed from the children's bounds using plump structure.
-psup : ∀ a μ (f : ∀ i → D₀ (μ i)) → D₀ (sup (ιˢ a , μ))
-psup a μ f = sup (a , λ i → ⟨ f i ⟩ᴾ) , sup≤ (λ i → <sup i (f i .snd))
+psup : ∀ a μ (f : ∀ i → D₀ (μ i)) → D₀ (Z.sup (ιˢ a , μ))
+psup a μ f = W.sup (a , λ i → ⟨ f i ⟩ᴾ) , sup≤ (λ i → <sup i (f i .snd))
 
 -- Weakening: if α ≤ β then stage α embeds into stage β.
 -- This gives the morphisms in our diagram of stages.
 pweaken : ∀ {α β} → α ≤ β → D₀ α → D₀ β
 pweaken α≤β (t , t≤α) = t , ≤≤ α≤β t≤α
-
--- Ordinal complexity of expressions: measures the "depth" needed to satisfy equations.
--- Variables have minimal complexity ⊥ᶻ, constructors have complexity based on arguments.
-ιᵉ : {V : Set ℓV} → Expr V → Z
-ιᵉ (varᴱ v) = ⊥ᶻ
-ιᵉ (supᴱ s f) = sup (ιˢ s , λ i → ιᵉ (f i))
-
--- Expression-ordinal comparison: when an expression fits within a stage.
-_≤ᴱ_ : {V : Set ℓV} → Expr V → Z → Prop (ℓS ⊔ ℓP)
-t ≤ᴱ α = ιᵉ t ≤ α
 
 -- Interpretation of equation sides as W-type elements.
 -- These functions evaluate expressions in the underlying W-type T.
@@ -99,7 +91,7 @@ data _⊢_≈ᵇ_ : (α : Z) → D₀ α → D₀ α → Prop (ℓS ⊔ ℓP ⊔
   -- Congruence: constructor applications respect equivalence
   ≈pcong : ∀ a μ (f g : ∀ i → D₀ (μ i))
         → (r : ∀ i → μ i ⊢ f i ≈ᵇ g i)
-        → sup (ιˢ a , μ) ⊢ psup a μ f ≈ᵇ psup a μ g
+        → Z.sup (ιˢ a , μ) ⊢ psup a μ f ≈ᵇ psup a μ g
 
   -- Equation satisfaction: enforce the equations from the signature
   ≈psat : ∀ {α} (e : E) (ϕ : Assignment T-alg* (Ξ e))
@@ -186,7 +178,7 @@ D = record
   module SetCat = Category (SetCat (ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV))
   open ≡.≡-Reasoning
   hom : ∀ {α β} → Box (α ≤ β) → (D̃ α /≈) → D̃ β /≈
-  hom {α} {β} (box α≤β) = quot-rec (λ s → [ pweaken α≤β s ])
+  hom {α} {β} (box α≤β) = quot-rec (λ s → SQ.[ pweaken α≤β s ])
     λ s t p → quot-rel (pweaken α≤β s) (pweaken α≤β t) (≈pweaken α≤β p)
 
   id : ∀ {α} → hom (≤p.id {α}) ≡h SetCat.id

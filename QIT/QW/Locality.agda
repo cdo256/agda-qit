@@ -13,15 +13,9 @@ open import QIT.Container.StrictFunctor S P (ℓS ⊔ ℓP ⊔ ℓV)
 open import QIT.Setoid
 open import QIT.QW.W S P
 open import QIT.QW.Equation S P ℓV
+open import QIT.QW.Stage sig
 open import QIT.Functor.Base
-open import QIT.Examples.Plump.Postulated S P as Z
-
-expr→Z : {V : Set ℓV} → Expr V → Z
-expr→Z (W.sup (inj₁ v , f)) = ⊥ᶻ
-expr→Z (W.sup (inj₂ s , f)) = Z.sup (ιˢ s , λ i → expr→Z (f i))
-
-_≤ᴱ_ : {V : Set ℓV} → Expr V → Z → Prop (ℓS ⊔ ℓP)
-e ≤ᴱ α = expr→Z e Z.≤ α
+open import QIT.Plump.Postulated S P as Z
 
 record OccurrenceAtDepth {V : Set ℓV} (v : V) (e : Expr V) (n : ℕ) : Set (ℓS ⊔ ℓP ⊔ ℓV) where
   field
@@ -45,3 +39,23 @@ LocalEquation : (E : Equation) → (α : Z) → Prop (ℓS ⊔ ℓP)
 LocalEquation E α = E.lhs ≤ᴱ α ∧ E.rhs ≤ᴱ α
   where
   module E = Equation E
+
+DepthPreservingSig : Prop (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV)
+DepthPreservingSig = ∀ (e : E) → DepthPreservingEquation (Ξ e)
+
+DepthPreserving : Prop (ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV)
+DepthPreserving = ∀ {α ŝ t̂} → α ⊢ ŝ ≈ᵇ t̂ → ιᶻ (ŝ .fst) ≡ ιᶻ (t̂ .fst)
+
+
+DPSig→DP : DepthPreservingSig → DepthPreserving
+DPSig→DP dp (≈pcong a μ f g r) =
+  ≡.cong (λ ○ → Z.sup (ιˢ a , ○)) (≡.funExt λ i → DPSig→DP dp (r i))
+DPSig→DP dp (≈psat e ϕ l≤α r≤α) = {!!}
+  where
+  open DepthPreservingEquation (dp e)
+  l≤r : ιᶻ (lhs' e ϕ) Z.≤ ιᶻ (rhs' e ϕ)
+
+DPSig→DP dp ≈prefl = ≡.refl
+DPSig→DP dp (≈psym p) = ≡.sym (DPSig→DP dp p)
+DPSig→DP dp (≈ptrans p q) = ≡.trans (DPSig→DP dp p) (DPSig→DP dp q)
+DPSig→DP dp (≈pweaken α≤β p) = DPSig→DP dp p

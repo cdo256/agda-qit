@@ -13,6 +13,9 @@ open import QIT.Container.StrictFunctor S P (ℓS ⊔ ℓP ⊔ ℓV)
 open import QIT.Setoid
 open import QIT.QW.W S P
 open import QIT.Functor.Base
+import QIT.Plump.Postulated S P as Z
+
+open Z using (Z; ⊥ᶻ; ιˢ)
 
 module Fᴱ = Functor F
 
@@ -59,6 +62,15 @@ record Equation : Set (lsuc ℓV ⊔ ℓS ⊔ ℓP) where
     -- Right-hand side expression
     rhs : Expr V
 
+-- Ordinal complexity of expressions: measures the "depth" needed to satisfy equations.
+-- Variables have minimal complexity ⊥ᶻ, constructors have complexity based on arguments.
+ιᵉ : {V : Set ℓV} → Expr V → Z
+ιᵉ (varᴱ v) = ⊥ᶻ
+ιᵉ (supᴱ s f) = Z.sup (ιˢ s , λ i → ιᵉ (f i))
+
+-- Expression-ordinal comparison: when an expression fits within a stage.
+_≤ᴱ_ : {V : Set ℓV} → Expr V → Z → Prop (ℓS ⊔ ℓP)
+t ≤ᴱ α = ιᵉ t Z.≤ α
 
 -- Equation satisfaction in a given algebra.
 -- An algebra satisfies an equation if the lhs and rhs evaluate to
