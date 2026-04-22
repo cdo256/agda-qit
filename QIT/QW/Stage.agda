@@ -39,8 +39,8 @@ Diagram≈ ℓD ℓD' = Functor (PreorderCat Z ≤p) (SetoidCat ℓD ℓD')
 Diagram/≈ : ∀ ℓD ℓD' → Set (ℓS ⊔ ℓP ⊔ lsuc ℓD ⊔ lsuc ℓD')
 Diagram/≈ ℓD ℓD' = Functor (PreorderCat Z ≤p) (SetCat (ℓD ⊔ ℓD'))
 
-_^_ : ∀ {ℓD ℓD'} → Diagram/≈ ℓD ℓD' → Set → Diagram/≈ ℓD ℓD'
-D ^ X = record
+Power : ∀ {ℓD ℓD' ℓX} → Diagram/≈ ℓD ℓD' → Set ℓX → Diagram/≈ (ℓD ⊔ ℓX) ℓD'
+Power D X = record
   { ob   = λ α → X → D.ob α
   ; hom  = λ p f x → D.hom p (f x)
   ; id   = ≡.funExt λ _ → D.id
@@ -147,6 +147,9 @@ D̃ α = record
     { refl = ≈prefl
     ; sym = ≈psym
     ; trans = ≈ptrans } }
+  module _ where
+  module D̃ = ≈.SetoidQuotient (D̃ α)
+  
 
 -- The complete diagram: stages connected by weakening morphisms.
 -- This forms a cocone over the plump ordinal preorder, and the colimit
@@ -172,7 +175,7 @@ D = record
   ; id = id
   ; comp = comp
   ; resp = λ _ → ≡.refl }
-  where
+  module D/≈ where
   module ≤p = Category (PreorderCat Z ≤p)
   module SetoidCat = Category (SetoidCat (ℓS ⊔ ℓP) (ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV))
   module SetCat = Category (SetCat (ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV))

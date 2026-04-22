@@ -32,7 +32,7 @@ open import QIT.Container.StrictFunctor S P (ℓD ⊔ ℓD')
 open import QIT.Category.Morphism (SetCat (ℓD ⊔ ℓD'))
 
 -- Size control and staging
-open import QIT.Relation.Plump S P
+open import QIT.Plump.Postulated S P as Z
 open import QIT.QW.Stage sig
 open import QIT.QW.Algebra sig
 open import QIT.QW.StageColimit sig
@@ -56,13 +56,124 @@ module ColimF∘D = SetoidQuotient (Colim (F ∘ D))
 module ColimD = SetoidQuotient (Colim D)
 module Ob = Functor F
 
-module PreservationByPowers (X : Set) where
+-- -- Tree compatibility relation based on ordinal bounds.
+-- _~ᵀ_ : ∀ (s t : T) → Prop _
+-- s ~ᵀ t = ιᶻ s ≤≥ ιᶻ t
+-- 
+-- -- Strong equivalence between trees: ordinal compatibility plus provable equality.
+-- module ≈s where
+--   record _≈ˢ_ (s t : T) : Prop (ℓS ⊔ ℓP ⊔ lsuc ℓV ⊔ ℓE) where
+--     constructor mk≈ˢ
+--     field
+--       s~t : s ~ᵀ t
+--       s≈t : ιᶻ s ⊢ s , ≤refl (ιᶻ s) ≈ᵇ t , s~t .∧.snd
+--   open _≈ˢ_ public
+-- open ≈s hiding (s~t; s≈t)
+-- 
+-- ≈srefl : ∀ {s} → s ≈ˢ s
+-- ≈srefl {s} = mk≈ˢ ≤≥-refl ≈prefl
+-- 
+-- ≈ssym : ∀ {s t} → s ≈ˢ t → t ≈ˢ s
+-- ≈ssym (mk≈ˢ s~ᵀt s≈t) = mk≈ˢ (≤≥-sym s~ᵀt) (≈psym (≈pweaken (s~ᵀt .∧.fst) s≈t))
+-- 
+-- ≈strans : ∀ {s t u} → s ≈ˢ t → t ≈ˢ u → s ≈ˢ u
+-- ≈strans (mk≈ˢ s~ᵀt s≈t) (mk≈ˢ t~ᵀu t≈u) =
+--   mk≈ˢ (≤≥-trans s~ᵀt t~ᵀu) (≈ptrans s≈t (≈pweaken (s~ᵀt .∧.snd) t≈u))
+-- 
+-- ≈scong : ∀ a (f g : ∀ i → T)
+--        → (r : ∀ i → f i ≈ˢ g i)
+--        → sup (a , f) ≈ˢ sup (a , g)
+-- ≈scong a f g r = mk≈ˢ (≤≥-cong (ιˢ a) (λ α → ιᶻ (f α)) (λ α → ιᶻ (g α)) λ i → r i .≈s.s~t)
+--                       (≈pcong a (λ α → ιᶻ (f α))
+--                                 (λ i → f i , ≤refl _)
+--                                 (λ i → g i , r i .≈s.s~t .∧.snd)
+--                                 (λ i → r i .≈s.s≈t))
+
+module PreservationByPowers (s : S) (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ιᶻ (ŝ .fst) ≡ ιᶻ (t̂ .fst)) where
+  -- -- Tighten stage-level relations to strong tree equivalences.
+  -- ≈ᵇ→≈ˢ : ∀ {α ŝ t̂} → D̃ α [ ŝ ≈ t̂ ]
+  --       → ŝ .fst ≈ˢ t̂ .fst
+  -- ≈ᵇ→≈ˢ {α} {s , s≤α} {t , t≤α} p = u p
+  --   where
+  --   u : D̃ α [ s , s≤α ≈ t , t≤α ]
+  --     → s ≈ˢ t
+  --   u (≈pcong a μ f g r) = ≈scong a (λ i → f i .fst) (λ i → g i .fst) (λ i → ≈ᵇ→≈ˢ (r i))
+  --   u (≈psat e ϕ l≤α r≤α) = mk≈ˢ s~ᵀt (≈psat e ϕ (≤refl (ιᶻ (lhs' e ϕ))) _)
+  --     where
+  --     s~ᵀt : s ~ᵀ t
+  --     s~ᵀt = depth-preserving α (s , s≤α) (t , t≤α) p
+  --   u ≈prefl = ≈srefl
+  --   u (≈psym p) = ≈ssym (≈ᵇ→≈ˢ p)
+  --   u (≈ptrans p q) = ≈strans (≈ᵇ→≈ˢ p) (≈ᵇ→≈ˢ q)
+  --   u (≈pweaken _ p) = (≈ᵇ→≈ˢ p)
+
+  X = P s
   D^X : Diagram/≈ ℓc ℓc'
-  D^X = _^_ {ℓc} {ℓc'} D X
+  D^X = Power {ℓc} {ℓc'} D X 
   module D^X = Functor D^X
   module ColimD^X = SetoidQuotient (Colim D^X)
+
+  module D^X/≈Q (α : Z) where
+    open SetoidQuotient {!!} public
+
+
+  module D/≈Q (α : Z) where
+    open SetoidQuotient (D̃ α) public
+
+  rankD : Colim₀ D → Z
+  rankD (α , t̂) = D/≈Q.rec α (λ (t , t≤α) → ιᶻ t) (λ {ŝ} {t̂} → depth-preserving α ŝ t̂) t̂
+
+  rankD^X : Colim₀ D^X → Z
+  rankD^X (α , t̂) = Z.sup (ιˢ s , λ x → rankD (α , t̂ x))
+
+  rankD-weaken : ∀ {α β} → (p : α ≤ β) → (t̃ : D̃ α /≈) → rankD (β , D/≈.hom (box p) t̃) ≡ rankD (α , t̃)
+  rankD-weaken {α} {β} p =
+    D/≈Q.elimp α (λ t̃ → rankD (β , hom (box p) t̃) ≡ rankD (α , t̃)) f
+    where
+    open D/≈
+    open D/≈Q α renaming ([_] to [_]ᴰ)
+    f : (t̂ : D₀ α) → rankD (β , D/≈.hom (box p) [ t̂ ]ᴰ) ≡ rankD (α , [ t̂ ]ᴰ)
+    f t̂ = ≡.refl
+
+  rankColimD : Colim/≈ D → Z
+  rankColimD = ColimD.rec rankD resp
+    module rankColimD where
+    resp : ∀ {s̃ t̃ : Colim₀ D} → Colim D [ s̃ ≈ t̃ ] → rankD s̃ ≡ rankD t̃ 
+    resp (≈lstage i ≡.refl) = ≡.refl
+    resp (≈lstep {i = α} {j = β} p t̂) = ≡.sym (rankD-weaken p t̂)
+    resp (≈lsym p) = ≡.sym (resp p)
+    resp (≈ltrans p q) = ≡.trans (resp p) (resp q)
+
+  rankColimD^X : Colim/≈ D^X → Z
+  rankColimD^X = ColimD^X.rec rankD^X resp
+    module rankColimD^X where
+    resp : ∀ {s̃ t̃ : Colim₀ D^X} → Colim D^X [ s̃ ≈ t̃ ] → rankD^X s̃ ≡ rankD^X t̃ 
+    resp (≈lstage i ≡.refl) = ≡.refl
+    resp (≈lstep {i = α} {j = β} p t̃) =
+      ≡.cong (λ ○ → Z.sup (ιˢ s , ○)) (≡.funExt λ x → ≡.sym (rankD-weaken p (t̃ x)))
+    resp (≈lsym p) = ≡.sym (resp p)
+    resp (≈ltrans p q) = ≡.trans (resp p) (resp q)
+
+
   ϕ₀ : Colim₀ D^X → X → Colim₀ D 
   ϕ₀ (α , t̂) x = α , t̂ x
+  ψ₀ : (X → Colim₀ D) → Colim₀ D^X
+  ψ₀ f̃ = β , λ x → D/≈.hom (box (α≤β x)) {!!}
+    where
+    α : (x : X) → Z
+    α x = rankD (f̃ x)
+    β : Z
+    β = Z.sup (ιˢ s , α)
+    open D/≈Q β renaming ([_] to [_]ᴰ)
+    α≤β : ∀ x → α x ≤ β
+    α≤β x = ≤≤ (sup≤ λ x → <sup x (≤refl (α x))) {!!}
+  ψ : (X → Colim/≈ D) → Colim/≈ D^X
+  ψ f̃ = {!!}
+    where
+    α : (x : X) → Z
+    α x = rankColimD (f̃ x)
+    β : Z
+    β = Z.sup (ιˢ s , α)
   ϕ-cong : ∀ {t̃ ũ} → Colim D^X [ t̃ ≈ ũ ] → (x : X) → Colim D [ ϕ₀ t̃ x ≈ ϕ₀ ũ x ]
   ϕ-cong {α , t̂} {α , t̂} (≈lstage α ≡.refl) x = ≡→≈ (Colim D) ≡.refl
   ϕ-cong {α , t̂} {β , û} (≈lstep p t̂) x = ≈lstep p (t̂ x)
@@ -72,6 +183,12 @@ module PreservationByPowers (X : Set) where
   ϕ : Colim/≈ D^X → (X → Colim/≈ D)
   ϕ f̃ x = ColimD^X.map (Colim D) (λ f → ϕ₀ f x) (λ p → ϕ-cong p x) f̃
 
+  dpt : (t̃ : X → Colim/≈ D) → ∃ λ (α : Z) → ∃ λ (f : X → D̃ α /≈)
+      → ∀ x → (ColimD.[ α , f x ]) ≡ t̃ x 
+  dpt t̃ = {!!}
+  
+  w : ∀ {t̃ ũ} → Colim D [ t̃ ≈ ũ ] → proj₁ t̃ ⊢ {!!} , {!!} ≈ᵇ {!!}
+  
   ϕ-inj≈ : ∀ {t̃ ũ} → (∀ x → Colim D [ ϕ₀ t̃ x ≈ ϕ₀ ũ x ])
          → Colim D^X [ t̃ ≈ ũ ]
   ϕ-inj≈ {α , t̂} {β , û} p = {!!}

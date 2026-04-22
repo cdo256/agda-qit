@@ -30,7 +30,7 @@ open import QIT.Container.Base
 open import QIT.Container.StrictFunctor S P (ℓD ⊔ ℓD')
 
 -- Size control and staging
-open import QIT.Relation.Plump S P
+open import QIT.Plump.Postulated S P
 open import QIT.QW.Stage sig
 open import QIT.QW.Algebra sig
 
