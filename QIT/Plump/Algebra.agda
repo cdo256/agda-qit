@@ -3,7 +3,7 @@ open import QIT.Prop
 open import QIT.Container.Base as W using (⟦_◁_⟧)
 open import QIT.Relation.Binary using (WellFounded)
 
-module QIT.Examples.Plump.Algebra {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
+module QIT.Plump.Algebra {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
 
 record Algebra ℓX : Set (lsuc ℓS ⊔ lsuc ℓP ⊔ lsuc ℓX) where
   field

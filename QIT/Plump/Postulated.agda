@@ -1,4 +1,4 @@
-module QIT.Examples.Plump.Postulated {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
+module QIT.Plump.Postulated {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
 
 open import QIT.Prelude
 open import QIT.Prop
@@ -15,7 +15,7 @@ open Plump public
            ; ≤≤ to ≤≤₀ ; ≤< to ≤<₀ ; <≤ to <≤₀
            ; sup≤ to sup≤₀ ; <sup to <sup₀)
 
-open import QIT.Examples.Plump.Algebra Sᶻ Pᶻ
+open import QIT.Plump.Algebra Sᶻ Pᶻ
 
 postulate
   Zᴬ : Algebra (ℓS ⊔ ℓP)
@@ -36,6 +36,12 @@ module _ {ℓX} (Xᴬ : Algebra ℓX) where
 [_] : Z₀ → Z
 [ W.sup (s , ξ) ] = sup (s , λ i → [ ξ i ])
 
+<[_] : ∀ {α β} → α <₀ β → [ α ] < [ β ]
+≤[_] : ∀ {α β} → α ≤₀ β → [ α ] ≤ [ β ]
+
+<[ <sup₀ i α≤ξi ] = <sup i ≤[ α≤ξi ]
+≤[ sup≤₀ ξ<α ] = sup≤ (λ i → <[ ξ<α i ])
+
 postulate
   elim≤ : ∀ {ℓB} (B : Z → Prop ℓB) {β : Z}
         → ({s : Sᶻ} {ξ : Pᶻ s → Z}
@@ -47,12 +53,6 @@ postulate
           → (i : Pᶻ s) → α ≤ ξ i
           → B (sup (s , ξ)))
         → (∀ {β} → α < β → B β)
-
-<[_] : ∀ {α β} → α <₀ β → [ α ] < [ β ]
-≤[_] : ∀ {α β} → α ≤₀ β → [ α ] ≤ [ β ]
-
-<[_] {α} {W.sup (s , ξ)} (<sup₀ i α≤ξi) = <sup i ≤[ α≤ξi ]
-≤[_] {W.sup (s , ξ)} {β} (sup≤₀ ξ<α) = sup≤ (λ i → <[ ξ<α i ])
 
 -- Bottom element
 ⊥ᶻ : Z
@@ -75,6 +75,12 @@ suc α = α ∨ᶻ α
 -- Embedding of base trees
 ιᶻ : W S P → Z
 ιᶻ (W.sup (s , f)) = sup ((ιˢ s) , λ i → ιᶻ (f i))
+
+_<ᵀ_ : (W S P) → Z → Prop (ℓS ⊔ ℓP)
+t <ᵀ α = ιᶻ t < α
+
+_≤ᵀ_ : (W S P) → Z → Prop (ℓS ⊔ ℓP)
+t ≤ᵀ α = ιᶻ t ≤ α
 
 -- -----------------------------------------------------------------------
 -- Derived order lemmas involving the lifted constructors

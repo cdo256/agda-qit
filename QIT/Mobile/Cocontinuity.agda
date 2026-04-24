@@ -30,7 +30,7 @@ module F = Functor F
 module D = Functor D
 module F∘D = Functor (F ∘ D)
 
-depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ιᶻ (ŝ .fst) ≤≥ ιᶻ (t̂ .fst)
+depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ιᶻ (ŝ .fst) ≡ ιᶻ (t̂ .fst)
 depth-preserving α (s , s≤α) (t , t≤α) (≈pcong a μ f g r) =
     sup≤sup (λ i → p i .∧.fst) , sup≤sup (λ i → p i .∧.snd)
   where p : ∀ i → ιᶻ (f i .fst) ≤≥ ιᶻ (g i .fst)
