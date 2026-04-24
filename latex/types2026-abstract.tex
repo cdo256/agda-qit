@@ -28,153 +28,150 @@
 
 \maketitle
 
-\section{Introduction}
+\section{Introduction and Motivation}
 
-Quotient inductive types (QITs) were introduced as a set-level
-fragment of higher inductive types suitable for internalising syntax
-in type theory~\cite{altenkirch2016-qit}. In a UIP or set-truncated
-setting, the higher structure collapses, but the idea of specifying
-data together with identifications remains, leading to quotient
-inductive types with initial-algebra semantics and elimination by
-initiality rather than by quotienting raw syntax
-afterwards~\cite{altenkirch2018-qiit,kaposi2019-constructing,kovacs2020-large}. This
-talk focuses on a basic obstruction in that picture: although a QIT
-may at first seem to be just an ordinary inductive type quotiented by
-equations, extensional quotienting forgets information that
-constructors may still need. This tension becomes especially visible
-in the infinitary case, where known general constructions appeal to
-weak choice principles. Using a simple running example, I explain why
-this happens and why weak quotients and setoid-style presentations
-suggest a different constructive moral.
+Quotient Inductive Types (QITs) are a central mechanism for specifying
+datatypes equipped with identifications in set-truncated Homotopy Type
+Theory \cite{hott2013-book}. They support a wide range of constructions,
+including the HoTT reals \cite{hott2013-book}, partiality monads
+\cite{altenkirch2017-partiality-monad}, and the syntax of type theory
+\cite{altenkirch2018-qiit}.
 
-\section{Constructing QITs}
+Despite their expressive power, QITs present significant foundational
+difficulties. Lumsdaine and Shulman showed that certain quotient
+constructions, including Brouwer's definition of the countable
+ordinals \cite{kraus2023-ordinal},
+cannot in general be obtained using quotients alone
+\cite{lumsdaine2020-hit}. This suggests that
+some form of infinitary principle or choice may be unavoidable in a
+constructive metatheory.
 
-A quotient inductive type is not
-merely a quotient of raw terms, but an initial algebra for a signature
-with equations. If $F_\Sigma(X)$ is the polynomial functor associated
-to a signature $\Sigma = (S,P)$, then a candidate quotient inductive
-type is given by an algebra
-\[
-\mathsf{sup} : F_\Sigma(Q) \to Q
-\]
-together with the expected universal property. The point of this
-presentation is that it packages the constructors and the eliminator at
-the same time: what matters is not only which terms are identified, but
-also how the resulting object supports recursion and induction. This is
-the perspective developed in the semantic treatment of QIITs by
-Altenkirch, Capriotti, Dijkstra, Kraus and Nordvall
-Forsberg~\cite{altenkirch2018-qiit}, and later extended to finitary and
-large/infinitary signature languages by Kaposi, Kov\'acs and
-collaborators~\cite{kaposi2019-constructing,kovacs2020-large}.
+Fiore, Pitts, and Steenkamp subsequently showed that a broad class of
+QITs, which they call quotient-W types (QW types), admit an initial
+algebra semantics assuming the Weak Initial Set of Covers (WISC)
+principle \cite{fiore2022-quotients-inductive-types}. Their result
+recovers many important examples, including extensional countable
+ordinals. However, WISC remains a nontrivial choice principle
+\cite{vandenberg2012-wisc-axiom}, and its necessity is poorly
+understood.
 
-\section{The lifting problem}
-
-The central example of the talk is the type of \emph{mobiles}: countably
-branching trees in which permuting the children does not change the
-resulting element. Writing $M$ for the desired quotient type, one may
-present it schematically by constructors
-\[
-\ell : M,
-\qquad
-n : (\mathbb{N}\to M)\to M,
-\qquad
-\mathsf{perm}_\pi(f) : n(f\circ \pi)=n(f)
-\]
-for each permutation $\pi : \mathrm{Perm}(\mathbb{N})$.
-
-The naive construction starts from the raw $W$-type $W$ of ordered
-countably branching trees and forms a quotient $W/{\sim}$ by the
-permutation equations. At first glance this looks exactly right. But the
-problem appears as soon as we ask for the constructor on the quotient.
-The leaf constructor lifts immediately by sending $\ell_W$ to its
-equivalence class. For the node constructor, however, we would need to
-define
-\[
-n_{\sim} : (W/\sim)^{\mathbb{N}} \to W/\sim.
-\]
-The obvious route is: given a family of quotient elements, choose a raw
-tree representing each one, apply the raw constructor in $W$, and then
-quotient again. But this requires choosing representatives.
-
-This is the basic lifting problem:
+This leads to the central question of this work:
 
 \begin{quote}
-a quotient gives equivalence classes, but a constructor wants
-representatives.
+  Can one identify a simple ordinal basis to which a local fragment of
+  quotient inductive types can be reduced?
 \end{quote}
 
-That is the conceptual centre of the talk. It explains why quotient
-classes alone are not enough: a QIT must still support elimination, and
-that means the constructors must be well defined on quotient elements,
-not just on chosen representatives.
+We propose the \emph{extensional plump ordinals}
+\cite{taylor1996-plump} as a candidate ordinal basis for a fragment of
+QITs that we call \emph{\(\alpha\)-local}. Intuitively, locality
+measures how deeply one must inspect the inductive structure of terms in
+order to witness an equation. In pathological examples, such as
+extensional ordinals, equality may require unbounded descent into
+subtrees. By contrast, in examples such as infinite mobiles, equality
+preserves depth and only inspects structure within a bounded range. We
+argue that the problem of constructing \(\alpha\)-local QIT signatures
+reduces to the existence of suitable extensional plump ordinals.
 
-\section{Why the problem is choice-shaped}
+\section{Background}
 
-This obstruction already has the shape of a choice principle. If the
-quotient map $[-]_\sim : W \twoheadrightarrow W/\sim$ admitted a section, then
-we could pick a representative tree for each quotient element and define
-$n_M$ by lifting along that section. In $\mathrm{Set}$, the
-principle that every surjection splits is equivalent to the axiom of
-choice. Thus the difficulty is not accidental: choice appears precisely
-when extensional quotienting has forgotten data that the constructor
-still needs.
+We briefly recall the framework of quotient-W types introduced by Fiore,
+Pitts, and Steenkamp \cite{fiore2022-quotients-inductive-types}. A QW
+signature consists of:
+\begin{itemize}
+    \item a container \(\Sigma = S \triangleleft P\)
+          \cite{abbott2005-containers}, specifying the underlying
+          polynomial functor, and
+    \item a system of equations \((E,V,l,r)\), where each equation
+          \(e : E\) has a set of variables \(V(e)\) and left- and
+          right-hand sides in the free \(\Sigma\)-algebra over \(V(e)\).
+\end{itemize}
 
-In the infinitary case this phenomenon is reflected in existing general
-constructions. Fiore, Pitts and Steenkamp introduce a broad class of
-indexed quotient-inductive types, called QWI types, and show that they
-can be constructed from inductive types and quotient types under WISC
-(or, equivalently for the relevant argument, IWISC in the form used in
-their paper)~\cite{fiore2022-qwit}. Their construction proceeds
-stagewise, building size-bounded approximations and then taking a
-colimit. The hard step is showing that forming constructor inputs is
-compatible with this stagewise colimit; this is exactly where the weak
-choice principle enters.
+From such a signature, Fiore et al.~construct a diagram of
+approximations indexed by a size structure. Intuitively, this diagram
+represents successive stages of the quotient construction, where each
+stage gives the equalities visible within a bounded depth. The desired
+quotient inductive type is then obtained as the colimit \(Q\) of this
+diagram.
 
-This fits a wider semantic picture. Higher inductive types are designed
-to build identifications into the type former itself rather than by
-external quotienting, and Lumsdaine and Shulman give general semantics
-for such constructions in suitable model categories~\cite{lumsdaine2020-hit}.
-From the present viewpoint, the contrast is not that one setting has
-problems and the other does not, but that different equality formalisms
-forget different amounts of information.
+To show that this colimit is an initial algebra, one must establish in
+particular the \emph{cocontinuity} of the associated polynomial functor:
+forming a constructor after quotienting must agree with quotienting
+after forming a constructor. In the work of Fiore et al., WISC is used
+at this step to size-bound families of subtrees and construct inverse
+maps witnessing the required isomorphism.
 
-\section{Choosing not to forget}
+\section{Mobiles}
 
-The second half of the talk takes this as a design hint. If choice
-appears because extensional quotients forget too much, then perhaps a
-more constructive notion of quotient should forget less. This motivates
-weak quotients and setoid-style presentations, where points are retained
-and equality is carried as explicit structure rather than collapsed
-immediately to bare equivalence classes. On this view, one does not need
-to recover representatives later, because the witness data was never
-thrown away in the first place.
+Our motivating example is the quotient inductive type of
+\emph{mobiles}: well-founded trees quotiented by permutation at each
+node. This example is simple enough to analyse directly, while still
+being representative of the infinitary behaviour relevant to QITs.
 
-This does \emph{not} mean that weak quotients solve everything. They
-solve one problem by introducing another. In a setoid or displayed-setoid
-semantics, a dependent family over a context must not only assign fibres
-to points, but also provide transport maps along equality witnesses,
-together with the required coherence conditions. So the difficulty moves
-from choosing representatives to managing coherent transport. Kaposi and
-Xie's work on quotient inductive-inductive types in the setoid model is
-a useful reference point here: it shows how much can be recovered in a
-strict setoid semantics, but also makes clear that plain setoids do not
-automatically provide all the coherence one would like for dependent
-elimination~\cite{kaposi2021-setoid}.
+Specifically, for an index set \(I\), one considers a type generated by
+a leaf constructor, a node constructor with \(I\)-indexed branches, and
+a path constructor identifying nodes whose branches differ only by a
+permutation of \(I\).
 
-\section{Conclusion}
+Because permutation does not change the subtree relation, this quotient
+is depth-preserving. It was first thought that this could be used to
+transport equations between stages, but it was later found that this
+direct approach still depended on the choice of ordinal.
 
-The aim of the talk is not to present a completed new construction,
-but to sharpen the conceptual picture. Using mobiles as a simple
-infinitary example, I argue that quotient inductive types are
-difficult because extensional quotients erase witness data and then
-require something choice-like when that data must later be
-recovered. The stagewise construction of Fiore, Pitts and Steenkamp
-shows how far this can be repaired using weak choice, while weak
-quotients suggest a different constructive moral: do not forget the
-witness data too early. The price, however, is that dependent type
-theory must then carry coherent transport explicitly. In this sense,
-the real issue is not whether we quotient, but what information our
-notion of equality is allowed to forget.
+Mobiles therefore provide a useful test case for analysing the role of
+WISC in the general construction, and for separating quotient-specific
+issues from the underlying ordinal requirements.
+
+\section{Locality}
+
+We formalise locality by assigning a rank function
+\[
+\mathrm{rank} : T_\Sigma X \to \mathcal{O}
+\]
+measuring the height of the underlying tree. An equation system is said
+to be \(\alpha\)-local if, for every equation \(e : E\), both sides
+\(l(e)\) and \(r(e)\) have rank at most a fixed ordinal \(\alpha\).
+Intuitively, this means that every generating equation only inspects
+structure up to depth \(\le \alpha\).
+
+Our central claim is that \(\alpha\)-local QIT signatures reduce to
+plump ordinals.
+
+\medskip
+\noindent
+\textbf{Claim.}
+Let the ambient type theory be ITT + UIP + Quotient +
+funExt. Then \(\alpha\)-local QIT signatures reduce to plump ordinals.
+\medskip
+
+The proof follows the outline of Fiore--Pitts--Steenkamp
+\cite{fiore2022-quotients-inductive-types}, but reformulates the
+cocontinuity argument in terms of extensional plump ordinals, thereby
+reducing the remaining difficulty to the existence of a suitable
+ordinal basis.
+
+\section{Discussion}
+
+Our analysis clarifies where the difficulty in constructing quotient
+inductive types lies. For extensional ordinals, equality is defined by
+mutual containment of downward closures, which requires unbounded
+descent into subtrees
+\cite{fiore2022-quotients-inductive-types}. No fixed ordinal bound
+\(\alpha\) suffices, so this quotient falls outside the local fragment.
+
+By contrast, for \(\alpha\)-local signatures, the obstruction caused by
+unbounded inspection is no longer present. In this case, we show that
+the construction problem reduces to the existence of sufficiently strong
+plump ordinals. Thus, rather than requiring choice at the level of the
+quotient construction itself, local QITs can be analysed in terms of a
+simpler underlying ordinal structure.
+
+This does not yet give a fully choice-free construction of all local
+QITs. Rather, it isolates the remaining issue: whether the required
+plump ordinals can themselves be constructed in the ambient theory.
+Future work includes completing the formalization of this reduction, and
+determining how far constructions from plump ordinals extend beyond the
+local fragment.
 
 \begin{thebibliography}{10}
 
@@ -191,7 +188,7 @@ Fredrik Nordvall Forsberg.
 \newblock In {\em Foundations of Software Science and Computation Structures
   (FoSSaCS 2018)}, pages 293--310, 2018.
 
-\bibitem{fiore2022-qwit}
+\bibitem{fiore2022-quotients-inductive-types}
 Marcelo P.~Fiore, Andrew M.~Pitts, and S.~C.~Steenkamp.
 \newblock Quotients, inductive types, and quotient inductive types.
 \newblock {\em Logical Methods in Computer Science}, 18(2), 2022.
@@ -219,6 +216,36 @@ Peter LeFanu Lumsdaine and Michael Shulman.
 \newblock Semantics of higher inductive types.
 \newblock {\em Mathematical Proceedings of the Cambridge Philosophical
   Society}, 169(1):159--208, 2020.
+
+\bibitem{hott2013-book}
+The Univalent Foundations Program.
+\newblock Homotopy Type Theory: Univalent Foundations of Mathematics.
+\newblock Institute for Advanced Study, 2013.
+
+\bibitem{altenkirch2017-partiality-monad}
+Thorsten Altenkirch, Nils Anders Danielsson, and Nicolai Kraus.
+\newblock Partiality, revisited: The partiality monad as a quotient inductive-inductive type.
+\newblock In {\em Foundations of Software Science and Computation Structures (FoSSaCS 2017)}, pages 17--33, 2017.
+
+\bibitem{abbott2005-containers}
+Michael Abbott, Thorsten Altenkirch, and Neil Ghani.
+\newblock Containers: Constructing strictly positive types.
+\newblock {\em Theoretical Computer Science}, 342(1):3--27, 2005.
+
+\bibitem{vandenberg2012-wisc-axiom}
+Benno van den Berg and Ieke Moerdijk.
+\newblock The axiom of multiple choice and models for constructive set theory.
+\newblock {\em arXiv preprint arXiv:1204.4045}, 2012.
+
+\bibitem{kraus2023-ordinal}
+Nicolai Kraus, Fredrik Nordvall Forsberg, and Chuangjie Xu.
+\newblock Type-theoretic approaches to ordinals.
+\newblock {\em Theoretical Computer Science}, 957:113843, 2023.
+
+\bibitem{taylor1996-plump}
+Paul Taylor.
+\newblock Intuitionistic sets and ordinals.
+\newblock {\em The Journal of Symbolic Logic}, 61(3):705--744, 1996.
 
 \end{thebibliography}
 
