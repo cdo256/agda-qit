@@ -29,7 +29,7 @@ record Algebra : Set₁ where
     ⨆≤ : ∀ a inc x → (∀ i → a i ≤ x) → ⨆ a inc ≤ x
     antisym : ∀ {x y} → x ≤ y → y ≤ x → x ≡ y
 
-open Algebra
+open Algebra public
 
 record Hom (A B : Algebra) : Set₁ where
   module A = Algebra A

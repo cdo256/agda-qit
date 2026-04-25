@@ -75,6 +75,8 @@ D→M A = record
     ≡.cong (λ ○ → x , y , ○) (isProp≤ p q)
 
 
+
+
 -- Convert a MutualAlgebra to a DirectAlgebra by forgetting the reification
 M→D : MA.Algebra → DA.Algebra
 M→D A = record
@@ -102,10 +104,10 @@ M→D A = record
               x (λ i → fst (p i)) (λ i → ≤fst≡ (p i)) (λ i → ≤snd≡ (p i))
       , ⨆≤-snd a (λ i → fst (inc i)) (λ i → ≤fst≡ (inc i)) (λ i → ≤snd≡ (inc i))
               x (λ i → fst (p i)) (λ i → ≤fst≡ (p i)) (λ i → ≤snd≡ (p i))
-  ; antisym = λ {x} {y} z z₁
-      → antisym x y (z .fst) (z₁ .fst)
-                (z .snd ._∧ᵖ_.fst) (z .snd ._∧ᵖ_.snd)
-                (z₁ .snd ._∧ᵖ_.fst) (z₁ .snd ._∧ᵖ_.snd)
+  ; antisym = λ {x} {y} p q
+      → antisym x y (p .fst) (q .fst)
+                (p .snd .∧.fst) (p .snd .∧.snd)
+                (q .snd .∧.fst) (q .snd .∧.snd)
   }
   module M→D where
   open MA.Algebra A
@@ -176,7 +178,7 @@ equiv = record { F = F ; G = G ; η = η ; ε = ε }
                         (λ i → ≡.cong p.f (ch≤-snd i)))
                       (f⨆ a inc inc-fst inc-snd) ≡.refl
     }
-    where
+    module F where
     module p = DA.Hom p
     open ≡.≡-Reasoning
     module X = DA.Algebra X
@@ -303,66 +305,112 @@ equiv = record { F = F ; G = G ; η = η ; ε = ε }
   η = record
     { ob = λ X → record
         { f = λ x → x
-        ; ≤ = λ {x} {y} p → p
+        ; ≤ = λ {x} {y} p → (x , y , p) , ≡.refl , ≡.refl
         ; η = λ _ → ≡.refl
         ; ⊥ = ≡.refl
         ; ⨆ = λ a inc → ≡.refl
         }
     ; hom = λ {X} {Y} f → DA.mk≈ (λ _ → ≡.refl)
     ; isIso = λ X → record
-        { inv = record
+        { f⁻¹ = record
             { f = λ x → x
-            ; ≤ = λ {x} {y} p → p
+            ; ≤ = λ {x} {y} (p , p-fst , p-snd) →
+                ≡.subst₂ (DA.Algebra._≤_ X) p-fst p-snd (proj₂ (proj₂ p))
             ; η = λ _ → ≡.refl
             ; ⊥ = ≡.refl
             ; ⨆ = λ a inc → ≡.refl
             }
-        ; iso₁ = DA.mk≈ (λ _ → ≡.refl)
-        ; iso₂ = DA.mk≈ (λ _ → ≡.refl)
+        ; linv = DA.mk≈ (λ _ → ≡.refl)
+        ; rinv = DA.mk≈ (λ _ → ≡.refl)
         }
     }
 
   -- Natural isomorphism ε : F ∘ G ⟹ Id
   -- For each MutualAlgebra X, we have D→M (M→D X) ≅ X
+  module ε-helpers where
+    open ≡.≡-Reasoning
+
+    -- Postulate: subst₂ on the derived order extracts the inner witness
+    -- In the round-trip (F ∘ G) X, the order is M→D._≤_ X which is ΣP (X.≤∙) λ p → ...
+    -- When we apply subst₂, we just need to adjust the coherence proofs, not the witness itself
+    postulate
+      subst₂-extract-witness : (X : MA.Algebra)
+        → ∀ {x y x' y'} (p : MA.≤∙ X) (p-fst : MA.≤fst X p ≡ x') (p-snd : MA.≤snd X p ≡ y')
+        → (eq-x : x' ≡ x) (eq-y : y' ≡ y)
+        → fst (≡.subst₂ (DA.Algebra._≤_ (M→D X)) eq-x eq-y (p , p-fst , p-snd)) ≡ p
+
+    -- Helper to prove ⨆ equality using subst₂-extract-witness
+    ⨆-eq : (X : MA.Algebra) → ∀ a inc inc-fst inc-snd
+         → (F ∘ G) .ob X .MA.⨆ a inc inc-fst inc-snd
+         ≡ X .MA.⨆ a (λ i → fst (proj₂ (proj₂ (inc i))))
+               (λ i → ≡.trans (snd (proj₂ (proj₂ (inc i))) .∧.fst) (inc-fst i))
+               (λ i → ≡.trans (snd (proj₂ (proj₂ (inc i))) .∧.snd) (inc-snd i))
+    ⨆-eq X a inc inc-fst inc-snd = ≡.cong (λ ch → X .MA.⨆ a ch _ _) (≡.funExt lemma)
+      where
+        lemma : ∀ i → fst (D→M.≤∙→≤ (M→D X) (inc i) (inc-fst i) (inc-snd i))
+                    ≡ fst (proj₂ (proj₂ (inc i)))
+        lemma i =
+          let (x , y , p-der , p-fst , p-snd) = inc i
+          in subst₂-extract-witness X p-der p-fst p-snd (inc-fst i) (inc-snd i)
+
+    ε-ob : (X : MA.Algebra) → MA.Hom ((F ∘ G) .ob X) X
+    ε-ob X = record
+      { f = λ x → x
+      ; f≤ = λ (x , y , p-der) → fst p-der
+      ; f≤-fst = λ (x , y , p-der) → snd p-der .∧.fst
+      ; f≤-snd = λ (x , y , p-der) → snd p-der .∧.snd
+      ; η = λ _ → ≡.refl
+      ; ⊥ = ≡.refl
+      ; ⨆ = ⨆-eq X
+          -- *** THIS IS WHERE THE ISSUE MANIFESTS ***
+          -- Goal: (F ∘ G) X .⨆ a inc inc-fst inc-snd ≡ X .⨆ a (extract inc) ...
+          -- Problem: (F ∘ G) X .⨆ expands to:
+          --   X .⨆ a (λ i → fst (subst₂ ... (inc-fst i) (inc-snd i) (inc i)))
+          -- But we need:
+          --   X .⨆ a (λ i → fst (proj₂ (proj₂ (inc i))))
+          -- These are NOT definitionally equal because subst₂ doesn't reduce!
+          --
+          -- With the subst₂-uip postulate, we can now prove they're equal
+          -- (see ⨆-eq definition above in the module)
+      ; ≤refl = λ x → MA.isProp≤ X _ _ ≡.refl ≡.refl
+      ; ≤trans = λ x y z p q p-fst p-snd q-fst q-snd →
+          MA.isProp≤ X (fst (proj₂ (proj₂ (MA.≤trans ((F ∘ G) .ob X) x y z p q _ _ _ _))))
+                              (MA.≤trans (ob Id X) x y z (fst (proj₂ (proj₂ p))) (fst (proj₂ (proj₂ q))) _ _ _ _)
+                                                {!≡.trans (MA.≤trans-fst ((F ∘ G) .ob X) x y z p q _ _ _ _) p-fst!}
+                                                {!≡.trans (MA.≤trans-snd ((F ∘ G) .ob X) x y z p q _ _ _ _) q-snd!}
+      ; ⊥≤ = λ x → MA.Algebra.isProp≤ X _ _ ≡.refl ≡.refl
+      ; ≤⨆ = λ a inc inc-fst inc-snd i →
+          MA.isProp≤ X _ _ (≡.trans (MA.≤⨆-fst ((F ∘ G) .ob X) a inc inc-fst inc-snd i) (inc-fst i))
+                           (MA.≤⨆-snd ((F ∘ G) .ob X) a inc inc-fst inc-snd i)
+      ; ⨆≤ = λ a inc inc-fst inc-snd x ch≤ ch≤-fst ch≤-snd →
+          MA.isProp≤ X _ _ (MA.⨆≤-fst ((F ∘ G) .ob X) a inc inc-fst inc-snd x ch≤ ch≤-fst ch≤-snd)
+                           (≡.trans (MA.⨆≤-snd ((F ∘ G) .ob X) a inc inc-fst inc-snd x ch≤ ch≤-fst ch≤-snd) ch≤-snd)
+      }
+
+    -- ; isIso = λ X → record
+    --     { f⁻¹ = record
+    --         { f = λ x → x
+    --         ; f≤ = λ p → MA.Algebra.≤fst X p , MA.Algebra.≤snd X p , (p , ≡.refl , ≡.refl)
+    --         ; f≤-fst = λ _ → ≡.refl
+    --         ; f≤-snd = λ _ → ≡.refl
+    --         ; η = λ _ → ≡.refl
+    --         ; ⊥ = ≡.refl
+    --         ; ⨆ = λ a inc inc-fst inc-snd → {!≡.refl!}
+    --         ; ≤refl = λ x → MA.Algebra.isProp≤ X _ _ ≡.refl ≡.refl
+    --         ; ≤trans = λ x y z p q p-fst p-snd q-fst q-snd →
+    --             MA.Algebra.isProp≤ X _ _ ≡.refl ≡.refl
+    --         ; ⊥≤ = λ x → MA.Algebra.isProp≤ X _ _ ≡.refl ≡.refl
+    --         ; ≤⨆ = λ a inc inc-fst inc-snd i →
+    --             MA.Algebra.isProp≤ X _ _ ≡.refl ≡.refl
+    --         ; ⨆≤ = λ a inc inc-fst inc-snd x ch≤ ch≤-fst ch≤-snd →
+    --             MA.Algebra.isProp≤ X _ _ ≡.refl ≡.refl
+    --         }
+    --     ; linv = MA.mk≈ (λ _ → ≡.refl) (λ _ → ≡.refl)
+    --     ; rinv = MA.mk≈ (λ _ → ≡.refl) (λ _ → ≡.refl)
+    --     }
+
   ε : QIT.Functor.NatTrans.NatIso (F ∘ G) Id
   ε = record
-    { ob = λ X → record
-        { f = λ x → x
-        ; f≤ = λ p → p
-        ; f≤-fst = λ _ → ≡.refl
-        ; f≤-snd = λ _ → ≡.refl
-        ; η = λ _ → ≡.refl
-        ; ⊥ = ≡.refl
-        ; ⨆ = λ a inc inc-fst inc-snd → ≡.refl
-        ; ≤refl = λ x → MA.Algebra.isProp≤ X _ _ ≡.refl ≡.refl
-        ; ≤trans = λ x y z p q p-fst p-snd q-fst q-snd →
-            MA.Algebra.isProp≤ X _ _ ≡.refl ≡.refl
-        ; ⊥≤ = λ x → MA.Algebra.isProp≤ X _ _ ≡.refl ≡.refl
-        ; ≤⨆ = λ a inc inc-fst inc-snd i →
-            MA.Algebra.isProp≤ X _ _ ≡.refl ≡.refl
-        ; ⨆≤ = λ a inc inc-fst inc-snd x ch≤ ch≤-fst ch≤-snd →
-            MA.Algebra.isProp≤ X _ _ ≡.refl ≡.refl
-        }
+    { ob = ε-helpers.ε-ob
     ; hom = λ {X} {Y} f → MA.mk≈ (λ _ → ≡.refl) (λ _ → ≡.refl)
-    ; isIso = λ X → record
-        { inv = record
-            { f = λ x → x
-            ; f≤ = λ p → p
-            ; f≤-fst = λ _ → ≡.refl
-            ; f≤-snd = λ _ → ≡.refl
-            ; η = λ _ → ≡.refl
-            ; ⊥ = ≡.refl
-            ; ⨆ = λ a inc inc-fst inc-snd → ≡.refl
-            ; ≤refl = λ x → MA.Algebra.isProp≤ X _ _ ≡.refl ≡.refl
-            ; ≤trans = λ x y z p q p-fst p-snd q-fst q-snd →
-                MA.Algebra.isProp≤ X _ _ ≡.refl ≡.refl
-            ; ⊥≤ = λ x → MA.Algebra.isProp≤ X _ _ ≡.refl ≡.refl
-            ; ≤⨆ = λ a inc inc-fst inc-snd i →
-                MA.Algebra.isProp≤ X _ _ ≡.refl ≡.refl
-            ; ⨆≤ = λ a inc inc-fst inc-snd x ch≤ ch≤-fst ch≤-snd →
-                MA.Algebra.isProp≤ X _ _ ≡.refl ≡.refl
-            }
-        ; iso₁ = MA.mk≈ (λ _ → ≡.refl) (λ _ → ≡.refl)
-        ; iso₂ = MA.mk≈ (λ _ → ≡.refl) (λ _ → ≡.refl)
-        }
     }
