@@ -17,4 +17,3 @@ record Functor : Set (ℓCo ⊔ ℓCh ⊔ ℓCe ⊔ ℓDo ⊔ ℓDh ⊔ ℓDe) w
     comp : ∀ {x y z : C.Obj} → (f : C [ x , y ]) → (g : C [ y , z ])
          → hom (g C.∘ f) D.≈ (hom g D.∘ hom f)
     resp : ∀ {x y} {f g : C [ x , y ]} → C [ f ≈ g ] → D [ hom f ≈ hom g ] 
-

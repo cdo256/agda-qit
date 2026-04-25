@@ -3,7 +3,19 @@ open import QIT.Category.Base
 open import QIT.Functor.Base
 open import QIT.Setoid.Base
 
-module QIT.Functor.Composition where
+module QIT.Functor.Properties where
+
+Id : ∀ {ℓCo ℓCh ℓCe}
+     → {C : Category ℓCo ℓCh ℓCe}
+     → Functor C C
+Id {C = C} = record
+  { ob = λ x → x
+  ; hom = λ z → z
+  ; id = refl
+  ; comp = λ _ _ → refl
+  ; resp = λ p → p }
+  where
+  open Category C
 
 -- Functor composition with diagrams: F ∘ P applies functor F to diagram P.
 -- If P : I → Setoid and F : Setoid → Setoid, then F ∘ P : I → Setoid.

@@ -69,6 +69,8 @@ record Algebra : Set₁ where
             → ≤fst q ≡ y → ≤snd q ≡ x
             → x ≡ y
 
+open Algebra public
+
 record Hom (A B : Algebra) : Set₁ where
   module A = Algebra A
   module B = Algebra B

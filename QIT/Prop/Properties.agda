@@ -44,6 +44,14 @@ cong : ∀ {a b} {A : Set a} {B : Set b} (f : A → B)
       → ∀ {x y} → x ≡ y → f x ≡ f y
 cong f refl = refl
 
+congp : ∀ {a b} {A : Prop a} {B : Set b} (f : A → B)
+      → ∀ {x y} → f x ≡ f y
+congp _ = refl
+
+congp₂ : ∀ {a b c} {A : Prop a} {B : Prop b} {C : Set c} (f : A → B → C)
+      → ∀ {a1 a2 b1 b2} → f a1 b1 ≡ f a2 b2
+congp₂ _ = refl
+
 cong₂ : ∀ {a b c} {A : Set a} {B : Set b} {C : Set c} (f : A → B → C)
       → ∀ {a1 a2 b1 b2} → a1 ≡ a2 → b1 ≡ b2 → f a1 b1 ≡ f a2 b2
 cong₂ f refl refl = refl

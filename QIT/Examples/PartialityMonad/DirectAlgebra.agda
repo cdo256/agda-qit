@@ -28,6 +28,8 @@ record Algebra : Set₁ where
     ⨆≤ : ∀ a inc x → (∀ i → a i ≤ x) → ⨆ a inc ≤ x
     antisym : ∀ {x y} → x ≤ y → y ≤ x → x ≡ y
 
+open Algebra
+
 record Hom (A B : Algebra) : Set₁ where
   module A = Algebra A
   module B = Algebra B
@@ -35,9 +37,9 @@ record Hom (A B : Algebra) : Set₁ where
   open B using () renaming (A⊥ to B₀)
   field
     f : A₀ → B₀
+    ≤ : ∀ {x y} → x A.≤ y → f x B.≤ f y
     η : ∀ b → f (A.η b) ≡ B.η b
     ⊥ : f A.⊥ ≡ B.⊥
-    ≤ : ∀ {x y} → x A.≤ y → f x B.≤ f y
     ⨆ : ∀ a inc → f (A.⨆ a inc)
       ≡ B.⨆ (λ i → f (a i)) (λ i → ≤ (inc i))
 
