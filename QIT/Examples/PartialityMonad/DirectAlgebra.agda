@@ -4,7 +4,7 @@ open import QIT.Prelude renaming (⊤ to ⊤'; ⊥ to ⊥')
 open import QIT.Prop
 open import QIT.Relation.Subset
 open import QIT.Relation.Binary
-open import QIT.Relation.Binary
+open import QIT.Relation.Nullary
 open import QIT.Category.Base
 import Data.Nat as ℕ
 open ℕ using (ℕ; zero; suc)
@@ -17,6 +17,7 @@ record Algebra : Set₁ where
   field
     A⊥ : Set
     _≤_ : A⊥ → A⊥ → Set
+    isProp≤ : ∀ {x y} → isProp (x ≤ y)
 
     η : Bool → A⊥
     ⊥ : A⊥

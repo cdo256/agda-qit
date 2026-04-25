@@ -15,10 +15,6 @@ open import QIT.Category.Equivalence
 open import QIT.Category.Base
 open import QIT.Functor.Base
 
--- Postulate UIP for order relations to prove equality of order proofs
-postulate
-  uip-≤ : ∀ {A : Set} (_≤_ : A → A → Set) {x y : A} (p q : x ≤ y) → p ≡ q
-
 
 D→M : DA.Algebra → MA.Algebra
 D→M A = record
@@ -26,6 +22,7 @@ D→M A = record
   ; ≤∙ = Σ A⊥ λ x → Σ A⊥ λ y → x ≤ y
   ; ≤fst = λ (x , y , p) → x
   ; ≤snd = λ (x , y , p) → y
+  ; isProp≤ = isProp≤'
   ; η = η
   ; ⊥ = ⊥
   ; ⨆ = λ a inc inc-fst inc-snd
@@ -66,6 +63,13 @@ D→M A = record
         → x ≤ y
   ≤∙→≤ {x} {y} (x' , y' , p) x'≡x y'≡y =
     ≡.subst₂ _≤_ x'≡x y'≡y p
+
+  isProp≤' : ∀ p q
+          → ≤fst p ≡ ≤fst q
+          → ≤snd p ≡ ≤snd q
+          → p ≡ q
+  isProp≤' (x , y , p) (x , y , q) ≡.refl ≡.refl =
+    ≡.cong (λ ○ → x , y , ○) (isProp≤ p q)
 
 
 M→D : MA.Algebra → DA.Algebra
@@ -115,27 +119,36 @@ equiv = record { F = F ; G = {!!} ; η = {!!} ; ε = {!!} }
     ; η = p.η
     ; ⊥ = p.⊥
     ; ⨆ = f⨆
-    ; ≤refl = λ x → ≡.cong₂ _,_ ≡.refl (≡.cong₂ _,_ ≡.refl (uip-≤ Y._≤_ (p.≤ X.≤refl) Y.≤refl))
+    ; ≤refl = λ x →
+        FY.isProp≤ (f≤ (FX.≤refl x)) (FY.≤refl (p.f x)) ≡.refl ≡.refl
     ; ≤trans = λ x y z p q p-fst p-snd q-fst q-snd →
         let p' = D→M.≤∙→≤ X p p-fst p-snd
             q' = D→M.≤∙→≤ X q q-fst q-snd
-        in ≡.cong₂ _,_ ≡.refl (≡.cong₂ _,_ ≡.refl
-          (uip-≤ Y._≤_ (p.≤ (X.≤trans p' q')) (Y.≤trans (p.≤ p') (p.≤ q'))))
-    ; ⊥≤ = λ x → ≡.cong₂ _,_ ≡.refl (≡.cong₂ _,_ ≡.refl
-        (uip-≤ Y._≤_ (p.≤ X.⊥≤) (≡.subst (λ z → z Y.≤ p.f x) (≡.sym p.⊥) Y.⊥≤)))
+        in FY.isProp≤ (f≤ (FX.≤trans x y z p q p-fst p-snd q-fst q-snd))
+                      (FY.≤trans (p.f x) (p.f y) (p.f z) (f≤ p) (f≤ q)
+                        (≡.cong p.f p-fst) (≡.cong p.f p-snd)
+                        (≡.cong p.f q-fst) (≡.cong p.f q-snd))
+                      ≡.refl ≡.refl
+    ; ⊥≤ = λ x →
+        FY.isProp≤ (f≤ (FX.⊥≤ x)) (FY.⊥≤ (p.f x)) p.⊥ ≡.refl
     ; ≤⨆ = λ a inc inc-fst inc-snd i →
         let inc' = λ j → D→M.≤∙→≤ X (inc j) (inc-fst j) (inc-snd j)
-        in ≡.cong₂ _,_ ≡.refl (≡.cong₂ _,_ ≡.refl
-          (uip-≤ Y._≤_ (p.≤ (X.≤⨆ a inc' i))
-            (≡.subst (λ z → p.f (a i) Y.≤ z) (≡.sym (p.⨆ a inc'))
-              (Y.≤⨆ (λ j → p.f (a j)) (λ j → p.≤ (inc' j)) i))))
+        in FY.isProp≤ (f≤ (FX.≤⨆ a inc inc-fst inc-snd i))
+                      (FY.≤⨆ (λ j → p.f (a j)) (λ j → f≤ (inc j))
+                        (λ j → ≡.cong p.f (inc-fst j))
+                        (λ j → ≡.cong p.f (inc-snd j)) i)
+                      ≡.refl (f⨆ a inc inc-fst inc-snd)
     ; ⨆≤ = λ a inc inc-fst inc-snd x ch≤ ch≤-fst ch≤-snd →
         let inc' = λ i → D→M.≤∙→≤ X (inc i) (inc-fst i) (inc-snd i)
             ch≤' = λ i → D→M.≤∙→≤ X (ch≤ i) (ch≤-fst i) (ch≤-snd i)
-        in ≡.cong₂ _,_ ≡.refl (≡.cong₂ _,_ ≡.refl
-          (uip-≤ Y._≤_ (p.≤ (X.⨆≤ a inc' x ch≤'))
-            (≡.subst (λ z → z Y.≤ p.f x) (≡.sym (p.⨆ a inc'))
-              (Y.⨆≤ (λ i → p.f (a i)) (λ i → p.≤ (inc' i)) (p.f x) (λ i → p.≤ (ch≤' i))))))
+        in FY.isProp≤ (f≤ (FX.⨆≤ a inc inc-fst inc-snd x ch≤ ch≤-fst ch≤-snd))
+                      (FY.⨆≤ (λ i → p.f (a i)) (λ i → f≤ (inc i))
+                        (λ i → ≡.cong p.f (inc-fst i))
+                        (λ i → ≡.cong p.f (inc-snd i))
+                        (p.f x) (λ i → f≤ (ch≤ i))
+                        (λ i → ≡.cong p.f (ch≤-fst i))
+                        (λ i → ≡.cong p.f (ch≤-snd i)))
+                      (f⨆ a inc inc-fst inc-snd) ≡.refl
     }
     where
     module p = DA.Hom p
@@ -178,4 +191,7 @@ equiv = record { F = F ; G = {!!} ; η = {!!} ; ε = {!!} }
 
   F .id {X} = MA.mk≈ (λ _ → ≡.refl) (λ _ → ≡.refl)
   F .comp f g = MA.mk≈ (λ _ → ≡.refl) (λ _ → ≡.refl)
-  F .resp {X} {Y} {f} {g} (DA.mk≈ p) = MA.mk≈ p (λ (x , y , q) → ≡.cong₂ _,_ (p x) (≡.cong₂ _,_ (p y) ≡.refl))
+  F .resp {X} {Y} {f} {g} (DA.mk≈ p) = MA.mk≈ p (λ (x , y , q) →
+    MA.Algebra.isProp≤ (F .ob Y) (DA.Hom.f f x , DA.Hom.f f y , DA.Hom.≤ f q)
+                                  (DA.Hom.f g x , DA.Hom.f g y , DA.Hom.≤ g q)
+                                  (p x) (p y))

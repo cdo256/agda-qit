@@ -3,6 +3,7 @@ module QIT.Examples.PartialityMonad.MutualAlgebra where
 open import QIT.Prelude renaming (⊤ to ⊤'; ⊥ to ⊥')
 open import QIT.Prop
 open import QIT.Relation.Subset
+open import QIT.Relation.Nullary
 import Data.Nat as ℕ
 open ℕ using (ℕ; zero; suc)
 import Data.Bool as 𝔹
@@ -12,9 +13,13 @@ record Algebra : Set₁ where
   field
     A⊥ : Set
     ≤∙ : Set
-
     ≤fst : ≤∙ → A⊥
     ≤snd : ≤∙ → A⊥
+    isProp≤ : ∀ p q
+            → ≤fst p ≡ ≤fst q
+            → ≤snd p ≡ ≤snd q
+            → p ≡ q
+
     η : Bool → A⊥
     ⊥ : A⊥
     ⨆ : (a : ℕ → A⊥)
