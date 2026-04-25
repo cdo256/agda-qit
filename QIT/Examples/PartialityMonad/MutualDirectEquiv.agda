@@ -14,6 +14,8 @@ import QIT.Examples.PartialityMonad.MutualAlgebra as MA
 open import QIT.Category.Equivalence
 open import QIT.Category.Base
 open import QIT.Functor.Base
+open import QIT.Functor.NatTrans
+open import QIT.Functor.Properties using (Id; _∘_)
 
 
 -- Convert a DirectAlgebra to a MutualAlgebra by reifying the order relation
@@ -127,7 +129,7 @@ M→D A = record
 
 -- The equivalence between DirectAlgebra and MutualAlgebra categories
 equiv : Equivalence DA.Cat MA.Cat
-equiv = record { F = F ; G = {!!} ; η = {!!} ; ε = {!!} }
+equiv = record { F = F ; G = G ; η = η ; ε = ε }
   where
   open Functor
 
@@ -230,3 +232,137 @@ equiv = record { F = F ; G = {!!} ; η = {!!} ; ε = {!!} }
       (DA.Hom.f f x , DA.Hom.f f y , DA.Hom.≤ f q)
       (DA.Hom.f g x , DA.Hom.f g y , DA.Hom.≤ g q)
       (p x) (p y))
+
+  -- Functor from MutualAlgebra to DirectAlgebra (inverse to F)
+  G : Functor MA.Cat DA.Cat
+  G .ob = M→D
+
+  G .hom {X} {Y} p = record
+    { f = p.f
+    ; ≤ = λ {x} {y} q → p.f≤ (fst q) , ≤-coh-fst q , ≤-coh-snd q
+    ; η = p.η
+    ; ⊥ = p.⊥
+    ; ⨆ = g⨆
+    }
+    where
+    module p = MA.Hom p
+    open ≡.≡-Reasoning
+    module X = MA.Algebra X
+    module Y = MA.Algebra Y
+    module GX = DA.Algebra (G .ob X)
+    module GY = DA.Algebra (G .ob Y)
+
+    -- Coherence for the first projection
+    ≤-coh-fst : ∀ {x y} (q : x GX.≤ y)
+              → Y.≤fst (p.f≤ (fst q)) ≡ p.f x
+    ≤-coh-fst {x} {y} (q , q-fst , q-snd) =
+      Y.≤fst (p.f≤ q)
+        ≡⟨ p.f≤-fst q ⟩
+      p.f (X.≤fst q)
+        ≡⟨ ≡.cong p.f q-fst ⟩
+      p.f x ∎
+
+    -- Coherence for the second projection
+    ≤-coh-snd : ∀ {x y} (q : x GX.≤ y)
+              → Y.≤snd (p.f≤ (fst q)) ≡ p.f y
+    ≤-coh-snd {x} {y} (q , q-fst , q-snd) =
+      Y.≤snd (p.f≤ q)
+        ≡⟨ p.f≤-snd q ⟩
+      p.f (X.≤snd q)
+        ≡⟨ ≡.cong p.f q-snd ⟩
+      p.f y ∎
+
+    -- Homomorphisms preserve ⨆
+    g⨆ : ∀ a inc
+       → p.f (GX.⨆ a inc)
+       ≡ GY.⨆ (λ i → p.f (a i)) (λ i → p.f≤ (fst (inc i)) , ≤-coh-fst (inc i) , ≤-coh-snd (inc i))
+    g⨆ a inc = begin
+      p.f (GX.⨆ a inc)
+        ≡⟨ ≡.refl ⟩
+      p.f (X.⨆ a (λ i → fst (inc i)) (λ i → snd (inc i) ._∧ᵖ_.fst) (λ i → snd (inc i) ._∧ᵖ_.snd))
+        ≡⟨ p.⨆ a (λ i → fst (inc i)) (λ i → snd (inc i) ._∧ᵖ_.fst) (λ i → snd (inc i) ._∧ᵖ_.snd) ⟩
+      Y.⨆ (λ i → p.f (a i)) (λ i → p.f≤ (fst (inc i)))
+          (λ i → ≡.trans (p.f≤-fst (fst (inc i))) (≡.cong p.f (snd (inc i) ._∧ᵖ_.fst)))
+          (λ i → ≡.trans (p.f≤-snd (fst (inc i))) (≡.cong p.f (snd (inc i) ._∧ᵖ_.snd)))
+        ≡⟨ ≡.refl ⟩
+      Y.⨆ (λ i → p.f (a i)) (λ i → p.f≤ (fst (inc i)))
+          (λ i → ≤-coh-fst (inc i))
+          (λ i → ≤-coh-snd (inc i))
+        ≡⟨ ≡.refl ⟩
+      GY.⨆ (λ i → p.f (a i)) (λ i → p.f≤ (fst (inc i)) , ≤-coh-fst (inc i) , ≤-coh-snd (inc i)) ∎
+
+  G .id {X} = DA.mk≈ (λ _ → ≡.refl)
+
+  G .comp f g = DA.mk≈ (λ _ → ≡.refl)
+
+  G .resp {X} {Y} {f} {g} (MA.mk≈ p-f p-f≤) = DA.mk≈ p-f
+
+  -- Natural isomorphism η : Id ⟹ G ∘ F
+  -- For each DirectAlgebra X, we have X ≅ M→D (D→M X)
+  η : QIT.Functor.NatTrans.NatIso Id (G ∘ F)
+  η = record
+    { ob = λ X → record
+        { f = λ x → x
+        ; ≤ = λ {x} {y} p → p
+        ; η = λ _ → ≡.refl
+        ; ⊥ = ≡.refl
+        ; ⨆ = λ a inc → ≡.refl
+        }
+    ; hom = λ {X} {Y} f → DA.mk≈ (λ _ → ≡.refl)
+    ; isIso = λ X → record
+        { inv = record
+            { f = λ x → x
+            ; ≤ = λ {x} {y} p → p
+            ; η = λ _ → ≡.refl
+            ; ⊥ = ≡.refl
+            ; ⨆ = λ a inc → ≡.refl
+            }
+        ; iso₁ = DA.mk≈ (λ _ → ≡.refl)
+        ; iso₂ = DA.mk≈ (λ _ → ≡.refl)
+        }
+    }
+
+  -- Natural isomorphism ε : F ∘ G ⟹ Id
+  -- For each MutualAlgebra X, we have D→M (M→D X) ≅ X
+  ε : QIT.Functor.NatTrans.NatIso (F ∘ G) Id
+  ε = record
+    { ob = λ X → record
+        { f = λ x → x
+        ; f≤ = λ p → p
+        ; f≤-fst = λ _ → ≡.refl
+        ; f≤-snd = λ _ → ≡.refl
+        ; η = λ _ → ≡.refl
+        ; ⊥ = ≡.refl
+        ; ⨆ = λ a inc inc-fst inc-snd → ≡.refl
+        ; ≤refl = λ x → MA.Algebra.isProp≤ X _ _ ≡.refl ≡.refl
+        ; ≤trans = λ x y z p q p-fst p-snd q-fst q-snd →
+            MA.Algebra.isProp≤ X _ _ ≡.refl ≡.refl
+        ; ⊥≤ = λ x → MA.Algebra.isProp≤ X _ _ ≡.refl ≡.refl
+        ; ≤⨆ = λ a inc inc-fst inc-snd i →
+            MA.Algebra.isProp≤ X _ _ ≡.refl ≡.refl
+        ; ⨆≤ = λ a inc inc-fst inc-snd x ch≤ ch≤-fst ch≤-snd →
+            MA.Algebra.isProp≤ X _ _ ≡.refl ≡.refl
+        }
+    ; hom = λ {X} {Y} f → MA.mk≈ (λ _ → ≡.refl) (λ _ → ≡.refl)
+    ; isIso = λ X → record
+        { inv = record
+            { f = λ x → x
+            ; f≤ = λ p → p
+            ; f≤-fst = λ _ → ≡.refl
+            ; f≤-snd = λ _ → ≡.refl
+            ; η = λ _ → ≡.refl
+            ; ⊥ = ≡.refl
+            ; ⨆ = λ a inc inc-fst inc-snd → ≡.refl
+            ; ≤refl = λ x → MA.Algebra.isProp≤ X _ _ ≡.refl ≡.refl
+            ; ≤trans = λ x y z p q p-fst p-snd q-fst q-snd →
+                MA.Algebra.isProp≤ X _ _ ≡.refl ≡.refl
+            ; ⊥≤ = λ x → MA.Algebra.isProp≤ X _ _ ≡.refl ≡.refl
+            ; ≤⨆ = λ a inc inc-fst inc-snd i →
+                MA.Algebra.isProp≤ X _ _ ≡.refl ≡.refl
+            ; ⨆≤ = λ a inc inc-fst inc-snd x ch≤ ch≤-fst ch≤-snd →
+                MA.Algebra.isProp≤ X _ _ ≡.refl ≡.refl
+            }
+        ; iso₁ = MA.mk≈ (λ _ → ≡.refl) (λ _ → ≡.refl)
+        ; iso₂ = MA.mk≈ (λ _ → ≡.refl) (λ _ → ≡.refl)
+        }
+    }
