@@ -55,7 +55,9 @@ _∘_ {A} {B} {C} g f = record
   ; η = λ b → ≡.trans (≡.cong g₀ (f.η b)) (g.η b)
   ; ⊥ = ≡.trans (≡.cong g₀ f.⊥) g.⊥
   ; ≤ = λ {x} {y} p → g.≤ (f.≤ p)
-  ; ⨆ = {!!} }
+  ; ⨆ = λ a inc →
+      ≡.trans (≡.cong g₀ (f.⨆ a inc))
+              (g.⨆ (λ i → f₀ (a i)) (λ i → f.≤ (inc i))) }
   where
   module A = Algebra A
   module B = Algebra B
@@ -67,8 +69,8 @@ _∘_ {A} {B} {C} g f = record
   module g = Hom g
   open f renaming (f to f₀)
   open g renaming (f to g₀)
-    
-record _≈_ {A B} (f g : Hom A B) : Prop₁ where
+
+record _≈_ {A B} (f g : Hom A B) : Prop ℓ0 where
   constructor mk≈
   module f = Hom f
   module g = Hom g
@@ -82,18 +84,23 @@ isEquiv≈ = record
   ; trans = λ (mk≈ p) (mk≈ q)
           → mk≈ λ a → ≡.trans (p a) (q a) }
 
-Cat : Category {!!} {!!} {!!}
+∘-resp-≈ : ∀ {A B C} {f h : Hom B C} {g i : Hom A B}
+         → f ≈ h → g ≈ i → (f ∘ g) ≈ (h ∘ i)
+∘-resp-≈ {f = f} {h} {g} {i} (mk≈ p) (mk≈ q) = mk≈ λ a →
+  ≡.trans (≡.cong (Hom.f f) (q a)) (p (Hom.f i a))
+
+Cat : Category (lsuc ℓ0) (lsuc ℓ0) ℓ0
 Cat = record
   { Obj = Algebra
   ; _⇒_ = Hom
   ; _≈_ = _≈_
   ; id = id
-  ; _∘_ = {!!}
-  ; assoc = {!!}
-  ; sym-assoc = {!!}
-  ; identityˡ = {!!}
-  ; identityʳ = {!!}
-  ; identity² = {!!}
-  ; equiv = {!!}
-  ; ∘-resp-≈ = {!!}
+  ; _∘_ = _∘_
+  ; assoc = mk≈ (λ _ → ≡.refl)
+  ; sym-assoc = mk≈ (λ _ → ≡.refl)
+  ; identityˡ = mk≈ (λ _ → ≡.refl)
+  ; identityʳ = mk≈ (λ _ → ≡.refl)
+  ; identity² = mk≈ (λ _ → ≡.refl)
+  ; equiv = isEquiv≈
+  ; ∘-resp-≈ = ∘-resp-≈
   }
