@@ -15,6 +15,10 @@ open import QIT.Category.Equivalence
 open import QIT.Category.Base
 open import QIT.Functor.Base
 
+-- Postulate UIP for order relations to prove equality of order proofs
+postulate
+  uip-≤ : ∀ {A : Set} (_≤_ : A → A → Set) {x y : A} (p q : x ≤ y) → p ≡ q
+
 
 D→M : DA.Algebra → MA.Algebra
 D→M A = record
@@ -111,11 +115,27 @@ equiv = record { F = F ; G = {!!} ; η = {!!} ; ε = {!!} }
     ; η = p.η
     ; ⊥ = p.⊥
     ; ⨆ = f⨆
-    ; ≤refl = λ x → {!!}
-    ; ≤trans = {!!}
-    ; ⊥≤ = {!!}
-    ; ≤⨆ = {!!}
-    ; ⨆≤ = {!!}
+    ; ≤refl = λ x → ≡.cong₂ _,_ ≡.refl (≡.cong₂ _,_ ≡.refl (uip-≤ Y._≤_ (p.≤ X.≤refl) Y.≤refl))
+    ; ≤trans = λ x y z p q p-fst p-snd q-fst q-snd →
+        let p' = D→M.≤∙→≤ X p p-fst p-snd
+            q' = D→M.≤∙→≤ X q q-fst q-snd
+        in ≡.cong₂ _,_ ≡.refl (≡.cong₂ _,_ ≡.refl
+          (uip-≤ Y._≤_ (p.≤ (X.≤trans p' q')) (Y.≤trans (p.≤ p') (p.≤ q'))))
+    ; ⊥≤ = λ x → ≡.cong₂ _,_ ≡.refl (≡.cong₂ _,_ ≡.refl
+        (uip-≤ Y._≤_ (p.≤ X.⊥≤) (≡.subst (λ z → z Y.≤ p.f x) (≡.sym p.⊥) Y.⊥≤)))
+    ; ≤⨆ = λ a inc inc-fst inc-snd i →
+        let inc' = λ j → D→M.≤∙→≤ X (inc j) (inc-fst j) (inc-snd j)
+        in ≡.cong₂ _,_ ≡.refl (≡.cong₂ _,_ ≡.refl
+          (uip-≤ Y._≤_ (p.≤ (X.≤⨆ a inc' i))
+            (≡.subst (λ z → p.f (a i) Y.≤ z) (≡.sym (p.⨆ a inc'))
+              (Y.≤⨆ (λ j → p.f (a j)) (λ j → p.≤ (inc' j)) i))))
+    ; ⨆≤ = λ a inc inc-fst inc-snd x ch≤ ch≤-fst ch≤-snd →
+        let inc' = λ i → D→M.≤∙→≤ X (inc i) (inc-fst i) (inc-snd i)
+            ch≤' = λ i → D→M.≤∙→≤ X (ch≤ i) (ch≤-fst i) (ch≤-snd i)
+        in ≡.cong₂ _,_ ≡.refl (≡.cong₂ _,_ ≡.refl
+          (uip-≤ Y._≤_ (p.≤ (X.⨆≤ a inc' x ch≤'))
+            (≡.subst (λ z → z Y.≤ p.f x) (≡.sym (p.⨆ a inc'))
+              (Y.⨆≤ (λ i → p.f (a i)) (λ i → p.≤ (inc' i)) (p.f x) (λ i → p.≤ (ch≤' i))))))
     }
     where
     module p = DA.Hom p
@@ -156,6 +176,6 @@ equiv = record { F = F ; G = {!!} ; η = {!!} ; ε = {!!} }
               ≡ ≤∙→≤ Y (f≤ (inc i)) (≡.cong p.f (inc-fst i)) (≡.cong p.f (inc-snd i))
       q i = ≤-subst₂-comm (inc-fst i) (inc-snd i) (inc i .proj₂ .proj₂)
 
-  F .id = {!!}
-  F .comp = {!!}
-  F .resp = {!!}
+  F .id {X} = MA.mk≈ (λ _ → ≡.refl) (λ _ → ≡.refl)
+  F .comp f g = MA.mk≈ (λ _ → ≡.refl) (λ _ → ≡.refl)
+  F .resp {X} {Y} {f} {g} (DA.mk≈ p) = MA.mk≈ p (λ (x , y , q) → ≡.cong₂ _,_ (p x) (≡.cong₂ _,_ (p y) ≡.refl))
