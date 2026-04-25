@@ -76,6 +76,7 @@ M→D : MA.Algebra → DA.Algebra
 M→D A = record
   { A⊥ = A⊥
   ; _≤_ = _≤_
+  ; isProp≤ = isProp≤'
   ; η = η
   ; ⊥ = ⊥
   ; ⨆ = λ a inc → ⨆ a (λ i → fst (inc i))
@@ -89,9 +90,9 @@ M→D A = record
   ; ≤⨆ = λ a inc i → ≤⨆ a (λ j → fst (inc j)) (λ j → ≤fst≡ (inc j))
         (λ j → ≤snd≡ (inc j)) i , (≤⨆-fst a (λ j → fst (inc j)) (λ j → ≤fst≡ (inc j)) (λ j → ≤snd≡ (inc j)) i) , ≤⨆-snd a (λ j → fst (inc j)) (λ j → ≤fst≡ (inc j)) (λ j → ≤snd≡ (inc j)) i
   ; ⨆≤ = λ a inc x p → (⨆≤ a (λ i → fst (inc i)) (λ i → ≤fst≡ (inc i)) (λ i → ≤snd≡ (inc i)) x (λ i → fst (p i)) (λ i → ≤fst≡ (p i)) λ i
-          → ≤snd≡ (p i)) , (⨆≤-fst a (λ i → fst (inc i)) (λ i → _) (λ i → _) x
-          (λ i → fst (p i)) (λ i → _) (λ i → _)) , (⨆≤-snd a (λ i → fst (inc i))
-          (λ i → _) (λ i → _) x (λ i → fst (p i)) (λ i → _) (λ i → _))
+          → ≤snd≡ (p i)) , (⨆≤-fst a (λ i → fst (inc i)) (λ i → ≤fst≡ (inc i)) (λ i → ≤snd≡ (inc i)) x
+          (λ i → fst (p i)) (λ i → ≤fst≡ (p i)) (λ i → ≤snd≡ (p i))) , (⨆≤-snd a (λ i → fst (inc i))
+          (λ i → ≤fst≡ (inc i)) (λ i → ≤snd≡ (inc i)) x (λ i → fst (p i)) (λ i → ≤fst≡ (p i)) (λ i → ≤snd≡ (p i)))
   ; antisym = λ {x} {y} z z₁ →
                   antisym x y (z .fst) (z₁ .fst) (z .snd ._∧ᵖ_.fst)
                   (z .snd ._∧ᵖ_.snd) (z₁ .snd ._∧ᵖ_.fst) (z₁ .snd ._∧ᵖ_.snd)
@@ -104,6 +105,9 @@ M→D A = record
   ≤fst≡ {x} {y} (p , q , r) = q
   ≤snd≡ : ∀ {x y} → (p : x ≤ y) → ≤snd (fst p) ≡ y
   ≤snd≡ {x} {y} (p , q , r) = r
+  isProp≤' : ∀ {x y} → (p q : x ≤ y) → p ≡ q
+  isProp≤' {x} {y} (p , p-fst , p-snd) (q , q-fst , q-snd) =
+    ΣP≡ _ _ (isProp≤ p q (≡.trans p-fst (≡.sym q-fst)) (≡.trans p-snd (≡.sym q-snd)))
 
 equiv : Equivalence DA.Cat MA.Cat
 equiv = record { F = F ; G = {!!} ; η = {!!} ; ε = {!!} }
