@@ -102,13 +102,19 @@ dcong₂ : ∀ {a b c} {A : Set a} {B : A → Set b} {C : Set c}
        → f x₁ y₁ ≡ f x₂ y₂
 dcong₂ f refl refl = refl
 
+dcongsp : ∀ {a b c} {A : Set a} {B : A → Prop b} {C : Set c}
+         (f : (x : A) → B x → C) {x₁ x₂ y₁ y₂}
+       → (p : x₁ ≡ x₂)
+       → f x₁ y₁ ≡ f x₂ y₂
+dcongsp f refl = refl
+
+
 dsubst₂ : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : A → Set ℓB} (C : ∀ a → B a → Set ℓC)
        → {a1 a2 : A} {b1 : B a1} {b2 : B a2}
        → (p : a1 ≡ a2) (q : subst B p b1 ≡ b2)
        → C a1 b1 → C a2 b2
 dsubst₂ C {a1} {a2} {b1} {b2} p q x =
   transport (dcong₂ C p q) x
-
 
 isPropBox : ∀ {ℓ} {P : Prop ℓ} (p q : Box P) → p ≡ q
 isPropBox (box p) (box q) = r refl
