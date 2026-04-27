@@ -11,6 +11,10 @@ sym refl = refl
 trans : ∀ {ℓ} {A : Set ℓ} {x y z : A} → x ≡ y → y ≡ z → x ≡ z
 trans refl refl = refl
 
+
+transport : ∀ {ℓA} {A A' : Set ℓA} → A ≡ A' → A → A'
+transport = subst (λ x → x)
+
 subst₂ : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : Set ℓB} (C : A → B → Set ℓC)
        → {a1 a2 : A} {b1 b2 : B}
        → (p : a1 ≡ a2) (q : b1 ≡ b2)
@@ -98,6 +102,14 @@ dcong₂ : ∀ {a b c} {A : Set a} {B : A → Set b} {C : Set c}
        → f x₁ y₁ ≡ f x₂ y₂
 dcong₂ f refl refl = refl
 
+dsubst₂ : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : A → Set ℓB} (C : ∀ a → B a → Set ℓC)
+       → {a1 a2 : A} {b1 : B a1} {b2 : B a2}
+       → (p : a1 ≡ a2) (q : subst B p b1 ≡ b2)
+       → C a1 b1 → C a2 b2
+dsubst₂ C {a1} {a2} {b1} {b2} p q x =
+  transport (dcong₂ C p q) x
+
+
 isPropBox : ∀ {ℓ} {P : Prop ℓ} (p q : Box P) → p ≡ q
 isPropBox (box p) (box q) = r refl
   where
@@ -113,3 +125,22 @@ subst-∘ : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : Set ℓB} {C : B → Set �
         → (f : A → B) {x y : A} (p : x ≡ y) (z : C (f x))
         → subst C (cong f p) z ≡ subst (λ a → C (f a)) p z
 subst-∘ f refl z = refl
+
+drefl : ∀ {ℓA ℓB} {A : Set ℓA} (B : A → Set ℓB) {a : A} {b : B a}
+      → subst B refl b ≡ b
+drefl B = refl
+
+dsym : ∀ {ℓA ℓB} {A : Set ℓA}
+      → (B : A → Set ℓB) {a1 a2 : A} {b1 : B a1} {b2 : B a2}
+      → (p : a1 ≡ a2)
+      → subst B p b1 ≡ b2
+      → subst B (sym p) b2 ≡ b1
+dsym B refl refl = refl
+
+dtrans : ∀ {ℓA ℓB} {A : Set ℓA}
+      → (B : A → Set ℓB) {a1 a2 a3 : A} {b1 : B a1} {b2 : B a2} {b3 : B a3}
+      → (p : a1 ≡ a2) (q : a2 ≡ a3)
+      → subst B p b1 ≡ b2
+      → subst B q b2 ≡ b3
+      → subst B (trans p q) b1 ≡ b3
+dtrans B refl refl refl refl = refl
