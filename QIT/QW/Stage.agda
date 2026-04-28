@@ -28,7 +28,7 @@ open import QIT.Category.Setoid
 open import QIT.Category.Set
 open import QIT.Category.Base
 open import QIT.Functor.Base
-open import QIT.Functor.Composition
+open import QIT.Functor.Properties
 
 -- Diagram is a functor from a preorder category to setoids
 Diagram≈ : ∀ ℓD ℓD' → Set (ℓS ⊔ ℓP ⊔ lsuc ℓD ⊔ lsuc ℓD')

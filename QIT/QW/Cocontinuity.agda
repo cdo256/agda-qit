@@ -6,7 +6,7 @@ open import QIT.Relation.Binary
 open import QIT.Relation.Subset
 open import QIT.Container.Base
 open import QIT.Functor.Base
-open import QIT.Functor.Composition
+open import QIT.Functor.Properties
 open import QIT.Category.Base hiding (_[_≈_]; _[_,_]; _[_∘_])
 open import QIT.Category.Preorder
 open import QIT.Category.Set
