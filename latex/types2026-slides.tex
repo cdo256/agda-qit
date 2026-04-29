@@ -1,3 +1,4 @@
+
 \documentclass{beamer}
 
 \usepackage{amsmath}
@@ -20,17 +21,25 @@
 \begin{document}
 
 % ---------------------------------------------------------------------------
-% Slide 1: Title
+% Slide 0: Title
 % ---------------------------------------------------------------------------
 \begin{frame}
   \titlepage
 \end{frame}
 
+% ---------------------------------------------------------------------------
+% Slide 1: Outline
+% ---------------------------------------------------------------------------
 \begin{frame}{Outline}
-  %TODO: Make outline.
-  \toc
+  \begin{enumerate}
+    \item Mobiles and the lifting problem
+    \item The FPS stagewise construction
+    \item Depth preservation and extensional ordinals
+    \item Proof idea
+    \item Why this does not yet generalise
+  \end{enumerate}
   \note{%
-    Timing: 0:30.
+    Timing: 1:00.
 
     This talk is about constructing quotient inductive types from
     quotients.
@@ -40,21 +49,55 @@
 
     I want to explain where that happens, and then isolate a simple
     syntactic property, depth preservation, that behaves better.
-  }
-\end{frame}
 
-\begin{frame}{What we already know}
-  \begin{itemize}
-    \item QITs are set-truncated HITs
-    \item Infinitary QITs are known difficult (Blass 1983, Lumsdaine--Shulman 2018)
-    \item QIITs reduce to QITs %TODO: Is this a known result?
-  \end{itemize}
-  \note{
+    Here is the plan.
+
+    First I will introduce mobiles and explain the lifting problem.
+
+    Then I will recall where weak choice enters in the FPS stagewise construction.
+
+    After that I will explain the key observation for mobiles, namely depth preservation.
+
+    Then I will say what extra ordinal structure I postulate, and sketch how that recovers the stagewise argument.
+
+    Finally I will say why this does not yet give a general criterion.
   }
 \end{frame}
 
 % ---------------------------------------------------------------------------
-% Slide 6: Mobiles as a test case
+% Slide 2: The story so far
+% ---------------------------------------------------------------------------
+\begin{frame}{The story so far}
+  \begin{itemize}
+    \item QITs are set-truncated HITs.
+    \item Finitary branching QITs reduce to inductive types + quotients.
+    \item Infinitary QITs are known difficult (Blass 1983, Lumsdaine--Shulman 2018).
+    \item Brouwer extensional ordinals are one such QIT.
+    \item We want to investigate where the boundary between the
+      constructible and non-constructible QITs arises.
+    %\item QIITs reduce to QITs %TODO: Is this a known result?
+  \end{itemize}
+  \note{%
+    Timing: 0:45.
+
+    This is the background I am starting from.
+
+    Quotient inductive types are the set-level version of higher inductive types.
+
+    In the finitary case, they are relatively well understood.
+
+    In the infinitary case, known constructions need extra strength, typically in the form of weak choice.
+
+    Brouwer extensional ordinals are one of the main difficult examples.
+
+    And importantly, the existence of one quotient inductive type does not automatically imply the existence of arbitrary others.
+
+    So the question is: which features of the equations are really responsible for that extra strength?
+  }
+\end{frame}
+
+% ---------------------------------------------------------------------------
+% Slide 3: Mobiles as a test case
 % ---------------------------------------------------------------------------
 \begin{frame}{A motivating example}
   Let \(\mathcal{M}\) be the intended QIT of mobiles:
@@ -80,7 +123,7 @@
     \draw (r1) -- (b1);
     \draw (r1) -- (c1);
 
-    \node at (2, -0.5) {$=$};
+    \node at (2, -0.5) {\large $=$};
 
     \node (r2) at (4,0) [circle,fill,minimum size=4pt] {};
     \node (c2) at (3,-1) [circle,fill,minimum size=4pt,label=below:$c$] {};
@@ -96,8 +139,7 @@
 
     Let me start with the example I want to study.
 
-    A mobile is just a countably branching tree whose children are
-    unordered.
+    A mobile is a countably branching tree whose children are unordered.
 
     So we have a leaf, a node, and an equation saying that permuting the
     children of a node does not change the element.
@@ -105,13 +147,13 @@
     I write \(\mathcal{M}\) for the quotient inductive type we want to
     construct.
 
-    Mobiles are useful because they are infinitary, but the defining
-    equations are still extremely simple.
+    Mobiles are a good test case because they are infinitary, but the
+    defining equations are still very simple.
   }
 \end{frame}
 
 % ---------------------------------------------------------------------------
-% Slide 7: Naive quotient attempt
+% Slide 4: Naive quotient attempt
 % ---------------------------------------------------------------------------
 \begin{frame}{Why not quotient a W-type?}
   Let \(W\) be the raw \(W\)-type of ordered countably branching trees.
@@ -144,7 +186,7 @@
 \end{frame}
 
 % ---------------------------------------------------------------------------
-% Slide 8: The lifting problem
+% Slide 5: The lifting problem
 % ---------------------------------------------------------------------------
 \begin{frame}[fragile]{The lifting problem}
   The leaf lifts immediately:
@@ -179,16 +221,17 @@
 
     But the node is different.
 
-    Its input is now a family of quotient elements, not a family of raw
-    trees.
+    Its input is now a family of quotient elements, not a family of raw trees.
 
-    To apply the raw constructor \(n_W\), we would need to choose a
-    representative tree for each input.
+    To apply the raw constructor \(n_W\), we would need to choose a representative tree for each input.
 
     Then we could apply \(n_W\) in \(W\), and quotient again.
 
-    So the slogan here is: a quotient gives classes, but a constructor
-    wants representatives.
+    This is easy in the finite case, because we can make finitely many choices one by one.
+
+    For an infinitary constructor, however, choosing a representative for every input is exactly the shape of a choice problem.
+
+    A quotient gives classes, but a constructor wants representatives.
 
     That representative-picking step is exactly where the problem lives.
   }
@@ -196,7 +239,7 @@
 
 
 % ---------------------------------------------------------------------------
-% Slide 4: The FPS construction
+% Slide 6: The FPS construction
 % ---------------------------------------------------------------------------
 \begin{frame}{The FPS construction}
   \begin{columns}[T]
@@ -273,7 +316,7 @@
 \end{frame}
 
 % ---------------------------------------------------------------------------
-% Slide 5: The question
+% Slide 7: The question
 % ---------------------------------------------------------------------------
 \begin{frame}{An observation from mobiles}
   \textbf{Observation}
@@ -317,11 +360,10 @@
 \end{frame}
 
 % ---------------------------------------------------------------------------
-% Slide 9: What we postulate
+% Slide 8: What we postulate
 % ---------------------------------------------------------------------------
 \begin{frame}{Extensional plump ordinals}
-  For each signature \(S \triangleleft P\), postulate an extensional
-  plump ordinal object \(Z\) compatible with that signature.
+  Assume an extensional plump ordinal basis for the given signature.
   \[
     \mathsf{sup} : \sum_{s:S} (P_s \to Z) \to Z
   \]
@@ -336,32 +378,29 @@
     \dfrac{\exists i:P_s.\; \alpha \le \xi_i}{\alpha < \mathsf{sup}_s\, \xi}
   \]
 
-  with mixed transitivity and extensionality:
+  with extensionality:
   \[
   \dfrac{\forall \gamma.\;(\gamma<\alpha \Leftrightarrow \gamma<\beta)}{\alpha=\beta}
   \]
   \note{%
     Timing: 1:15.
 
-    At this point I need to say clearly what extra structure I am
-    assuming.
+    At this point I need to say clearly what extra structure I am assuming.
 
     I am not assuming full choice.
 
-    What I postulate is an extensional plump ordinal object \(Z\),
-    equipped with a sup constructor for the given signature, together with
-    the order structure needed to run the stage argument.
+    What I postulate is an extensional plump ordinal object \(Z\), equipped with a sup constructor for the given signature, together with the order structure needed to run the stage argument.
 
-    The point is that the stage object itself is now built in a way that
-    already respects the relevant identifications.
+    Crucially, extensionality says that each ordinal is determined by its set of strictly smaller ordinals.
 
-    This is the extra structure that replaces the choice step in the
-    positive case.
+    The point is that the stage object itself is now built in a way that already respects the relevant identifications.
+
+    This is the extra structure that replaces the choice step in the mobile case.
   }
 \end{frame}
 
 % ---------------------------------------------------------------------------
-% Slide 10: Why extensional ordinals?
+% Slide 9: Why extensional ordinals?
 % ---------------------------------------------------------------------------
 \begin{frame}{Why extensionality is needed}
   Raw plump ordinals still remember the order of children.
@@ -406,7 +445,7 @@
 \end{frame}
 
 % ---------------------------------------------------------------------------
-% Slide 12: Proof sketch
+% Slide 10: Proof sketch
 % ---------------------------------------------------------------------------
 \begin{frame}{Proof sketch}
   For mobiles, permutation equations are depth-preserving.
@@ -458,86 +497,80 @@
   }
 \end{frame}
 
-
 % ---------------------------------------------------------------------------
-% Slide 11: Syntactic criteria
+% Slide 11: Result for mobiles
 % ---------------------------------------------------------------------------
-\begin{frame}{Can we generalise beyond mobiles?}
-  A tempting idea is to look for a syntactic boundedness criterion.
+\begin{frame}{Result for mobiles}
+  For mobiles, the FPS colimit construction can be carried out relative to
+  an extensional plump ordinal basis.
 
   \medskip
 
-  For mobiles, the equations are \textbf{depth-preserving}:
+  So in this case, the quotient inductive type of mobiles is obtained
+  constructively from the stagewise argument, without using the full
+  cocontinuity proof via IWISC.
+  \note{%
+    Timing: 0:30.
+
+    This is the payoff.
+
+    For mobiles, depth preservation gives enough control to recover the stagewise construction from the extensional ordinal basis.
+
+    So in this case, the full weak-choice argument is not needed in the same way as in the general FPS proof.
+
+    This has also been partially formalised in Agda.
+  }
+\end{frame}
+
+% ---------------------------------------------------------------------------
+% Slide 12: Syntactic criteria
+% ---------------------------------------------------------------------------
+\begin{frame}{Can we generalise beyond mobiles?}
+  The positive case for mobiles comes from a \textbf{syntactic} property:
+
+  \medskip
+
+  \textbf{Depth-preserving equations}
   \begin{quote}
     variables occur at the same depth on both sides
   \end{quote}
 
   \medskip
 
-  One might try to weaken this to a bounded depth shift, or to a
-  `locality' condition on equations:
-  \begin{quote}
-    equations only reach a depth-bound of \alpha
-  \end{quote}
-
-  \medskip
-
-  \textbf{Barrier:} this cannot be the whole story.
-  Blass's 1983 example already satisfies such boundedness conditions,
-  yet still generates large ordinal strength in classical settings.
-  \note{%
-    Timing: 1:00.
-
-    The reason this is interesting is that depth preservation is a purely
-    syntactic property.
-
-    You can read it off from the equations themselves.
-
-    That raises the obvious question of whether one can weaken it to some
-    bounded depth shift or locality condition in which equations don't
-    descend without bound.
-
-    But boundedness alone cannot be the whole story.
-
-    Blass's example, later reframed by Lumsdaine and Shulman, shows that
-    even apparently controlled equations can still generate large ordinal
-    strength.
-
-    So the remaining question is which structural features really matter.
-  }
-\end{frame}
-
-\begin{frame}{Why locality is not enough}
-  A tempting weakening is \textbf{locality}:
-
-  \medskip
-
-  An equation is \(\alpha\)-local if both sides have depth \(< \alpha\).
-
-  \medskip
-
-  But two problems remain:
+  A tempting weakening is some boundedness condition, for example:
   \begin{itemize}
-    \item the existence of a sufficiently large extensional ordinal bound
-          is not guaranteed to be constructively available
+    \item bounded depth shift
+    \item \(\alpha\)-locality: both sides have depth \(< \alpha\)
+  \end{itemize}
+
+  \medskip
+
+  But this cannot be the whole story:
+  \begin{itemize}
+    \item a large enough extensional ordinal bound may itself not be constructively available
     \item bounded syntax alone does not control ordinal strength in general
   \end{itemize}
 
   \medskip
 
-  So locality is suggestive, but not yet a complete constructive criterion.
+  Blass's 1983 example already shows a genuine barrier.
   \note{%
-    Timing: 1:00.
+    Timing: 2:00.
 
-    The natural next idea is to weaken depth preservation to locality.
+    The reason this is interesting is that depth preservation is a purely
+    syntactic property.
 
-    Here locality just means that both sides of an equation live below
-    some fixed depth bound alpha.
+    You can read it off directly from the equations.
 
-    But this does not solve the whole problem.
+    So the obvious next question is whether one can weaken it.
 
-    First, even if such a syntactic bound exists, the large extensional
-    ordinal needed to contain all derived witnesses may itself not be
+    The most natural weakenings are bounded depth shift, or locality,
+    where both sides of an equation stay below some fixed depth bound.
+
+    But I do not want to oversell that.
+
+    First, even if such a syntactic bound exists, the extensional ordinal
+    needed to contain all derived witnesses may itself fail to be
     constructively available.
 
     And that is exactly the kind of choice-like strength we are trying to
@@ -546,18 +579,23 @@
     Second, boundedness on its own does not control ordinal strength in
     general.
 
-    So locality is a useful guide, but it is not yet the final answer.
+    Blass's example, later reframed by Lumsdaine and Shulman, shows that
+    even apparently controlled equations can still generate large ordinal
+    strength.
+
+    So depth preservation gives a genuine positive case, but the right
+    general criterion is still open.
   }
 \end{frame}
 
 % ---------------------------------------------------------------------------
-% Slide 15: Conclusion
+% Slide 13: Conclusion
 % ---------------------------------------------------------------------------
 \begin{frame}{Conclusion}
   \begin{itemize}
     \item Known general constructions of infinitary QITs use weak choice.
     \item For mobiles, depth-preservation lets us recover a stable stage assignment.
-    \item Extensional plump ordinals provide the ordinal basis for that positive case.
+    \item Extensional plump ordinals provide the ordinal basis for the mobile case.
     \item But bounded syntactic criteria alone do not yet explain the general case:
           Blass and Lumsdaine--Shulman show a genuine barrier.
   \end{itemize}
@@ -597,86 +635,88 @@
   }
 \end{frame}
 
+\begin{frame}[allowframebreaks]{References}
+  \tiny
+  \begin{thebibliography}{3}
 
-\begin{thebibliography}{3}
+  \bibitem{abbott2005-containers}
+  Michael Abbott, Thorsten Altenkirch, and Neil Ghani.
+  \newblock Containers: Constructing strictly positive types.
+  \newblock {\em Theoretical Computer Science}, 342(1):3--27, 2005.
 
-\bibitem{abbott2005-containers}
-Michael Abbott, Thorsten Altenkirch, and Neil Ghani.
-\newblock Containers: Constructing strictly positive types.
-\newblock {\em Theoretical Computer Science}, 342(1):3--27, 2005.
+  \bibitem{altenkirch2016-qit}
+  Thorsten Altenkirch and Ambrus Kaposi.
+  \newblock Type theory in type theory using quotient inductive types.
+  \newblock In {\em Proceedings of the 43rd ACM SIGPLAN-SIGACT Symposium on
+    Principles of Programming Languages (POPL 2016)}, pages 18--29, 2016.
 
-\bibitem{altenkirch2016-qit}
-Thorsten Altenkirch and Ambrus Kaposi.
-\newblock Type theory in type theory using quotient inductive types.
-\newblock In {\em Proceedings of the 43rd ACM SIGPLAN-SIGACT Symposium on
-  Principles of Programming Languages (POPL 2016)}, pages 18--29, 2016.
+  \bibitem{altenkirch2018-qiit}
+  Thorsten Altenkirch, Paolo Capriotti, Gabe Dijkstra, Nicolai Kraus, and
+  Fredrik Nordvall Forsberg.
+  \newblock Quotient inductive-inductive types.
+  \newblock In {\em Foundations of Software Science and Computation Structures
+    (FoSSaCS 2018)}, pages 293--310, 2018.
 
-\bibitem{altenkirch2018-qiit}
-Thorsten Altenkirch, Paolo Capriotti, Gabe Dijkstra, Nicolai Kraus, and
-Fredrik Nordvall Forsberg.
-\newblock Quotient inductive-inductive types.
-\newblock In {\em Foundations of Software Science and Computation Structures
-  (FoSSaCS 2018)}, pages 293--310, 2018.
+  \bibitem{altenkirch2017-partiality-monad}
+  Thorsten Altenkirch, Nils Anders Danielsson, and Nicolai Kraus.
+  \newblock Partiality, revisited: The partiality monad as a quotient inductive-inductive type.
+  \newblock In {\em Foundations of Software Science and Computation Structures (FoSSaCS 2017)}, pages 17--33, 2017.
 
-\bibitem{altenkirch2017-partiality-monad}
-Thorsten Altenkirch, Nils Anders Danielsson, and Nicolai Kraus.
-\newblock Partiality, revisited: The partiality monad as a quotient inductive-inductive type.
-\newblock In {\em Foundations of Software Science and Computation Structures (FoSSaCS 2017)}, pages 17--33, 2017.
+  \bibitem{fiore2022-quotients-inductive-types}
+  Marcelo P.~Fiore, Andrew M.~Pitts, and S.~C.~Steenkamp.
+  \newblock Quotients, inductive types, and quotient inductive types.
+  \newblock {\em Logical Methods in Computer Science}, 18(2), 2022.
 
-\bibitem{fiore2022-quotients-inductive-types}
-Marcelo P.~Fiore, Andrew M.~Pitts, and S.~C.~Steenkamp.
-\newblock Quotients, inductive types, and quotient inductive types.
-\newblock {\em Logical Methods in Computer Science}, 18(2), 2022.
+  \bibitem{kaposi2019-constructing}
+  Ambrus Kaposi, Andr\'as Kov\'acs, and Thorsten Altenkirch.
+  \newblock Constructing quotient inductive-inductive types.
+  \newblock {\em Proceedings of the ACM on Programming Languages},
+    3(POPL):2:1--2:24, 2019.
 
-\bibitem{kaposi2019-constructing}
-Ambrus Kaposi, Andr\'as Kov\'acs, and Thorsten Altenkirch.
-\newblock Constructing quotient inductive-inductive types.
-\newblock {\em Proceedings of the ACM on Programming Languages},
-  3(POPL):2:1--2:24, 2019.
+  \bibitem{kaposi2021-setoid}
+  Ambrus Kaposi and Zongpu Xie.
+  \newblock Quotient inductive-inductive types in the setoid model.
+  \newblock In {\em 27th International Conference on Types for Proofs and
+    Programs (TYPES 2021)}, presentation abstract/slides, 2021.
 
-\bibitem{kaposi2021-setoid}
-Ambrus Kaposi and Zongpu Xie.
-\newblock Quotient inductive-inductive types in the setoid model.
-\newblock In {\em 27th International Conference on Types for Proofs and
-  Programs (TYPES 2021)}, presentation abstract/slides, 2021.
+  \bibitem{kovacs2020-large}
+  Andr\'as Kov\'acs and Ambrus Kaposi.
+  \newblock Large and infinitary quotient inductive-inductive types.
+  \newblock In {\em Proceedings of the 35th Annual ACM/IEEE Symposium on Logic in
+    Computer Science (LICS 2020)}, pages 648--661, 2020.
 
-\bibitem{kovacs2020-large}
-Andr\'as Kov\'acs and Ambrus Kaposi.
-\newblock Large and infinitary quotient inductive-inductive types.
-\newblock In {\em Proceedings of the 35th Annual ACM/IEEE Symposium on Logic in
-  Computer Science (LICS 2020)}, pages 648--661, 2020.
+  \bibitem{kraus2023-ordinal}
+  Nicolai Kraus, Fredrik Nordvall Forsberg, and Chuangjie Xu.
+  \newblock Type-theoretic approaches to ordinals.
+  \newblock {\em Theoretical Computer Science}, 957:113843, 2023.
 
-\bibitem{kraus2023-ordinal}
-Nicolai Kraus, Fredrik Nordvall Forsberg, and Chuangjie Xu.
-\newblock Type-theoretic approaches to ordinals.
-\newblock {\em Theoretical Computer Science}, 957:113843, 2023.
+  \bibitem{lumsdaine2020-hit}
+  Peter LeFanu Lumsdaine and Michael Shulman.
+  \newblock Semantics of higher inductive types.
+  \newblock {\em Mathematical Proceedings of the Cambridge Philosophical
+    Society}, 169(1):159--208, 2020.
 
-\bibitem{lumsdaine2020-hit}
-Peter LeFanu Lumsdaine and Michael Shulman.
-\newblock Semantics of higher inductive types.
-\newblock {\em Mathematical Proceedings of the Cambridge Philosophical
-  Society}, 169(1):159--208, 2020.
+  \bibitem{taylor1996-intuitionistic}
+  Paul Taylor.
+  \newblock Intuitionistic sets and ordinals.
+  \newblock {\em The Journal of Symbolic Logic}, 61(3):705--744, 1996.
 
-\bibitem{taylor1996-intuitionistic}
-Paul Taylor.
-\newblock Intuitionistic sets and ordinals.
-\newblock {\em The Journal of Symbolic Logic}, 61(3):705--744, 1996.
+  \bibitem{taylor1999-practical}
+  Paul Taylor.
+  \newblock Practical Foundations of Mathematics.
+  \newblock {\em Cambridge Studies in Advanced Mathematics}, volume 59. Cambridge University Press, 1999.
 
-\bibitem{taylor1999-practical}
-Paul Taylor.
-\newblock Practical Foundations of Mathematics.
-\newblock {\em Cambridge Studies in Advanced Mathematics}, volume 59. Cambridge University Press, 1999.
+  \bibitem{hott2013-book}
+  The Univalent Foundations Program.
+  \newblock Homotopy Type Theory: Univalent Foundations of Mathematics.
+  \newblock Institute for Advanced Study, 2013.
 
-\bibitem{hott2013-book}
-The Univalent Foundations Program.
-\newblock Homotopy Type Theory: Univalent Foundations of Mathematics.
-\newblock Institute for Advanced Study, 2013.
+  \bibitem{vandenberg2012-wisc-axiom}
+  Benno van den Berg and Ieke Moerdijk.
+  \newblock The axiom of multiple choice and models for constructive set theory.
+  \newblock {\em arXiv preprint arXiv:1204.4045}, 2012.
 
-\bibitem{vandenberg2012-wisc-axiom}
-Benno van den Berg and Ieke Moerdijk.
-\newblock The axiom of multiple choice and models for constructive set theory.
-\newblock {\em arXiv preprint arXiv:1204.4045}, 2012.
-
-\end{thebibliography}
+  \end{thebibliography}
+\end{frame}
 
 \end{document}
