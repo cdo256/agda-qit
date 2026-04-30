@@ -1,24 +1,27 @@
 {
-    "load_direnv": "shell_hook",
-    "lsp": {
+  "load_direnv": "shell_hook",
+  "lsp": {
+    "texlab": {
+      "settings": {
         "texlab": {
-            "settings": {
-                "texlab": {
-                    "build": {
-                        "executable": "make",
-                        "args": ["all"],
-                        "onSave": true,
-                        "forwardSearchAfter": false
-                    },
-                    "auxDirectory": "out"
-                }
-            }
-        }
+          "build": {
+            "executable": "make",
+            "args": ["all"],
+            "onSave": true,
+            "forwardSearchAfter": false,
+          },
+          "auxDirectory": "out",
+        },
+      },
     },
-    "languages": {
-        "LaTeX": {
-            "preferred_line_length": 80,
-            "soft_wrap": "none"
-        }
-    }
+  },
+  "languages": {
+    "LaTeX": {
+      "preferred_line_length": 80,
+      "soft_wrap": "none",
+      "tab_size": 2,
+      "hard_tabs": false,
+      "format_on_save": "off",
+    },
+  },
 }
