@@ -41,11 +41,10 @@
   \note{%
     Timing: 1:00.
 
-    This talk is about constructing quotient inductive types from
-    quotients.
+    This talk is about constructing quotient inductive types from quotients.
 
-    In the infinitary case, the standard constructions seem to require
-    weak choice.
+    In the infinitary case, the standard constructions seem to require weak
+    choice.
 
     I want to explain where that happens, and then isolate a simple
     syntactic property, depth preservation, that behaves better.
@@ -54,11 +53,14 @@
 
     First I will introduce mobiles and explain the lifting problem.
 
-    Then I will recall where weak choice enters in the FPS stagewise construction.
+    Then I will recall where weak choice enters in the FPS stagewise
+    construction.
 
-    After that I will explain the key observation for mobiles, namely depth preservation.
+    After that I will explain the key observation for mobiles, namely depth
+    preservation.
 
-    Then I will say what extra ordinal structure I postulate, and sketch how that recovers the stagewise argument.
+    Then I will say what extra ordinal structure I postulate, and sketch how
+    that recovers the stagewise argument.
 
     Finally I will say why this does not yet give a general criterion.
   }
@@ -71,10 +73,11 @@
   \begin{itemize}
     \item QITs are set-truncated HITs.
     \item Finitary branching QITs reduce to inductive types + quotients.
-    \item Infinitary QITs are known difficult (Blass 1983, Lumsdaine--Shulman 2018).
+    \item Infinitary QITs are known difficult (Blass 1983, Lumsdaine--
+          Shulman 2018).
     \item Brouwer extensional ordinals are one such QIT.
     \item We want to investigate where the boundary between the
-      constructible and non-constructible QITs arises.
+          constructible and non-constructible QITs arises.
     %\item QIITs reduce to QITs %TODO: Is this a known result?
   \end{itemize}
   \note{%
@@ -82,17 +85,21 @@
 
     This is the background I am starting from.
 
-    Quotient inductive types are the set-level version of higher inductive types.
+    Quotient inductive types are the set-level version of higher inductive
+    types.
 
     In the finitary case, they are relatively well understood.
 
-    In the infinitary case, known constructions need extra strength, typically in the form of weak choice.
+    In the infinitary case, known constructions need extra strength,
+    typically in the form of weak choice.
 
     Brouwer extensional ordinals are one of the main difficult examples.
 
-    And importantly, the existence of one quotient inductive type does not automatically imply the existence of arbitrary others.
+    And importantly, the existence of one quotient inductive type does not
+    automatically imply the existence of arbitrary others.
 
-    So the question is: which features of the equations are really responsible for that extra strength?
+    So the question is: which features of the equations are really
+    responsible for that extra strength?
   }
 \end{frame}
 
@@ -181,7 +188,8 @@
 
     \(Q\) looks to have the right shape element-wise.
 
-    But the problem is whether \(Q\) carries the right constructor structure.
+    But the problem is whether \(Q\) carries the right constructor
+    structure.
   }
 \end{frame}
 
@@ -221,15 +229,19 @@
 
     But the node is different.
 
-    Its input is now a family of quotient elements, not a family of raw trees.
+    Its input is now a family of quotient elements, not a family of raw
+    trees.
 
-    To apply the raw constructor \(n_W\), we would need to choose a representative tree for each input.
+    To apply the raw constructor \(n_W\), we would need to choose a
+    representative tree for each input.
 
     Then we could apply \(n_W\) in \(W\), and quotient again.
 
-    This is easy in the finite case, because we can make finitely many choices one by one.
+    This is easy in the finite case, because we can make finitely many
+    choices one by one.
 
-    For an infinitary constructor, however, choosing a representative for every input is exactly the shape of a choice problem.
+    For an infinitary constructor, however, choosing a representative for
+    every input is exactly the shape of a choice problem.
 
     A quotient gives classes, but a constructor wants representatives.
 
@@ -298,8 +310,8 @@
   \note{%
     Timing: 1:15.
 
-    There is already a general answer to this problem, due to Fiore,
-    Pitts, and Steenkamp.
+    There is already a general answer to this problem, due to Fiore, Pitts,
+    and Steenkamp.
 
     Their idea is to build the quotient inductive type stage by stage.
 
@@ -308,8 +320,8 @@
 
     The hard step is cocontinuity.
 
-    Roughly, cocontinuity says that forming constructor inputs behaves
-    well with this colimit.
+    Roughly, cocontinuity says that forming constructor inputs behaves well
+    with this colimit.
 
     That is exactly where weak choice enters their proof.
   }
@@ -389,13 +401,18 @@
 
     I am not assuming full choice.
 
-    What I postulate is an extensional plump ordinal object \(Z\), equipped with a sup constructor for the given signature, together with the order structure needed to run the stage argument.
+    What I postulate is an extensional plump ordinal object \(Z\), equipped
+    with a sup constructor for the given signature, together with the order
+    structure needed to run the stage argument.
 
-    Crucially, extensionality says that each ordinal is determined by its set of strictly smaller ordinals.
+    Crucially, extensionality says that each ordinal is determined by its
+    set of strictly smaller ordinals.
 
-    The point is that the stage object itself is now built in a way that already respects the relevant identifications.
+    The point is that the stage object itself is now built in a way that
+    already respects the relevant identifications.
 
-    This is the extra structure that replaces the choice step in the mobile case.
+    This is the extra structure that replaces the choice step in the mobile
+    case.
   }
 \end{frame}
 
@@ -479,14 +496,14 @@
 
     Here is the proof idea.
 
-    First, for mobiles, permutation does not change depth, so the raw
-    stage assignment \(d_0 : W \to Z\) respects the quotient relation
-    inside each stage.
+    First, for mobiles, permutation does not change depth, so the raw stage
+    assignment \(d_0 : W \to Z\) respects the quotient relation inside each
+    stage.
 
     That means it descends to maps \(d_\alpha : D_\alpha \to Z\).
 
-    Second, these descended maps are compatible with the connecting maps
-    of the diagram, so they induce a single map
+    Second, these descended maps are compatible with the connecting maps of
+    the diagram, so they induce a single map
     \(d : \mathrm{colim}\,D \to Z\).
 
     This gives exactly the stable stage assignment needed to define the
@@ -514,9 +531,11 @@
 
     This is the payoff.
 
-    For mobiles, depth preservation gives enough control to recover the stagewise construction from the extensional ordinal basis.
+    For mobiles, depth preservation gives enough control to recover the
+    stagewise construction from the extensional ordinal basis.
 
-    So in this case, the full weak-choice argument is not needed in the same way as in the general FPS proof.
+    So in this case, the full weak-choice argument is not needed in the same
+    way as in the general FPS proof.
 
     This has also been partially formalised in Agda.
   }
@@ -547,7 +566,8 @@
 
   But this cannot be the whole story:
   \begin{itemize}
-    \item a large enough extensional ordinal bound may itself not be constructively available
+    \item a large enough extensional ordinal bound may itself not be
+          constructively available
     \item bounded syntax alone does not control ordinal strength in general
   \end{itemize}
 
@@ -564,8 +584,8 @@
 
     So the obvious next question is whether one can weaken it.
 
-    The most natural weakenings are bounded depth shift, or locality,
-    where both sides of an equation stay below some fixed depth bound.
+    The most natural weakenings are bounded depth shift, or locality, where
+    both sides of an equation stay below some fixed depth bound.
 
     But I do not want to oversell that.
 
@@ -594,10 +614,12 @@
 \begin{frame}{Conclusion}
   \begin{itemize}
     \item Known general constructions of infinitary QITs use weak choice.
-    \item For mobiles, depth-preservation lets us recover a stable stage assignment.
-    \item Extensional plump ordinals provide the ordinal basis for the mobile case.
-    \item But bounded syntactic criteria alone do not yet explain the general case:
-          Blass and Lumsdaine--Shulman show a genuine barrier.
+    \item For mobiles, depth-preservation lets us recover a stable stage
+          assignment.
+    \item Extensional plump ordinals provide the ordinal basis for the
+          mobile case.
+    \item But bounded syntactic criteria alone do not yet explain the
+          general case: Blass and Lumsdaine--Shulman show a genuine barrier.
   \end{itemize}
 
   \medskip
@@ -609,8 +631,8 @@
 
     So to conclude: weak choice is not the whole story.
 
-    In depth-preserving examples such as mobiles, equality stays in the
-    same stage, and that lets us recover a stable stage assignment.
+    In depth-preserving examples such as mobiles, equality stays in the same
+    stage, and that lets us recover a stable stage assignment.
 
     Extensional plump ordinals provide the ordinal basis for that positive
     case.
