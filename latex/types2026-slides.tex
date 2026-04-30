@@ -72,13 +72,13 @@
 \begin{frame}{The story so far}
   \begin{itemize}
     \item QITs are set-truncated HITs.
-    \item Finitary branching QITs reduce to inductive types + quotients.
+    \item Finitary branching QITs admit constructions from inductive
+      types + quotients.
     \item Infinitary QITs are known difficult (Blass 1983, Lumsdaine--
           Shulman 2018).
     \item Brouwer extensional ordinals are one such QIT.
     \item We want to investigate where the boundary between the
           constructible and non-constructible QITs arises.
-    %\item QIITs reduce to QITs %TODO: Is this a known result?
   \end{itemize}
   \note{%
     Timing: 0:45.
@@ -524,8 +524,9 @@
   \medskip
 
   So in this case, the quotient inductive type of mobiles is obtained
-  constructively from the stagewise argument, without using the full
-  cocontinuity proof via IWISC.
+  from the stagewise argument from this basis, without relying on IWISC.
+  \medskip
+  This argument has been paritally formalized in Agda.
   \note{%
     Timing: 0:30.
 
@@ -742,3 +743,4 @@
 \end{frame}
 
 \end{document}
+
