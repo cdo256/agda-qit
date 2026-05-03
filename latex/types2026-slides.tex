@@ -434,9 +434,9 @@
 
     At this point I need to say clearly what extra structure I am assuming.
 
-    I am not assuming full choice.
+    We are not assuming full choice.
 
-    What I postulate is an extensional plump ordinal object \(Z\), equipped
+    What we postulate is an extensional plump ordinal object \(Z\), equipped
     with a sup constructor for the given signature, together with the order
     structure needed to run the stage argument.
 
@@ -619,34 +619,25 @@
   \note{%
     Timing: 2:00 (cumulative: 14:10).
 
-    The reason this is interesting is that depth preservation is a purely
-    syntactic property.
+    Depth preservation is a purely syntactic property: you can read it
+    off directly from the equations.
 
-    You can read it off directly from the equations.
+    The obvious next question is whether one can weaken it.  The most
+    natural weakenings are bounded depth shift, or locality, where both
+    sides stay below some fixed depth bound.
 
-    So the obvious next question is whether one can weaken it.
+    But this cannot be the whole story.  Even if such a syntactic bound
+    exists, a large enough extensional ordinal may not be constructively
+    available — and that is exactly the choice-like strength we are
+    trying to avoid.
 
-    The most natural weakenings are bounded depth shift, or locality,
-    where both sides of an equation stay below some fixed depth bound.
-
-    But I do not want to oversell that.
-
-    First, even if such a syntactic bound exists, the extensional ordinal
-    needed to contain all derived witnesses may itself fail to be
-    constructively available.
-
-    And that is exactly the kind of choice-like strength we are trying to
-    avoid.
-
-    Second, boundedness on its own does not control ordinal strength in
-    general.
-
-    Blass's example, later reframed by Lumsdaine and Shulman, shows that
-    even apparently controlled equations can still generate large ordinal
-    strength.
+    Also, bounded syntax alone does not control ordinal strength in
+    general: Blass's example (later reframed by Lumsdaine and Shulman)
+    shows that apparently controlled equations can still generate large
+    ordinal strength.
 
     So depth preservation gives a genuine positive case, but the right
-    general criterion is still open.
+    general criterion remains open.
   }
 \end{frame}
 
@@ -682,7 +673,7 @@
     Extensional plump ordinals provide the ordinal basis for the mobile
     case.
 
-    My current working conjecture is that this extra ordinal basis is not
+    Our current working conjecture is that this extra ordinal basis is not
     just an artefact of the proof.
 
     In other words, mobiles are not derivable from UIP, function
