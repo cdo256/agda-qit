@@ -562,9 +562,12 @@
   \medskip
 
   So in this case, the quotient inductive type of mobiles is obtained
-  from the stagewise argument from this basis, without relying on IWISC.
+  from the stagewise argument relative to this basis, without relying on
+  the full cocontinuity proof via IWISC.
+
   \medskip
-  This argument has been paritally formalized in Agda.
+
+  This argument has been partially formalised in Agda.
   \note{%
     Timing: 0:30 (cumulative: 12:10).
 
@@ -573,8 +576,8 @@
     For mobiles, depth preservation gives enough control to recover the
     stagewise construction from the extensional ordinal basis.
 
-    So in this case, the full weak-choice argument is not needed in the same
-    way as in the general FPS proof.
+    So in this case, the full weak-choice argument is not needed in the
+    same way as in the general FPS proof.
 
     This has also been partially formalised in Agda.
   }
@@ -616,25 +619,34 @@
   \note{%
     Timing: 2:00 (cumulative: 14:10).
 
-    Depth preservation is a purely syntactic property: you can read it off
-    directly from the equations.
+    The reason this is interesting is that depth preservation is a purely
+    syntactic property.
 
-    The obvious next question is whether one can weaken it.  The most
-    natural weakenings are bounded depth shift, or locality, where both
-    sides stay below some fixed depth bound.
+    You can read it off directly from the equations.
 
-    But this cannot be the whole story.  Even if such a syntactic bound
-    exists, a large enough extensional ordinal may not be constructively
-    available — and that is exactly the choice-like strength we are trying
-    to avoid.
+    So the obvious next question is whether one can weaken it.
 
-    Also, bounded syntax alone does not control ordinal strength in general:
-    Blass's example (later reframed by Lumsdaine and Shulman) shows that
-    apparently controlled equations can still generate large ordinal
+    The most natural weakenings are bounded depth shift, or locality,
+    where both sides of an equation stay below some fixed depth bound.
+
+    But I do not want to oversell that.
+
+    First, even if such a syntactic bound exists, the extensional ordinal
+    needed to contain all derived witnesses may itself fail to be
+    constructively available.
+
+    And that is exactly the kind of choice-like strength we are trying to
+    avoid.
+
+    Second, boundedness on its own does not control ordinal strength in
+    general.
+
+    Blass's example, later reframed by Lumsdaine and Shulman, shows that
+    even apparently controlled equations can still generate large ordinal
     strength.
 
     So depth preservation gives a genuine positive case, but the right
-    general criterion remains open.
+    general criterion is still open.
   }
 \end{frame}
 
@@ -654,8 +666,11 @@
 
   \medskip
 
-  The open problem is to identify which structural features of equations
-  control the need for large ordinal strength or choice principles.
+  \textbf{Working conjecture:}
+  the quotient inductive type of mobiles is not derivable from
+  UIP + funExt + Prop + quotients + \(W\)-types alone,
+  without an additional ordinal principle.
+
   \note{%
     Timing: 0:45 (cumulative: 14:55).
 
@@ -664,13 +679,16 @@
     In depth-preserving examples such as mobiles, equality stays in the same
     stage, and that lets us recover a stable stage assignment.
 
-    Extensional plump ordinals provide the ordinal basis for that positive
+    Extensional plump ordinals provide the ordinal basis for the mobile
     case.
 
-    But this does not yet explain the general infinitary situation.
+    My current working conjecture is that this extra ordinal basis is not
+    just an artefact of the proof.
 
-    The open problem is to identify which structural features of the
-    equations control the need for large ordinal strength or choice.
+    In other words, mobiles are not derivable from UIP, function
+    extensionality, Prop, quotients, and W-types alone.
+
+    Proving or refuting that is the next step.
   }
 \end{frame}
 
