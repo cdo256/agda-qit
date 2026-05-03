@@ -102,11 +102,10 @@
 \begin{frame}{The story so far}
   \begin{itemize}
     \item QITs are set-truncated HITs.
-    \item Finitary QIITs reduce to one universal QIIT, the theory of signatures
-          (Kaposi--Kov\'acs--Altenkirch 2019).
+    \item Finitary QIITs admit a universal reduction via the theory of signatures.
     \item Large and infinitary QIITs have a general syntax/semantics, but are
           harder to construct (Kov\'acs--Kaposi 2020).
-    \item Infinitary QITs are known difficult (Blass 1983, Lumsdaine--Shulman 2018).
+    \item Infinitary QITs are known difficult (Blass 1983, Lumsdaine--Shulman 2020).
     \item We want to investigate where the boundary between the
           constructible and non-constructible QITs arises.
   \end{itemize}
@@ -142,6 +141,9 @@
     n_\mathcal{M} : (\mathbb N \to \mathcal{M}) \to \mathcal{M}
     \qquad
     n_\mathcal{M}(f \circ \pi)=n_\mathcal{M}(f)
+  \]
+  \[
+    \text{for each permutation } \pi : \mathbb{N} \cong \mathbb{N}.
   \]
 
   \medskip
@@ -500,7 +502,7 @@
 % Slide 10: Proof sketch
 % ---------------------------------------------------------------------------
 \begin{frame}{Proof sketch}
-  For mobiles, permutation equations are depth-preserving.
+  For mobiles, permutation equations are \textbf{depth-preserving}.
 
   \medskip
 
@@ -525,7 +527,7 @@
 
   \medskip
 
-  This coherent stage assignment gives the section needed to define the
+  This coherent stage assignment gives the \textbf{section} needed to define the
   constructors on the colimit.
 
   \note{%
@@ -561,9 +563,8 @@
 
   \medskip
 
-  So in this case, the quotient inductive type of mobiles is obtained
-  from the stagewise argument relative to this basis, without relying on
-  the full cocontinuity proof via IWISC.
+  So the quotient inductive type of mobiles is obtained from the stagewise
+  argument relative to an extensional plump ordinal basis.
 
   \medskip
 
@@ -722,6 +723,11 @@
   Thorsten Altenkirch, Nils Anders Danielsson, and Nicolai Kraus.
   \newblock Partiality, revisited: The partiality monad as a quotient inductive-inductive type.
   \newblock In {\em Foundations of Software Science and Computation Structures (FoSSaCS 2017)}, pages 17--33, 2017.
+
+  \bibitem{blass1983-words}
+  Andreas Blass.
+  \newblock Words, free algebras, and coequalizers.
+  \newblock {\em Fundamenta Mathematicae}, 117(3):255--256, 1983.
 
   \bibitem{fiore2022-quotients-inductive-types}
   Marcelo P.~Fiore, Andrew M.~Pitts, and S.~C.~Steenkamp.
