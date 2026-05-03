@@ -1,4 +1,3 @@
-
 \documentclass{beamer}
 
 \usepackage{amsmath}
@@ -10,11 +9,26 @@
 \usepackage{pgfpages}
 \setbeameroption{show notes on second screen=right}
 
+% Fix duplicate PDF destination warnings (NavigationN, page.N) caused by
+% pgfpages creating two logical pages per frame.  The patch suppresses the
+% hyperref anchor hooks on the notes logical page so each named destination
+% is only emitted once.  Requires the xpatch package.
+\usepackage{xpatch}
+\makeatletter
+\xpatchcmd{\beamer@outsideframenote}{\pgfpagescurrentpagewillbelogicalpage}{%
+  \renewcommand*{\HyPL@EveryPage}{\ltx@empty}%
+  \renewcommand*{\Hy@EveryPageAnchor}{\ltx@empty}%
+  \pgfpagescurrentpagewillbelogicalpage}%
+  {}{\errmessage{Patch beamer@outsideframenote for note page FAILED}}%
+\makeatother
+
+\graphicspath{{latex/}}
+
 \usetheme{default}
 \setbeamertemplate{navigation symbols}{}
 
 \title{Constructing QITs from Quotients}
-\author{Christina O'Donnell\\[4pt]
+\author{Christina O'Donnell\texorpdfstring{\\[4pt]}{, }%
   \footnotesize Joint work with Thorsten Altenkirch}
 \date{TYPES 2026}
 
@@ -25,8 +39,26 @@
 % ---------------------------------------------------------------------------
 \begin{frame}
   \titlepage
+\end{frame}
+
+\begin{frame}{Question}
+  \begin{center}
+    \Large
+    When does quotienting an inductive type really give the
+    quotient inductive type we want?
+  \end{center}
   \note{%
-    This talk is about constructing quotient inductive types from quotients.
+    Timing: 0:20.
+
+    This talk is about one basic question.
+
+    When do quotients and inductive types give rise to quotient inductive types?
+
+    In the infinitary branching case, the standard constructions seem
+    to rely on a weak form of choice.
+
+    I want to explore where that need for choice comes from, by
+    working through a specific motivating example.
   }
 \end{frame}
 
@@ -35,37 +67,32 @@
 % ---------------------------------------------------------------------------
 \begin{frame}{Outline}
   \begin{enumerate}
-    \item Mobiles and the lifting problem
-    \item The FPS stagewise construction
-    \item Depth preservation and extensional ordinals
-    \item Proof idea
-    \item Why this does not yet generalise
+    \item A simple example: mobiles
+    \item Why the obvious construction fails
+    \item Where weak choice enters
+    \item A positive case
+    \item Why the general problem is still open
   \end{enumerate}
   \note{%
-    Timing: 1:00 (cumulative: 1:00).
-
-    This talk is about constructing quotient inductive types from quotients.
-
-    In the infinitary case, the standard constructions seem to require weak
-    choice.
-
-    I want to explain where that happens, and then isolate a simple
-    syntactic property, depth preservation, that behaves better.
-
+    Timing: 0:40 (cumulative: 1:00).
+  
     Here is the plan.
-
-    First I will introduce mobiles and explain the lifting problem.
-
-    Then I will recall where weak choice enters in the FPS stagewise
+  
+    First I will introduce the motivating structure which we call
+    ``mobiles'' and explain the lifting problem.
+  
+    Then I will say where choice enters in the size indexed stage
     construction.
-
-    After that I will explain the key observation for mobiles, namely depth
-    preservation.
-
-    Then I will say what extra ordinal structure I postulate, and sketch how
-    that recovers the stagewise argument.
-
-    Finally I will say why this does not yet give a general criterion.
+  
+    After that I will explain the key observation for mobiles, namely that
+    permutation does not change depth.
+  
+    Then I will sketch the proof that depth preserving equations gives
+    us a section on the colimit morphism, say what extra ordinal
+    structure we assume, and sketch why that is enough in this case.
+  
+    Finally I will state a working conjecture on the provability of
+    mobiles from quotients and W-types alone.
   }
 \end{frame}
 
@@ -119,29 +146,36 @@
 
   \medskip
 
-  Intuition: countably branching trees with unordered children.
+  \begin{columns}[c]
+    \begin{column}{0.55\textwidth}
+      Intuition: countably branching trees with unordered children.
 
-  \begin{center}
-  \begin{tikzpicture}[scale=0.9, every node/.style={inner sep=1.5pt}]
-    \node (r1) at (0,0) [circle,fill,minimum size=4pt] {};
-    \node (a1) at (-1,-1) [circle,fill,minimum size=4pt,label=below:$a$] {};
-    \node (b1) at (0,-1) [circle,fill,minimum size=4pt,label=below:$b$] {};
-    \node (c1) at (1,-1) [circle,fill,minimum size=4pt,label=below:$c$] {};
-    \draw (r1) -- (a1);
-    \draw (r1) -- (b1);
-    \draw (r1) -- (c1);
+      \begin{center}
+      \begin{tikzpicture}[scale=0.55, every node/.style={inner sep=1.5pt}]
+        \node (r1) at (0,0) [circle,fill,minimum size=4pt] {};
+        \node (a1) at (-1,-1) [circle,fill,minimum size=4pt,label=below:$a$] {};
+        \node (b1) at (0,-1) [circle,fill,minimum size=4pt,label=below:$b$] {};
+        \node (c1) at (1,-1) [circle,fill,minimum size=4pt,label=below:$c$] {};
+        \draw (r1) -- (a1);
+        \draw (r1) -- (b1);
+        \draw (r1) -- (c1);
 
-    \node at (2, -0.5) {\large $=$};
+        \node at (2, -0.5) {\large $=$};
 
-    \node (r2) at (4,0) [circle,fill,minimum size=4pt] {};
-    \node (c2) at (3,-1) [circle,fill,minimum size=4pt,label=below:$c$] {};
-    \node (a2) at (4,-1) [circle,fill,minimum size=4pt,label=below:$a$] {};
-    \node (b2) at (5,-1) [circle,fill,minimum size=4pt,label=below:$b$] {};
-    \draw (r2) -- (c2);
-    \draw (r2) -- (a2);
-    \draw (r2) -- (b2);
-  \end{tikzpicture}
-  \end{center}
+        \node (r2) at (4,0) [circle,fill,minimum size=4pt] {};
+        \node (c2) at (3,-1) [circle,fill,minimum size=4pt,label=below:$c$] {};
+        \node (a2) at (4,-1) [circle,fill,minimum size=4pt,label=below:$a$] {};
+        \node (b2) at (5,-1) [circle,fill,minimum size=4pt,label=below:$b$] {};
+        \draw (r2) -- (c2);
+        \draw (r2) -- (a2);
+        \draw (r2) -- (b2);
+      \end{tikzpicture}
+      \end{center}
+    \end{column}
+    \begin{column}{0.42\textwidth}
+      \includegraphics[width=\linewidth]{fish-mobile}
+    \end{column}
+  \end{columns}
   \note{%
     Timing: 1:00 (cumulative: 2:45).
 
@@ -472,11 +506,13 @@
 
   So the raw stage assignment
   \[
-    d_0 : W \to Z
+  \mathrm{rank}_0 : W \to Z
+  \qquad
+  \mathrm{rank}(node f) = \mathrm{sup}_i (\mathrm{rank}_0 (f_i)
   \]
   respects the quotient relation at each stage, and descends to maps
   \[
-    d_\alpha : D_\alpha \to Z.
+    \mathrm{rank}_\alpha : D_\alpha \to Z.
   \]
 
   \medskip
@@ -484,7 +520,7 @@
   These descended maps are compatible with the cocone maps, so they
   assemble into
   \[
-    d : \mathrm{colim}\,D \to Z.
+    \mathrm{rank} : \mathrm{colim}\,D \to Z.
   \]
 
   \medskip
@@ -498,14 +534,15 @@
     Here is the proof idea.
 
     First, for mobiles, permutation does not change depth, so the raw stage
-    assignment \(d_0 : W \to Z\) respects the quotient relation inside each
-    stage.
+    assignment rank0 from the raw tree W to the plump ordinal Z
+    respects the quotient relation inside each stage.
 
-    That means it descends to maps \(d_\alpha : D_\alpha \to Z\).
+    That means it descends to maps rank alpha from the stage at some
+    ordinal alpha to alpha to Z.
 
-    Second, these descended maps are compatible with the connecting maps of
-    the diagram, so they induce a single map
-    \(d : \mathrm{colim}\,D \to Z\).
+    Second, these descended rank maps are compatible with the
+    connecting inclusion morphisms of the diagram, so they induce a
+    single map rank from the colimit of D, to Z.
 
     This gives exactly the stable stage assignment needed to define the
     constructors on the colimit.
@@ -579,34 +616,25 @@
   \note{%
     Timing: 2:00 (cumulative: 14:10).
 
-    The reason this is interesting is that depth preservation is a purely
-    syntactic property.
+    Depth preservation is a purely syntactic property: you can read it off
+    directly from the equations.
 
-    You can read it off directly from the equations.
+    The obvious next question is whether one can weaken it.  The most
+    natural weakenings are bounded depth shift, or locality, where both
+    sides stay below some fixed depth bound.
 
-    So the obvious next question is whether one can weaken it.
+    But this cannot be the whole story.  Even if such a syntactic bound
+    exists, a large enough extensional ordinal may not be constructively
+    available — and that is exactly the choice-like strength we are trying
+    to avoid.
 
-    The most natural weakenings are bounded depth shift, or locality, where
-    both sides of an equation stay below some fixed depth bound.
-
-    But I do not want to oversell that.
-
-    First, even if such a syntactic bound exists, the extensional ordinal
-    needed to contain all derived witnesses may itself fail to be
-    constructively available.
-
-    And that is exactly the kind of choice-like strength we are trying to
-    avoid.
-
-    Second, boundedness on its own does not control ordinal strength in
-    general.
-
-    Blass's example, later reframed by Lumsdaine and Shulman, shows that
-    even apparently controlled equations can still generate large ordinal
+    Also, bounded syntax alone does not control ordinal strength in general:
+    Blass's example (later reframed by Lumsdaine and Shulman) shows that
+    apparently controlled equations can still generate large ordinal
     strength.
 
     So depth preservation gives a genuine positive case, but the right
-    general criterion is still open.
+    general criterion remains open.
   }
 \end{frame}
 
@@ -744,4 +772,5 @@
 \end{frame}
 
 \end{document}
+
 
