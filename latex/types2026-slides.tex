@@ -25,6 +25,9 @@
 % ---------------------------------------------------------------------------
 \begin{frame}
   \titlepage
+  \note{%
+    This talk is about constructing quotient inductive types from quotients.
+  }
 \end{frame}
 
 % ---------------------------------------------------------------------------
@@ -72,11 +75,11 @@
 \begin{frame}{The story so far}
   \begin{itemize}
     \item QITs are set-truncated HITs.
-    \item Finitary branching QITs admit constructions from inductive
-      types + quotients.
-    \item Infinitary QITs are known difficult (Blass 1983, Lumsdaine--
-          Shulman 2018).
-    \item Brouwer extensional ordinals are one such QIT.
+    \item Finitary QIITs reduce to one universal QIIT, the theory of signatures
+          (Kaposi--Kov\'acs--Altenkirch 2019).
+    \item Large and infinitary QIITs have a general syntax/semantics, but are
+          harder to construct (Kov\'acs--Kaposi 2020).
+    \item Infinitary QITs are known difficult (Blass 1983, Lumsdaine--Shulman 2018).
     \item We want to investigate where the boundary between the
           constructible and non-constructible QITs arises.
   \end{itemize}
@@ -85,18 +88,16 @@
 
     This is the background I am starting from.
 
-    Quotient inductive types are the set-level version of higher inductive
-    types.
+    Quotient inductive types are the set-level version of higher inductive types.
 
-    In the finitary case, they are relatively well understood.
+    In the finitary case, Kaposi, Kov\'acs, and Altenkirch reduce general
+    QIITs to one universal QIIT, namely the theory of signatures.
 
-    In the infinitary case, known constructions need extra strength,
-    typically in the form of weak choice.
+    So that gives a powerful reduction principle, but it does not by itself
+    construct that universal object.
 
-    Brouwer extensional ordinals are one of the main difficult examples.
-
-    And importantly, the existence of one quotient inductive type does not
-    automatically imply the existence of arbitrary others.
+    In the large and infinitary case, there is also a general syntax and
+    semantics, but actual constructions are harder.
 
     So the question is: which features of the equations are really
     responsible for that extra strength?
