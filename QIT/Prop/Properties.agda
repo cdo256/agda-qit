@@ -92,6 +92,11 @@ subst-subst : ∀ {ℓA ℓP} {A : Set ℓA} {P : A → Set ℓP} {x y z : A}
             → subst P y≡z (subst P x≡y p) ≡ subst P (trans x≡y y≡z) p
 subst-subst refl = refl
 
+subst-inv : ∀ {ℓA ℓP} {A : Set ℓA} (P : A → Set ℓP) {x y : A}
+            → (p : x ≡ y) {u : P x}
+            → subst P (sym p) (subst P p u) ≡ u
+subst-inv P refl = refl
+
 dcong : ∀ {a b} {A : Set a} {B : A → Set b} (f : (x : A) → B x) {x y}
       → (p : x ≡ y) → subst B p (f x) ≡ f y
 dcong f refl = refl
@@ -150,3 +155,9 @@ dtrans : ∀ {ℓA ℓB} {A : Set ℓA}
       → subst B q b2 ≡ b3
       → subst B (trans p q) b1 ≡ b3
 dtrans B refl refl refl refl = refl
+
+Σ≡ : ∀ {ℓA ℓB} → {A : Set ℓA} {B : A → Set ℓB}
+   → {a1 a2 : A} {b1 : B a1} {b2 : B a2}
+   → (p : a1 ≡ a2) (q : subst B p b1 ≡ b2)
+   → _≡_ {A = Σ A B} (a1 , b1) (a2 , b2)
+Σ≡ refl refl = refl
