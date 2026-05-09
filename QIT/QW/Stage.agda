@@ -203,3 +203,7 @@ D = record
       → hom (box g ≤p.∘ box f) t̃
       ≡ (hom (box g) SetCat.∘ hom (box f)) t̃
     q = quot-elimp _ λ _ → ≡.refl
+
+
+HasStabalizationRank : ∀ {α} (x : D̃ α /≈) (β : Z) → Prop {!!}
+HasStabalizationRank {α} x β = ∀ β → (y : D̃ β /≈) → {!!}
