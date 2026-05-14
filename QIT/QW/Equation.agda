@@ -59,28 +59,6 @@ record Equation : Set (lsuc ℓV ⊔ ℓS ⊔ ℓP) where
     -- Right-hand side expression
     rhs : Expr V
 
-record EquationV (V : Set ℓV) : Set (lsuc ℓV ⊔ ℓS ⊔ ℓP) where
-  field
-    -- Left-hand side expression
-    lhs : Expr V
-    -- Right-hand side expression
-    rhs : Expr V
-
-data EquationChain : (V : Set ℓV) → Set (lsuc ℓV ⊔ ℓS ⊔ lsuc ℓP) where
-  ebase : ∀ {V} → EquationV V
-        → EquationChain V
-  estep : ∀ {V} (U : Set ℓV) (Q : Set ℓP)
-        → (Q → EquationV (U ⊎ V))
-        → EquationChain V
-        → EquationChain V
-
-data EquationDChain : (V : Set ℓV) → Set (lsuc ℓV ⊔ ℓS ⊔ lsuc ℓP) where
-  ebase : ∀ {V} (l r : Expr V)
-        → EquationDChain V
-  estep : ∀ {V} (l r : Expr V)
-        → EquationDChain V
-        → EquationDChain V
-
 record EquationHorn ℓB : Set (lsuc ℓV ⊔ ℓS ⊔ lsuc ℓP ⊔ lsuc ℓB) where
   field
     V : Set ℓV
