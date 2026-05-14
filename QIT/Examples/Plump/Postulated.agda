@@ -48,6 +48,29 @@ postulate
           → B (sup (s , ξ)))
         → (∀ {β} → α < β → B β)
 
+  -- Set-valued structural eliminator / well-founded recursion.
+  -- To compute B α for every ordinal α, it suffices to show how to
+  -- compute B (sup (s , ξ)) given the values B (ξ i) for all children.
+  -- This is the counterpart of elim≤/elim< for Set-valued predicates.
+  ind : ∀ {ℓB} (B : Z → Set ℓB)
+      → ({s : Sᶻ} {ξ : Pᶻ s → Z}
+        → (∀ i → B (ξ i))
+        → B (sup (s , ξ)))
+      → ∀ α → B α
+  ind-β : ∀ {ℓB} (B : Z → Set ℓB)
+          (step : {s : Sᶻ} {ξ : Pᶻ s → Z} → (∀ i → B (ξ i)) → B (sup (s , ξ)))
+          (s : Sᶻ) (ξ : Pᶻ s → Z)
+        → ind B step (sup (s , ξ)) ≡ step (λ i → ind B step (ξ i))
+{-# REWRITE ind-β #-}
+
+-- Non-dependent recursion: fold over the tree shape.
+-- step receives the shape s, the child ordinals ξ, and the
+-- recursively-computed results for each child.
+fold : ∀ {ℓB} {B : Set ℓB}
+     → ((s : Sᶻ) (ξ : Pᶻ s → Z) → (Pᶻ s → B) → B)
+     → Z → B
+fold step = ind _ (λ {s} {ξ} ih → step s ξ ih)
+
 <[_] : ∀ {α β} → α <₀ β → [ α ] < [ β ]
 ≤[_] : ∀ {α β} → α ≤₀ β → [ α ] ≤ [ β ]
 
@@ -109,3 +132,12 @@ isPreorder-≤ = record
 
 ≤p : Preorder Z _
 ≤p = _≤_ , isPreorder-≤
+
+-- Lift the order to the base W-type T via the abstract Z.
+-- These differ from the same-named definitions in QIT.Relation.Plump, which
+-- use the concrete W-type Z₀; here α ranges over the abstract ordinals Z.
+_<ᵀ_ : W S P → Z → Prop (ℓS ⊔ ℓP)
+t <ᵀ α = ιᶻ t < α
+
+_≤ᵀ_ : W S P → Z → Prop (ℓS ⊔ ℓP)
+t ≤ᵀ α = ιᶻ t ≤ α
