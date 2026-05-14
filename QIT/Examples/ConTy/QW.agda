@@ -16,7 +16,7 @@ data S : Set where
   su : S
   sπ : S
   sσ : S
-  
+
 data P : S → Set where
   p[] : P s[]
   pt̂ : P st̂
@@ -36,7 +36,6 @@ open import QIT.Container.Base
 open import QIT.QW.Equation S P ℓ0
 
 module Equations where
-  open EquationV
   data E : Set where
     ekk̂ : E
     ekĉ : E
@@ -88,7 +87,7 @@ module Equations where
   t̂ γ = supᴱ st̂ f
     where
     f : P st̂ → Expr V
-    f pt̂-γ = γ 
+    f pt̂-γ = γ
 
   ∙ : Expr V
   ∙ = supᴱ s∙ λ ()
@@ -96,25 +95,25 @@ module Equations where
   ▷ γ a = supᴱ s▷ f
     where
     f : P s▷ → Expr V
-    f p▷-γ = γ 
+    f p▷-γ = γ
     f p▷-a = a
   u : Expr V → Expr V
   u γ = supᴱ su f
     where
     f : P su → Expr V
-    f pu-γ = γ 
+    f pu-γ = γ
   π : Expr V → Expr V → Expr V → Expr V
   π γ a b = supᴱ sπ f
     where
     f : P sπ → Expr V
-    f pπ-γ = γ 
+    f pπ-γ = γ
     f pπ-a = a
     f pπ-b = b
   σ : Expr V → Expr V → Expr V → Expr V
   σ γ a b = supᴱ sσ f
     where
     f : P sσ → Expr V
-    f pσ-γ = γ 
+    f pσ-γ = γ
     f pσ-a = a
     f pσ-b = b
 
@@ -126,67 +125,38 @@ module Equations where
   b = v vb
   c = v vc
 
-  PE : ∀ e → B e → EquationV V
-  PE ekt̂ bkt̂-kγ .lhs = [ γ ]
-  PE ekt̂ bkt̂-kγ .rhs = ĉ
-  PE ek▷ bk▷-kγ .lhs = [ γ ]
-  PE ek▷ bk▷-kγ .rhs = ĉ
-  PE ek▷ bk▷-ka .lhs = [ a ]
-  PE ek▷ bk▷-ka .rhs = t̂ γ
-  PE ek▷ bk▷-kb .lhs = [ b ]
-  PE ek▷ bk▷-kb .rhs = t̂ (▷ γ a)
-  PE eku bku-kγ .lhs = [ γ ]
-  PE eku bku-kγ .rhs = ĉ
-  PE ekπ bkπ-kγ .lhs = [ γ ]
-  PE ekπ bkπ-kγ .rhs = ĉ
-  PE ekπ bkπ-ka .lhs = [ a ]
-  PE ekπ bkπ-ka .rhs = t̂ γ
-  PE ekπ bkπ-kb .lhs = [ b ]
-  PE ekπ bkπ-kb .rhs = t̂ (▷ γ a)
-  PE ekσ bkσ-kγ .lhs = [ γ ]
-  PE ekσ bkσ-kγ .rhs = ĉ
-  PE ekσ bkσ-ka .lhs = [ a ]
-  PE ekσ bkσ-ka .rhs = t̂ γ
-  PE ekσ bkσ-kb .lhs = [ b ]
-  PE ekσ bkσ-kb .rhs = t̂ (▷ γ a)
-  PE eσ▷ bσ▷-kγ .lhs = [ γ ]
-  PE eσ▷ bσ▷-kγ .rhs = ĉ
-  PE eσ▷ bσ▷-ka .lhs = [ a ]
-  PE eσ▷ bσ▷-ka .rhs = t̂ γ
-  PE eσ▷ bσ▷-kb .lhs = [ b ]
-  PE eσ▷ bσ▷-kb .rhs = t̂ (▷ γ a)
-  PE eσ▷ bσ▷-kc .lhs = [ c ]
-  PE eσ▷ bσ▷-kc .rhs = t̂ (▷ (▷ γ a) b)
-  PE eσπ bσπ-kγ .lhs = [ γ ]
-  PE eσπ bσπ-kγ .rhs = ĉ
-  PE eσπ bσπ-ka .lhs = [ a ]
-  PE eσπ bσπ-ka .rhs = t̂ γ
-  PE eσπ bσπ-kb .lhs = [ b ]
-  PE eσπ bσπ-kb .rhs = t̂ (▷ γ a)
-  PE eσπ bσπ-kc .lhs = [ c ]
-  PE eσπ bσπ-kc .rhs = t̂ (▷ (▷ γ a) b)
+  PE : ∀ e → B e → Expr V × Expr V
+  PE ekt̂ bkt̂-kγ = [ γ ] , ĉ
+  PE ek▷ bk▷-kγ = [ γ ] , ĉ
+  PE ek▷ bk▷-ka = [ a ] , t̂ γ
+  PE ek▷ bk▷-kb = [ b ] , t̂ (▷ γ a)
+  PE eku bku-kγ = [ γ ] , ĉ
+  PE ekπ bkπ-kγ = [ γ ] , ĉ
+  PE ekπ bkπ-ka = [ a ] , t̂ γ
+  PE ekπ bkπ-kb = [ b ] , t̂ (▷ γ a)
+  PE ekσ bkσ-kγ = [ γ ] , ĉ
+  PE ekσ bkσ-ka = [ a ] , t̂ γ
+  PE ekσ bkσ-kb = [ b ] , t̂ (▷ γ a)
+  PE eσ▷ bσ▷-kγ = [ γ ] , ĉ
+  PE eσ▷ bσ▷-ka = [ a ] , t̂ γ
+  PE eσ▷ bσ▷-kb = [ b ] , t̂ (▷ γ a)
+  PE eσ▷ bσ▷-kc = [ c ] , t̂ (▷ (▷ γ a) b)
+  PE eσπ bσπ-kγ = [ γ ] , ĉ
+  PE eσπ bσπ-ka = [ a ] , t̂ γ
+  PE eσπ bσπ-kb = [ b ] , t̂ (▷ γ a)
+  PE eσπ bσπ-kc = [ c ] , t̂ (▷ (▷ γ a) b)
 
-  PC : E → EquationV V
-  PC ekk̂ .lhs = [ k̂ ]
-  PC ekk̂ .rhs = k̂
-  PC ekĉ .lhs = [ ĉ ]
-  PC ekĉ .rhs = k̂
-  PC ekt̂ .lhs = [ t̂ γ ]
-  PC ekt̂ .rhs = k̂
-  PC ek∙ .lhs = [ ∙ ]
-  PC ek∙ .rhs = ĉ
-  PC ek▷ .lhs = [ ▷ γ a ]
-  PC ek▷ .rhs = ĉ
-  PC eku .lhs = [ u γ ]
-  PC eku .rhs = t̂ γ
-  PC ekπ .lhs = [ π γ a b ]
-  PC ekπ .rhs = t̂ γ
-  PC ekσ .lhs = [ σ γ a b ]
-  PC ekσ .rhs = t̂ γ
-  PC eσ▷ .lhs = ▷ (σ γ a b) c
-  PC eσ▷ .rhs = ▷ (▷ (▷ γ a) b) c
-  PC eσπ .lhs = π γ a (π (▷ γ a) b c)
-  PC eσπ .rhs = π γ (σ γ a b) c
+  PC : E → Expr V × Expr V
+  PC ekk̂ = [ k̂ ] , k̂
+  PC ekĉ = [ ĉ ] , k̂
+  PC ekt̂ = [ t̂ γ ] , k̂
+  PC ek∙ = [ ∙ ] , ĉ
+  PC ek▷ = [ ▷ γ a ] , ĉ
+  PC eku = [ u γ ] , t̂ γ
+  PC ekπ = [ π γ a b ] , t̂ γ
+  PC ekσ = [ σ γ a b ] , t̂ γ
+  PC eσ▷ = ▷ (σ γ a b) c , ▷ (▷ (▷ γ a) b) c
+  PC eσπ = π γ a (π (▷ γ a) b c) , π γ (σ γ a b) c
 
   Ξ : E → EquationHorn ℓ0
   Ξ e = record
