@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Setoid
@@ -32,7 +33,7 @@ open import QIT.Container.StrictFunctor S P (ℓD ⊔ ℓD')
 open import QIT.Category.Morphism (SetCat (ℓD ⊔ ℓD'))
 
 -- Size control and staging
-open import QIT.Relation.Plump S P
+open import QIT.Examples.Plump.Postulated S P as Z hiding (rec)
 open import QIT.QW.Stage sig
 open import QIT.QW.Algebra sig
 open import QIT.QW.StageColimit sig
@@ -56,18 +57,45 @@ module ColimF∘D = SetoidQuotient (Colim (F ∘ D))
 module ColimD = SetoidQuotient (Colim D)
 module Ob = Functor F
 
-module PreservationByPowers (X : Set) where
+module PreservationByPowers
+       (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ιᶻ (ŝ .fst) ≡ ιᶻ (t̂ .fst)) (s : S)
+       where
+
+  open SetoidQuotient
+  rankD : ∀ {α} → D̃ α /≈ → Z
+  rankD {α} = rec (D̃ α) f f-cong
+    where
+      f : D₀ α → Z
+      f ŝ = ιᶻ (ŝ .fst)
+      f-cong : ∀ {ŝ t̂} → α ⊢ ŝ ≈ᵇ t̂ → ιᶻ (ŝ .fst) ≡ ιᶻ (t̂ .fst)
+      f-cong {ŝ} {t̂} p = depth-preserving α ŝ t̂ p
+
+  rankC : Colim/≈ D → Z
+  rankC = rec (Colim D) (λ (_ , ŝ) → rankD ŝ) stable
+    where
+    stable : ∀ {x y} → Colim D [ x ≈ y ] → rankD (x .proj₂) ≡ rankD (y .proj₂)
+    stable (≈lstage i p) = ≡.cong rankD p
+    stable (≈lstep {α} {β} p x) = q
+      where
+      q : rankD x ≡ rankD (D/≈.hom (box p) x)
+      q = let
+        w : ∀ β → (p : α ≤ β) → rankD x ≡ rankD (D/≈.hom (box p) x)
+        w = {!!} in {!!}
+    stable (≈lsym p) = {!!}
+    stable (≈ltrans p q) = {!!}
+
+  X = P s
   D^X : Diagram/≈ ℓc ℓc'
-  D^X = _^_ {ℓc} {ℓc'} D X
+  D^X = _^_ {ℓc} {ℓc'} D (Lift ℓS X)
   module D^X = Functor D^X
   module ColimD^X = SetoidQuotient (Colim D^X)
-  ϕ₀ : Colim₀ D^X → X → Colim₀ D 
-  ϕ₀ (α , t̂) x = α , t̂ x
-  ϕ-cong : ∀ {t̃ ũ} → Colim D^X [ t̃ ≈ ũ ] → (x : X) → Colim D [ ϕ₀ t̃ x ≈ ϕ₀ ũ x ]
+  ϕ₀ : Colim₀ D^X → X → Colim₀ D
+  ϕ₀ (α , t̂) x = α , t̂ (lift x)
+  ϕ-cong : ∀ {t̃ ũ} → Colim D^X [ t̃ ≈ ũ ] → (x : X) → Colim D [ ϕ₀ t̃ x ≈ ϕ₀ ũ x ]
   ϕ-cong {α , t̂} {α , t̂} (≈lstage α ≡.refl) x = ≡→≈ (Colim D) ≡.refl
-  ϕ-cong {α , t̂} {β , û} (≈lstep p t̂) x = ≈lstep p (t̂ x)
-  ϕ-cong {α , t̂} {β , û} (≈lsym p) x = ≈lsym (ϕ-cong p x)
-  ϕ-cong {α , t̂} {β , û} (≈ltrans p q) x = ≈ltrans (ϕ-cong p x) (ϕ-cong q x)
+  ϕ-cong {α , t̂} {β , û} (≈lstep p t̂) x = ≈lstep p (t̂ (lift x))
+  ϕ-cong {α , t̂} {β , û} (≈lsym p) x = ≈lsym (ϕ-cong p x)
+  ϕ-cong {α , t̂} {β , û} (≈ltrans p q) x = ≈ltrans (ϕ-cong p x) (ϕ-cong q x)
 
   ϕ : Colim/≈ D^X → (X → Colim/≈ D)
   ϕ f̃ x = ColimD^X.map (Colim D) (λ f → ϕ₀ f x) (λ p → ϕ-cong p x) f̃
