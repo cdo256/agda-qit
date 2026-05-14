@@ -17,7 +17,7 @@ open import QIT.Setoid
 open import QIT.Set.Base using (_≡h_)
 open import QIT.Relation.Subset
 open import QIT.Relation.SetQuotient
-open import QIT.Relation.Plump S P
+open import QIT.Examples.Plump.Postulated S P as Z hiding ([_])
 open import QIT.QW.W S P
 open import QIT.Algebra F
 open import QIT.Algebra.Lift S P ℓV
@@ -37,7 +37,7 @@ Diagram≈ ℓD ℓD' = Functor (PreorderCat Z ≤p) (SetoidCat ℓD ℓD')
 Diagram/≈ : ∀ ℓD ℓD' → Set (ℓS ⊔ ℓP ⊔ lsuc ℓD ⊔ lsuc ℓD')
 Diagram/≈ ℓD ℓD' = Functor (PreorderCat Z ≤p) (SetCat (ℓD ⊔ ℓD'))
 
-_^_ : ∀ {ℓD ℓD'} → Diagram/≈ ℓD ℓD' → Set → Diagram/≈ ℓD ℓD'
+_^_ : ∀ {ℓD ℓD'} → Diagram/≈ ℓD ℓD' → Set ℓD → Diagram/≈ ℓD ℓD'
 D ^ X = record
   { ob   = λ α → X → D.ob α
   ; hom  = λ p f x → D.hom p (f x)
@@ -56,8 +56,8 @@ D₀ α = ΣP T (_≤ᵀ α)
 
 -- Constructor for stage elements: build a tree with given shape and children.
 -- The ordinal bound is computed from the children's bounds using plump structure.
-psup : ∀ a μ (f : ∀ i → D₀ (μ i)) → D₀ (sup (ιˢ a , μ))
-psup a μ f = sup (a , λ i → ⟨ f i ⟩ᴾ) , sup≤ (λ i → <sup i (f i .snd))
+psup : ∀ a μ (f : ∀ i → D₀ (μ i)) → D₀ (Z.sup (ιˢ a , μ))
+psup a μ f = W.sup (a , λ i → ⟨ f i ⟩ᴾ) , sup≤ (λ i → <sup i (f i .snd))
 
 -- Weakening: if α ≤ β then stage α embeds into stage β.
 -- This gives the morphisms in our diagram of stages.
@@ -68,7 +68,7 @@ pweaken α≤β (t , t≤α) = t , ≤≤ α≤β t≤α
 -- Variables have minimal complexity ⊥ᶻ, constructors have complexity based on arguments.
 ιᵉ : {V : Set ℓV} → Expr V → Z
 ιᵉ (varᴱ v) = ⊥ᶻ
-ιᵉ (supᴱ s f) = sup (ιˢ s , λ i → ιᵉ (f i))
+ιᵉ (supᴱ s f) = Z.sup (ιˢ s , λ i → ιᵉ (f i))
 
 -- Expression-ordinal comparison: when an expression fits within a stage.
 _≤ᴱ_ : {V : Set ℓV} → Expr V → Z → Prop (ℓS ⊔ ℓP)
@@ -99,7 +99,7 @@ data _⊢_≈ᵇ_ : (α : Z) → D₀ α → D₀ α → Prop (ℓS ⊔ ℓP ⊔
   -- Congruence: constructor applications respect equivalence
   ≈pcong : ∀ a μ (f g : ∀ i → D₀ (μ i))
         → (r : ∀ i → μ i ⊢ f i ≈ᵇ g i)
-        → sup (ιˢ a , μ) ⊢ psup a μ f ≈ᵇ psup a μ g
+        → Z.sup (ιˢ a , μ) ⊢ psup a μ f ≈ᵇ psup a μ g
 
   -- Equation satisfaction: enforce the equations from the signature
   ≈psat : ∀ {α} (e : E) (ϕ : Assignment T-alg* (Ξ e))
@@ -180,12 +180,12 @@ D = record
   ; id = id
   ; comp = comp
   ; resp = λ _ → ≡.refl }
-  where
+  module D/≈ where
   module ≤p = Category (PreorderCat Z ≤p)
   module SetoidCat = Category (SetoidCat (ℓS ⊔ ℓP) (ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV))
   module SetCat = Category (SetCat (ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV))
   open ≡.≡-Reasoning
-  hom : ∀ {α β} → Box (α ≤ β) → (D̃ α /≈) → D̃ β /≈
+  hom : ∀ {α β} → Box (α ≤ β) → D̃ α /≈ → D̃ β /≈
   hom {α} {β} (box α≤β) = quot-rec (λ s → [ pweaken α≤β s ])
     λ s t p → quot-rel (pweaken α≤β s) (pweaken α≤β t) (≈pweaken α≤β p)
 
@@ -203,7 +203,3 @@ D = record
       → hom (box g ≤p.∘ box f) t̃
       ≡ (hom (box g) SetCat.∘ hom (box f)) t̃
     q = quot-elimp _ λ _ → ≡.refl
-
-
-HasStabalizationRank : ∀ {α} (x : D̃ α /≈) (β : Z) → Prop {!!}
-HasStabalizationRank {α} x β = ∀ β → (y : D̃ β /≈) → {!!}
