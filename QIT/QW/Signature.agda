@@ -32,3 +32,15 @@ record Sig ℓS ℓP ℓE ℓV : Set (lsuc ℓE ⊔ lsuc ℓV ⊔ lsuc ℓS ⊔ 
     Ξ : E → Equation S P ℓV
 
   open Equation public
+
+record SigQ ℓS ℓP ℓE ℓV ℓB : Set (lsuc ℓE ⊔ lsuc ℓV ⊔ lsuc ℓS ⊔ lsuc ℓP ⊔ lsuc ℓB) where
+  field
+    -- Container signature: shapes (constructors) and positions (arguments)
+    S : Set ℓS
+    P : S → Set ℓP
+
+    -- Equation signature: equation names and their interpretations
+    E : Set ℓE
+    Ξ : E → EquationHorn S P ℓV ℓB
+
+  open EquationHorn public
