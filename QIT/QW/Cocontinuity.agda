@@ -75,14 +75,15 @@ module PreservationByPowers
     where
     stable : ∀ {x y} → Colim D [ x ≈ y ] → rankD (x .proj₂) ≡ rankD (y .proj₂)
     stable (≈lstage i p) = ≡.cong rankD p
-    stable (≈lstep {α} {β} p x) = q
-      where
-      q : rankD x ≡ rankD (D/≈.hom (box p) x)
-      q = let
-        w : ∀ β → (p : α ≤ β) → rankD x ≡ rankD (D/≈.hom (box p) x)
-        w = {!!} in {!!}
-    stable (≈lsym p) = {!!}
-    stable (≈ltrans p q) = {!!}
+    stable (≈lstep {α} {β} p x) =
+      -- pweaken does not change the underlying tree (.fst), so both sides
+      -- reduce to ιᶻ (s .fst) by the rec-β rewrite; the base case is refl.
+      elimp (D̃ α)
+            (λ q → rankD q ≡ rankD (D/≈.hom (box p) q))
+            (λ _ → ≡.refl)
+            x
+    stable (≈lsym p)     = ≡.sym (stable p)
+    stable (≈ltrans p q) = ≡.trans (stable p) (stable q)
 
   X = P s
   D^X : Diagram/≈ ℓc ℓc'
