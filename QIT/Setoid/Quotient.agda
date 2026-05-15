@@ -1,5 +1,6 @@
 open import QIT.Prelude
 open import QIT.Prop
+open import QIT.Prop.Properties using (isPropBox)
 open import QIT.Prop.Logic
 open import QIT.Setoid.Base renaming (_[_≈_] to _⟦_≈_⟧)
 open import QIT.Relation.Binary using (IsEquivalence)
@@ -54,10 +55,27 @@ module SetoidQuotient {ℓA ℓR} (Ã : Setoid ℓA ℓR) where
     → Ã /≈ → B
   recp f x = Q.quot-recp f x
 
+  recp₂
+    : ∀ {ℓB} {B : Prop ℓB}
+    → (f : A → A → B)
+    → Ã /≈ → Ã /≈ → B
+  recp₂ {B = B} f x y = unbox (rec₂ (λ x y → box (f x y)) (λ _ _ → isPropBox _ _) x y)
+
   elimp : ∀ {ℓB} (B : Ã /≈ → Prop ℓB)
     → (f : ∀ a → B [ a ])
     → ∀ a/ → B a/
   elimp B f a/ = Q.quot-elimp B f a/
+
+  elimp₂
+    : ∀ {ℓB} {B : Ã /≈ → Ã /≈ → Prop ℓB}
+    → (f : ∀ x y → B [ x ] [ y ])
+    → ∀ x y → B x y
+  elimp₂ {B = B} f x y =
+    elimp (λ a/ → ∀ b/ → B a/ b/)
+          (λ a → elimp (B [ a ]) (f a))
+          x
+          y
+
 
   effectiveness : ∀ x y → [ x ] ≡ [ y ] → x ≈ y
   effectiveness x y p = unbox (≡.subst P p (box refl))
