@@ -72,9 +72,7 @@ module SetoidQuotient {ℓA ℓR} (Ã : Setoid ℓA ℓR) where
     → ∀ x y → B x y
   elimp₂ {B = B} f x y =
     elimp (λ a/ → ∀ b/ → B a/ b/)
-          (λ a → elimp (B [ a ]) (f a))
-          x
-          y
+          (λ a → elimp (B [ a ]) (f a)) x y
 
 
   effectiveness : ∀ x y → [ x ] ≡ [ y ] → x ≈ y

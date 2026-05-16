@@ -39,7 +39,6 @@ quot-recp : ∀ {ℓA ℓB ℓR} → {A : Set ℓA} {R : A → A → Prop ℓR} 
   → A / R → B
 quot-recp f x = unbox (quot-rec (λ x → box (f x)) (λ _ _ _ → ≡.isPropBox _ _) x)
 
-
 quot-elimp : ∀ {ℓA ℓB ℓR} → {A : Set ℓA} {R : A → A → Prop ℓR} (B : A / R → Prop ℓB)
   → (f : ∀ a → B [ a ])
   → ∀ a/ → B a/

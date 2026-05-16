@@ -61,7 +61,7 @@ module PreservationByPowers
        (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ιᶻ (ŝ .fst) ≡ ιᶻ (t̂ .fst)) (s : S)
        where
 
-  open SetoidQuotient
+  open SetoidQuotient renaming ([_] to _⊢[_])
   rankD : ∀ {α} → D̃ α /≈ → Z
   rankD {α} = rec (D̃ α) f f-cong
     where
@@ -69,6 +69,9 @@ module PreservationByPowers
       f ŝ = ιᶻ (ŝ .fst)
       f-cong : ∀ {ŝ t̂} → α ⊢ ŝ ≈ᵇ t̂ → ιᶻ (ŝ .fst) ≡ ιᶻ (t̂ .fst)
       f-cong {ŝ} {t̂} p = depth-preserving α ŝ t̂ p
+
+  rankD-beta : ∀ {α} (ŝ : D₀ α) → rankD (D̃ α ⊢[ ŝ ]) ≡ ιᶻ (ŝ .fst)
+  rankD-beta ŝ = ≡.refl
 
   rankC : Colim/≈ D → Z
   rankC = rec (Colim D) (λ (_ , ŝ) → rankD ŝ) stable
@@ -84,6 +87,48 @@ module PreservationByPowers
             x
     stable (≈lsym p)     = ≡.sym (stable p)
     stable (≈ltrans p q) = ≡.trans (stable p) (stable q)
+
+  plift : ∀ {α} → (s : D₀ α) → D₀ (ιᶻ (s .fst))
+  plift (s , s≤α) = s , ≤refl (ιᶻ s)
+
+  s≤rankD : ∀ {α} (s : D₀ α) → s .fst ≤ᵀ rankD (D̃ α ⊢[ s ])
+  s≤rankD {α} (s , s≤α) = ≤refl (ιᶻ s)
+
+  plift≈ : ∀ {α} → (s : D̃ α /≈) → D̃ (rankD s) /≈
+  plift≈ {α} = {!!}
+    where
+    f : D₀ α → Σ Z (λ β → D̃ β /≈)
+    f (s , s≤α) = ιᶻ s , D̃ (ιᶻ s) ⊢[ s , ≤refl _ ]
+    f-cong : ∀ {ŝ t̂} → D̃ α [ ŝ ≈ t̂ ] → f ŝ ≡ f t̂ 
+    f-cong {s , s≤α} {t , t≤α} p = ≡.Σ≡ dp q
+      where
+      dp : ιᶻ s ≡ ιᶻ t
+      dp = depth-preserving α (s , s≤α) (t , t≤α) p
+      q : subst (λ β → D̃ β /≈) dp (D̃ (ιᶻ s) ⊢[ s , ≤refl (ιᶻ s) ])
+        ≡                         (D̃ (ιᶻ t) ⊢[ t , ≤refl (ιᶻ t) ])
+      q = {!!}
+    d : D̃ α /≈ → Σ Z (λ β → D̃ β /≈)
+    d = rec (D̃ α) f f-cong
+
+  isInjHom : ∀ {α β} (p : α ≤ β) → IsInjection (D/≈.hom (box p))
+  isInjHom {α} {β} p {x} {y} q =
+    Dα.elimp₂ {B = λ x y → D/≈.hom (box p) x ≡ D/≈.hom (box p) y → x ≡ y} r x y q
+    where
+    module Dα = SetoidQuotient (D̃ α)
+    module Dβ = SetoidQuotient (D̃ β)
+    u : ∀ {x y} → D̃ β [ pweaken p x ≈ pweaken p y ] → D̃ α [ x ≈ y ]
+    u {x} {y} p = {!!}
+    r : (x' y' : D₀ α)
+      → D/≈.hom (box p) (Dα.[ x' ])
+      ≡ D/≈.hom (box p) (Dα.[ y' ])
+      → Dα.[ x' ] ≡ Dα.[ y' ]
+    r x' y' = D/≈.isInjHom p {!!}
+  
+  sect : Colim/≈ D → Σ Z D₀
+  sect = rec (Colim D) {!f!} {!!}
+    where
+    f : Σ Z (λ α → D̃ α /≈) → Σ Z (λ α → D̃ α /≈)
+    f (α , ŝ) = rankD ŝ , {!!}
 
   X = P s
   D^X : Diagram/≈ ℓc ℓc'
