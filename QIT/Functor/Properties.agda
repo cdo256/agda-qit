@@ -57,3 +57,10 @@ _∘_ {A = A} {B} {C} G F = record
       ≈⟨ G.comp (F.hom f) (F.hom g) ⟩
     G.hom (F.hom g) C.∘ G.hom (F.hom f) ∎
     where open ≈syntax {S = C.hom-setoid}
+
+restrict-domain : ∀ {ℓAo ℓAh ℓAe ℓBo ℓBh ℓBe ℓCo ℓCh ℓCe}
+     → {A : Category ℓAo ℓAh ℓAe}
+     → {B : Category ℓBo ℓBh ℓBe}
+     → {C : Category ℓCo ℓCh ℓCe}
+     → Functor A B → Functor B C → Functor A C
+restrict-domain i F = F ∘ i
