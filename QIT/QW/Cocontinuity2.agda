@@ -1,4 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
 open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Setoid
@@ -78,6 +77,12 @@ module PreservationByPowers
 
   plift : ∀ {α} → (t̂ : D₀ α) → D₀ (rankD₀ t̂)
   plift (t , _) = t , ≤refl (ιᶻ t)
+
+  plift≈ : ∀ {α} → (t̂ : D̃ α /≈) → D̃ (rankD t̂) /≈
+  plift≈ {α} = rec (D̃ α) f {!!} {!!}
+    where
+    f : D₀ α → (t̂ : D̃ α /≈) → D̃ (rankD t̂) /≈
+    f t₀ t̂ = subst (λ ○ → D̃ ○ /≈) {!!} (D̃ (rankD (D̃ α ⊢[ t₀ ])) ⊢[ plift t₀ ] )
 
   s≤rankD : ∀ {α} (t̂ : D₀ α) → t̂ .fst ≤ᵀ rankD (D̃ α ⊢[ t̂ ])
   s≤rankD {α} t̂ = ≤refl (rankD₀ t̂)
@@ -161,6 +166,62 @@ module PreservationByPowers
   ϕ : Colim/≈ D^X → (X → Colim/≈ D)
   ϕ f̃ x = ColimD^X.map (Colim D) (λ f → ϕ₀ f x) (λ p → ϕ-cong p x) f̃
 
+  join≈ : ∀ {i j} {x : D̃ i /≈} {y : D̃ j /≈}
+        → Colim D [ i , x ≈ j , y ]
+        → ∀ {γ} (i≤γ : i ≤ γ) (j≤γ : j ≤ γ)
+        → D.hom (box i≤γ) x ≡ D.hom (box j≤γ) y
+  join≈ = recˡ D J c-stage c-step c-sym c-trans
+    where
+    open ≡.≡-Reasoning
+
+    J : ∀ {s t} → Colim D [ s ≈ t ] → Prop _
+    J {s} {t} _ = ∀ {γ} (s≤γ : s .proj₁ ≤ γ) (t≤γ : t .proj₁ ≤ γ)
+      → D.hom (box s≤γ) (s .proj₂) ≡ D.hom (box t≤γ) (t .proj₂)
+
+    c-stage : ∀ i {x x'} (e : x ≡ x') → ∀ {γ} (i≤γ : i ≤ γ) (i≤γ' : i ≤ γ)
+      → D.hom (box i≤γ) x ≡ D.hom (box i≤γ') x'
+    c-stage i {x} {x'} e {γ} i≤γ i≤γ' = begin
+      D.hom (box i≤γ) x
+        ≡⟨ resp≤ ⟩
+      D.hom (box i≤γ') x
+        ≡⟨ ≡.cong (D.hom (box i≤γ')) e ⟩
+      D.hom (box i≤γ') x' ∎
+      where
+      resp≤ : D.hom (box i≤γ) x ≡ D.hom (box i≤γ') x
+      resp≤ = D.resp {f = box i≤γ} {g = box i≤γ'} (≡.isPropBox _ _) {x = x}
+
+    c-step : ∀ {i j} (p : i ≤ j) (x : D̃ i /≈) → ∀ {γ} (i≤γ : i ≤ γ) (j≤γ : j ≤ γ)
+      → D.hom (box i≤γ) x ≡ D.hom (box j≤γ) (D.hom (box p) x)
+    c-step {i} {j} p x {γ} i≤γ j≤γ = begin
+      D.hom (box i≤γ) x
+        ≡⟨ resp≤ ⟩
+      D.hom (box (≤≤ j≤γ p)) x
+        ≡⟨ comp≤ ⟩
+      D.hom (box j≤γ) (D.hom (box p) x) ∎
+      where
+      resp≤ : D.hom (box i≤γ) x ≡ D.hom (box (≤≤ j≤γ p)) x
+      resp≤ = D.resp {f = box i≤γ} {g = box (≤≤ j≤γ p)} (≡.isPropBox _ _) {x = x}
+
+      comp≤ : D.hom (box (≤≤ j≤γ p)) x ≡ D.hom (box j≤γ) (D.hom (box p) x)
+      comp≤ = D.comp (box p) (box j≤γ) {x = x}
+
+    c-sym : ∀ {s t} (r : Colim D [ s ≈ t ]) → J r → J (≈lsym r)
+    c-sym {s} {t} r ih t≤γ s≤γ = ≡.sym (ih s≤γ t≤γ)
+
+    ≡→≤ : ∀ {α β} → α ≡ β → α ≤ β
+    ≡→≤ {α} {α} ≡.refl = ≤refl α
+
+    c-trans : ∀ {s t u} (r₁ : Colim D [ s ≈ t ]) (r₂ : Colim D [ t ≈ u ])
+      → J r₁ → J r₂ → J (≈ltrans r₁ r₂)
+    c-trans {s = s} {t} {u} r₁ r₂ ih₁ ih₂ {γ} s≤γ u≤γ = ≡.trans (ih₁ s≤γ t≤γ) (ih₂ t≤γ u≤γ)
+      where
+      t' : {!!}
+      t' = plift {!!}
+      -- dp : {!!}
+      -- dp = depth-preserving γ {!s!} {!!}
+      t≤γ : t .proj₁ ≤ γ
+      t≤γ = ≤≤ s≤γ (≡→≤ {!!})
+
   ϕ-inj≈ : ∀ {t̃ ũ} → (∀ x → Colim D [ ϕ₀ t̃ x ≈ ϕ₀ ũ x ])
          → Colim D^X [ t̃ ≈ ũ ]
   ϕ-inj≈ {α , t̂} {β , û} p =
@@ -176,7 +237,7 @@ module PreservationByPowers
     γ : Z
     γ = α ∨ᶻ β
     q : ∀ x → D.hom (box ∨ᶻ-l) (t̂ x) ≡ D.hom (box ∨ᶻ-r) (û x)
-    q x = {!!}
+    q x = join≈ (p (lower x)) ∨ᶻ-l ∨ᶻ-r
 
   --   let
   --     w : D̃ γ /≈
