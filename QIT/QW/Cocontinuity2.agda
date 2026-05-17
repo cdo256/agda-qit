@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Setoid
@@ -79,24 +80,118 @@ module PreservationByPowers
   plift (t , _) = t , ≤refl (ιᶻ t)
 
   plift≈ : ∀ {α} → (t̂ : D̃ α /≈) → D̃ (rankD t̂) /≈
-  plift≈ {α} = elim (D̃ α) Q f f-cong
+  plift≈ {α} t̂ = subst (λ β → D̃ β /≈) (first t̂) ((d t̂) .proj₂)
     where
     module Dα = SetoidQuotient (D̃ α)
-    Q : D̃ α /≈ → Set (ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV)
-    Q t̂ = D̃ (rankD t̂) /≈
-    f : (t̂ : D₀ α) → Q Dα.[ t̂ ]
-    f t̂ = D̃ (rankD₀ t̂) ⊢[ plift t̂ ]
-    f-cong' : ∀ {ŝ t̂ : D₀ α} → (p : Dα.[ ŝ ] ≡ Dα.[ t̂ ])
-           → subst Q p (f ŝ) ≡ f t̂
-    f-cong' p = {!!}
-    f-cong : ∀ {ŝ t̂ : D₀ α} → (p : D̃ α [ ŝ ≈ t̂ ])
-           → subst Q Dα.≈[ p ] (f ŝ) ≡ f t̂
-    f-cong (≈pcong a μ f₁ g r) = {!!}
-    f-cong (≈psat e ϕ l≤α r≤α) = {!!}
-    f-cong ≈prefl = ≡.refl
-    f-cong (≈psym p) = ≡.dsym Q Dα.≈[ p ] (f-cong p)
-    f-cong (≈ptrans p q) = ≡.dtrans Q Dα.≈[ p ] Dα.≈[ q ] (f-cong p) (f-cong q)
-    f-cong (≈pweaken α≤β p) = {!!}
+    open ≡.≡-Reasoning
+
+    same-fst : ∀ {γ} {t : T} (p q : t ≤ᵀ γ) → D̃ γ [ (t , p) ≈ (t , q) ]
+    same-fst p q = ≡→≈ (D̃ _) (ΣP≡ (_ , p) (_ , q) ≡.refl)
+
+    castʳ : ∀ {γ} {x y z : D₀ γ} → y ≡ z → D̃ γ [ x ≈ y ] → D̃ γ [ x ≈ z ]
+    castʳ ≡.refl p = p
+
+    castˡ : ∀ {γ} {x y z : D₀ γ} → x ≡ y → D̃ γ [ x ≈ z ] → D̃ γ [ y ≈ z ]
+    castˡ ≡.refl p = p
+
+    cast-rhs : ∀ {γ s t} {ps : s ≤ᵀ γ} {pt qt : t ≤ᵀ γ}
+      → D̃ γ [ (s , ps) ≈ (t , pt) ]
+      → D̃ γ [ (s , ps) ≈ (t , qt) ]
+    cast-rhs {pt = pt} {qt = qt} p = ≈ptrans p (same-fst pt qt)
+
+    transport≈ : ∀ {γ δ} (p : γ ≡ δ) {x y : D₀ γ}
+      → D̃ γ [ x ≈ y ] → D̃ δ [ subst D₀ p x ≈ subst D₀ p y ]
+    transport≈ ≡.refl r = r
+
+    subst-D₀-fst : ∀ {γ δ} (p : γ ≡ δ) (û : D₀ γ) → (subst D₀ p û) .fst ≡ û .fst
+    subst-D₀-fst ≡.refl û = ≡.refl
+
+    plift-fst : ∀ {γ} (û : D₀ γ) → (plift û) .fst ≡ û .fst
+    plift-fst û = ≡.refl
+
+    plift-psup : ∀ a μ (f : ∀ i → D₀ (μ i))
+      → plift (psup a μ f) ≡ psup a (λ i → rankD₀ (f i)) (λ i → plift (f i))
+    plift-psup a μ f = ΣP≡ _ _ (≡.refl)
+
+    exactify : ∀ {γ} {ŝ t̂ : D₀ γ} (p : D̃ γ [ ŝ ≈ t̂ ])
+      → D̃ (rankD₀ ŝ) [ plift ŝ ≈ subst D₀ (≡.sym (rankD-cong p)) (plift t̂) ]
+    exactify (≈pcong a μ f₁ g r) = castˡ (plift-psup a μ f₁) (castʳ rhs≈ base)
+      where
+      δi : ∀ i → rankD₀ (f₁ i) ≡ rankD₀ (g i)
+      δi i = rankD-cong (r i)
+      μ' : P a → Z
+      μ' i = rankD₀ (f₁ i)
+      f' : ∀ i → D₀ (μ' i)
+      f' i = plift (f₁ i)
+      g' : ∀ i → D₀ (μ' i)
+      g' i = subst D₀ (≡.sym (δi i)) (plift (g i))
+      base : D̃ (rankD₀ (psup a μ f₁)) [ psup a μ' f' ≈ psup a μ' g' ]
+      base = ≈pcong a μ' f' g' (λ i → exactify (r i))
+      dp : rankD₀ (psup a μ f₁) ≡ rankD₀ (psup a μ g)
+      dp = rankD-cong (≈pcong a μ f₁ g r)
+      g'fst : ∀ i → (g' i) .fst ≡ (plift (g i)) .fst
+      g'fst i = subst-D₀-fst (≡.sym (δi i)) (plift (g i))
+      rhs≈ : psup a μ' g' ≡ subst D₀ (≡.sym dp) (plift (psup a μ g))
+      rhs≈ = ΣP≡ _ _ rhsfst
+        where
+        rhsfst : (psup a μ' g') .fst ≡ (subst D₀ (≡.sym dp) (plift (psup a μ g))) .fst
+        rhsfst = ≡.trans (≡.cong (λ h → W.sup (a , h)) (≡.funExt g'fst))
+                          (≡.sym (subst-D₀-fst (≡.sym dp) (plift (psup a μ g))))
+    exactify (≈psat e ϕ l≤α r≤α) = castʳ rhs≈ base
+      where
+      dp : rankD₀ (lhs' e ϕ , l≤α) ≡ rankD₀ (rhs' e ϕ , r≤α)
+      dp = rankD-cong (≈psat e ϕ l≤α r≤α)
+      base : D̃ (rankD₀ (lhs' e ϕ , l≤α)) [ plift (lhs' e ϕ , l≤α) ≈ (rhs' e ϕ , ≡.substp (rhs' e ϕ ≤ᵀ_) (≡.sym dp) (≤refl _)) ]
+      base = ≈psat e ϕ (≤refl _) (≡.substp (rhs' e ϕ ≤ᵀ_) (≡.sym dp) (≤refl _))
+      rhs≈ : (rhs' e ϕ , ≡.substp (rhs' e ϕ ≤ᵀ_) (≡.sym dp) (≤refl _)) ≡ subst D₀ (≡.sym dp) (plift (rhs' e ϕ , r≤α))
+      rhs≈ = ΣP≡ _ _ (≡.sym (subst-D₀-fst (≡.sym dp) (plift (rhs' e ϕ , r≤α))))
+    exactify ≈prefl = ≈prefl
+    exactify {ŝ = ŝ} {t̂ = t̂} (≈psym p) =
+      castˡ {z = subst D₀ dp (plift t̂)} lhs≈ (transport≈ dp (≈psym (exactify p)))
+      where
+      dp : rankD₀ t̂ ≡ rankD₀ ŝ
+      dp = rankD-cong p
+      lhs≈ : subst D₀ dp (subst D₀ (≡.sym dp) (plift ŝ)) ≡ plift ŝ
+      lhs≈ = ≡.subst-inv D₀ (≡.sym dp)
+    exactify {ŝ = ŝ} {t̂ = û} (≈ptrans {ŝ = ŝ} {t̂ = t̂} {û = û} p q) = castʳ rhs≈ (≈ptrans (exactify p) mid)
+      where
+      dp : rankD₀ ŝ ≡ rankD₀ t̂
+      dp = rankD-cong p
+      dq : rankD₀ t̂ ≡ rankD₀ û
+      dq = rankD-cong q
+      mid : D̃ (rankD₀ ŝ) [ subst D₀ (≡.sym dp) (plift t̂) ≈ subst D₀ (≡.sym dp) (subst D₀ (≡.sym dq) (plift û)) ]
+      mid = transport≈ (≡.sym dp) (exactify q)
+      rhs≈ : subst D₀ (≡.sym dp) (subst D₀ (≡.sym dq) (plift û)) ≡ subst D₀ (≡.sym (rankD-cong (≈ptrans p q))) (plift û)
+      rhs≈ = ≡.subst-subst {P = D₀} (≡.sym dq) {y≡z = ≡.sym dp} {p = plift û}
+    exactify (≈pweaken α≤β p) = exactify p
+
+    f : D₀ α → Σ Z (λ β → D̃ β /≈)
+    f t̂ = rankD₀ t̂ , D̃ (rankD₀ t̂) ⊢[ plift t̂ ]
+
+    u : ∀ {γ δ} {û : D₀ δ} (p : γ ≡ δ)
+      → subst (λ β → D̃ β /≈) p (D̃ γ ⊢[ subst D₀ (≡.sym p) û ])
+      ≡ D̃ δ ⊢[ û ]
+    u ≡.refl = ≡.refl
+
+    f-cong : ∀ {ŝ t̂ : D₀ α} → (p : D̃ α [ ŝ ≈ t̂ ]) → f ŝ ≡ f t̂
+    f-cong {ŝ} {t̂} p = ≡.Σ≡ dp q
+      where
+      dp : rankD₀ ŝ ≡ rankD₀ t̂
+      dp = rankD-cong p
+      q : subst (λ β → D̃ β /≈) dp (D̃ (rankD₀ ŝ) ⊢[ plift ŝ ])
+        ≡ D̃ (rankD₀ t̂) ⊢[ plift t̂ ]
+      q = begin
+          subst (λ β → D̃ β /≈) dp (D̃ (rankD₀ ŝ) ⊢[ plift ŝ ])
+            ≡⟨ ≡.cong (subst (λ β → D̃ β /≈) dp) (D̃ (rankD₀ ŝ) ⊢≈[ exactify p ]) ⟩
+          subst (λ β → D̃ β /≈) dp (D̃ (rankD₀ ŝ) ⊢[ subst D₀ (≡.sym dp) (plift t̂) ])
+            ≡⟨ u dp ⟩
+          D̃ (rankD₀ t̂) ⊢[ plift t̂ ] ∎
+
+    d : D̃ α /≈ → Σ Z (λ β → D̃ β /≈)
+    d = rec (D̃ α) f f-cong
+
+    first : ∀ t̂ → (d t̂) .proj₁ ≡ rankD t̂
+    first = elimp (D̃ α) (λ t̂ → (d t̂) .proj₁ ≡ rankD t̂) (λ _ → ≡.refl)
 
   s≤rankD : ∀ {α} (t̂ : D₀ α) → t̂ .fst ≤ᵀ rankD (D̃ α ⊢[ t̂ ])
   s≤rankD {α} t̂ = ≤refl (rankD₀ t̂)
