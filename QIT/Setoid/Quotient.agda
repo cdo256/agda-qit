@@ -197,3 +197,22 @@ QuotHomRel∃ : ∀ {ℓB ℓB≈ ℓR} (B : Setoid ℓB ℓB≈)
         → (R : ⟨ B ⟩ → ⟨ B ⟩ → Prop ℓR)
         → (B /≈ → B /≈ → Prop (ℓB ⊔ ℓB≈ ⊔ ℓR))
 QuotHomRel∃ B R x y = ∥ QuotRelWitness B B R x y ∥
+
+QuotHomRel∀→∃ : ∀ {ℓB ℓB≈ ℓR} (B : Setoid ℓB ℓB≈)
+        → (R : ⟨ B ⟩ → ⟨ B ⟩ → Prop ℓR)
+        → (x y : B /≈)
+        → QuotHomRel∀ B R x y → QuotHomRel∃ B R x y
+QuotHomRel∀→∃ B R x y = elimp P f x y
+  where
+  open SetoidQuotient B
+  P : B /≈ → Prop _
+  P x = ∀ y → QuotHomRel∀ B R x y → QuotHomRel∃ B R x y
+
+  f : ∀ x₀ → P [ x₀ ]
+  f x₀ y p = elimp Q g y p
+    where
+    Q : B /≈ → Prop _
+    Q y = QuotHomRel∀ B R [ x₀ ] y → QuotHomRel∃ B R [ x₀ ] y
+
+    g : ∀ y₀ → Q [ y₀ ]
+    g y₀ p = ∣ qrwitness x₀ y₀ (p x₀ y₀ ≡.refl ≡.refl) ≡.refl ≡.refl ∣
