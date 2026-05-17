@@ -2,6 +2,7 @@ open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Relation.Base
 open import QIT.Relation.Binary
+open import QIT.Relation.Subset
 open import QIT.Setoid
 open import QIT.Setoid.Quotient
 open import QIT.Set.Base
@@ -34,6 +35,7 @@ module QIT.QW.Colimit.Properties {ℓI} {ℓ≤}
 
   module Bounded (α : I) where
     open import QIT.QW.Colimit.Base (≤p.Restrict≤ α) ℓD ℓD' (RestrictDiagram α) public
+      using ()
       renaming
         ( Colim₀ to Colim≤₀
         ; _≈ˡ_ to _≈ˡ≤_
@@ -42,6 +44,32 @@ module QIT.QW.Colimit.Properties {ℓI} {ℓ≤}
         ; Colim to Colim≤~
         ; Colim/≈ to Colim≤
         )
+
+    forget₀ : Colim≤₀ → Colim₀
+    forget₀ (i≤α , x) = i≤α .fst , x
+
+    forget≈≤ : ∀ {s t} → s ≈ˡ≤ t → forget₀ s ≈ˡ forget₀ t
+    forget≈≤ (≈lstage i e) = ≈lstage (i .fst) e
+    forget≈≤ (≈lstep p x) = ≈lstep p x
+    forget≈≤ (≈lsym r) = ≈lsym (forget≈≤ r)
+    forget≈≤ (≈ltrans r₁ r₂) = ≈ltrans (forget≈≤ r₁) (forget≈≤ r₂)
+
+    recˡ↑ : ∀ {ℓ ℓ'}
+         → (C≤ : ∀ {s t} → s ≈ˡ≤ t → Prop ℓ)
+         → (C  : ∀ {s t} → s ≈ˡ t → Prop ℓ')
+         → (c-stage : ∀ (i : ≤p.Below α) {x x'} (e : x ≡ x') → C≤ (_≈ˡ≤_.≈lstage i e))
+         → (c-step  : ∀ {i j : ≤p.Below α} (p : i .fst ≤ j .fst) (x : Functor.ob (RestrictDiagram α) i) → C≤ (_≈ˡ≤_.≈lstep p x))
+         → (c-sym   : ∀ {s t} (r : s ≈ˡ≤ t) → C≤ r → C≤ (_≈ˡ≤_.≈lsym r))
+         → (c-trans : ∀ {s t u} (r₁ : s ≈ˡ≤ t) (r₂ : t ≈ˡ≤ u) → C≤ r₁ → C≤ r₂ → C≤ (_≈ˡ≤_.≈ltrans r₁ r₂))
+         → (forgetC : ∀ {s t} (r : s ≈ˡ≤ t) → C≤ r → C (forget≈≤ r))
+         → ∀ {s t} (r : s ≈ˡ≤ t) → C (forget≈≤ r)
+    recˡ↑ C≤ C c-stage c-step c-sym c-trans forgetC r = forgetC r (go r)
+      where
+      go : ∀ {s t} (r : s ≈ˡ≤ t) → C≤ r
+      go (≈lstage i e) = c-stage i e
+      go (≈lstep {i} {j} p x) = c-step {i} {j} p x
+      go (≈lsym r) = c-sym r (go r)
+      go (≈ltrans r₁ r₂) = c-trans r₁ r₂ (go r₁) (go r₂)
 
   record Cocone : Set (lsuc (ℓ≤ ⊔ ℓD' ⊔ ℓD ⊔ ℓI)) where
     field
