@@ -61,16 +61,17 @@ module PreservationByPowers
        (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ιᶻ (ŝ .fst) ≡ ιᶻ (t̂ .fst)) (s : S)
        where
 
-  open SetoidQuotient renaming ([_] to _⊢[_])
-  rankD : ∀ {α} → D̃ α /≈ → Z
-  rankD {α} = rec (D̃ α) f f-cong
-    where
-      f : D₀ α → Z
-      f ŝ = ιᶻ (ŝ .fst)
-      f-cong : ∀ {ŝ t̂} → α ⊢ ŝ ≈ᵇ t̂ → ιᶻ (ŝ .fst) ≡ ιᶻ (t̂ .fst)
-      f-cong {ŝ} {t̂} p = depth-preserving α ŝ t̂ p
+  open SetoidQuotient renaming ([_] to _⊢[_]; ≈[_] to _⊢≈[_])
+  rankD₀ : ∀ {α} → D₀ α → Z
+  rankD₀ (s , _) = ιᶻ s 
 
-  rankD-beta : ∀ {α} (ŝ : D₀ α) → rankD (D̃ α ⊢[ ŝ ]) ≡ ιᶻ (ŝ .fst)
+  rankD-cong : ∀ {α ŝ t̂} → α ⊢ ŝ ≈ᵇ t̂ → rankD₀ ŝ ≡ rankD₀ t̂
+  rankD-cong {α} {ŝ} {t̂} p = depth-preserving α ŝ t̂ p
+
+  rankD : ∀ {α} → D̃ α /≈ → Z
+  rankD {α} = rec (D̃ α) rankD₀ rankD-cong
+
+  rankD-beta : ∀ {α} (ŝ : D₀ α) → rankD (D̃ α ⊢[ ŝ ]) ≡ rankD₀ ŝ
   rankD-beta ŝ = ≡.refl
 
   rankC : Colim/≈ D → Z
@@ -88,13 +89,13 @@ module PreservationByPowers
     stable (≈lsym p)     = ≡.sym (stable p)
     stable (≈ltrans p q) = ≡.trans (stable p) (stable q)
 
-  plift : ∀ {α} → (s : D₀ α) → D₀ (ιᶻ (s .fst))
-  plift (s , s≤α) = s , ≤refl (ιᶻ s)
+  plift : ∀ {α} → (ŝ : D₀ α) → D₀ (rankD₀ ŝ)
+  plift (s , _) = s , ≤refl (ιᶻ s)
 
-  s≤rankD : ∀ {α} (s : D₀ α) → s .fst ≤ᵀ rankD (D̃ α ⊢[ s ])
-  s≤rankD {α} (s , s≤α) = ≤refl (ιᶻ s)
+  s≤rankD : ∀ {α} (ŝ : D₀ α) → ŝ .fst ≤ᵀ rankD (D̃ α ⊢[ ŝ ])
+  s≤rankD {α} ŝ = ≤refl (rankD₀ ŝ)
 
-  plift≈ : ∀ {α} → (s : D̃ α /≈) → D̃ (rankD s) /≈
+  plift≈ : ∀ {α} → (ŝ : D̃ α /≈) → D̃ (rankD ŝ) /≈
   plift≈ {α} = {!!}
     where
     f : D₀ α → Σ Z (λ β → D̃ β /≈)
@@ -102,11 +103,23 @@ module PreservationByPowers
     f-cong : ∀ {ŝ t̂} → D̃ α [ ŝ ≈ t̂ ] → f ŝ ≡ f t̂ 
     f-cong {s , s≤α} {t , t≤α} p = ≡.Σ≡ dp q
       where
+      open ≡.≡-Reasoning
       dp : ιᶻ s ≡ ιᶻ t
       dp = depth-preserving α (s , s≤α) (t , t≤α) p
+      r : D̃ (ιᶻ s) [ (s , ≤refl (ιᶻ s)) ≈ subst D₀ (≡.sym dp) (t , ≤refl (ιᶻ t)) ]
+      r = {!!}
+      u : ∀ {α β } {ŝ : D₀ β} → (dp : α ≡ β)
+        → subst (λ β → D̃ β /≈) dp (D̃ α ⊢[ subst D₀ (≡.sym dp) ŝ ])
+        ≡ D̃ β ⊢[ ŝ ]
+      u ≡.refl = ≡.refl
       q : subst (λ β → D̃ β /≈) dp (D̃ (ιᶻ s) ⊢[ s , ≤refl (ιᶻ s) ])
         ≡                         (D̃ (ιᶻ t) ⊢[ t , ≤refl (ιᶻ t) ])
-      q = {!!}
+      q = begin
+          subst (λ β → D̃ β /≈) dp (D̃ (ιᶻ s) ⊢[ s , _ ])
+            ≡⟨ (≡.cong (subst (λ β → D̃ β /≈) dp) (D̃ (ιᶻ s) ⊢≈[ r ])) ⟩
+          subst (λ β → D̃ β /≈) dp ((D̃ (ιᶻ s) ⊢[ subst D₀ (≡.sym dp) (t , ≤refl (ιᶻ t)) ]))
+            ≡⟨ u dp ⟩
+          D̃ (ιᶻ t) ⊢[ t , ≤refl (ιᶻ t) ] ∎
     d : D̃ α /≈ → Σ Z (λ β → D̃ β /≈)
     d = rec (D̃ α) f f-cong
 
