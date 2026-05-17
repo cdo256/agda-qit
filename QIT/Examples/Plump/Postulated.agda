@@ -90,6 +90,12 @@ _∨ᶻ_ : Z → Z → Z
   ξ (lift (inj₁ tt)) = α
   ξ (lift (inj₂ tt)) = β
 
+∨ᶻ-l : ∀ {α β} → α ≤ (α ∨ᶻ β)
+∨ᶻ-l {α} {β} = <→≤ (<sup (lift (inj₁ tt)) (≤refl α))
+
+∨ᶻ-r : ∀ {α β} → β ≤ (α ∨ᶻ β)
+∨ᶻ-r {α} {β} = <→≤ (<sup (lift (inj₂ tt)) (≤refl β))
+
 -- Successor: well-defined since sucᶻ α = sup(∨ˢ, λ _ → α) is
 -- congruent w.r.t. ≤≥ by ≤≥-cong.
 suc : Z → Z

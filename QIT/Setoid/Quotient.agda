@@ -21,6 +21,8 @@ module SetoidQuotient {ℓA ℓR} (Ã : Setoid ℓA ℓR) where
   ≈[_] : ∀ {x y} → x ≈ y → [ x ] ≡ [ y ]
   ≈[_] p = Q.quot-rel _ _ p
 
+
+
   rec
     : ∀ {ℓB} {B : Set ℓB}
     → (f : A → B)
@@ -139,3 +141,59 @@ module SetoidQuotient {ℓA ℓR} (Ã : Setoid ℓA ℓR) where
   map B̃ f₀ f-cong = rec (λ x → Q.[ f₀ x ]) λ {x} {y} p → Q.quot-rel (f₀ x) (f₀ y) (f-cong p)
     where
     module B = Setoid B̃
+
+open SetoidQuotient using () renaming ([_] to _⊢[_]; ≈[_] to _⊢≈[_]) public
+
+record QuotRelWitness {ℓA ℓA≈ ℓB ℓB≈ ℓR} (A : Setoid ℓA ℓA≈) (B : Setoid ℓB ℓB≈)
+        (R : ⟨ A ⟩ → ⟨ B ⟩ → Prop ℓR)
+        (a : A /≈) (b : B /≈) : Set (ℓA ⊔ ℓA≈ ⊔ ℓB ⊔ ℓB≈ ⊔ ℓR) where
+  constructor qrwitness
+  field
+    a₀ : ⟨ A ⟩
+    b₀ : ⟨ B ⟩
+    r : R a₀ b₀
+    pa : A ⊢[ a₀ ] ≡ a
+    pb : B ⊢[ b₀ ] ≡ b
+    
+QuotHetRel∀ : ∀ {ℓA ℓB ℓB≈ ℓR} {A : Set ℓA} (B : A → Setoid ℓB ℓB≈)
+        → (R : ∀ {x y} → ⟨ B x ⟩ → ⟨ B y ⟩ → Prop ℓR)
+        → (∀ {x y} → B x /≈ → B y /≈ → Prop (ℓB ⊔ ℓB≈ ⊔ ℓR))
+QuotHetRel∀ B R {x} {y} bx by =
+  ∀ bx₀ by₀ → (B x ⊢[ bx₀ ] ≡ bx) → (B y ⊢[ by₀ ] ≡ by) → R bx₀ by₀
+    
+QuotHetRel∃ : ∀ {ℓA ℓB ℓB≈ ℓR} {A : Set ℓA} (B : A → Setoid ℓB ℓB≈)
+        → (R : ∀ {x y} → ⟨ B x ⟩ → ⟨ B y ⟩ → Prop ℓR)
+        → (∀ {x y} → B x /≈ → B y /≈ → Prop (ℓB ⊔ ℓB≈ ⊔ ℓR))
+QuotHetRel∃ B R {x} {y} bx by = ∥ QuotRelWitness (B x) (B y) R bx by ∥
+
+QuotHetRel∀→∃ : ∀ {ℓA ℓB ℓB≈ ℓR} {A : Set ℓA} (B : A → Setoid ℓB ℓB≈)
+        → (R : ∀ {x y} → ⟨ B x ⟩ → ⟨ B y ⟩ → Prop ℓR)
+        → ∀ {x y} → (bx : B x /≈) → (by : B y /≈)
+        → QuotHetRel∀ B R bx by → QuotHetRel∃ B R bx by
+QuotHetRel∀→∃ B R {x} {y} bx by = Bx.elimp P f bx by
+  where
+  module Bx = SetoidQuotient (B x)
+  module By = SetoidQuotient (B y)
+
+  P : B x /≈ → Prop _
+  P bx = ∀ by → QuotHetRel∀ B R bx by → QuotHetRel∃ B R bx by
+
+  f : ∀ bx₀ → P (Bx.[ bx₀ ])
+  f bx₀ by p = By.elimp Q g by p
+    where
+    Q : B y /≈ → Prop _
+    Q by = QuotHetRel∀ B R (Bx.[ bx₀ ]) by → QuotHetRel∃ B R (Bx.[ bx₀ ]) by
+
+    g : ∀ by₀ → Q (By.[ by₀ ])
+    g by₀ p = ∣ qrwitness bx₀ by₀ (p bx₀ by₀ ≡.refl ≡.refl) ≡.refl ≡.refl ∣
+
+QuotHomRel∀ : ∀ {ℓB ℓB≈ ℓR} (B : Setoid ℓB ℓB≈)
+        → (R : ⟨ B ⟩ → ⟨ B ⟩ → Prop ℓR)
+        → (B /≈ → B /≈ → Prop (ℓB ⊔ ℓB≈ ⊔ ℓR))
+QuotHomRel∀ B R b1 b2 =
+    ∀ b1₀ b2₀ → (B ⊢[ b1₀ ] ≡ b1) → (B ⊢[ b2₀ ] ≡ b2) → R b1₀ b2₀
+
+QuotHomRel∃ : ∀ {ℓB ℓB≈ ℓR} (B : Setoid ℓB ℓB≈)
+        → (R : ⟨ B ⟩ → ⟨ B ⟩ → Prop ℓR)
+        → (B /≈ → B /≈ → Prop (ℓB ⊔ ℓB≈ ⊔ ℓR))
+QuotHomRel∃ B R x y = ∥ QuotRelWitness B B R x y ∥
