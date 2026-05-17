@@ -79,10 +79,24 @@ module PreservationByPowers
   plift (t , _) = t , ≤refl (ιᶻ t)
 
   plift≈ : ∀ {α} → (t̂ : D̃ α /≈) → D̃ (rankD t̂) /≈
-  plift≈ {α} = rec (D̃ α) f {!!} {!!}
+  plift≈ {α} = elim (D̃ α) Q f f-cong
     where
-    f : D₀ α → (t̂ : D̃ α /≈) → D̃ (rankD t̂) /≈
-    f t₀ t̂ = subst (λ ○ → D̃ ○ /≈) {!!} (D̃ (rankD (D̃ α ⊢[ t₀ ])) ⊢[ plift t₀ ] )
+    module Dα = SetoidQuotient (D̃ α)
+    Q : D̃ α /≈ → Set (ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV)
+    Q t̂ = D̃ (rankD t̂) /≈
+    f : (t̂ : D₀ α) → Q Dα.[ t̂ ]
+    f t̂ = D̃ (rankD₀ t̂) ⊢[ plift t̂ ]
+    f-cong' : ∀ {ŝ t̂ : D₀ α} → (p : Dα.[ ŝ ] ≡ Dα.[ t̂ ])
+           → subst Q p (f ŝ) ≡ f t̂
+    f-cong' p = {!!}
+    f-cong : ∀ {ŝ t̂ : D₀ α} → (p : D̃ α [ ŝ ≈ t̂ ])
+           → subst Q Dα.≈[ p ] (f ŝ) ≡ f t̂
+    f-cong (≈pcong a μ f₁ g r) = {!!}
+    f-cong (≈psat e ϕ l≤α r≤α) = {!!}
+    f-cong ≈prefl = ≡.refl
+    f-cong (≈psym p) = ≡.dsym Q Dα.≈[ p ] (f-cong p)
+    f-cong (≈ptrans p q) = ≡.dtrans Q Dα.≈[ p ] Dα.≈[ q ] (f-cong p) (f-cong q)
+    f-cong (≈pweaken α≤β p) = {!!}
 
   s≤rankD : ∀ {α} (t̂ : D₀ α) → t̂ .fst ≤ᵀ rankD (D̃ α ⊢[ t̂ ])
   s≤rankD {α} t̂ = ≤refl (rankD₀ t̂)
