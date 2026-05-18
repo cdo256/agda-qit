@@ -58,7 +58,7 @@ module QIT.QW.Colimit.Properties {ℓI} {ℓ≤}
     forget≈≤ (≈lsym r) = ≈lsym (forget≈≤ r)
     forget≈≤ (≈ltrans r₁ r₂) = ≈ltrans (forget≈≤ r₁) (forget≈≤ r₂)
 
-    recˡ↑ : ∀ {ℓ ℓ'}
+    recˡ≤' : ∀ {ℓ ℓ'}
          → (C≤ : ∀ {s t} → s ≈ˡ≤ t → Prop ℓ)
          → (C  : ∀ {s t} → s ≈ˡ t → Prop ℓ')
          → (c-stage : ∀ (i : ≤p.Below α) {x x'} (e : x ≡ x') → C≤ (≈l≤stage i e))
@@ -67,13 +67,27 @@ module QIT.QW.Colimit.Properties {ℓI} {ℓ≤}
          → (c-trans : ∀ {s t u} (r₁ : s ≈ˡ≤ t) (r₂ : t ≈ˡ≤ u) → C≤ r₁ → C≤ r₂ → C≤ (≈l≤trans r₁ r₂))
          → (forgetC : ∀ {s t} (r : s ≈ˡ≤ t) → C≤ r → C (forget≈≤ r))
          → ∀ {s t} (r : s ≈ˡ≤ t) → C (forget≈≤ r)
-    recˡ↑ C≤ C c-stage c-step c-sym c-trans forgetC r = forgetC r (go r)
+    recˡ≤' C≤ C c-stage c-step c-sym c-trans forgetC r = forgetC r (go r)
       where
       go : ∀ {s t} (r : s ≈ˡ≤ t) → C≤ r
       go (≈lstage i e) = c-stage i e
       go (≈lstep {i} {j} p x) = c-step {i} {j} p x
       go (≈lsym r) = c-sym r (go r)
       go (≈ltrans r₁ r₂) = c-trans r₁ r₂ (go r₁) (go r₂)
+
+  module _ where
+    open Bounded renaming (_≈ˡ≤_ to _⊢_≈ˡ≤_)
+    -- recˡ↑ : 
+    -- recˡ↑ : ∀ {ℓ ℓ'}
+    --      → (C≤ : ∀ α {s t} → α ⊢ s ≈ˡ≤ t → Prop ℓ)
+    --      → (C  : ∀ {s t} → s ≈ˡ t → Prop ℓ')
+    --      → (c-stage : ∀ α (i : ≤p.Below α) {x x' : ?} (e : x ≡ x') → C≤ α (≈l≤stage i e))
+    --      → (c-step  : ∀ α {i j : ≤p.Below α} (p : i .fst ≤ j .fst) (x : Functor.ob (RestrictDiagram α) i) → C≤ α (≈l≤step p x))
+    --      → (c-sym   : ∀ α {s t} (r : α ⊢ s ≈ˡ≤ t) → C≤ r → C≤ (≈l≤sym r))
+    --      → (c-trans : ∀ α {s t u} (r₁ : α ⊢ s ≈ˡ≤ t) (r₂ : α ⊢ t ≈ˡ≤ u) → C≤ r₁ → C≤ r₂ → C≤ (≈l≤trans r₁ r₂))
+    --      → (forgetC : ∀ α {s t} (r : α ⊢ s ≈ˡ≤ t) → C≤ r → C (forget≈≤ r))
+    --      → ∀ {s t} (r : s ≈ˡ t) → C r
+    -- recˡ↑ C≤ C c-stage c-step c-sym c-trans forgetC r = ?
 
   record Cocone : Set (lsuc (ℓ≤ ⊔ ℓD' ⊔ ℓD ⊔ ℓI)) where
     field
