@@ -75,6 +75,39 @@ module QIT.QW.Colimit.Properties {ℓI} {ℓ≤}
       go (≈lsym r) = c-sym r (go r)
       go (≈ltrans r₁ r₂) = c-trans r₁ r₂ (go r₁) (go r₂)
 
+  record BoundedFactor (s t : Colim₀) : Set (ℓI ⊔ ℓ≤ ⊔ ℓD ⊔ ℓD') where
+    field
+      α : I
+      s≤α : s .proj₁ ≤ α
+      t≤α : t .proj₁ ≤ α
+      r≤ : let module B = Bounded α in B._≈ˡ≤_ ((s .proj₁ , s≤α) , s .proj₂) ((t .proj₁ , t≤α) , t .proj₂)
+
+  recˡ↑ : ∀ {ℓ≤' ℓ}
+       → (C : ∀ {s t} → s ≈ˡ t → Prop ℓ)
+       → (factor : ∀ {s t} (r : s ≈ˡ t) → BoundedFactor s t)
+       → (C≤ : ∀ α {s t} → let module B = Bounded α in B._≈ˡ≤_ s t → Prop ℓ≤')
+       → (c-stage : ∀ α (i : ≤p.Below α) {x x'} (e : x ≡ x') → C≤ α (Bounded.≈l≤stage {α = α} i e))
+       → (c-step  : ∀ α {i j : ≤p.Below α} (p : i .fst ≤ j .fst) (x : Functor.ob (RestrictDiagram α) i)
+                 → C≤ α (Bounded.≈l≤step {α = α} {i = i} {j = j} p x))
+       → (c-sym   : ∀ α {s t} (r : let module B = Bounded α in B._≈ˡ≤_ s t)
+                 → C≤ α r → C≤ α (Bounded.≈l≤sym {α = α} r))
+       → (c-trans : ∀ α {s t u}
+                 (r₁ : let module B = Bounded α in B._≈ˡ≤_ s t)
+                 (r₂ : let module B = Bounded α in B._≈ˡ≤_ t u)
+                 → C≤ α r₁ → C≤ α r₂ → C≤ α (Bounded.≈l≤trans {α = α} r₁ r₂))
+       → (forgetC : ∀ α {s t} (r : let module B = Bounded α in B._≈ˡ≤_ s t)
+                 → C≤ α r → C (Bounded.forget≈≤ α r))
+       → (stable : ∀ {s t} (p q : s ≈ˡ t) → C q → C p)
+       → ∀ {s t} (r : s ≈ˡ t) → C r
+  recˡ↑ C factor C≤ c-stage c-step c-sym c-trans forgetC stable r =
+    stable r (B.forget≈≤ (F.r≤)) pr
+    where
+    f = factor r
+    module F = BoundedFactor f
+    module B = Bounded (F.α)
+    pr : C (B.forget≈≤ (F.r≤))
+    pr = B.recˡ≤' (C≤ (F.α)) C (c-stage (F.α)) (c-step (F.α)) (c-sym (F.α)) (c-trans (F.α)) (forgetC (F.α)) (F.r≤)
+
   module _ where
     open Bounded renaming (_≈ˡ≤_ to _⊢_≈ˡ≤_)
     -- recˡ↑ : 
