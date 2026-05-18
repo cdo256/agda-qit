@@ -43,6 +43,10 @@ module QIT.QW.Colimit.Properties {ℓI} {ℓ≤}
         ; ≈lrefl to ≈lrefl≤
         ; Colim to Colim≤~
         ; Colim/≈ to Colim≤
+        ; ≈lstage to ≈l≤stage
+        ; ≈lstep to ≈l≤step
+        ; ≈lsym to ≈l≤sym
+        ; ≈ltrans to ≈l≤trans
         )
 
     forget₀ : Colim≤₀ → Colim₀
@@ -57,10 +61,10 @@ module QIT.QW.Colimit.Properties {ℓI} {ℓ≤}
     recˡ↑ : ∀ {ℓ ℓ'}
          → (C≤ : ∀ {s t} → s ≈ˡ≤ t → Prop ℓ)
          → (C  : ∀ {s t} → s ≈ˡ t → Prop ℓ')
-         → (c-stage : ∀ (i : ≤p.Below α) {x x'} (e : x ≡ x') → C≤ (_≈ˡ≤_.≈lstage i e))
-         → (c-step  : ∀ {i j : ≤p.Below α} (p : i .fst ≤ j .fst) (x : Functor.ob (RestrictDiagram α) i) → C≤ (_≈ˡ≤_.≈lstep p x))
-         → (c-sym   : ∀ {s t} (r : s ≈ˡ≤ t) → C≤ r → C≤ (_≈ˡ≤_.≈lsym r))
-         → (c-trans : ∀ {s t u} (r₁ : s ≈ˡ≤ t) (r₂ : t ≈ˡ≤ u) → C≤ r₁ → C≤ r₂ → C≤ (_≈ˡ≤_.≈ltrans r₁ r₂))
+         → (c-stage : ∀ (i : ≤p.Below α) {x x'} (e : x ≡ x') → C≤ (≈l≤stage i e))
+         → (c-step  : ∀ {i j : ≤p.Below α} (p : i .fst ≤ j .fst) (x : Functor.ob (RestrictDiagram α) i) → C≤ (≈l≤step p x))
+         → (c-sym   : ∀ {s t} (r : s ≈ˡ≤ t) → C≤ r → C≤ (≈l≤sym r))
+         → (c-trans : ∀ {s t u} (r₁ : s ≈ˡ≤ t) (r₂ : t ≈ˡ≤ u) → C≤ r₁ → C≤ r₂ → C≤ (≈l≤trans r₁ r₂))
          → (forgetC : ∀ {s t} (r : s ≈ˡ≤ t) → C≤ r → C (forget≈≤ r))
          → ∀ {s t} (r : s ≈ˡ≤ t) → C (forget≈≤ r)
     recˡ↑ C≤ C c-stage c-step c-sym c-trans forgetC r = forgetC r (go r)
