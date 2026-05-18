@@ -78,14 +78,14 @@ module PreservationByPowers
   plift : ∀ {α} → (t̂ : D₀ α) → D₀ (rankD₀ t̂)
   plift (t , _) = t , ≤refl (ιᶻ t)
 
+  same-stage : ∀ {α} {t : T} (p q : t ≤ᵀ α) → D̃ α [ (t , p) ≈ (t , q) ]
+  same-stage p q = ≡→≈ (D̃ _) (ΣP≡ (_ , p) (_ , q) ≡.refl)
+
   plift≈ : ∀ {α} → (t̂ : D̃ α /≈) → D̃ (rankD t̂) /≈
   plift≈ {α} t̂ = subst (λ β → D̃ β /≈) (first t̂) ((d t̂) .proj₂)
     where
     module Dα = SetoidQuotient (D̃ α)
     open ≡.≡-Reasoning
-
-    same-fst : ∀ {γ} {t : T} (p q : t ≤ᵀ γ) → D̃ γ [ (t , p) ≈ (t , q) ]
-    same-fst p q = ≡→≈ (D̃ _) (ΣP≡ (_ , p) (_ , q) ≡.refl)
 
     castʳ : ∀ {γ} {x y z : D₀ γ} → y ≡ z → D̃ γ [ x ≈ y ] → D̃ γ [ x ≈ z ]
     castʳ ≡.refl p = p
@@ -96,7 +96,7 @@ module PreservationByPowers
     cast-rhs : ∀ {γ s t} {ps : s ≤ᵀ γ} {pt qt : t ≤ᵀ γ}
       → D̃ γ [ (s , ps) ≈ (t , pt) ]
       → D̃ γ [ (s , ps) ≈ (t , qt) ]
-    cast-rhs {pt = pt} {qt = qt} p = ≈ptrans p (same-fst pt qt)
+    cast-rhs {pt = pt} {qt = qt} p = ≈ptrans p (same-stage pt qt)
 
     transport≈ : ∀ {γ δ} (p : γ ≡ δ) {x y : D₀ γ}
       → D̃ γ [ x ≈ y ] → D̃ δ [ subst D₀ p x ≈ subst D₀ p y ]
@@ -288,118 +288,115 @@ module PreservationByPowers
     map≈≤ (Bα.≈l≤trans r₁ r₂) = Bβ.≈l≤trans (map≈≤ r₁) (map≈≤ r₂)
 
   module _ where
-  sameBounded : ∀ {γ α} (p q : α ≤ γ) {y : D̃ α /≈}
-    → let module B = Bounded D γ in B._≈ˡ≤_ ((α , p) , y) ((α , q) , y)
-  sameBounded {γ} {α} p q {y} = B.≈l≤trans (B.≈l≤step (≤refl α) y) (B.≈l≤stage (α , q) eq)
-    where
-    module B = Bounded D γ
-    module Dα = SetoidQuotient (D̃ α)
-    module D∣γ = Functor (RestrictDiagram D γ)
-    hom-refl : (y : D̃ α /≈) → D∣γ.hom {α , p} {α , p} (box (≤refl α)) y ≡ y
-    hom-refl = Dα.elimp (λ y → D∣γ.hom {α , p} {α , p} (box (≤refl α)) y ≡ y) h
+    open Bounded D renaming (_≈ˡ≤_ to _⊢_≈ˡ≤_)
+    sameBounded : ∀ {γ α} (p q : α ≤ γ) {y : D̃ α /≈}
+      → γ ⊢ ((α , p) , y) ≈ˡ≤ ((α , q) , y)
+    sameBounded {γ} {α} p q {y} = B.≈l≤trans (B.≈l≤step (≤refl α) y) (B.≈l≤stage (α , q) eq)
       where
-      h : ∀ t̂ → D∣γ.hom {α , p} {α , p} (box (≤refl α)) (D̃ α ⊢[ t̂ ]) ≡ D̃ α ⊢[ t̂ ]
-      h t̂ = ≡.trans ≡.refl (D̃ α ⊢≈[ ≡→≈ (D̃ α) (ΣP≡ (pweaken (≤refl α) t̂) t̂ ≡.refl) ])
-    eq : D∣γ.hom {α , p} {α , p} (box (≤refl α)) y ≡ y
-    eq = hom-refl y
-
-  boundedJoin : ∀ {α β} {x : D̃ α /≈} {y : D̃ β /≈}
-    → Colim D [ α , x ≈ β , y ]
-    → ∃ λ γ → (α ≤ γ) ∧ᵖ λ α≤γ → (β ≤ γ) ∧ᵖ λ β≤γ → let module B = Bounded D γ in B._≈ˡ≤_ ((α , α≤γ) , x) ((β , β≤γ) , y)
-  boundedJoin = recˡ D C sC pC syC trC
-    where
-    C : ∀ {s t} → Colim D [ s ≈ t ] → Prop _
-    C {α , x} {β , y} _ = ∃ λ γ → (α ≤ γ) ∧ᵖ λ α≤γ → (β ≤ γ) ∧ᵖ λ β≤γ → let module B = Bounded D γ in B._≈ˡ≤_ ((α , α≤γ) , x) ((β , β≤γ) , y)
-
-    sC : ∀ α {x x'} (e : x ≡ x') → C (≈lstage α e)
-    sC α e = ∣ α , ≤refl α , ≤refl α , Bounded._≈ˡ≤_.≈lstage {P = D} (α , ≤refl α) e ∣
-
-    pC : ∀ {α β} (p : α ≤ β) (x : D̃ α /≈) → C (≈lstep p x)
-    pC {α} {β} p x = ∣ β , p , ≤refl β , Bounded._≈ˡ≤_.≈lstep {P = D} p x ∣
-
-    syC : ∀ {s t} (r : Colim D [ s ≈ t ]) → C r → C (≈lsym r)
-    syC {α , x} {β , y} r ∣ γ , α≤γ , β≤γ , r≤ ∣ =
-      ∣ γ , β≤γ , α≤γ , Bounded._≈ˡ≤_.≈lsym {P = D} r≤ ∣
-
-    trC : ∀ {s t u} (r₁ : Colim D [ s ≈ t ]) (r₂ : Colim D [ t ≈ u ]) → C r₁ → C r₂ → C (≈ltrans r₁ r₂)
-    trC {α , x} {β , y} {δ , z} r₁ r₂ ∣ γ₁ , α≤γ₁ , β≤γ₁ , q₁ ∣ ∣ γ₂ , β≤γ₂ , δ≤γ₂ , q₂ ∣ =
-      ∣ γ , α≤γ , δ≤γ , B._≈ˡ≤_.≈ltrans q₁' (B._≈ˡ≤_.≈ltrans mid q₂') ∣
-      where
-      γ : Z
-      γ = γ₁ ∨ᶻ γ₂
       module B = Bounded D γ
-      α≤γ : α ≤ γ
-      α≤γ = ≤≤ ∨ᶻ-l α≤γ₁
-      δ≤γ : δ ≤ γ
-      δ≤γ = ≤≤ ∨ᶻ-r δ≤γ₂
-      β≤γˡ : β ≤ γ
-      β≤γˡ = ≤≤ ∨ᶻ-l β≤γ₁
-      β≤γʳ : β ≤ γ
-      β≤γʳ = ≤≤ ∨ᶻ-r β≤γ₂
-      q₁' : B._≈ˡ≤_ ((α , α≤γ) , x) ((β , β≤γˡ) , y)
-      q₁' = map≈≤ ∨ᶻ-l q₁
-      q₂' : B._≈ˡ≤_ ((β , β≤γʳ) , y) ((δ , δ≤γ) , z)
-      q₂' = map≈≤ ∨ᶻ-r q₂
-      mid : B._≈ˡ≤_ ((β , β≤γˡ) , y) ((β , β≤γʳ) , y)
-      mid = sameBounded β≤γˡ β≤γʳ
+      module Dα = SetoidQuotient (D̃ α)
+      module D∣γ = Functor (RestrictDiagram D γ)
+      hom-refl : (y : D̃ α /≈) → D∣γ.hom {α , p} {α , p} (box (≤refl α)) y ≡ y
+      hom-refl = Dα.elimp (λ y → D∣γ.hom {α , p} {α , p} (box (≤refl α)) y ≡ y) h
+        where
+        h : ∀ t̂ → D∣γ.hom {α , p} {α , p} (box (≤refl α)) (D̃ α ⊢[ t̂ ]) ≡ D̃ α ⊢[ t̂ ]
+        h t̂ = D̃ α ⊢≈[ same-stage _ _ ]
+      eq : D∣γ.hom {α , p} {α , p} (box (≤refl α)) y ≡ y
+      eq = hom-refl y
 
-  join≈ : ∀ {α j} {x : D̃ α /≈} {y : D̃ j /≈}
-        → Colim D [ α , x ≈ j , y ]
-        → ∀ {γ} (i≤γ : α ≤ γ) (j≤γ : j ≤ γ)
-        → D.hom (box i≤γ) x ≡ D.hom (box j≤γ) y
-  join≈ = recˡ D J c-stage c-step c-sym c-trans
-    where
-    open ≡.≡-Reasoning
-
-    J : ∀ {s t} → Colim D [ s ≈ t ] → Prop _
-    J {s} {t} _ = ∀ {γ} (s≤γ : s .proj₁ ≤ γ) (t≤γ : t .proj₁ ≤ γ)
-      → D.hom (box s≤γ) (s .proj₂) ≡ D.hom (box t≤γ) (t .proj₂)
-
-    J' : ∀ {s t} → Colim D [ s ≈ t ] → Prop _
-    J' {s} {t} _ = ∀ {γ} (s≤γ : s .proj₁ ≤ γ) (t≤γ : t .proj₁ ≤ γ)
-      → D.hom (box s≤γ) (s .proj₂) ≡ D.hom (box t≤γ) (t .proj₂)
-
-    c-stage : ∀ α {x x'} (e : x ≡ x') → ∀ {γ} (i≤γ : α ≤ γ) (i≤γ' : α ≤ γ)
-      → D.hom (box i≤γ) x ≡ D.hom (box i≤γ') x'
-    c-stage α {x} {x'} e {γ} i≤γ i≤γ' = begin
-      D.hom (box i≤γ) x
-        ≡⟨ resp≤ ⟩
-      D.hom (box i≤γ') x
-        ≡⟨ ≡.cong (D.hom (box i≤γ')) e ⟩
-      D.hom (box i≤γ') x' ∎
+    boundedJoin : ∀ {α β} {x : D̃ α /≈} {y : D̃ β /≈}
+      → Colim D [ α , x ≈ β , y ]
+      → ∃ λ γ → (α ≤ γ) ∧ᵖ λ α≤γ → (β ≤ γ) ∧ᵖ λ β≤γ → let module B = Bounded D γ in B._≈ˡ≤_ ((α , α≤γ) , x) ((β , β≤γ) , y)
+    boundedJoin = recˡ D C sC pC syC trC
       where
-      resp≤ : D.hom (box i≤γ) x ≡ D.hom (box i≤γ') x
-      resp≤ = D.resp {f = box i≤γ} {g = box i≤γ'} (≡.isPropBox _ _) {x = x}
+      C : ∀ {s t} → Colim D [ s ≈ t ] → Prop _
+      C {α , x} {β , y} _ = ∃ λ γ → (α ≤ γ) ∧ᵖ λ α≤γ → (β ≤ γ) ∧ᵖ λ β≤γ → let module B = Bounded D γ in B._≈ˡ≤_ ((α , α≤γ) , x) ((β , β≤γ) , y)
 
-    c-step : ∀ {α β} (p : α ≤ β) (x : D̃ α /≈) → ∀ {γ} (i≤γ : α ≤ γ) (j≤γ : β ≤ γ)
-      → D.hom (box i≤γ) x ≡ D.hom (box j≤γ) (D.hom (box p) x)
-    c-step {α} {β} p x {γ} i≤γ j≤γ = begin
-      D.hom (box i≤γ) x
-        ≡⟨ resp≤ ⟩
-      D.hom (box (≤≤ j≤γ p)) x
-        ≡⟨ comp≤ ⟩
-      D.hom (box j≤γ) (D.hom (box p) x) ∎
+      sC : ∀ α {x x'} (e : x ≡ x') → C (≈lstage α e)
+      sC α e = ∣ α , ≤refl α , ≤refl α , Bounded._≈ˡ≤_.≈lstage {P = D} (α , ≤refl α) e ∣
+
+      pC : ∀ {α β} (p : α ≤ β) (x : D̃ α /≈) → C (≈lstep p x)
+      pC {α} {β} p x = ∣ β , p , ≤refl β , Bounded._≈ˡ≤_.≈lstep {P = D} p x ∣
+
+      syC : ∀ {s t} (r : Colim D [ s ≈ t ]) → C r → C (≈lsym r)
+      syC {α , x} {β , y} r ∣ γ , α≤γ , β≤γ , r≤ ∣ =
+        ∣ γ , β≤γ , α≤γ , Bounded._≈ˡ≤_.≈lsym {P = D} r≤ ∣
+
+      trC : ∀ {s t u} (r₁ : Colim D [ s ≈ t ]) (r₂ : Colim D [ t ≈ u ]) → C r₁ → C r₂ → C (≈ltrans r₁ r₂)
+      trC {α , x} {β , y} {δ , z} r₁ r₂ ∣ γ₁ , α≤γ₁ , β≤γ₁ , q₁ ∣ ∣ γ₂ , β≤γ₂ , δ≤γ₂ , q₂ ∣ =
+        ∣ γ , α≤γ , δ≤γ , B._≈ˡ≤_.≈ltrans q₁' (B._≈ˡ≤_.≈ltrans mid q₂') ∣
+        where
+        γ : Z
+        γ = γ₁ ∨ᶻ γ₂
+        module B = Bounded D γ
+        α≤γ : α ≤ γ
+        α≤γ = ≤≤ ∨ᶻ-l α≤γ₁
+        δ≤γ : δ ≤ γ
+        δ≤γ = ≤≤ ∨ᶻ-r δ≤γ₂
+        β≤γˡ : β ≤ γ
+        β≤γˡ = ≤≤ ∨ᶻ-l β≤γ₁
+        β≤γʳ : β ≤ γ
+        β≤γʳ = ≤≤ ∨ᶻ-r β≤γ₂
+        q₁' : B._≈ˡ≤_ ((α , α≤γ) , x) ((β , β≤γˡ) , y)
+        q₁' = map≈≤ ∨ᶻ-l q₁
+        q₂' : B._≈ˡ≤_ ((β , β≤γʳ) , y) ((δ , δ≤γ) , z)
+        q₂' = map≈≤ ∨ᶻ-r q₂
+        mid : B._≈ˡ≤_ ((β , β≤γˡ) , y) ((β , β≤γʳ) , y)
+        mid = sameBounded β≤γˡ β≤γʳ
+
+    join≈ : ∀ {α j} {x : D̃ α /≈} {y : D̃ j /≈}
+          → Colim D [ α , x ≈ j , y ]
+          → ∀ {γ} (i≤γ : α ≤ γ) (j≤γ : j ≤ γ)
+          → D.hom (box i≤γ) x ≡ D.hom (box j≤γ) y
+    join≈ = recˡ D J c-stage c-step c-sym c-trans
       where
-      resp≤ : D.hom (box i≤γ) x ≡ D.hom (box (≤≤ j≤γ p)) x
-      resp≤ = D.resp {f = box i≤γ} {g = box (≤≤ j≤γ p)} (≡.isPropBox _ _) {x = x}
+      open ≡.≡-Reasoning
 
-      comp≤ : D.hom (box (≤≤ j≤γ p)) x ≡ D.hom (box j≤γ) (D.hom (box p) x)
-      comp≤ = D.comp (box p) (box j≤γ) {x = x}
+      J : ∀ {s t} → Colim D [ s ≈ t ] → Prop _
+      J {s} {t} _ = ∀ {γ} (s≤γ : s .proj₁ ≤ γ) (t≤γ : t .proj₁ ≤ γ)
+        → D.hom (box s≤γ) (s .proj₂) ≡ D.hom (box t≤γ) (t .proj₂)
 
-    c-sym : ∀ {s t} (r : Colim D [ s ≈ t ]) → J r → J (≈lsym r)
-    c-sym {s} {t} r ih t≤γ s≤γ = ≡.sym (ih s≤γ t≤γ)
+      c-stage : ∀ α {x x'} (e : x ≡ x') → ∀ {γ} (i≤γ : α ≤ γ) (i≤γ' : α ≤ γ)
+        → D.hom (box i≤γ) x ≡ D.hom (box i≤γ') x'
+      c-stage α {x} {x'} e {γ} i≤γ i≤γ' = begin
+          D.hom (box i≤γ) x
+            ≡⟨ resp≤ ⟩
+          D.hom (box i≤γ') x
+            ≡⟨ ≡.cong (D.hom (box i≤γ')) e ⟩
+          D.hom (box i≤γ') x' ∎
+          where
+          resp≤ : D.hom (box i≤γ) x ≡ D.hom (box i≤γ') x
+          resp≤ = D.resp {f = box i≤γ} {g = box i≤γ'} (≡.isPropBox _ _) {x = x}
 
-    ≡→≤ : ∀ {α β} → α ≡ β → α ≤ β
-    ≡→≤ {α} {α} ≡.refl = ≤refl α
+      c-step : ∀ {α β} (p : α ≤ β) (x : D̃ α /≈) → ∀ {γ} (i≤γ : α ≤ γ) (j≤γ : β ≤ γ)
+        → D.hom (box i≤γ) x ≡ D.hom (box j≤γ) (D.hom (box p) x)
+      c-step {α} {β} p x {γ} i≤γ j≤γ = begin
+          D.hom (box i≤γ) x
+            ≡⟨ resp≤ ⟩
+          D.hom (box (≤≤ j≤γ p)) x
+            ≡⟨ comp≤ ⟩
+          D.hom (box j≤γ) (D.hom (box p) x) ∎
+        where
+          resp≤ : D.hom (box i≤γ) x ≡ D.hom (box (≤≤ j≤γ p)) x
+          resp≤ = D.resp {f = box i≤γ} {g = box (≤≤ j≤γ p)} (≡.isPropBox _ _) {x = x}
 
-    c-trans : ∀ {s t u} (r₁ : Colim D [ s ≈ t ]) (r₂ : Colim D [ t ≈ u ])
-      → J r₁ → J r₂ → J (≈ltrans r₁ r₂)
-    c-trans {s = s} {t} {u} r₁ r₂ ih₁ ih₂ {γ} s≤γ u≤γ = ≡.trans (ih₁ s≤γ t≤γ) (ih₂ t≤γ u≤γ)
-      where
-      t' : D̃ (rankD (t .proj₂)) /≈
-      t' = plift≈ (t .proj₂)
-      t≤γ : t .proj₁ ≤ γ
-      t≤γ = ≤≤ s≤γ (≡→≤ {!!})
+          comp≤ : D.hom (box (≤≤ j≤γ p)) x ≡ D.hom (box j≤γ) (D.hom (box p) x)
+          comp≤ = D.comp (box p) (box j≤γ) {x = x}
+
+      c-sym : ∀ {s t} (r : Colim D [ s ≈ t ]) → J r → J (≈lsym r)
+      c-sym {s} {t} r ih t≤γ s≤γ = ≡.sym (ih s≤γ t≤γ)
+
+      ≡→≤ : ∀ {α β} → α ≡ β → α ≤ β
+      ≡→≤ {α} {α} ≡.refl = ≤refl α
+
+      c-trans : ∀ {s t u} (r₁ : Colim D [ s ≈ t ]) (r₂ : Colim D [ t ≈ u ])
+        → J r₁ → J r₂ → J (≈ltrans r₁ r₂)
+      c-trans {s = s} {t} {u} r₁ r₂ ih₁ ih₂ {γ} s≤γ u≤γ = ≡.trans (ih₁ s≤γ t≤γ) (ih₂ t≤γ u≤γ)
+        where
+        t' : D̃ (rankD (t .proj₂)) /≈
+        t' = plift≈ (t .proj₂)
+        t≤γ : t .proj₁ ≤ γ
+        t≤γ = ≤≤ s≤γ (≡→≤ {!!})
 
   ϕ-inj≈ : ∀ {t̃ ũ} → (∀ x → Colim D [ ϕ₀ t̃ x ≈ ϕ₀ ũ x ])
          → Colim D^X [ t̃ ≈ ũ ]
