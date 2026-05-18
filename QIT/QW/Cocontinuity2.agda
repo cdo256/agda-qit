@@ -287,18 +287,20 @@ module PreservationByPowers
     map≈≤ (Bα.≈l≤sym r) = Bβ.≈l≤sym (map≈≤ r)
     map≈≤ (Bα.≈l≤trans r₁ r₂) = Bβ.≈l≤trans (map≈≤ r₁) (map≈≤ r₂)
 
-  sameBounded : ∀ {γ j} (p q : j ≤ γ) {y : D̃ j /≈}
-    → let module B = Bounded D γ in B._≈ˡ≤_ ((j , p) , y) ((j , q) , y)
-  sameBounded {γ} {j} p q {y} = B._≈ˡ≤_.≈ltrans (B._≈ˡ≤_.≈lstep (≤refl j) y) (B._≈ˡ≤_.≈lstage (j , q) eq)
+  module _ where
+  sameBounded : ∀ {γ α} (p q : α ≤ γ) {y : D̃ α /≈}
+    → let module B = Bounded D γ in B._≈ˡ≤_ ((α , p) , y) ((α , q) , y)
+  sameBounded {γ} {α} p q {y} = B.≈l≤trans (B.≈l≤step (≤refl α) y) (B.≈l≤stage (α , q) eq)
     where
     module B = Bounded D γ
-    module Dj = SetoidQuotient (D̃ j)
-    hom-refl : (y : D̃ j /≈) → Functor.hom (RestrictDiagram D γ) (box (≤refl j)) y ≡ y
-    hom-refl = Dj.elimp (λ y → Functor.hom (RestrictDiagram D γ) (box (≤refl j)) y ≡ y) h
+    module Dα = SetoidQuotient (D̃ α)
+    module D∣γ = Functor (RestrictDiagram D γ)
+    hom-refl : (y : D̃ α /≈) → D∣γ.hom {α , p} {α , p} (box (≤refl α)) y ≡ y
+    hom-refl = Dα.elimp (λ y → D∣γ.hom {α , p} {α , p} (box (≤refl α)) y ≡ y) h
       where
-      h : ∀ t̂ → Functor.hom (RestrictDiagram D γ) (box (≤refl j)) (D̃ j ⊢[ t̂ ]) ≡ D̃ j ⊢[ t̂ ]
-      h t̂ = ≡.trans ≡.refl (D̃ j ⊢≈[ ≡→≈ (D̃ j) (ΣP≡ (pweaken (≤refl j) t̂) t̂ ≡.refl) ])
-    eq : Functor.hom (RestrictDiagram D γ) (box (≤refl j)) y ≡ y
+      h : ∀ t̂ → D∣γ.hom {α , p} {α , p} (box (≤refl α)) (D̃ α ⊢[ t̂ ]) ≡ D̃ α ⊢[ t̂ ]
+      h t̂ = ≡.trans ≡.refl (D̃ α ⊢≈[ ≡→≈ (D̃ α) (ΣP≡ (pweaken (≤refl α) t̂) t̂ ≡.refl) ])
+    eq : D∣γ.hom {α , p} {α , p} (box (≤refl α)) y ≡ y
     eq = hom-refl y
 
   boundedJoin : ∀ {α β} {x : D̃ α /≈} {y : D̃ β /≈}
@@ -351,6 +353,10 @@ module PreservationByPowers
 
     J : ∀ {s t} → Colim D [ s ≈ t ] → Prop _
     J {s} {t} _ = ∀ {γ} (s≤γ : s .proj₁ ≤ γ) (t≤γ : t .proj₁ ≤ γ)
+      → D.hom (box s≤γ) (s .proj₂) ≡ D.hom (box t≤γ) (t .proj₂)
+
+    J' : ∀ {s t} → Colim D [ s ≈ t ] → Prop _
+    J' {s} {t} _ = ∀ {γ} (s≤γ : s .proj₁ ≤ γ) (t≤γ : t .proj₁ ≤ γ)
       → D.hom (box s≤γ) (s .proj₂) ≡ D.hom (box t≤γ) (t .proj₂)
 
     c-stage : ∀ α {x x'} (e : x ≡ x') → ∀ {γ} (i≤γ : α ≤ γ) (i≤γ' : α ≤ γ)
