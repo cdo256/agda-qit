@@ -275,6 +275,83 @@ module PreservationByPowers
   ϕ : Colim/≈ D^X → (X → Colim/≈ D)
   ϕ f̃ x = ColimD^X.map (Colim D) (λ f → ϕ₀ f x) (λ p → ϕ-cong p x) f̃
 
+  module _ {α β : Z} (α≤β : α ≤ β) where
+    module Bα = Bounded D α
+    module Bβ = Bounded D β
+
+    map≤₀ : Bα.Colim≤₀ → Bβ.Colim≤₀
+    map≤₀ (i≤α , x) = (i≤α .fst , ≤≤ α≤β (i≤α .snd)) , x
+
+    map≈≤ : ∀ {s t} → Bα._≈ˡ≤_ s t → Bβ._≈ˡ≤_ (map≤₀ s) (map≤₀ t)
+    map≈≤ = Bα.recˡ≤ _ s≤ p≤ sy≤ tr≤
+      where
+      s≤ : ∀ i {x x'} (e : x ≡ x') → Bβ._≈ˡ≤_ (map≤₀ (i , x)) (map≤₀ (i , x'))
+      s≤ i e = Bβ._≈ˡ≤_.≈lstage (i .fst , ≤≤ α≤β (i .snd)) e
+
+      p≤ : ∀ {i j} (p : i .fst ≤ j .fst) (x : Functor.ob (RestrictDiagram D α) i)
+        → Bβ._≈ˡ≤_ (map≤₀ (i , x)) (map≤₀ (j , Functor.hom (RestrictDiagram D α) (box p) x))
+      p≤ p x = Bβ._≈ˡ≤_.≈lstep p x
+
+      sy≤ : ∀ {s t} (r : Bα._≈ˡ≤_ s t)
+        → Bβ._≈ˡ≤_ (map≤₀ s) (map≤₀ t)
+        → Bβ._≈ˡ≤_ (map≤₀ t) (map≤₀ s)
+      sy≤ r ih = Bβ._≈ˡ≤_.≈lsym ih
+
+      tr≤ : ∀ {s t u} (r₁ : Bα._≈ˡ≤_ s t) (r₂ : Bα._≈ˡ≤_ t u)
+        → Bβ._≈ˡ≤_ (map≤₀ s) (map≤₀ t)
+        → Bβ._≈ˡ≤_ (map≤₀ t) (map≤₀ u)
+        → Bβ._≈ˡ≤_ (map≤₀ s) (map≤₀ u)
+      tr≤ r₁ r₂ ih₁ ih₂ = Bβ._≈ˡ≤_.≈ltrans ih₁ ih₂
+
+  sameBounded : ∀ {γ j} (p q : j ≤ γ) {y : D̃ j /≈}
+    → let module B = Bounded D γ in B._≈ˡ≤_ ((j , p) , y) ((j , q) , y)
+  sameBounded {γ} {j} p q {y} = B._≈ˡ≤_.≈ltrans (B._≈ˡ≤_.≈lstep (≤refl j) y) (B._≈ˡ≤_.≈lstage (j , q) eq)
+    where
+    module B = Bounded D γ
+    module R = Functor (RestrictDiagram D γ)
+    eq : Functor.hom (RestrictDiagram D γ) (box (≤refl j)) y ≡ y
+    eq = R.id {x = (j , p)} {x = y}
+
+  boundedJoin : ∀ {i j} {x : D̃ i /≈} {y : D̃ j /≈}
+    → Colim D [ i , x ≈ j , y ]
+    → ∃ λ γ → (i ≤ γ) ∧ᵖ λ i≤γ → (j ≤ γ) ∧ᵖ λ j≤γ → let module B = Bounded D γ in B._≈ˡ≤_ ((i , i≤γ) , x) ((j , j≤γ) , y)
+  boundedJoin = recˡ D C sC pC syC trC
+    where
+    C : ∀ {s t} → Colim D [ s ≈ t ] → Prop _
+    C {i , x} {j , y} _ = ∃ λ γ → (i ≤ γ) ∧ᵖ λ i≤γ → (j ≤ γ) ∧ᵖ λ j≤γ → let module B = Bounded D γ in B._≈ˡ≤_ ((i , i≤γ) , x) ((j , j≤γ) , y)
+
+    sC : ∀ i {x x'} (e : x ≡ x') → C (≈lstage i e)
+    sC i e = ∣ i , ≤refl i , ≤refl i , Bounded._≈ˡ≤_.≈lstage {P = D} (i , ≤refl i) e ∣
+
+    pC : ∀ {i j} (p : i ≤ j) (x : D̃ i /≈) → C (≈lstep p x)
+    pC {i} {j} p x = ∣ j , p , ≤refl j , Bounded._≈ˡ≤_.≈lstep {P = D} p x ∣
+
+    syC : ∀ {s t} (r : Colim D [ s ≈ t ]) → C r → C (≈lsym r)
+    syC {i , x} {j , y} r ∣ γ , i≤γ , j≤γ , r≤ ∣ =
+      ∣ γ , j≤γ , i≤γ , Bounded._≈ˡ≤_.≈lsym {P = D} r≤ ∣
+
+    trC : ∀ {s t u} (r₁ : Colim D [ s ≈ t ]) (r₂ : Colim D [ t ≈ u ]) → C r₁ → C r₂ → C (≈ltrans r₁ r₂)
+    trC {i , x} {j , y} {k , z} r₁ r₂ ∣ γ₁ , i≤γ₁ , j≤γ₁ , q₁ ∣ ∣ γ₂ , j≤γ₂ , k≤γ₂ , q₂ ∣ =
+      ∣ γ , i≤γ , k≤γ , B._≈ˡ≤_.≈ltrans q₁' (B._≈ˡ≤_.≈ltrans mid q₂') ∣
+      where
+      γ : Z
+      γ = γ₁ ∨ᶻ γ₂
+      module B = Bounded D γ
+      i≤γ : i ≤ γ
+      i≤γ = ≤≤ ∨ᶻ-l i≤γ₁
+      k≤γ : k ≤ γ
+      k≤γ = ≤≤ ∨ᶻ-r k≤γ₂
+      j≤γˡ : j ≤ γ
+      j≤γˡ = ≤≤ ∨ᶻ-l j≤γ₁
+      j≤γʳ : j ≤ γ
+      j≤γʳ = ≤≤ ∨ᶻ-r j≤γ₂
+      q₁' : B._≈ˡ≤_ ((i , i≤γ) , x) ((j , j≤γˡ) , y)
+      q₁' = map≈≤ ∨ᶻ-l q₁
+      q₂' : B._≈ˡ≤_ ((j , j≤γʳ) , y) ((k , k≤γ) , z)
+      q₂' = map≈≤ ∨ᶻ-r q₂
+      mid : B._≈ˡ≤_ ((j , j≤γˡ) , y) ((j , j≤γʳ) , y)
+      mid = sameBounded j≤γˡ j≤γʳ
+
   join≈ : ∀ {i j} {x : D̃ i /≈} {y : D̃ j /≈}
         → Colim D [ i , x ≈ j , y ]
         → ∀ {γ} (i≤γ : i ≤ γ) (j≤γ : j ≤ γ)
@@ -324,10 +401,8 @@ module PreservationByPowers
       → J r₁ → J r₂ → J (≈ltrans r₁ r₂)
     c-trans {s = s} {t} {u} r₁ r₂ ih₁ ih₂ {γ} s≤γ u≤γ = ≡.trans (ih₁ s≤γ t≤γ) (ih₂ t≤γ u≤γ)
       where
-      t' : {!!}
-      t' = plift {!!}
-      -- dp : {!!}
-      -- dp = depth-preserving γ {!s!} {!!}
+      t' : D̃ (rankD (t .proj₂)) /≈
+      t' = plift≈ (t .proj₂)
       t≤γ : t .proj₁ ≤ γ
       t≤γ = ≤≤ s≤γ (≡→≤ {!!})
 
