@@ -33,6 +33,7 @@ import QIT.Category.Base
 import QIT.Category.Strict
 import QIT.Category.SetoidEnriched
 import QIT.Category.Morphism
+import QIT.Category.Equivalence
 import QIT.Category.Slice
 import QIT.Category.Initial
 import QIT.Category.Terminal
@@ -57,7 +58,7 @@ import QIT.Category.FamilyOfSetoids
 
 -- Functor
 import QIT.Functor.Base
-import QIT.Functor.Composition
+import QIT.Functor.Properties
 import QIT.Functor.NatTrans
 
 -- Algebra
@@ -79,6 +80,8 @@ import QIT.QW.Signature
 import QIT.QW.Algebra
 import QIT.QW.Stage
 import QIT.QW.StageColimit
+import QIT.QW.Colimit.Base
+import QIT.QW.Colimit.Properties
 import QIT.QW.Colimit
 import QIT.QW.Locality
 -- import QIT.QW.Cocontinuity
