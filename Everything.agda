@@ -33,6 +33,8 @@ import QIT.Category.Base
 import QIT.Category.Strict
 import QIT.Category.SetoidEnriched
 import QIT.Category.Morphism
+import QIT.Category.CategoryEquivalence
+import QIT.Category.Equivalence
 import QIT.Category.Slice
 import QIT.Category.Initial
 import QIT.Category.Terminal

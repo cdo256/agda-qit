@@ -365,47 +365,48 @@ module PreservationByPowers
         γ⊢y≈y : γ ⊢ ((β , β≤γˡ) , y) ≈ˡ≤ ((β , β≤γʳ) , y)
         γ⊢y≈y = sameBounded β≤γˡ β≤γʳ
 
-  --   join : ∀ {α β} {x : D̃ α /≈} {y : D̃ β /≈}
-  --         → BoundedJoin x y
-  --         → ∀ {γ} (α≤γ : α ≤ γ) (β≤γ : β ≤ γ)
-  --         → D.hom (box α≤γ) x ≡ D.hom (box β≤γ) y
-  --   join p = {!!}
+    join : ∀ {α β} {x : D̃ α /≈} {y : D̃ β /≈}
+          → BoundedJoin (α , x) (β , y)
+          → ∀ {γ} (α≤γ : α ≤ γ) (β≤γ : β ≤ γ)
+          → D.hom (box α≤γ) x ≡ D.hom (box β≤γ) y
+    join (bjoin γ α≤γ β≤γ γ⊢x≈y) {δ} α≤δ β≤δ = {!!}
 
-  --   join≈ : ∀ {α β} {x : D̃ α /≈} {y : D̃ β /≈}
-  --         → Colim D [ α , x ≈ β , y ]
-  --         → ∀ {γ} (α≤γ : α ≤ γ) (β≤γ : β ≤ γ)
-  --         → D.hom (box α≤γ) x ≡ D.hom (box β≤γ) y
-  --   join≈ p = {!!}
+    join≈ : ∀ {α β} {x : D̃ α /≈} {y : D̃ β /≈}
+          → Colim D [ α , x ≈ β , y ]
+          → ∀ {γ} (α≤γ : α ≤ γ) (β≤γ : β ≤ γ)
+          → D.hom (box α≤γ) x ≡ D.hom (box β≤γ) y
+    join≈ p = {!!}
 
-  -- ϕ-inj≈ : ∀ {t̃ ũ} → (∀ x → Colim D [ ϕ₀ t̃ x ≈ ϕ₀ ũ x ])
-  --        → Colim D^X [ t̃ ≈ ũ ]
-  -- ϕ-inj≈ {α , t̂} {β , û} p =
-  --      α , t̂
-  --   ≈⟨ ≈lstep ∨ᶻ-l t̂ ⟩
-  --      γ , (λ x → D.hom (box ∨ᶻ-l) (t̂ x))
-  --   ≈⟨ ≈lstage (α ∨ᶻ β) (≡.funExt q) ⟩
-  --      γ , (λ x → D.hom (box ∨ᶻ-r) (û x))
-  --   ≈⟨ ≈lsym (≈lstep ∨ᶻ-r û) ⟩
-  --     β , û ∎
-  --   where
-  --   open ≈.≈syntax {S = Colim D^X}
-  --   γ : Z
-  --   γ = α ∨ᶻ β
-  --   q : ∀ x → D.hom (box ∨ᶻ-l) (t̂ x) ≡ D.hom (box ∨ᶻ-r) (û x)
-  --   q x = join≈ (p (lower x)) ∨ᶻ-l ∨ᶻ-r
+  ϕ-inj≈ : ∀ {t̃ ũ} → (∀ x → Colim D [ ϕ₀ t̃ x ≈ ϕ₀ ũ x ])
+         → Colim D^X [ t̃ ≈ ũ ]
+  ϕ-inj≈ {α , t̂} {β , û} p with boundedJoin {!p!}
+  ... | w =
+       α , t̂
+    ≈⟨ ≈lstep ∨ᶻ-l t̂ ⟩
+       γ , (λ x → D.hom (box ∨ᶻ-l) (t̂ x))
+    ≈⟨ ≈lstage (α ∨ᶻ β) (≡.funExt q) ⟩
+       γ , (λ x → D.hom (box ∨ᶻ-r) (û x))
+    ≈⟨ ≈lsym (≈lstep ∨ᶻ-r û) ⟩
+      β , û ∎
+    where
+    open ≈.≈syntax {S = Colim D^X}
+    γ : Z
+    γ = α ∨ᶻ β
+    q : ∀ x → D.hom (box ∨ᶻ-l) (t̂ x) ≡ D.hom (box ∨ᶻ-r) (û x)
+    q x = join≈ (p (lower x)) ∨ᶻ-l ∨ᶻ-r
 
-  -- --   let
-  -- --     w : D̃ γ /≈
-  -- --     w = D.hom (box ∨ᶻ-l) {!!} in {!!}
+  --   let
+  --     w : D̃ γ /≈
+  --     w = D.hom (box ∨ᶻ-l) {!!} in {!!}
   
-  -- -- ϕ-inj : ∀ {t̃ ũ} → (∀ x → ϕ t̃ x ≡ ϕ ũ x) → t̃ ≡ ũ
-  -- -- ϕ-inj {t̃} {ũ} = {!!}
+  -- ϕ-inj : ∀ {t̃ ũ} → (∀ x → ϕ t̃ x ≡ ϕ ũ x) → t̃ ≡ ũ
+  -- ϕ-inj {t̃} {ũ} = {!!}
 
-  -- -- ϕ-surj≈ : (f : X → Colim/≈ D) → ∃ λ t̃ → ϕ t̃ ≡ f
-  -- -- ϕ-surj≈ f = ∣ {!!} , {!!} ∣
+  -- ϕ-surj≈ : (f : X → Colim/≈ D) → ∃ λ t̃ → ϕ t̃ ≡ f
+  -- ϕ-surj≈ f = ∣ {!!} , {!!} ∣
 
-  -- -- ϕ-surj : (f : X → Colim/≈ D) → ∃ λ t̃ → ϕ t̃ ≡ f
-  -- -- ϕ-surj f = {!!}
+  -- ϕ-surj : (f : X → Colim/≈ D) → ∃ λ t̃ → ϕ t̃ ≡ f
+  -- ϕ-surj f = {!!}
 
-  -- -- lemma : Colim/≈ D^X ≅ (X → Colim/≈ D)
-  -- -- lemma = Bijection→Iso ϕ ((λ p → ϕ-inj (≡.funExt⁻ p)) , ϕ-surj)
+  -- lemma : Colim/≈ D^X ≅ (X → Colim/≈ D)
+  -- lemma = Bijection→Iso ϕ ((λ p → ϕ-inj (≡.funExt⁻ p)) , ϕ-surj)
