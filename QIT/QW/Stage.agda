@@ -26,7 +26,7 @@ open import QIT.QW.Equation S P ℓV
 open import QIT.Category.Preorder
 open import QIT.Category.Setoid
 open import QIT.Category.Set
-open import QIT.Category.Base
+open import QIT.Category.Base hiding (_[_≈_])
 open import QIT.Functor.Base
 open import QIT.Functor.Properties
 
@@ -203,3 +203,15 @@ D = record
       → hom (box g ≤p.∘ box f) t̃
       ≡ (hom (box g) SetCat.∘ hom (box f)) t̃
     q = quot-elimp _ λ _ → ≡.refl
+
+  open import QIT.Function.Base
+  open import QIT.Set.Bijection
+  isInjHom : ∀ {α β} (p : α ≤ β)
+           → (∀ {x y} → D̃ β [ pweaken p x ≈ pweaken p y ] → D̃ α [ x ≈ y ])
+           → (∀ {x y} → hom (box p) [ x ] ≡ hom (box p) [ y ] → _≡_ {A = D̃ α /≈} [ x ] [ y ])
+  isInjHom {α} {β} α≤β injWeaken {x} {y} q =
+    quot-rel x y (injWeaken r)
+    where
+    open ≈.SetoidQuotient
+    r : D̃ β [ pweaken α≤β x ≈ pweaken α≤β y ]
+    r = effectiveness (D̃ β) _ _ q
