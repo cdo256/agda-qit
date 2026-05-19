@@ -14,7 +14,7 @@ open import QIT.Setoid
 open import QIT.QW.W S P
 open import QIT.QW.Equation S P ℓV
 open import QIT.Functor.Base
-open import QIT.Examples.Plump.Postulated S P as Z
+open import QIT.Plump.Postulated S P as Z
 
 expr→Z : {V : Set ℓV} → Expr V → Z
 expr→Z (W.sup (inj₁ v , f)) = ⊥ᶻ

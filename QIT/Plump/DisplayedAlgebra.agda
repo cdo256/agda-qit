@@ -3,11 +3,11 @@ open import QIT.Prop
 open import QIT.Container.Base as W using (⟦_◁_⟧)
 open import QIT.Relation.Binary using (WellFounded)
 
-module QIT.Examples.Plump.DisplayedAlgebra
+module QIT.Plump.DisplayedAlgebra
   {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP)
   where
 
-open import QIT.Examples.Plump.Algebra S P
+open import QIT.Plump.Algebra S P
 
 record Displayed
   {ℓX} (X-alg : Algebra ℓX) (ℓD : Level)

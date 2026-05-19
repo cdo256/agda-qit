@@ -33,7 +33,7 @@ open import QIT.Container.StrictFunctor S P (ℓD ⊔ ℓD')
 open import QIT.Category.Morphism (SetCat (ℓD ⊔ ℓD'))
 
 -- Size control and staging
-open import QIT.Examples.Plump.Postulated S P as Z hiding (rec)
+open import QIT.Plump.Postulated S P as Z hiding (rec)
 open import QIT.QW.Stage sig
 open import QIT.QW.Algebra sig
 open import QIT.QW.StageColimit sig

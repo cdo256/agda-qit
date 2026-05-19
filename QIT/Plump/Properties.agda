@@ -1,4 +1,4 @@
-module QIT.Examples.Plump.Properties {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
+module QIT.Plump.Properties {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
 
 open import QIT.Prelude
 open import QIT.Prop
@@ -8,7 +8,7 @@ import QIT.Container.Base as W
 open W hiding (sup)
 open import QIT.Setoid
 
-open import QIT.Examples.Plump.Postulated S P
+open import QIT.Plump.Postulated S P
 
 open import QIT.Function.Base
 open import QIT.Relation.Subset
@@ -42,4 +42,3 @@ open import QIT.Category.Equivalence
 record IsRegular (κ : Z) : Prop (ℓS ⊔ ℓP) where
   field
     regular : ∀ α → α < κ → Equivalence (PreorderCat↓ α) (PreorderCat↓ κ) → ⊥p
-

@@ -1,4 +1,4 @@
-module QIT.Examples.Plump.Postulated {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
+module QIT.Plump.Postulated {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
 
 open import QIT.Prelude
 open import QIT.Prop
@@ -16,7 +16,7 @@ open Plump public
            ; ≤≤ to ≤≤₀ ; ≤< to ≤<₀ ; <≤ to <≤₀
            ; sup≤ to sup≤₀ ; <sup to <sup₀)
 
-open import QIT.Examples.Plump.Algebra Sᶻ Pᶻ
+open import QIT.Plump.Algebra Sᶻ Pᶻ
 
 postulate
   Zᴬ : Algebra (ℓS ⊔ ℓP)

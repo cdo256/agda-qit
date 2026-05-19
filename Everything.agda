@@ -73,6 +73,9 @@ import QIT.Container.Functor
 import QIT.Container.StrictFunctor
 import QIT.Container.Indexed
 
+import QIT.Plump.Postulated
+import QIT.Plump.Properties
+
 -- QW type definition
 import QIT.QW.W
 import QIT.QW.Equation
@@ -103,7 +106,6 @@ import QIT.QW.Locality
 
 -- -- Examples
 -- -- import QIT.Examples.CauchyReals
-import QIT.Examples.Plump.Postulated
 -- import QIT.Examples.ConTy
 -- import QIT.Examples.HoleList
 -- import QIT.Examples.ListBag

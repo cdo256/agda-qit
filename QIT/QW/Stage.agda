@@ -17,7 +17,7 @@ open import QIT.Setoid
 open import QIT.Set.Base using (_≡h_)
 open import QIT.Relation.Subset
 open import QIT.Relation.SetQuotient
-open import QIT.Examples.Plump.Postulated S P as Z hiding ([_])
+open import QIT.Plump.Postulated S P as Z hiding ([_])
 open import QIT.QW.W S P
 open import QIT.Algebra F
 open import QIT.Algebra.Lift S P ℓV
