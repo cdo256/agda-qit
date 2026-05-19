@@ -8,6 +8,7 @@ open W hiding (sup)
 open import QIT.Setoid
 
 import QIT.Relation.Plump S P as Plump
+open import QIT.Relation.Subset
 
 open Plump public
   using (Sᶻ ; Pᶻ ; ιˢ ; ∨ˢ ; ⊥ˢ)
@@ -63,6 +64,13 @@ postulate
         → ind B step (sup (s , ξ)) ≡ step (λ i → ind B step (ξ i))
 {-# REWRITE ind-β #-}
 
+postulate
+  -- minimum
+  _∧ᶻ_ : Z → Z → Z 
+  ∧≤₁ : ∀ {α β} → (α ∧ᶻ β) ≤ α
+  ∧≤₂ : ∀ {α β} → (α ∧ᶻ β) ≤ β
+  ∧-lim : ∀ {α β γ} → γ ≤ α → γ ≤ β → γ ≤ (α ∧ᶻ β)
+
 -- Non-dependent recursion: fold over the tree shape.
 -- step receives the shape s, the child ordinals ξ, and the
 -- recursively-computed results for each child.
@@ -89,6 +97,12 @@ _∨ᶻ_ : Z → Z → Z
   ξ : Pᶻ ∨ˢ → Z
   ξ (lift (inj₁ tt)) = α
   ξ (lift (inj₂ tt)) = β
+
+∨ᶻ-l : ∀ {α β} → α ≤ (α ∨ᶻ β)
+∨ᶻ-l {α} {β} = <→≤ (<sup (lift (inj₁ tt)) (≤refl α))
+
+∨ᶻ-r : ∀ {α β} → β ≤ (α ∨ᶻ β)
+∨ᶻ-r {α} {β} = <→≤ (<sup (lift (inj₂ tt)) (≤refl β))
 
 -- Successor: well-defined since sucᶻ α = sup(∨ˢ, λ _ → α) is
 -- congruent w.r.t. ≤≥ by ≤≥-cong.
@@ -141,3 +155,18 @@ t <ᵀ α = ιᶻ t < α
 
 _≤ᵀ_ : W S P → Z → Prop (ℓS ⊔ ℓP)
 t ≤ᵀ α = ιᶻ t ≤ α
+
+↓<_ : Z → Set (ℓS ⊔ ℓP)
+↓< α = ΣP Z (_< α)
+↓≤_ : Z → Set (ℓS ⊔ ℓP)
+↓≤ α = ΣP Z (_≤ α)
+
+_≤↓<_ : ∀ {α} (β γ : ↓< α) → Prop (ℓS ⊔ ℓP)
+(β , _) ≤↓< (γ , _) = β ≤ γ
+_<↓<_ : ∀ {α} (β γ : ↓< α) → Prop (ℓS ⊔ ℓP)
+(β , _) <↓< (γ , _) = β < γ
+
+_≤↓≤_ : ∀ {α} (β γ : ↓≤ α) → Prop (ℓS ⊔ ℓP)
+(β , _) ≤↓≤ (γ , _) = β ≤ γ
+_<↓≤_ : ∀ {α} (β γ : ↓≤ α) → Prop (ℓS ⊔ ℓP)
+(β , _) <↓≤ (γ , _) = β < γ
