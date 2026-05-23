@@ -112,8 +112,29 @@ module PreservationByPowers
   ~ᴰ⇔~ᴰ' : ∀ {α β} (s : D̃ α /≈) (t : D̃ β /≈) → (s ~ᴰ t) ⇔ (s ~ᴰ' t)
   ~ᴰ⇔~ᴰ' {α} {β} s t = QuotHetRel∀→∃ D̃ _~ᴰ⁰_ s t , r
     where
-    r : s ~ᴰ' t → s ~ᴰ t
-    r p bx₀ by₀ = {!!} , {!!} , {!!}
+    f : D₀ α → Σ Z (λ β → D̃ β /≈)
+    f (s , s≤α) = ιᶻ s , D̃ (ιᶻ s) ⊢[ s , ≤refl _ ]
+    f-cong : ∀ {ŝ t̂} → D̃ α [ ŝ ≈ t̂ ] → f ŝ ≡ f t̂ 
+    f-cong {s , s≤α} {t , t≤α} p = ≡.Σ≡ dp q
+      where
+      open import QIT.Relation.SetQuotient
+      open ≈.≈syntax {S = D̃ (ιᶻ t)}
+      dp : ιᶻ s ≡ ιᶻ t
+      dp = depth-preserving α (s , s≤α) (t , t≤α) p
+      u : ∀ {β₁ β₂ : Z} (p : β₁ ≡ β₂) (s≤β₁ : s ≤ᵀ β₁)
+        → fst (subst D₀ p (s , s≤β₁)) ≡ s
+      u ≡.refl s≤β₁ = _≡_.refl
+      r : D̃ (ιᶻ t) [ subst D₀ dp (s , ≤refl (ιᶻ s)) ≈ (t , ≤refl (ιᶻ t)) ]
+      r = subst D₀ dp (s , ≤refl (ιᶻ s))
+            ≈⟨ ≡→≈ (D̃ (ιᶻ t)) (ΣP≡ (subst D₀ dp (s , _)) (s , _) (u dp _)) ⟩
+          s , ≡.substp (_≤ ιᶻ t) (≡.sym dp) (≤refl (ιᶻ t))
+            ≈⟨ {!!} ⟩
+          t , ≤refl (ιᶻ t) ∎
+      q : subst (λ β → D̃ β /≈) dp (D̃ (ιᶻ s) ⊢[ s , ≤refl (ιᶻ s) ])
+        ≡                         (D̃ (ιᶻ t) ⊢[ t , ≤refl (ιᶻ t) ])
+      q = quot-drel D₀ (λ {β} → D̃ β [_≈_]) {ιᶻ s} {ιᶻ t} (s , _) (t , _) dp r
+    d : D̃ α /≈ → Σ Z (λ β → D̃ β /≈)
+    d = rec (D̃ α) f f-cong
 
 -- --   _~ᴰ_ : ∀ {α β} (s : D̃ α /≈) (t : D̃ β /≈) → Prop _
 -- --   _~ᴰ_ {α} {β} ŝ t̂ =

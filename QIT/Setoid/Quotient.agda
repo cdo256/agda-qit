@@ -22,7 +22,6 @@ module SetoidQuotient {ℓA ℓR} (Ã : Setoid ℓA ℓR) where
   ≈[_] p = Q.quot-rel _ _ p
 
 
-
   rec
     : ∀ {ℓB} {B : Set ℓB}
     → (f : A → B)

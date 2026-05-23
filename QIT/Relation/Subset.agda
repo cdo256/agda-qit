@@ -33,6 +33,13 @@ infixr 4 _,_
     → (x y : ΣP A B) → x .fst ≡ y .fst → x ≡ y
 ΣP≡ x y p = ΣP≡' (x .fst) (y .fst) p (x .snd) (y .snd)
 
+--- u : ∀ {a b} {A : Set a} {C : Set a} {B : A → Prop b}
+---   → (D : C → Set _)
+---   → {x y : A} (p : x ≡ y) (u : B x)
+---   → subst (λ ○ → {!!}) {!p!} (x , u) .fst ≡ x
+--- u = {!!}
+
+
 -- Logical existence on predicates.
 ∃ : ∀ {a b} {A : Set a} → (A → Prop b) → Prop (a ⊔ b)
 ∃ {A = A} B = ∥ ΣP A B ∥
@@ -49,3 +56,4 @@ Singleton {A = A} a = ΣP A (_≡ a)
 
 inspect : ∀ {ℓA} {A : Set ℓA} (x : A) → Singleton x
 inspect x = x , ≡.refl
+

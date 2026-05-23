@@ -44,6 +44,10 @@ quot-elimp : ∀ {ℓA ℓB ℓR} → {A : Set ℓA} {R : A → A → Prop ℓR}
   → ∀ a/ → B a/
 quot-elimp B f a/ = unbox (quot-elim (λ x → Box (B x)) (λ x → box (f x)) (λ _ _ _ → ≡.isPropBox _ _) a/)
 
+quot-drel : ∀ {ℓA ℓB ℓR} → {A : Set ℓA} (B : A → Set ℓB) (R : ∀ {x} → B x → B x → Prop ℓR)
+    → {x y : A} (u : B x) (v : B y) (p : x ≡ y)
+    → R (subst B p u) v → ≡.subst (λ ○ → B ○ / R) p [ u ] ≡ [ v ]
+quot-drel B R u v ≡.refl ruv = quot-rel u v ruv
+
 {-# REWRITE quot-rec-beta #-}
 {-# REWRITE quot-elim-beta #-}
-
