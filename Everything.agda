@@ -33,6 +33,7 @@ import QIT.Category.Base
 import QIT.Category.Strict
 import QIT.Category.SetoidEnriched
 import QIT.Category.Morphism
+import QIT.Category.CategoryEquivalence
 import QIT.Category.Equivalence
 import QIT.Category.Slice
 import QIT.Category.Initial
@@ -83,8 +84,6 @@ import QIT.QW.Signature
 import QIT.QW.Algebra
 import QIT.QW.Stage
 import QIT.QW.StageColimit
-import QIT.QW.Colimit.Base
-import QIT.QW.Colimit.Properties
 import QIT.QW.Colimit
 import QIT.QW.Locality
 -- import QIT.QW.Cocontinuity
@@ -126,5 +125,3 @@ import QIT.QW.Locality
 -- import QIT.Topology.Constructions
 -- import QIT.Topology.Examples
 -- import QIT.Topology.Subset
-
-
