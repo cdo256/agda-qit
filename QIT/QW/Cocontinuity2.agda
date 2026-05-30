@@ -250,8 +250,10 @@ module PreservationByPowers
   ~ᶜ∀→∃ = QuotHomRel∀→∃ (Colim D) _~ᶜ⁰_
 
   ~ᶜ∃→∀ : ∀ (x y : Colim/≈ D) → x ~ᶜ∃ y → x ~ᶜ∀ y
-  ~ᶜ∃→∀ x y ∣ qrwitness x₀ y₀ r px py ∣ x₁ y₁ qx qy =
-    {!!}
+  ~ᶜ∃→∀ x y ∣ qrwitness (α , x₀) (β , y₀) r px py ∣
+    (α' , ŝ) (β' , t̂) ≡.refl ≡.refl
+    (s , s≤) (t , t≤) ≡.refl ≡.refl = {!!}
+    where open Setoid (Colim D)
 
   ~ᶜ⇔ : ∀ (x y : Colim/≈ D) → (x ~ᶜ∀ y) ⇔ (x ~ᶜ∃ y)
   ~ᶜ⇔ x y = ~ᶜ∀→∃ x y , ~ᶜ∃→∀ x y
