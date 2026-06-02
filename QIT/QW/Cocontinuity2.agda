@@ -252,8 +252,62 @@ module PreservationByPowers
   ~ᶜ∃→∀ : ∀ (x y : Colim/≈ D) → x ~ᶜ∃ y → x ~ᶜ∀ y
   ~ᶜ∃→∀ x y ∣ qrwitness (α , x₀) (β , y₀) r px py ∣
     (α' , ŝ) (β' , t̂) ≡.refl ≡.refl
-    (s , s≤) (t , t≤) ≡.refl ≡.refl = {!!}
-    where open Setoid (Colim D)
+    (s , s≤) (t , t≤) ≡.refl ≡.refl =
+      ≡.trans (rep-rank (s , s≤) ≡.refl)
+        (≡.trans mid (≡.sym (rep-rank (t , t≤) ≡.refl)))
+    where
+    open Setoid (Colim D)
+    open ≈.≈syntax {S = Colim D}
+
+    rank~ : ∀ {γ δ} {û : D̃ γ /≈} {v̂ : D̃ δ /≈} → û ~∀ v̂ → rankD û ≡ rankD v̂
+    rank~ {γ} {δ} {û} {v̂} u~v = Dγ.elimp Pred f û v̂ u~v
+      where
+      module Dγ = SetoidQuotient (D̃ γ)
+      module Dδ = SetoidQuotient (D̃ δ)
+
+      Pred : D̃ γ /≈ → Prop _
+      Pred û = ∀ v̂ → û ~∀ v̂ → rankD û ≡ rankD v̂
+
+      f : ∀ u₀ → Pred (D̃ γ ⊢[ u₀ ])
+      f u₀ v̂ = Dδ.elimp Pred' g v̂
+        where
+        Pred' : D̃ δ /≈ → Prop _
+        Pred' v̂ = (D̃ γ ⊢[ u₀ ]) ~∀ v̂ → rankD (D̃ γ ⊢[ u₀ ]) ≡ rankD v̂
+
+        g : ∀ v₀ → Pred' (D̃ δ ⊢[ v₀ ])
+        g v₀ p = ≡.trans (rankD-beta u₀)
+                 (≡.trans (p u₀ v₀ ≡.refl ≡.refl)
+                           (≡.sym (rankD-beta v₀)))
+
+    rep-rank : ∀ {γ} (u₀ : D₀ γ) {û : D̃ γ /≈}
+      → D̃ γ ⊢[ u₀ ] ≡ û → rankD₀ u₀ ≡ rankD û
+    rep-rank u₀ pu = ≡.trans (≡.sym (rankD-beta u₀)) (≡.cong rankD pu)
+
+    rank≈ : ∀ {γ δ} {û : D̃ γ /≈} {v̂ : D̃ δ /≈}
+      → Colim D [ γ , û ≈ δ , v̂ ] → rankD û ≡ rankD v̂
+    rank≈ (≈lstage i e) = ≡.cong rankD e
+    rank≈ (≈lstep {i = γ} p û) =
+      elimp (D̃ γ)
+            (λ q → rankD q ≡ rankD (D/≈.hom (box p) q))
+            (λ _ → ≡.refl)
+            û
+    rank≈ (≈lsym p) = ≡.sym (rank≈ p)
+    rank≈ (≈ltrans p q) = ≡.trans (rank≈ p) (rank≈ q)
+
+    ŝ≈x₀ : Colim D [ α' , ŝ ≈ α , x₀ ]
+    ŝ≈x₀ = begin
+      α' , ŝ
+        ≈⟨ ColimD.effectiveness (α' , ŝ) (α , x₀) (≡.sym px) ⟩
+      α , x₀ ∎
+
+    y₀≈t̂ : Colim D [ β , y₀ ≈ β' , t̂ ]
+    y₀≈t̂ = begin
+      β , y₀
+        ≈⟨ ColimD.effectiveness (β , y₀) (β' , t̂) py ⟩
+      β' , t̂ ∎
+
+    mid : rankD ŝ ≡ rankD t̂
+    mid = ≡.trans (rank≈ ŝ≈x₀) (≡.trans (rank~ r) (rank≈ y₀≈t̂))
 
   ~ᶜ⇔ : ∀ (x y : Colim/≈ D) → (x ~ᶜ∀ y) ⇔ (x ~ᶜ∃ y)
   ~ᶜ⇔ x y = ~ᶜ∀→∃ x y , ~ᶜ∃→∀ x y
@@ -319,7 +373,6 @@ module PreservationByPowers
         β≤γ : β ≤ γ
         γ⊢x≈y : γ ⊢ ((α , α≤γ) , s̃) ≈ˡ≤ ((β , β≤γ) , t̃)
 
-
     boundedJoin : ∀ {α β} {x : D̃ α /≈} {y : D̃ β /≈}
       → Colim D [ α , x ≈ β , y ]
       → ∥ BoundedJoin (α , x) (β , y) ∥
@@ -377,38 +430,57 @@ module PreservationByPowers
           → Colim D [ α , x ≈ β , y ]
           → ∀ {γ} (α≤γ : α ≤ γ) (β≤γ : β ≤ γ)
           → D.hom (box α≤γ) x ≡ D.hom (box β≤γ) y
-    join≈ p = {!!}
+    join≈ (≈lstage α ≡.refl) α≤γ α≤γ = ≡.refl
+    join≈ {α} {β} {x} {y} (≈lstep α≤β x) {γ} α≤γ β≤γ =
+      ≡.trans {!!} {!!}
+    join≈ {α} {β} {x} {y} (≈lsym p) {γ} α≤γ β≤γ = {!!}
+    join≈ {α} {β} {x} {y} (≈ltrans p p₁) {γ} α≤γ β≤γ = {!!}
 
-  ϕ-inj≈ : ∀ {t̃ ũ} → (∀ x → Colim D [ ϕ₀ t̃ x ≈ ϕ₀ ũ x ])
-         → Colim D^X [ t̃ ≈ ũ ]
-  ϕ-inj≈ {α , t̂} {β , û} p with boundedJoin {!p!}
-  ... | w =
-       α , t̂
-    ≈⟨ ≈lstep ∨ᶻ-l t̂ ⟩
-       γ , (λ x → D.hom (box ∨ᶻ-l) (t̂ x))
-    ≈⟨ ≈lstage (α ∨ᶻ β) (≡.funExt q) ⟩
-       γ , (λ x → D.hom (box ∨ᶻ-r) (û x))
-    ≈⟨ ≈lsym (≈lstep ∨ᶻ-r û) ⟩
-      β , û ∎
-    where
-    open ≈.≈syntax {S = Colim D^X}
-    γ : Z
-    γ = α ∨ᶻ β
-    q : ∀ x → D.hom (box ∨ᶻ-l) (t̂ x) ≡ D.hom (box ∨ᶻ-r) (û x)
-    q x = join≈ (p (lower x)) ∨ᶻ-l ∨ᶻ-r
+-- join (bjoin γ α≤γ β≤γ {!!}) α≤γ β≤γ
+  --     where
+  --     q : γ ⊢ (α , α≤γ) , x ≈ˡ≤ ((β , β≤γ) , y)
+  --     q =
+  --       (α , α≤γ) , x
+  --         ≈⟨ ≈l≤step α≤γ x ⟩
+  --       (γ , ≤refl γ) , D.hom (box α≤γ) x
+  --         ≈⟨ ≈l≤stage (γ , ≤refl γ) {!!} ⟩
+  --       (γ , ≤refl γ) , D.hom (box β≤γ) y
+  --         ≈⟨ sym (≈l≤step β≤γ y) ⟩
+  --       (β , β≤γ) , y ∎
+  --       where
+  --       -- open Bounded D
+  --       open ≈.≈syntax {S = Colim≤~ γ}
+  --       open Setoid (Colim≤~ γ)
 
-  --   let
-  --     w : D̃ γ /≈
-  --     w = D.hom (box ∨ᶻ-l) {!!} in {!!}
+  -- ϕ-inj≈ : ∀ {t̃ ũ} → (∀ x → Colim D [ ϕ₀ t̃ x ≈ ϕ₀ ũ x ])
+  --        → Colim D^X [ t̃ ≈ ũ ]
+  -- ϕ-inj≈ {α , t̂} {β , û} p =
+  --      α , t̂
+  --   ≈⟨ ≈lstep ∨ᶻ-l t̂ ⟩
+  --      γ , (λ x → D.hom (box ∨ᶻ-l) (t̂ x))
+  --   ≈⟨ ≈lstage (α ∨ᶻ β) (≡.funExt q) ⟩
+  --      γ , (λ x → D.hom (box ∨ᶻ-r) (û x))
+  --   ≈⟨ ≈lsym (≈lstep ∨ᶻ-r û) ⟩
+  --     β , û ∎
+  --   where
+  --   open ≈.≈syntax {S = Colim D^X}
+  --   γ : Z
+  --   γ = α ∨ᶻ β
+  --   q : ∀ x → D.hom (box ∨ᶻ-l) (t̂ x) ≡ D.hom (box ∨ᶻ-r) (û x)
+  --   q x = join≈ (p (lower x)) ∨ᶻ-l ∨ᶻ-r
+
+  -- --   let
+  -- --     w : D̃ γ /≈
+  -- --     w = D.hom (box ∨ᶻ-l) {!!} in {!!}
   
-  -- ϕ-inj : ∀ {t̃ ũ} → (∀ x → ϕ t̃ x ≡ ϕ ũ x) → t̃ ≡ ũ
-  -- ϕ-inj {t̃} {ũ} = {!!}
+  -- -- ϕ-inj : ∀ {t̃ ũ} → (∀ x → ϕ t̃ x ≡ ϕ ũ x) → t̃ ≡ ũ
+  -- -- ϕ-inj {t̃} {ũ} = {!!}
 
-  -- ϕ-surj≈ : (f : X → Colim/≈ D) → ∃ λ t̃ → ϕ t̃ ≡ f
-  -- ϕ-surj≈ f = ∣ {!!} , {!!} ∣
+  -- -- ϕ-surj≈ : (f : X → Colim/≈ D) → ∃ λ t̃ → ϕ t̃ ≡ f
+  -- -- ϕ-surj≈ f = ∣ {!!} , {!!} ∣
 
-  -- ϕ-surj : (f : X → Colim/≈ D) → ∃ λ t̃ → ϕ t̃ ≡ f
-  -- ϕ-surj f = {!!}
+  -- -- ϕ-surj : (f : X → Colim/≈ D) → ∃ λ t̃ → ϕ t̃ ≡ f
+  -- -- ϕ-surj f = {!!}
 
-  -- lemma : Colim/≈ D^X ≅ (X → Colim/≈ D)
-  -- lemma = Bijection→Iso ϕ ((λ p → ϕ-inj (≡.funExt⁻ p)) , ϕ-surj)
+  -- -- lemma : Colim/≈ D^X ≅ (X → Colim/≈ D)
+  -- -- lemma = Bijection→Iso ϕ ((λ p → ϕ-inj (≡.funExt⁻ p)) , ϕ-surj)

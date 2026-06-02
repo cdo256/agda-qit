@@ -114,7 +114,6 @@ T→D ta = record
                  (≡.dcongsp (TA.π γ kγ (TA.σ γ kγ a ka b kb) (TA.kσ γ kγ a ka b kb))
                             (≡.sym (≡.Jp (λ _ p → fst (subst Ty p (c , kc)) ≡ c) σ▷ ≡.refl))))
 
-module D→TDefs (da : D.Algebra) where
 D→T : D.Algebra → T.Algebra
 D→T da = record
   { CT = CT
@@ -128,15 +127,15 @@ D→T da = record
   ; ∙ = con DA.∙
   ; k∙ = refl
   ; ▷ = ▷
-  ; k▷ = {!!}
-  ; u = {!!}
-  ; ku = {!!}
-  ; π = {!!}
-  ; kπ = {!!}
-  ; σ = {!!}
-  ; kσ = {!!}
-  ; σ▷ = {!!}
-  ; σπ = {!!}
+  ; k▷ = k▷
+  ; u = u
+  ; ku = ku
+  ; π = π
+  ; kπ = kπ
+  ; σ = σ
+  ; kσ = kσ
+  ; σ▷ = σ▷
+  ; σπ = σπ
   }
   where
   module DA = D.Algebra da
@@ -336,32 +335,6 @@ D→T da = record
       (≡.trans kc (≡.dcongsp t̂ (σ▷ γ kγ a ka b kb)))
   σπ (con γ) refl (ty a) refl (ty b) refl (ty c) refl = ≡.cong ty DA.σπ
 
-
-D→T : D.Algebra → T.Algebra
-D→T da = record
-  { CT = CT
-  ; [_] = [_]
-  ; k̂ = k̂
-  ; kk̂ = ≡.refl
-  ; ĉ = ĉ
-  ; kĉ = ≡.refl
-  ; t̂ = t̂
-  ; kt̂ = λ _ _ → ≡.refl
-  ; ∙ = con DA.∙
-  ; k∙ = ≡.refl
-  ; ▷ = ▷
-  ; k▷ = k▷
-  ; u = u
-  ; ku = ku
-  ; π = π
-  ; kπ = kπ
-  ; σ = σ
-  ; kσ = kσ
-  ; σ▷ = σ▷
-  ; σπ = σπ
-  }
-  where
-  open D→TDefs da
 
 WT→D : WT.Algebra → D.Algebra
 WT→D wta = record
