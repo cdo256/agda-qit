@@ -522,11 +522,59 @@ module PreservationByPowers
         eq : ColimD.[ ϕ₀ t̃ x ] ≡ ColimD.[ ϕ₀ ũ x ]
         eq = ≡.trans (≡.sym (ϕ-β t̃ x)) (≡.trans (p x) (ϕ-β ũ x))
 
-  ϕ-surj≈ : (f : X → Colim/≈ D) → ∃ λ t̃ → ϕ t̃ ≡ f
-  ϕ-surj≈ f = ∣ {!!} , {!!} ∣
+  ϕ-surj≈ : (f̂ : X → Colim₀ D) → ∃ λ t̂ → ∀ x → Colim D [ ϕ₀ t̂ x ≈ f̂ x ]
+  ϕ-surj≈ f̂ = ∣ t̂ , p ∣ 
+    where
+    α : Z
+    α = Z.sup (ιˢ s , λ x → f̂ x .proj₁)
+    t̂ : Colim₀ D^X
+    t̂ = α , (λ (lift x) → D.hom (box (child≤ s _ x)) (proj₂ (f̂ x)))
+    p : ∀ x → Colim D [ ϕ₀ t̂ x ≈ f̂ x ]
+    p x = sym (≈lstep β≤α (proj₂ (f̂ x)))
+      where
+      β : Z
+      β = f̂ x .proj₁
+      β≤α : β ≤ α
+      β≤α = child≤ s _ x
+      open ≈.≈syntax {S = Colim D}
+      open Setoid (Colim D)
+
+  sect : Colim/≈ D → Colim₀ D
+  sect = ColimD.rec sect₀ stable
+    where
+    sect₀ : Colim₀ D → Colim₀ D
+    sect₀ (α , s̃) = rankD s̃ , plift≈ s̃
+    sect-hom : ∀ {α β} → (p : α ≤ β) → (s̃ : D̃ α /≈) → sect₀ (α , s̃) ≡ sect₀ (β , D.hom (box p) s̃)
+    sect-hom {α} {β} p s̃ =
+      rankD s̃ , plift≈ s̃
+        ≡⟨ ≡.Σ≡ rankD-hom plift≈-hom ⟩
+      rankD (D.hom (box p) s̃) , plift≈ (D.hom (box p) s̃) ∎
+      where
+      open ≡.≡-Reasoning
+      rankD-hom : rankD s̃ ≡ rankD (D.hom (box p) s̃) 
+      rankD-hom = {!!}
+      plift≈-hom : subst D̃/≈ rankD-hom (plift≈ s̃) ≡ (plift≈ (D.hom (box p) s̃)) 
+    stable : ∀ {x y} → Colim D [ x ≈ y ] → sect₀ x ≡ sect₀ y
+    stable {α , s̃} {α , t̃} (≈lstage α ≡.refl) = ≡.refl
+    stable {α , s̃} {β , t̃} (≈lstep p s̃) = sect-hom p s̃
+    stable {α , s̃} {β , t̃} (≈lsym p) = ≡.sym (stable p)
+    stable {α , s̃} {β , t̃} (≈ltrans p q) = ≡.trans (stable p) (stable q)
+
+  -- Possibly easier double-negated form to see if I can crack it this way.
+  ϕ-surj' : (f : X → Colim/≈ D) → ¬ (∀ t̃ → ϕ t̃ ≢ f)
+  ϕ-surj' f u = {!!}
+
+  ϕ-surj'' : (f : X → Colim/≈ D) → ∃ λ t̃ → ∀ x → ColimD^X.map (Colim D) (λ f → ϕ₀ f x) (λ p → ϕ-cong p x) t̃ ≡ f x
+  ϕ-surj'' f = ∣ {!!} , {!!} ∣
+    where
+    γ : X → Z
+    γ x = rankC (f x)
+    α = Z.sup (ιˢ s , γ)
+    
+
 
   ϕ-surj : (f : X → Colim/≈ D) → ∃ λ t̃ → ϕ t̃ ≡ f
-  ϕ-surj f = {!!}
+  ϕ-surj f = ∣ {!!} , {!!} ∣
 
   lemma : Colim/≈ D^X ≅ (X → Colim/≈ D)
   lemma = Bijection→Iso ϕ ((λ p → ϕ-inj (≡.funExt⁻ p)) , ϕ-surj)
