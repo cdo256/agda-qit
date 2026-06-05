@@ -20,7 +20,7 @@
 -- - Unordered tree structures (syntax trees, decision trees)
 -- - Combinatorial objects with inherent symmetries
 -- - Data structures where permutation equivalence is natural
-module QIT.Mobile.Base (I : Set) where
+module QIT.Examples.Mobile.Base (I : Set) where
 
 open import QIT.Prelude
 open import QIT.Prop
@@ -31,14 +31,14 @@ open import QIT.QW
 -- Container signature for I-branching trees before quotienting.
 -- We have two constructors: leaves (no children) and nodes (I children).
 data Sᵀ : Set where
-  l : Sᵀ  -- Leaf constructor
-  n : Sᵀ  -- Node constructor
+  l : Sᵀ
+  n : Sᵀ
 
 -- Arity function: leaves have no positions, nodes have I positions.
 -- This gives us the standard I-ary tree structure.
 Pᵀ : Sᵀ → Set
-Pᵀ l = ⊥*  -- Leaves are nullary (no children)
-Pᵀ n = I   -- Nodes have exactly I children
+Pᵀ l = ⊥*
+Pᵀ n = I
 
 -- The underlying W-type: I-branching trees without quotient.
 -- This gives us finite trees where each internal node branches I ways.
@@ -69,13 +69,13 @@ _∘ᵗ_ : ∀ (α : I → T) (π : I ↔ I)
 -- The equations are indexed by all bijections I ↔ I (the symmetric group on I).
 sig : QW.Sig ℓ0 ℓ0 ℓ0 ℓ0
 sig = record
-  { S = Sᵀ                    -- Tree constructors (leaf, node)
-  ; P = Pᵀ                    -- Arities (0, I)
-  ; E = I ↔ I                 -- Equations indexed by bijections I ↔ I
-  ; Ξ = λ π → record          -- Each bijection π gives an equation:
-    { V = I                   --   Variables: one for each child position
-    ; lhs = QW.supᴱ n (λ i → QW.varᴱ i {λ()})     -- n(xᵢ)ᵢ∈I
-    ; rhs = QW.supᴱ n (λ i → QW.varᴱ (π .↔.to i) {λ()}) } } -- n(x_{π(i)})ᵢ∈I
+  { S = Sᵀ
+  ; P = Pᵀ
+  ; E = I ↔ I
+  ; Ξ = λ π → record
+    { V = I
+    ; lhs = QW.supᴱ n (λ i → QW.varᴱ i {λ()})
+    ; rhs = QW.supᴱ n (λ i → QW.varᴱ (π .↔.to i) {λ()}) } }
 
 -- The equations say: n(xᵢ)ᵢ∈I ≈ n(x_{π(i)})ᵢ∈I for any bijection π.
 -- This makes node construction invariant under permutation of children,

@@ -73,6 +73,7 @@ import QIT.Container.Functor
 import QIT.Container.StrictFunctor
 import QIT.Container.Indexed
 
+-- Plump ordinals
 import QIT.Plump.Postulated
 import QIT.Plump.Properties
 
@@ -88,9 +89,6 @@ import QIT.QW.Locality
 import QIT.QW.Cocontinuity
 import QIT.QW
 
--- -- Mobile construction
--- import QIT.Mobile.Base
--- import QIT.Mobile.Cocontinuity
 
 -- -- Extended Type Theories
 -- import QIT.IIT.Cont1
@@ -103,7 +101,9 @@ import QIT.QW
 -- -- import QIT.KK2020.Syntax -- incomplete
 
 -- -- Examples
--- -- import QIT.Examples.CauchyReals
+import QIT.Examples.Mobile.Base
+import QIT.Examples.Mobile.Cocontinuity
+-- import QIT.Examples.CauchyReals
 -- import QIT.Examples.ConTy
 -- import QIT.Examples.HoleList
 -- import QIT.Examples.ListBag
@@ -124,5 +124,3 @@ import QIT.QW
 -- import QIT.Topology.Constructions
 -- import QIT.Topology.Examples
 -- import QIT.Topology.Subset
-
-
