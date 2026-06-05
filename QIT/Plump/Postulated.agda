@@ -16,7 +16,7 @@ open Plump public
            ; ≤≤ to ≤≤₀ ; ≤< to ≤<₀ ; <≤ to <≤₀
            ; sup≤ to sup≤₀ ; <sup to <sup₀)
 
-open import QIT.Plump.Algebra Sᶻ Pᶻ
+open import QIT.Plump.Algebra Sᶻ Pᶻ public
 
 postulate
   Zᴬ : Algebra (ℓS ⊔ ℓP)
