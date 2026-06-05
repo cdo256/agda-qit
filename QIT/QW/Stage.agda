@@ -17,7 +17,7 @@ open import QIT.Setoid
 open import QIT.Set.Base using (_≡h_)
 open import QIT.Relation.Subset
 open import QIT.Relation.SetQuotient
-open import QIT.Plump.Postulated S P as Z hiding ([_])
+open import QIT.Plump.Postulated S P as Z hiding ([_]; Algebra)
 open import QIT.QW.W S P
 open import QIT.Algebra F
 open import QIT.Algebra.Lift S P ℓV
@@ -155,6 +155,9 @@ D̃ α = record
     { refl = ≈prefl
     ; sym = ≈psym
     ; trans = ≈ptrans } }
+
+D̃/≈ : Z → Set (ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV) 
+D̃/≈ α = D̃ α /≈
 
 -- The complete diagram: stages connected by weakening morphisms.
 -- This forms a cocone over the plump ordinal preorder, and the colimit

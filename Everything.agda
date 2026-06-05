@@ -83,12 +83,10 @@ import QIT.QW.Signature
 import QIT.QW.Algebra
 import QIT.QW.Stage
 import QIT.QW.StageColimit
-import QIT.QW.Colimit.Base
-import QIT.QW.Colimit.Properties
 import QIT.QW.Colimit
 import QIT.QW.Locality
--- import QIT.QW.Cocontinuity
--- import QIT.QW
+import QIT.QW.Cocontinuity
+import QIT.QW
 
 -- -- Mobile construction
 -- import QIT.Mobile.Base
