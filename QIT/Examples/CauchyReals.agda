@@ -103,6 +103,7 @@ constIsCauchy q = ∣ record
 ]0,1[ x = 0ᴿ < x ∧ x < 1ᴿ 
 
 Interval : ℚ → ℚ → ℝ → Prop
+Interval x y z = ℚ→ℝ x ≤ z ∧ z ≤ ℚ→ℝ y
 
 [0,1] : ℝ → Prop
 [0,1] x = 0ᴿ ≤ x ∧ x ≤ 1ᴿ 

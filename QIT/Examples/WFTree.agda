@@ -27,7 +27,7 @@ record WFTree : Set₁ where
 import Data.Bool as 𝟚
 open 𝟚
   using (true; false) renaming (Bool to 𝟚) 
-open import QIT.Mobile.Base 𝟚
+open import QIT.Examples.Mobile.Base 𝟚
 
 fork : T → T → T
 fork x y = sup (n , λ b → 𝟚.if b then x else y) 

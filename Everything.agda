@@ -89,35 +89,34 @@ import QIT.QW.Locality
 import QIT.QW.Cocontinuity
 import QIT.QW
 
-
--- -- Extended Type Theories
--- import QIT.IIT.Cont1
+-- Extended Type Theories
+import QIT.IIT.Cont1
 -- -- import QIT.IIT.Codes -- incomplete
 -- -- import QIT.QIIT -- very incomplete
 
--- -- Kaposi-Kovacs-Altenkirch Syntax
--- import QIT.KKA2019.Syntax
+-- Kaposi-Kovacs-Altenkirch Syntax
+import QIT.KKA2019.Syntax
 -- import QIT.KK2020.Level
 -- -- import QIT.KK2020.Syntax -- incomplete
 
 -- -- Examples
 import QIT.Examples.Mobile.Base
 import QIT.Examples.Mobile.Cocontinuity
--- import QIT.Examples.CauchyReals
--- import QIT.Examples.ConTy
--- import QIT.Examples.HoleList
--- import QIT.Examples.ListBag
--- import QIT.Examples.PartialityMonad
--- import QIT.Examples.RotTree
--- import QIT.Examples.SGL
--- import QIT.Examples.T
--- import QIT.Examples.Trunc
--- import QIT.Examples.WFTree
--- import QIT.Examples.Lambda
--- import QIT.Examples.Surreal
--- import QIT.Examples.PartialityMonad
+import QIT.Examples.CauchyReals
+import QIT.Examples.ConTy
+import QIT.Examples.HoleList
+import QIT.Examples.ListBag
+import QIT.Examples.PartialityMonad
+import QIT.Examples.RotTree
+import QIT.Examples.SGL
+import QIT.Examples.T
+import QIT.Examples.Trunc
+import QIT.Examples.WFTree
+import QIT.Examples.Lambda
+import QIT.Examples.Surreal
+import QIT.Examples.PartialityMonad
 
--- -- Topology
+-- -- Topology - TODO: Move to a different repo
 -- import QIT.Topology.Base
 -- import QIT.Topology.BishopReals
 -- import QIT.Topology.Category
