@@ -26,8 +26,8 @@ module _ {ℓX} {A B : Set ℓX} where
 
   open Category (SetCat ℓX)
 
-  Bijection→Iso : (f : A → B) → IsBijection f → A ≅ B
-  Bijection→Iso f (inj , surj) = ∣ iso ∣
+  Bijection→Iso : (f : A → B) → IsBijection f → Iso A B
+  Bijection→Iso f (inj , surj) = iso
     where
     T : B → Set _
     T y = ΣP A (λ x → f x ≡ y)
@@ -55,7 +55,7 @@ module _ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} where
   open Category (SetCat (ℓA ⊔ ℓB))
 
   HetBijection→Iso : (f : A → B) → IsBijection f → Lift ℓB A ≅ Lift ℓA B
-  HetBijection→Iso f (inj , surj) = Bijection→Iso f' (inj' , surj')
+  HetBijection→Iso f (inj , surj) = ∣ Bijection→Iso f' (inj' , surj') ∣
     where
     f' : Lift ℓB A → Lift ℓA B
     f' (lift x) = lift (f x)
