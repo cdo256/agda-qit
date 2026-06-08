@@ -53,4 +53,10 @@ module ↔ where
     module p = _↔_ p
     module q = _↔_ q
 
-open ↔ using (_↔_) public
+  open import QIT.Set.Bijection using (IsInjection)
+  ↔to-Injection : ∀ {ℓX ℓY} {X : Set ℓX} {Y : Set ℓY}
+                → (p : X ↔ Y) → IsInjection (p .to)
+  ↔to-Injection {ℓX} {ℓY} {X} {Y} p {x} {y} q =
+    ≡.trans (≡.sym (p .rinv x)) (≡.trans (≡.cong (p .from) q) (p .rinv y))
+
+open ↔ using (_↔_; ↔to-Injection) public

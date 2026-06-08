@@ -48,7 +48,6 @@ module _ {ℓX} {A B : Set ℓX} where
       ; linv = λ {x} → inj (snd (f⁻¹T (f x)))
       ; rinv = λ {y} → (snd (f⁻¹T y)) }
 
-
 module _ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} where
   open import QIT.Category.Morphism (SetCat (ℓA ⊔ ℓB))
 

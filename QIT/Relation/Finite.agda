@@ -35,8 +35,16 @@ module _ {ℓA} where
     Sz : (n : ℕ) → Prop ℓA
     Sz n = ∥ Fin n ↔ A ∥
     isPropΣSz : isProp (ΣP ℕ Sz)
-    isPropΣSz (m , ∣ p ∣) (n , ∣ q ∣) = {!!}
+    isPropΣSz (m , ∣ p ∣) (n , ∣ q ∣) = ΣP≡ _ _ m≡n
       where
       open ↔
+      open import QIT.Fin.Properties
       [m]↔[n] : Fin m ↔ Fin n
       [m]↔[n] = flip q ∘ p
+      m≡n : m ≡ n
+      m≡n = cantor-schröder-bernstein
+        ([m]↔[n] .to) ([m]↔[n] .from)
+        (↔to-Injection [m]↔[n])
+        (↔to-Injection (flip [m]↔[n]))
+    isContrΣSz : isContr (ΣP ℕ Sz)
+    isContrΣSz = ∣ {!!} , isPropΣSz {!!} ∣
