@@ -21,8 +21,11 @@ data ⊤p : Prop where
 
 pattern tt* = liftp tt 
 
-absurdp : ∀ {ℓ ℓ'} {A : Set ℓ} → ⊥p* {ℓ'} → A
+absurdp : ∀ {ℓ} {A : Set ℓ} → ⊥p → A
 absurdp ()
+
+absurdp' : ∀ {ℓ} {A : Prop ℓ} → ⊥p → A
+absurdp' ()
 
 ⊥→⊥p : ⊥ → ⊥p
 ⊥→⊥p ()
@@ -63,8 +66,16 @@ open ∨ public using (_∨_)
 
 -- Bi-implication for propositions.
 infix 3 _⇔_
-_⇔_ : ∀ {ℓ ℓ'} (A : Prop ℓ) (B : Prop ℓ') → Prop (ℓ ⊔ ℓ')
+_⇔_ : ∀ {ℓA ℓB} (A : Prop ℓA) (B : Prop ℓB) → Prop (ℓA ⊔ ℓB)
 A ⇔ B = (A → B) ∧ (B → A)
+
+⇔refl : ∀ {ℓA} {A : Prop ℓA} → A ⇔ A
+⇔refl = (λ z → z) , (λ z → z)
+⇔sym : ∀ {ℓA ℓB} {A : Prop ℓA} {B : Prop ℓB} → A ⇔ B → B ⇔ A
+⇔sym (p₁ , p₂) = p₂ , p₁
+⇔trans : ∀ {ℓA ℓB ℓC} {A : Prop ℓA} {B : Prop ℓB} {C : Prop ℓC}
+     → A ⇔ B → B ⇔ C → A ⇔ C
+⇔trans (p₁ , p₂) (q₁ , q₂) = (λ z → q₁ (p₁ z)) , (λ z → p₂ (q₂ z))
 
 postulate
   propExt : ∀ {ℓA} → {A B : Prop ℓA}

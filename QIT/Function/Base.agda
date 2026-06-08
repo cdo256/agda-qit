@@ -28,14 +28,14 @@ module ↔ where
 
   open _↔_ public
 
-  refl : {X : Set} → X ↔ X
+  refl : ∀ {ℓX} {X : Set ℓX} → X ↔ X
   refl = record
     { to = λ x → x
     ; from = λ x → x
     ; rinv = λ _ → ≡.refl
     ; linv = λ _ → ≡.refl }
 
-  flip : {X Y : Set} → X ↔ Y → Y ↔ X
+  flip : ∀ {ℓX ℓY} {X : Set ℓX} {Y : Set ℓY} → X ↔ Y → Y ↔ X
   flip X↔Y = record
     { to = X↔Y .from
     ; from = X↔Y .to
@@ -43,7 +43,7 @@ module ↔ where
     ; linv = X↔Y .rinv }
     where open _↔_ X↔Y
 
-  _∘_ : {X Y Z : Set} → Y ↔ Z → X ↔ Y → X ↔ Z
+  _∘_ : ∀ {ℓX ℓY ℓZ} {X : Set ℓX} {Y : Set ℓY} {Z : Set ℓZ} → Y ↔ Z → X ↔ Y → X ↔ Z
   q ∘ p = record
     { to = λ x → q.to (p.to x)
     ; from = λ z → p.from (q.from z)

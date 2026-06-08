@@ -20,6 +20,7 @@ import QIT.Relation.IndexedBinary
 import QIT.Relation.Subset
 import QIT.Relation.Plump
 import QIT.Relation.Nullary
+import QIT.Relation.Finite
 import QIT.Relation.WellFounded
 import QIT.Relation.Tests
 import QIT.Relation.BarInduction
