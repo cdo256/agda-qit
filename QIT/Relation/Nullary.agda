@@ -53,7 +53,12 @@ isProp : ∀ {ℓA} → Set ℓA → Prop ℓA
 isProp A = ∀ (x y : A) → x ≡ y
 
 isContr : ∀ {ℓA} → Set ℓA → Prop ℓA
-isContr A = ∃ {A = A} λ x → ∀ y → x ≡ y
+isContr A = ∃ λ (x : A) → ∀ y → x ≡ y
+
+mkIsContr
+  : ∀ {ℓA} → (A : Set ℓA)
+  → ∥ A ∥ → isProp A → isContr A
+mkIsContr A ∣ x ∣ isPropA = ∣ x , isPropA x ∣
 
 Σ≡Prop
   : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB}

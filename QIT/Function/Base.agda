@@ -28,14 +28,14 @@ module ↔ where
 
   open _↔_ public
 
-  refl : {X : Set} → X ↔ X
+  refl : ∀ {ℓX} {X : Set ℓX} → X ↔ X
   refl = record
     { to = λ x → x
     ; from = λ x → x
     ; rinv = λ _ → ≡.refl
     ; linv = λ _ → ≡.refl }
 
-  flip : {X Y : Set} → X ↔ Y → Y ↔ X
+  flip : ∀ {ℓX ℓY} {X : Set ℓX} {Y : Set ℓY} → X ↔ Y → Y ↔ X
   flip X↔Y = record
     { to = X↔Y .from
     ; from = X↔Y .to
@@ -43,7 +43,7 @@ module ↔ where
     ; linv = X↔Y .rinv }
     where open _↔_ X↔Y
 
-  _∘_ : {X Y Z : Set} → Y ↔ Z → X ↔ Y → X ↔ Z
+  _∘_ : ∀ {ℓX ℓY ℓZ} {X : Set ℓX} {Y : Set ℓY} {Z : Set ℓZ} → Y ↔ Z → X ↔ Y → X ↔ Z
   q ∘ p = record
     { to = λ x → q.to (p.to x)
     ; from = λ z → p.from (q.from z)
@@ -53,4 +53,10 @@ module ↔ where
     module p = _↔_ p
     module q = _↔_ q
 
-open ↔ using (_↔_) public
+  open import QIT.Set.Bijection using (IsInjection)
+  ↔to-Injection : ∀ {ℓX ℓY} {X : Set ℓX} {Y : Set ℓY}
+                → (p : X ↔ Y) → IsInjection (p .to)
+  ↔to-Injection {ℓX} {ℓY} {X} {Y} p {x} {y} q =
+    ≡.trans (≡.sym (p .rinv x)) (≡.trans (≡.cong (p .from) q) (p .rinv y))
+
+open ↔ using (_↔_; ↔to-Injection) public

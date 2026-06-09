@@ -11,7 +11,10 @@ open import Data.Nat
 
 module _ {ℓA} where
   isFiniteᵖ : (A : Set ℓA) → Prop _
-  isFiniteᵖ A = ∃ λ n → ∥ Fin n ↠ A ∥ 
+  isFiniteᵖ A = ∃ λ n → ∥ Fin n ↔ A ∥
+
+  isFinite' : (A : Set ℓA) → Set _
+  isFinite' A = ΣP ℕ λ n → ∥ Fin n ↔ A ∥
 
   isFinite : (A : Set ℓA) → Set _
   isFinite A = Σ ℕ λ n → Fin n ↔ A
@@ -22,9 +25,30 @@ module _ {ℓA} where
   isFinite→Discrete : (A : Set ℓA) → isFinite A → Discrete A
   isFinite→Discrete A (n , f) x y =
     case (i ≟Fin j) of
-      λ{(no ¬p) → no (λ q → ¬p (box (≡.cong from (unbox q))) )
-      ; (yes (box p)) → yes (box (≡.trans (≡.sym (linv x)) (≡.trans (≡.cong to p) (linv y)))) }  
+      λ{(no ¬p) → no (λ q → ¬p (≡.cong from q) )
+      ; (yes p) → yes (≡.trans (≡.sym (linv x)) (≡.trans (≡.cong to p) (linv y))) }  
     where
     open _↔_ f
     i = from x
     j = from y
+
+  isFiniteᵖ→isFinite' : {A : Set ℓA} → isFiniteᵖ A → isFinite' A
+  isFiniteᵖ→isFinite' {A} isFiniteA = 
+    A!C _ isContrΣSz
+    where
+    Sz : (n : ℕ) → Prop ℓA
+    Sz n = ∥ Fin n ↔ A ∥
+    isPropΣSz : isProp (ΣP ℕ Sz)
+    isPropΣSz (m , ∣ p ∣) (n , ∣ q ∣) = ΣP≡ _ _ m≡n
+      where
+      open ↔
+      open import QIT.Fin.Properties
+      [m]↔[n] : Fin m ↔ Fin n
+      [m]↔[n] = flip q ∘ p
+      m≡n : m ≡ n
+      m≡n = cantor-schröder-bernstein
+        ([m]↔[n] .to) ([m]↔[n] .from)
+        (↔to-Injection [m]↔[n])
+        (↔to-Injection (flip [m]↔[n]))
+    isContrΣSz : isContr (ΣP ℕ Sz)
+    isContrΣSz = mkIsContr _ isFiniteA isPropΣSz

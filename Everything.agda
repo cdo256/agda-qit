@@ -3,6 +3,7 @@ module Everything where
 -- Base
 import QIT.Prelude
 import QIT.Fin.Base
+import QIT.Fin.Properties
 import QIT.Function.Base
 import QIT.Prop.Base
 import QIT.Prop.Logic
@@ -20,6 +21,7 @@ import QIT.Relation.IndexedBinary
 import QIT.Relation.Subset
 import QIT.Relation.Plump
 import QIT.Relation.Nullary
+import QIT.Relation.Finite
 import QIT.Relation.WellFounded
 import QIT.Relation.Tests
 import QIT.Relation.BarInduction

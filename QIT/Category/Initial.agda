@@ -8,16 +8,15 @@ open import QIT.Relation.Subset
 open import QIT.Relation.Nullary
 open import QIT.Category.Base
 
-module QIT.Category.Initial where
-private
-  variable
-    ℓCo ℓCh ℓCe : Level
+module QIT.Category.Initial {ℓCo} {ℓCh} {ℓCe} (C : Category ℓCo ℓCh ℓCe) where
 
-module _ (C : Category ℓCo ℓCh ℓCe) where
-  open Category C
+open Category C
 
-  isWeaklyInitial : (x : Obj) → Prop (ℓCo ⊔ ℓCh)
-  isWeaklyInitial x = ∀ (y : Obj) → ∥ x ⇒ y ∥
+isWeaklyInitial : (x : Obj) → Prop (ℓCo ⊔ ℓCh)
+isWeaklyInitial x = ∀ (y : Obj) → ∥ x ⇒ y ∥
 
-  isInitial : (x : Obj) → Prop (ℓCo ⊔ ℓCh)
-  isInitial x = ∀ y → isProp (x ⇒ y)
+isInitial : (x : Obj) → Prop (ℓCo ⊔ ℓCh)
+isInitial x = ∀ y → isProp (x ⇒ y)
+
+Initial : Set (ℓCo ⊔ ℓCh)
+Initial = ΣP Obj isInitial
