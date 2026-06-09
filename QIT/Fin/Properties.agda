@@ -8,6 +8,7 @@ open import QIT.Relation.Nullary
 open import QIT.Function.Base 
 open import Data.Fin as Fin hiding (_≟_; pred) public
 open import Data.Nat as ℕ hiding (_≟_) renaming (_>_ to _>ᴺ_)
+open import Data.Nat.Properties as ℕₚ using (≤-total)
 
 ℕ-suc-injective : ∀ {m n} → suc m ≡ suc n → m ≡ n
 ℕ-suc-injective = ≡.cong pred
@@ -199,6 +200,13 @@ open import QIT.Relation.WellFounded
 ≤trans-ℕ z≤n q = z≤n
 ≤trans-ℕ (s≤s p) (s≤s q) = s≤s (≤trans-ℕ p q)
 
+≤suc∧≢→≤ : ∀ {m n} → m ℕ.≤ suc n → m ≢ suc n → m ℕ.≤ n
+≤suc∧≢→≤ {zero} m≤sn m≢sn = z≤n
+≤suc∧≢→≤ {suc zero} {zero} (s≤s z≤n) m≢sn = absurdp (m≢sn ≡.refl)
+≤suc∧≢→≤ {suc (suc m)} {zero} (s≤s ()) m≢sn
+≤suc∧≢→≤ {suc m} {suc n} (s≤s m≤sn) m≢sn =
+  s≤s (≤suc∧≢→≤ m≤sn (λ q → m≢sn (≡.cong suc q)))
+
 minℕ : ∀ {ℓP} → (P : ℕ → Prop ℓP)
      → (∀ n → Decᵖ (P n))
      → ∃ P
@@ -222,25 +230,22 @@ minℕ P decP ∣ n , pn ∣ = rec n ∣ n , pn , ∣ ≤refl-ℕ ∣ ∣
     ¬p<n' : ¬ P' (suc n)
     ¬p<n' ∣ m , pm , ∣ m≤n' ∣ ∣ with m ≟ℕ suc n
     ... | yes ≡.refl = ¬pn' pm
-    ... | no m≠n' = ¬p<n ∣ {!!} ∣
+    ... | no m≠n' = ¬p<n ∣ m , pm , ∣ ≤suc∧≢→≤ m≤n' m≠n' ∣ ∣
+  least : ∀ {max} → ¬ P' max → ∀ m → P m → ∥ suc max ℕ.≤ m ∥
+  least {max} ¬p< m pm with ≤-total m (suc max)
+  ... | inj₁ m≤sn with m ≟ℕ suc max
+  ...   | yes ≡.refl = ∣ ≤refl-ℕ ∣
+  ...   | no m≢sn = absurdp' (¬p< ∣ m , pm , ∣ ≤suc∧≢→≤ m≤sn m≢sn ∣ ∣)
+  least ¬p< m pm | inj₂ sn≤m = ∣ sn≤m ∣
   rec : (max : ℕ)
       → ∃ (λ n → P n ∧ ∥ n ℕ.≤ max ∥)
       → ∃ (λ n → P n ∧ ∀ m → P m → ∥ n ℕ.≤ m ∥)
-  rec max ∣ zero , pn , n≤max ∣ = ∣ zero , pn , (λ m z → ∣ z≤n ∣) ∣
-  rec max ∣ suc n , psn , n≤max ∣ with decP n
-  ... | yes pn = rec n ∣ n , pn , ∣ ≤refl-ℕ ∣ ∣
-  ... | no ¬pn = ∣ {!!} ∣
-
--- minℕ {ℓP} P decP inhabP with decP 0
--- ... | yes p = 0 , p
--- ... | no ¬p =
---   let P' : ℕ → Prop ℓP
---       P' m = P (suc m)
---       decP' : (n : ℕ) → Decᵖ (P (suc n))
---       decP' n = decP (suc n)
---       inhab-suc : ∥ ΣP ℕ P ∥ → ∥ ΣP ℕ P' ∥
---       inhab-suc ∣ m , p ∣ = {!!}
---       inhabP' : ∥ ΣP ℕ P' ∥
---       inhabP' = {!!}
---       n , q = minℕ P' decP' {!inhabP'!}
---   in {!!}
+  rec zero ∣ zero , pn , n≤max ∣ = ∣ zero , pn , (λ m z → ∣ z≤n ∣) ∣
+  rec zero ∣ suc n , pn , ∣ () ∣ ∣
+  rec (suc max) ex with decP' max
+  ... | yes p< = rec max p<
+  ... | no ¬p< with ex
+  ...   | ∣ zero , p0 , ∣ z≤n ∣ ∣ = absurdp' (¬p< ∣ zero , p0 , ∣ z≤n ∣ ∣)
+  ...   | ∣ suc n , psn , ∣ n≤max ∣ ∣ with n ≟ℕ max
+  ...     | yes ≡.refl = ∣ suc max , psn , least ¬p< ∣
+  ...     | no n≠max = absurdp' (¬p< ∣ suc n , psn , ∣ ≤suc∧≢→≤ n≤max (λ q → n≠max (ℕ-suc-injective q)) ∣ ∣)
