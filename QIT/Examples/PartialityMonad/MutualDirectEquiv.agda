@@ -362,7 +362,6 @@ equiv = record { F = F ; G = G ; η = η ; ε = ε }
       ; η = λ _ → ≡.refl
       ; ⊥ = ≡.refl
       ; ⨆ = ⨆-eq X
-          -- *** THIS IS WHERE THE ISSUE MANIFESTS ***
           -- Goal: (F ∘ G) X .⨆ a inc inc-fst inc-snd ≡ X .⨆ a (extract inc) ...
           -- Problem: (F ∘ G) X .⨆ expands to:
           --   X .⨆ a (λ i → fst (subst₂ ... (inc-fst i) (inc-snd i) (inc i)))

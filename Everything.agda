@@ -2,6 +2,7 @@ module Everything where
 
 -- Base
 import QIT.Prelude
+import QIT.Nat
 import QIT.Fin.Base
 import QIT.Fin.Properties
 import QIT.Function.Base
