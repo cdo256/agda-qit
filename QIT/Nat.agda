@@ -1,5 +1,4 @@
 module QIT.Nat where
-
 open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Relation.Base
@@ -22,3 +21,12 @@ suc n ≟ℕ suc m = case n ≟ℕ m of
 iter : ∀ {ℓX} {X : Set ℓX} → X → (X → X) → ℕ → X
 iter z s zero = z
 iter z s (suc n) = s (iter z s n)
+
+0-right-identity : ∀ {n : ℕ} → n + 0 ≡ n
+0-right-identity {zero} = ≡.refl
+0-right-identity {suc n} =
+  ≡.cong suc 0-right-identity
+
++suc : ∀ m n → m + suc n ≡ suc (m + n)
++suc zero n = ≡.refl
++suc (suc m) n = ≡.cong suc (+suc m n)

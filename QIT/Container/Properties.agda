@@ -55,6 +55,12 @@ module _ {ℓS ℓP} {S : Set ℓS} {P : S → Set ℓP} where
                → f i ≡ f' (subst P (≡.cong getShape p) i)
   sup-child-eq ≡.refl i = ≡.refl
 
+module _ where
+  open import QIT.Relation.Finite
+
+  isFinitary : ∀ {ℓS ℓP} {S : Set ℓS} (P : S → Set ℓP) → Prop (ℓS ⊔ ℓP)
+  isFinitary P = ∀ s → isFiniteᵖ (P s)
+
 -- -- Container morphisms: natural transformations between container functors.
 -- -- A morphism (fs, fp) : (S ◁ P) → (S' ◁ P') maps shapes and positions
 -- -- contravariantly, inducing a natural transformation ⟦ S ◁ P ⟧ → ⟦ S' ◁ P' ⟧.
