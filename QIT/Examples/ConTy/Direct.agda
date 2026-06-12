@@ -4,6 +4,7 @@ open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Relation.Binary using (IsEquivalence)
 open import QIT.Category.Base
+open import QIT.Relation.Subset
 
 record Algebra : Set₁ where
   infixl 5 _▷_
@@ -171,3 +172,6 @@ Cat = record
   ; equiv     = isEquiv≈
   ; ∘-resp-≈  = ∘-resp-≈
   }
+
+open import QIT.Category.Morphism Cat public
+open import QIT.Category.Initial Cat public
