@@ -2,7 +2,7 @@ module QIT.Examples.Nat where
 
 open import QIT.Prelude
 open import QIT.Relation.Nullary
-open import QIT.Prop hiding (_≡ˢ_)
+open import QIT.Prop
 open import Data.Bool.Properties 
 
 postulate
@@ -24,7 +24,7 @@ record ℕˢ {ℓ} (A : ℕᴰ ℓ) : Set ℓ where
     sˢ : ∀ {n} → Nˢ (s n) ≡ sᴰ (Nˢ n)
 
 
-record _≡ˢ_ {ℓ} {A : ℕᴰ ℓ} (e₁ e₂ : ℕˢ A) : Prop ℓ where
+record _≈ˢ_ {ℓ} {A : ℕᴰ ℓ} (e₁ e₂ : ℕˢ A) : Prop ℓ where
   module A = ℕᴰ A
   module e₁ = ℕˢ e₁
   module e₂ = ℕˢ e₂
@@ -35,7 +35,7 @@ postulate
   elim : ∀ {ℓ} (A : ℕᴰ ℓ) → ℕˢ A
   elim-unique
     : ∀ {ℓ} (A : ℕᴰ ℓ) (r : ℕˢ A)
-    → r ≡ˢ elim A
+    → r ≈ˢ elim A
 
 module Examples where
   open import Data.Bool

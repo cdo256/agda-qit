@@ -3,7 +3,7 @@ module QIT.Examples.Int where
 open import QIT.Prelude
 open import QIT.Bool
 open import QIT.Relation.Nullary
-open import QIT.Prop hiding (_≡ˢ_)
+open import QIT.Prop
 
 postulate
   ℤ : Set
@@ -33,7 +33,7 @@ record ℤˢ {ℓ} (A : ℤᴰ ℓ) : Set ℓ where
     pˢ : ∀ {n} → Zˢ (p n) ≡ pᴰ (Zˢ n)
 
 
-record _≡ˢ_ {ℓ} {A : ℤᴰ ℓ} (e₁ e₂ : ℤˢ A) : Prop ℓ where
+record _≈ˢ_ {ℓ} {A : ℤᴰ ℓ} (e₁ e₂ : ℤˢ A) : Prop ℓ where
   module A = ℤᴰ A
   module e₁ = ℤˢ e₁
   module e₂ = ℤˢ e₂
@@ -44,7 +44,7 @@ postulate
   elim : ∀ {ℓ} (A : ℤᴰ ℓ) → ℤˢ A
   elim-unique
     : ∀ {ℓ} (A : ℤᴰ ℓ) (r : ℤˢ A)
-    → r ≡ˢ elim A
+    → r ≈ˢ elim A
 
 module Examples where
   open import Data.Bool
