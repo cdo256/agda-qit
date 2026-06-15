@@ -20,6 +20,21 @@ module ≡syntax {ℓ} {A : Set ℓ} where
   _∎ : ∀ (x : A) → x ≡ x
   x ∎ = ≡.refl
 
+module ≡ˢsyntax {ℓ} {A : Set ℓ} where
+
+  infix 1 begin_
+  begin_ : ∀ {x y : A} → x ≡ˢ y → x ≡ˢ y
+  begin p = p
+
+  infixr 2 step-≡
+  step-≡ : ∀ (x : A) {y z} → y ≡ˢ z → x ≡ˢ y → x ≡ˢ z
+  step-≡ _ q p = transˢ p q
+  syntax step-≡ x q p = x ≡⟨ˢ p ⟩ q
+
+  infix 3 _∎
+  _∎ : ∀ (x : A) → x ≡ˢ x
+  x ∎ = reflˢ
+
 infixr 5 _∘_
 _∘_ : ∀ {ℓA ℓB ℓC}
     → {A : Set ℓA} {B : Set ℓB} {C : Set ℓC}
