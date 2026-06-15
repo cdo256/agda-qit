@@ -67,7 +67,10 @@ _ = ≡.refl
 _ : ↑ π2 ≡ π1
 _ = ≡.refl
 
-module _ ( _≟ᵗ_ : ∀ {s} → Discrete (Pᵀ s)) where
+module _ ( _≟ᵗˢ_ : ∀ {s} → Discreteˢ (Pᵀ s)) where
+  _≟ᵗ_ : ∀ {s} → Discrete (Pᵀ s)
+  _≟ᵗ_ = Discreteˢ→Discrete _≟ᵗˢ_
+
   record StepInj {a f i j s t p q π₁ π₂}
     (r : step {a} {f} i s p π₁ ≡ step j t q π₂) : Prop where
     field
