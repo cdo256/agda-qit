@@ -1,4 +1,4 @@
-module QIT.Examples.Lambda where
+module QIT.Examples.Lambda.DeBruijn where
 
 open import QIT.Prelude
 open import Data.Nat
