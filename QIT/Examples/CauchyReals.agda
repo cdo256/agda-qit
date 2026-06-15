@@ -2,6 +2,7 @@ module QIT.Examples.CauchyReals where
 
 open import QIT.Prelude renaming (⊤ to ⊤'; ⊥ to ⊥')
 open import QIT.Prop
+open import QIT.Prop.SetPath
 open import QIT.Relation.Subset
 import Data.Nat as ℕ
 open ℕ using (ℕ; zero; suc)
@@ -52,9 +53,9 @@ data _≤_ : (a b : ℝ) → Prop where
 
 x>0→q<q+x : ∀ (x q : ℚ) → x >0 → q ℚ.< q ℚ.+ x
 x>0→q<q+x x q x>0 =
-  ≡.subst (ℚ._< q ℚ.+ x)
-          (≡ˢ→≡ (ℚ.+-identityʳ q))
-          q+0<q+x
+  substˢ (ℚ._< q ℚ.+ x)
+         (ℚ.+-identityʳ q)
+         q+0<q+x
   where
   0<x : 0ℚ ℚ.< x
   0<x = ℚ.positive⁻¹ x ⦃ x>0 ⦄
