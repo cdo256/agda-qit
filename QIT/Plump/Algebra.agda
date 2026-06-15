@@ -85,12 +85,74 @@ record Elim {ℓA} {ZA : Algebra ℓA}
     <ᴱ : ∀ {α β} → (p : α < β) → p ⊢ Zᴱ α <ᴰ Zᴱ β
     ≤ᴱ : ∀ {α β} → (p : α ≤ β) → p ⊢ Zᴱ α ≤ᴰ Zᴱ β
 
+record Hom {ℓA} (ZA ZB : Algebra ℓA)
+  : Set (ℓS ⊔ ℓP ⊔ lsuc ℓA) where
+  module ZA = Algebra ZA
+  module ZB = Algebra ZB
+  field
+    Zʰ : ZA.Z → ZB.Z
+    supʰ : ∀ s (ξ : P s → ZA.Z)
+        → Zʰ (ZA.sup (s , ξ)) ≡ ZB.sup (s , λ i → Zʰ (ξ i))
+    <ʰ : ∀ {α β} → ZA._<_ α β → ZB._<_ (Zʰ α) (Zʰ β)
+    ≤ʰ : ∀ {α β} → ZA._≤_ α β → ZB._≤_ (Zʰ α) (Zʰ β)
+
+record _≈ʰ_ {ℓA} {ZA ZB : Algebra ℓA}
+             (f g : Hom ZA ZB)
+             : Prop (ℓS ⊔ ℓP ⊔ ℓA) where
+  module f = Hom f
+  module g = Hom g
+  field
+    ≈Zʰ : ∀ α → f.Zʰ α ≡ g.Zʰ α
+
 record _≈ᴱ_ {ℓA} {ZA : Algebra ℓA} {ZD : Displayed ℓA ZA}
               (e₁ e₂ : Elim ZD) : Prop (ℓS ⊔ ℓP ⊔ lsuc ℓA) where
   module e₁ = Elim e₁
   module e₂ = Elim e₂
   field
     Zᴱ : ∀ α → e₁.Zᴱ α ≡ e₂.Zᴱ α
+
+module _ {ℓA} {ZA ZB : Algebra ℓA} where
+  module ZA = Algebra ZA
+  module ZB = Algebra ZB
+
+  Constᴰ : Displayed ℓA ZA
+  Constᴰ = record
+    { Zᴰ = λ _ → ZB.Z
+    ; supᴰ = λ s f → ZB.sup (s , f)
+    ; _⊢_<ᴰ_ = λ _ x y → ZB._<_ x y
+    ; _⊢_≤ᴰ_ = λ _ x y → ZB._≤_ x y
+    ; sup≤ᴰ = λ _ r → ZB.sup≤ r
+    ; <supᴰ = λ i _ r → ZB.<sup i r
+    ; ≤≤ᴰ = λ yz xy → ZB.≤≤ yz xy
+    ; <≤ᴰ = λ yz xy → ZB.<≤ yz xy
+    ; ≤<ᴰ = λ yz xy → ZB.≤< yz xy
+    ; <<ᴰ = λ yz xy → ZB.<< yz xy
+    ; <→≤ᴰ = λ xy → ZB.<→≤ xy
+    ; ≤reflᴰ = ZB.≤refl _
+    }
+
+  hom→elim : Hom ZA ZB → Elim Constᴰ
+  hom→elim h = record
+    { Zᴱ = H.Zʰ
+    ; supᴱ = λ s ξ → ≡.sym (H.supʰ s ξ)
+    ; <ᴱ = H.<ʰ
+    ; ≤ᴱ = H.≤ʰ
+    }
+    where
+    module H = Hom h
+
+  elim→hom : Elim Constᴰ → Hom ZA ZB
+  elim→hom e = record
+    { Zʰ = E.Zᴱ
+    ; supʰ = λ s ξ → ≡.sym (E.supᴱ s ξ)
+    ; <ʰ = E.<ᴱ
+    ; ≤ʰ = E.≤ᴱ
+    }
+    where
+    module E = Elim e
+
+  elim≈→hom≈ : ∀ {e₁ e₂ : Elim Constᴰ} → e₁ ≈ᴱ e₂ → elim→hom e₁ ≈ʰ elim→hom e₂
+  elim≈→hom≈ p = record { ≈Zʰ = _≈ᴱ_.Zᴱ p }
 
 record IsExtensional {ℓA} (ZA : Algebra ℓA) : Prop ℓA where
   open Algebra ZA
@@ -110,11 +172,26 @@ record IsExtensionalᴰ {ℓA} {ZA : Algebra ℓA} (ZD : Displayed ℓA ZA) : Pr
             → p ⊢ x ≤ᴰ y → q ⊢ y ≤ᴰ x
             → subst Zᴰ (antisym p q) x ≡ y
 
+module _ {ℓA} {ZA ZB : Algebra ℓA} where
+  const-isExtensionalᴰ : IsExtensional ZA → IsExtensional ZB → IsExtensionalᴰ (Constᴰ {ZA = ZA} {ZB = ZB})
+  const-isExtensionalᴰ extZA extZB = record
+    { isExtZA = extZA
+    ; antisymᴰ = λ _ _ xy yx → IsExtensional.antisym extZB xy yx
+    }
+
 record IsInitial {ℓA} (ZA : Algebra ℓA) : Set (ℓS ⊔ ℓP ⊔ lsuc ℓA) where
   open Algebra ZA
   field
     elim : (ZD : Displayed ℓA ZA) → Elim ZD
     elim-unique : ∀ ZD → (e : Elim ZD) → elim ZD ≈ᴱ e
+
+  recʰ : (ZB : Algebra ℓA) → Hom ZA ZB
+  recʰ ZB = elim→hom {ZA = ZA} {ZB = ZB} (elim (Constᴰ {ZA = ZA} {ZB = ZB}))
+
+  recʰ-unique : ∀ ZB → (fʰ : Hom ZA ZB) → recʰ ZB ≈ʰ fʰ
+  recʰ-unique ZB fʰ =
+    elim≈→hom≈ {ZA = ZA} {ZB = ZB}
+      (elim-unique (Constᴰ {ZA = ZA} {ZB = ZB}) (hom→elim {ZA = ZA} {ZB = ZB} fʰ))
 
 record IsInitialExt {ℓA} (ZA : Algebra ℓA) : Set (ℓS ⊔ ℓP ⊔ lsuc ℓA) where
   open Algebra ZA
@@ -124,3 +201,15 @@ record IsInitialExt {ℓA} (ZA : Algebra ℓA) : Set (ℓS ⊔ ℓP ⊔ lsuc ℓ
          → IsExtensionalᴰ ZD
          → Elim ZD
     elim-unique : ∀ ZD isExtZD e → elim ZD isExtZD ≈ᴱ e
+
+  recʰ : ∀ {ZB : Algebra ℓA} → IsExtensional ZB → Hom ZA ZB
+  recʰ {ZB} extZB =
+    elim→hom {ZA = ZA} {ZB = ZB}
+      (elim (Constᴰ {ZA = ZA} {ZB = ZB}) (const-isExtensionalᴰ {ZA = ZA} {ZB = ZB} ext extZB))
+
+  recʰ-unique : ∀ {ZB : Algebra ℓA} (extZB : IsExtensional ZB) → (fʰ : Hom ZA ZB) → recʰ extZB ≈ʰ fʰ
+  recʰ-unique {ZB} extZB fʰ =
+    elim≈→hom≈ {ZA = ZA} {ZB = ZB}
+      (elim-unique (Constᴰ {ZA = ZA} {ZB = ZB})
+                   (const-isExtensionalᴰ {ZA = ZA} {ZB = ZB} ext extZB)
+                   (hom→elim {ZA = ZA} {ZB = ZB} fʰ))

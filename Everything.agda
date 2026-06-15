@@ -77,8 +77,7 @@ import QIT.Container.StrictFunctor
 import QIT.Container.Indexed
 
 -- Plump ordinals
-import QIT.Plump.Extensional
-import QIT.Plump.Properties
+import QIT.Plump
 
 -- QW type definition
 import QIT.QW.W

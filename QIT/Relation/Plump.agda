@@ -5,4 +5,4 @@ open import QIT.Container.Base
 
 module QIT.Relation.Plump {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
 
-open import QIT.Plump.W public
+open import QIT.Plump.W.Base S P public
