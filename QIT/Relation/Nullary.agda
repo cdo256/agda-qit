@@ -52,6 +52,15 @@ const a _ = a
 isProp : ∀ {ℓA} → Set ℓA → Prop ℓA
 isProp A = ∀ (x y : A) → x ≡ y
 
+hProp : ∀ ℓA → Set (lsuc ℓA)
+hProp ℓA = ΣP (Set ℓA) isProp
+
+hProp→Prop : ∀ {ℓA} → hProp ℓA → Prop ℓA
+hProp→Prop (A , _) = ∥ A ∥
+
+Prop→hProp : ∀ {ℓA} → Prop ℓA → hProp ℓA
+Prop→hProp A = Box A , ≡.isPropBox
+
 isContr : ∀ {ℓA} → Set ℓA → Prop ℓA
 isContr A = ∃ λ (x : A) → ∀ y → x ≡ y
 
@@ -64,10 +73,12 @@ mkIsContr A ∣ x ∣ isPropA = ∣ x , isPropA x ∣
   : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB}
   → ((x : A) → isProp (B x)) → {u v : Σ A B}
   → (p : u .proj₁ ≡ v .proj₁) → u ≡ v
-Σ≡Prop pB {x , u} {x , v} ≡.refl = ≡.cong (x ,_) (pB x u v)
+Σ≡Prop pB {x , u} {x , v} ≡.refl =
+  ≡.cong (x ,_) (pB x u v)
 
 isSetSet : ∀ {ℓA} {A : Set ℓA} {x y : A} (p q : x ≡ y) → p ≡ᵖ q
 isSetSet ≡.refl ≡.refl = ≡.refl
 
 postulate
   A!C : ∀ {ℓX} (X : Set ℓX) → isContr X → X
+
