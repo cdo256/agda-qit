@@ -30,9 +30,20 @@ open import Function.Base using (case_of_; case_returning_of_) public
 Discreteᵖ : ∀ {ℓA} (A : Set ℓA) → Prop ℓA
 Discreteᵖ A = ∀ (x y : A) → ∥ Decᵖ (x ≡ y) ∥
 
+Discreteᵖˢ : ∀ {ℓA} (A : Set ℓA) → Prop ℓA
+Discreteᵖˢ A = ∀ (x y : A) → ∥ Dec (x ≡ˢ y) ∥
+
 -- Discrete types - equality is decidable.
 Discrete : ∀ {ℓA} (A : Set ℓA) → Set ℓA
 Discrete A = ∀ (x y : A) → Decᵖ (x ≡ y)
+
+Discreteˢ : ∀ {ℓA} (A : Set ℓA) → Set ℓA
+Discreteˢ A = ∀ (x y : A) → Dec (x ≡ˢ y)
+
+Discreteˢ→Discrete : ∀ {ℓA} {A : Set ℓA} → Discreteˢ A → Discrete A
+Discreteˢ→Discrete d x y with d x y
+... | yes p = yes (≡ˢ→≡ p)
+... | no ¬p = no (λ p → ⊥→⊥p (¬p (≡→≡ˢ p)))
 
 -- Conditional expression based on decidability.
 infixr 3 if_then_else_
@@ -81,4 +92,3 @@ isSetSet ≡.refl ≡.refl = ≡.refl
 
 postulate
   A!C : ∀ {ℓX} (X : Set ℓX) → isContr X → X
-
