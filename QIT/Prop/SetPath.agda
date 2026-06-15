@@ -41,6 +41,32 @@ subst₂ˢ : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : Set ℓB} (C : A → B →
        → C a1 b1 → C a2 b2
 subst₂ˢ C reflˢ reflˢ x = x
 
+dcongˢ : ∀ {a b} {A : Set a} {B : A → Set b} (f : (x : A) → B x) {x y}
+      → (p : x ≡ˢ y) → substˢ B p (f x) ≡ˢ f y
+dcongˢ f reflˢ = reflˢ
+
+dcong₂ˢ : ∀ {a b c} {A : Set a} {B : A → Set b} {C : Set c}
+         (f : (x : A) → B x → C) {x₁ x₂ y₁ y₂}
+       → (p : x₁ ≡ˢ x₂) → substˢ B p y₁ ≡ˢ y₂
+       → f x₁ y₁ ≡ˢ f x₂ y₂
+dcong₂ˢ f reflˢ reflˢ = reflˢ
+
+subst-substˢ : ∀ {ℓA ℓP} {A : Set ℓA} {P : A → Set ℓP} {x y z : A}
+             → (x≡y : x ≡ˢ y) {y≡z : y ≡ˢ z} {p : P x}
+             → substˢ P y≡z (substˢ P x≡y p) ≡ˢ substˢ P (transˢ x≡y y≡z) p
+subst-substˢ reflˢ {y≡z = reflˢ} = reflˢ
+
+subst-invˢ : ∀ {ℓA ℓP} {A : Set ℓA} (P : A → Set ℓP) {x y : A}
+           → (p : x ≡ˢ y) {u : P x}
+           → substˢ P (symˢ p) (substˢ P p u) ≡ˢ u
+subst-invˢ P reflˢ = reflˢ
+
+Σ≡ˢ : ∀ {ℓA ℓB} → {A : Set ℓA} {B : A → Set ℓB}
+    → {a1 a2 : A} {b1 : B a1} {b2 : B a2}
+    → (p : a1 ≡ˢ a2) (q : substˢ B p b1 ≡ˢ b2)
+    → (a1 , b1) ≡ˢ (a2 , b2)
+Σ≡ˢ reflˢ reflˢ = reflˢ
+
 funExtˢ⁻ : ∀ {ℓA ℓB} → {A : Set ℓA} {B : A → Set ℓB} {f g : ∀ x → B x}
          → f ≡ˢ g → (∀ x → f x ≡ˢ g x)
 funExtˢ⁻ reflˢ _ = reflˢ
