@@ -6,7 +6,7 @@ import QIT.Container.Base as W
 open W hiding (sup)
 open import QIT.Setoid
 
-module QIT.Plump.Properties {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
+module QIT.Plump.Extensional.Properties {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
 
 open import QIT.Prelude
 open import QIT.Prop
@@ -14,7 +14,7 @@ open import QIT.Prop.Logic
 import QIT.Container.Base as W
 open import QIT.Setoid
 
-import QIT.Plump.W S P as Plump
+import QIT.Plump.W.Base S P as Plump
 open import QIT.Relation.Subset
 
 open Plump public
