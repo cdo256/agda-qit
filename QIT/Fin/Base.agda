@@ -13,10 +13,17 @@ Fin-suc-injective : ∀ {m} {a : Fin m} {b : Fin m}
                   → suc a ≡ suc b → a ≡ b
 Fin-suc-injective ≡.refl = ≡.refl
 
-_≟Fin_ : ∀ {n} → Discrete (Fin n) 
-zero ≟Fin zero = yes ≡.refl
-zero ≟Fin suc j = no (λ ())
-suc i ≟Fin zero = no (λ ())
-suc i ≟Fin suc j = case i ≟Fin j of
-  λ{(no ¬p) → no λ q → ¬p (Fin-suc-injective q)
-  ; (yes p) → yes (≡.cong suc p) }
+Fin-suc-injectiveˢ : ∀ {m} {a : Fin m} {b : Fin m}
+                   → suc a ≡ˢ suc b → a ≡ˢ b
+Fin-suc-injectiveˢ reflˢ = reflˢ
+
+_≟Finˢ_ : ∀ {n} → Discreteˢ (Fin n)
+zero ≟Finˢ zero = yes reflˢ
+zero ≟Finˢ suc j = no (λ ())
+suc i ≟Finˢ zero = no (λ ())
+suc i ≟Finˢ suc j = case i ≟Finˢ j of
+  λ{(no ¬p) → no λ q → ¬p (Fin-suc-injectiveˢ q)
+  ; (yes p) → yes (congˢ suc p) }
+
+_≟Fin_ : ∀ {n} → Discrete (Fin n)
+_≟Fin_ = Discreteˢ→Discrete _≟Finˢ_
