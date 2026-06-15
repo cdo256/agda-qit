@@ -15,11 +15,20 @@ module _ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} where
   IsInjection : (f : A → B) → Prop (ℓA ⊔ ℓB)
   IsInjection f = ∀ {x y} → f x ≡ f y → x ≡ y
 
+  IsInjectionˢ : (f : A → B) → Set (ℓA ⊔ ℓB)
+  IsInjectionˢ f = ∀ {x y} → f x ≡ˢ f y → x ≡ˢ y
+
   IsSurjection : (f : A → B) → Prop (ℓA ⊔ ℓB)
   IsSurjection f = ∀ y → ∃ λ x → f x ≡ y
 
+  IsSurjectionˢ : (f : A → B) → Set (ℓA ⊔ ℓB)
+  IsSurjectionˢ f = ∀ y → Σ A λ x → f x ≡ˢ y
+
   IsBijection : (f : A → B) → Prop (ℓA ⊔ ℓB)
   IsBijection f = IsInjection f ∧ IsSurjection f
+
+  IsBijectionˢ : (f : A → B) → Set (ℓA ⊔ ℓB)
+  IsBijectionˢ f = IsInjectionˢ f × IsSurjectionˢ f
 
 module _ {ℓA ℓP ℓB} {A : Set ℓA} {P : A → Prop ℓP} {Q : A → Prop ℓP} {B : Set ℓB} where
   injΣP-restrict
