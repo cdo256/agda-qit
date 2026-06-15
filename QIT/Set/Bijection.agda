@@ -21,6 +21,13 @@ module _ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} where
   IsBijection : (f : A → B) → Prop (ℓA ⊔ ℓB)
   IsBijection f = IsInjection f ∧ IsSurjection f
 
+module _ {ℓA ℓP ℓB} {A : Set ℓA} {P : A → Prop ℓP} {Q : A → Prop ℓP} {B : Set ℓB} where
+  injΣP-restrict
+    : (P⊆Q : ∀ {x} → P x → Q x) (f : ΣP A Q → B) (f-inj : IsInjection f)
+    → IsInjection {A = ΣP A P} {B = B} (λ (x , p) → f (x , P⊆Q p))
+  injΣP-restrict P⊆Q f f-inj {x , px} {y , py} r =
+    ΣP≡ (x , px) (y , py) (≡.cong fst (f-inj r))
+
 module _ {ℓX} {A B : Set ℓX} where
   open import QIT.Category.Morphism (SetCat ℓX)
 
