@@ -9,6 +9,7 @@ import QIT.Function.Base
 import QIT.Prop.Base
 import QIT.Prop.Logic
 import QIT.Prop.Path
+import QIT.Prop.SetPath
 import QIT.Prop.Data
 import QIT.Prop.Properties
 import QIT.Prop
