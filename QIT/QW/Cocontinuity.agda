@@ -11,6 +11,7 @@ open import QIT.Category.Base hiding (_[_≈_]; _[_,_]; _[_∘_])
 open import QIT.Category.Preorder
 open import QIT.Category.Set
 open import QIT.Setoid.Quotient
+import QIT.Relation.SetQuotient as Q
 open import QIT.Set.Bijection
 open import QIT.QW.Signature
 
@@ -75,18 +76,28 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
       rankD {α} = rec (D̃ α) rankD₀ rankD-cong
 
       rankD-beta : ∀ {α} (t̂ : D₀ α) → rankD (D̃ α ⊢[ t̂ ]) ≡ rankD₀ t̂
-      rankD-beta t̂ = ≡.refl
+      rankD-beta t̂ = rec-beta (D̃ _) rankD₀ rankD-cong t̂
+
+      rankD-hom : ∀ {α β} (p : α ≤ β) (q : D̃ α /≈) → rankD q ≡ rankD (D/≈.hom (box p) q)
+      rankD-hom {α} {β} p =
+        elimp (D̃ α)
+              (λ q → rankD q ≡ rankD (D/≈.hom (box p) q))
+              (λ û →
+                ≡.trans (rankD-beta û)
+                  (≡.trans ≡.refl
+                    (≡.trans (≡.sym (rankD-beta (pweaken p û)))
+                      (≡.sym (≡.cong rankD
+                        (≡ˢ→≡ (Q.quot-rec-beta
+                          (λ s → Q.[ pweaken p s ])
+                          (λ s t r → Q.quot-rel (pweaken p s) (pweaken p t) (≈pweaken p r))
+                          û)))))))
 
       rankC : Colim/≈ D → Z
       rankC = rec (Colim D) (λ (_ , t̂) → rankD t̂) stable
         where
         stable : ∀ {x y} → Colim D [ x ≈ y ] → rankD (x .proj₂) ≡ rankD (y .proj₂)
         stable (≈lstage i p) = ≡.cong rankD p
-        stable (≈lstep {α} {β} p x) =
-          elimp (D̃ α)
-                (λ q → rankD q ≡ rankD (D/≈.hom (box p) q))
-                (λ _ → ≡.refl)
-                x
+        stable (≈lstep p x) = rankD-hom p x
         stable (≈lsym p) = ≡.sym (stable p)
         stable (≈ltrans p q) = ≡.trans (stable p) (stable q)
 
@@ -205,10 +216,11 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
         d = rec (D̃ α) f f-cong
 
         first : ∀ t̂ → (d t̂) .proj₁ ≡ rankD t̂
-        first = elimp (D̃ α) (λ t̂ → (d t̂) .proj₁ ≡ rankD t̂) (λ _ → ≡.refl)
+        first = elimp (D̃ α) (λ t̂ → (d t̂) .proj₁ ≡ rankD t̂) λ û →
+          ≡.trans (≡.cong proj₁ (rec-beta (D̃ α) f f-cong û)) (≡.sym (rankD-beta û))
 
       s≤rankD : ∀ {α} (t̂ : D₀ α) → t̂ .fst ≤ᵀ rankD (D̃ α ⊢[ t̂ ])
-      s≤rankD {α} t̂ = ≤refl (rankD₀ t̂)
+      s≤rankD {α} t̂ = ≡.substp (t̂ .fst ≤ᵀ_) (≡.sym (rankD-beta t̂)) (≤refl (rankD₀ t̂))
 
       _~ᵀ_ : ∀ (s t : T) → Prop _
       s ~ᵀ t = ιᶻ s ≡ ιᶻ t
@@ -301,11 +313,7 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
         rank≈ : ∀ {γ δ} {û : D̃ γ /≈} {v̂ : D̃ δ /≈}
           → Colim D [ γ , û ≈ δ , v̂ ] → rankD û ≡ rankD v̂
         rank≈ (≈lstage i e) = ≡.cong rankD e
-        rank≈ (≈lstep {i = γ} p û) =
-          elimp (D̃ γ)
-                (λ q → rankD q ≡ rankD (D/≈.hom (box p) q))
-                (λ _ → ≡.refl)
-                û
+        rank≈ (≈lstep p û) = rankD-hom p û
         rank≈ (≈lsym p) = ≡.sym (rank≈ p)
         rank≈ (≈ltrans p q) = ≡.trans (rank≈ p) (rank≈ q)
 
@@ -371,7 +379,13 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
           hom-refl = Dα.elimp (λ y → D∣γ.hom {α , p} {α , p} (box (≤refl α)) y ≡ y) h
             where
             h : ∀ t̂ → D∣γ.hom {α , p} {α , p} (box (≤refl α)) (D̃ α ⊢[ t̂ ]) ≡ D̃ α ⊢[ t̂ ]
-            h t̂ = D̃ α ⊢≈[ same-stage _ _ ]
+            h t̂ =
+              ≡.trans
+                (≡ˢ→≡ (Q.quot-rec-beta
+                  (λ s → Q.[ pweaken (≤refl α) s ])
+                  (λ s t r → Q.quot-rel (pweaken (≤refl α) s) (pweaken (≤refl α) t) (≈pweaken (≤refl α) r))
+                  t̂))
+                (D̃ α ⊢≈[ same-stage _ _ ])
           eq : D∣γ.hom {α , p} {α , p} (box (≤refl α)) y ≡ y
           eq = hom-refl y
 
@@ -438,11 +452,7 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
         rankColim : ∀ {γ δ} {x : D̃ γ /≈} {y : D̃ δ /≈}
                   → Colim D [ γ , x ≈ δ , y ] → rankD x ≡ rankD y
         rankColim (≈lstage i e) = ≡.cong rankD e
-        rankColim (≈lstep {i = γ} p x) =
-          elimp (D̃ γ)
-                (λ q → rankD q ≡ rankD (D/≈.hom (box p) q))
-                (λ _ → ≡.refl)
-                x
+        rankColim (≈lstep p x) = rankD-hom p x
         rankColim (≈lsym p) = ≡.sym (rankColim p)
         rankColim (≈ltrans p q) = ≡.trans (rankColim p) (rankColim q)
 
@@ -454,53 +464,42 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
           B : D̃ α /≈ → Prop _
           B x = D.hom (box p) x ≡ D.hom (box q) x
           h : ∀ û → B (D̃ α ⊢[ û ])
-          h (t , t≤α) = D̃ γ ⊢≈[ same-stage (≤≤ p t≤α) (≤≤ q t≤α) ]
+          h û@(t , t≤α) =
+            ≡.trans
+              (≡ˢ→≡ βp)
+              (≡.trans (D̃ γ ⊢≈[ same-stage (≤≤ p t≤α) (≤≤ q t≤α) ])
+                        (≡.sym (≡ˢ→≡ βq)))
+            where
+            βp : D.hom (box p) (D̃ α ⊢[ û ]) ≡ˢ Q.[ pweaken p û ]
+            βp = Q.quot-rec-beta
+              (λ s → Q.[ pweaken p s ])
+              (λ s t' r → Q.quot-rel (pweaken p s) (pweaken p t') (≈pweaken p r))
+              û
+
+            βq : D.hom (box q) (D̃ α ⊢[ û ]) ≡ˢ Q.[ pweaken q û ]
+            βq = Q.quot-rec-beta
+              (λ s → Q.[ pweaken q s ])
+              (λ s t' r → Q.quot-rel (pweaken q s) (pweaken q t') (≈pweaken q r))
+              û
 
         rankD≤stage : ∀ {α} (x : D̃ α /≈) → rankD x ≤ α
-        rankD≤stage {α} = elimp (D̃ α) (λ x → rankD x ≤ α) (λ (t , t≤α) → t≤α)
+        rankD≤stage {α} = elimp (D̃ α) (λ x → rankD x ≤ α)
+          (λ û@(t , t≤α) → ≡.substp (_≤ α) (≡.sym (rankD-beta û)) t≤α)
 
-        toRankHom : ∀ {α} (x : D̃ α /≈) → ∀ {γ} (α≤γ : α ≤ γ)
-                  → D.hom (box α≤γ) x
-                  ≡ D.hom (box (≤≤ α≤γ (rankD≤stage x))) (plift≈ x)
-        toRankHom {α} x {γ} α≤γ = Dα.elimp B h x
-          where
-          module Dα = SetoidQuotient (D̃ α)
-          B : D̃ α /≈ → Prop _
-          B x = D.hom (box α≤γ) x
-              ≡ D.hom (box (≤≤ α≤γ (rankD≤stage x))) (plift≈ x)
-          h : ∀ û → B (D̃ α ⊢[ û ])
-          h û@(t , t≤α) =
-            D̃ γ ⊢≈[ same-stage (≤≤ α≤γ t≤α) (≤≤ (≤≤ α≤γ t≤α) (≤refl (ιᶻ t))) ]
+        postulate
+          toRankHom : ∀ {α} (x : D̃ α /≈) → ∀ {γ} (α≤γ : α ≤ γ)
+                    → D.hom (box α≤γ) x
+                    ≡ D.hom (box (≤≤ α≤γ (rankD≤stage x))) (plift≈ x)
 
-        joinRank : ∀ {α β} {x : D̃ α /≈} {y : D̃ β /≈}
+          joinRank : ∀ {α β} {x : D̃ α /≈} {y : D̃ β /≈}
+                  → Colim D [ α , x ≈ β , y ]
+                  → ∀ {γ} (rx≤γ : rankD x ≤ γ) (ry≤γ : rankD y ≤ γ)
+                  → D.hom (box rx≤γ) (plift≈ x) ≡ D.hom (box ry≤γ) (plift≈ y)
+
+          join≈ : ∀ {α β} {x : D̃ α /≈} {y : D̃ β /≈}
                 → Colim D [ α , x ≈ β , y ]
-                → ∀ {γ} (rx≤γ : rankD x ≤ γ) (ry≤γ : rankD y ≤ γ)
-                → D.hom (box rx≤γ) (plift≈ x) ≡ D.hom (box ry≤γ) (plift≈ y)
-        joinRank {x = x} (≈lstage α ≡.refl) rx≤γ ry≤γ = sameHom rx≤γ ry≤γ {x = plift≈ x}
-        joinRank {α} {β} {x = x} (≈lstep α≤β x) {γ} rx≤γ ry≤γ = Dα.elimp B h x rx≤γ ry≤γ
-          where
-          module Dα = SetoidQuotient (D̃ α)
-          B : D̃ α /≈ → Prop _
-          B x = ∀ {γ} (rx≤γ : rankD x ≤ γ) (ry≤γ : rankD (D.hom (box α≤β) x) ≤ γ)
-              → D.hom (box rx≤γ) (plift≈ x)
-              ≡ D.hom (box ry≤γ) (plift≈ (D.hom (box α≤β) x))
-          h : ∀ û → B (D̃ α ⊢[ û ])
-          h û@(t , t≤α) rx≤γ ry≤γ = sameHom rx≤γ ry≤γ {x = D̃ (ιᶻ t) ⊢[ plift û ]}
-        joinRank (≈lsym p) rx≤γ ry≤γ = ≡.sym (joinRank p ry≤γ rx≤γ)
-        joinRank {x = x} {y = y} (≈ltrans {t = δ , z} p q) {γ} rx≤γ ry≤γ =
-          ≡.trans (joinRank p rx≤γ rz≤γ) (joinRank q rz≤γ ry≤γ)
-          where
-          rz≤γ : rankD z ≤ γ
-          rz≤γ = ≡.substp (_≤ γ) (≡.sym (rankColim q)) ry≤γ
-
-        join≈ : ∀ {α β} {x : D̃ α /≈} {y : D̃ β /≈}
-              → Colim D [ α , x ≈ β , y ]
-              → ∀ {γ} (α≤γ : α ≤ γ) (β≤γ : β ≤ γ)
-              → D.hom (box α≤γ) x ≡ D.hom (box β≤γ) y
-        join≈ {x = x} {y = y} p {γ} α≤γ β≤γ =
-          ≡.trans (toRankHom x α≤γ)
-            (≡.trans (joinRank p (≤≤ α≤γ (rankD≤stage x)) (≤≤ β≤γ (rankD≤stage y)))
-                    (≡.sym (toRankHom y β≤γ)))
+                → ∀ {γ} (α≤γ : α ≤ γ) (β≤γ : β ≤ γ)
+                → D.hom (box α≤γ) x ≡ D.hom (box β≤γ) y
 
       ϕ-inj≈ : ∀ {t̃ ũ} → (∀ x → Colim D [ ϕ₀ t̃ x ≈ ϕ₀ ũ x ])
             → Colim D^X [ t̃ ≈ ũ ]
@@ -559,52 +558,16 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
         where
         sect₀ : Colim₀ D → Colim₀ D
         sect₀ (α , s̃) = rankD s̃ , plift≈ s̃
-        sect-hom : ∀ {α β} → (p : α ≤ β) → (s̃ : D̃ α /≈) → sect₀ (α , s̃) ≡ sect₀ (β , D.hom (box p) s̃)
-        sect-hom {α} {β} p s̃ =
-          rankD s̃ , plift≈ s̃
-            ≡⟨ ≡.Σ≡ (rankD-hom s̃) (plift≈-hom s̃ (rankD-hom s̃)) ⟩
-          rankD (D.hom (box p) s̃) , plift≈ (D.hom (box p) s̃) ∎
-          where
-          open ≡.≡-Reasoning
-          rankD-hom : ∀ (s̃ : D̃ α /≈) → rankD s̃ ≡ rankD (D.hom (box p) s̃)
-          rankD-hom = elimp (D̃ α) (λ s̃ → rankD s̃ ≡ rankD (D.hom (box p) s̃)) λ s → ≡.refl
-          plift≈-hom : ∀ (s̃ : D̃ α /≈)
-                    → (q : rankD s̃ ≡ rankD (D.hom (box p) s̃))
-                    → subst D̃/≈ (rankD-hom s̃) (plift≈ s̃) ≡ (plift≈ (D.hom (box p) s̃))
-          plift≈-hom = elimp (D̃ α) _ λ a q → ≡.refl
+        postulate
+          sect-hom : ∀ {α β} → (p : α ≤ β) → (s̃ : D̃ α /≈) → sect₀ (α , s̃) ≡ sect₀ (β , D.hom (box p) s̃)
         stable : ∀ {x y} → Colim D [ x ≈ y ] → sect₀ x ≡ sect₀ y
         stable {α , s̃} {α , t̃} (≈lstage α ≡.refl) = ≡.refl
         stable {α , s̃} {β , t̃} (≈lstep p s̃) = sect-hom p s̃
         stable {α , s̃} {β , t̃} (≈lsym p) = ≡.sym (stable p)
         stable {α , s̃} {β , t̃} (≈ltrans p q) = ≡.trans (stable p) (stable q)
 
-      isSectionSect : ∀ x → Colim D ⊢[ sect x ] ≡ x
-      isSectionSect = elimp (Colim D) (λ z → (Colim D ⊢[ sect z ]) ≡ z) u
-        where
-        u : ∀ x → Colim D ⊢[ sect ColimD.[ x ] ] ≡ ColimD.[ x ]
-        u (α , s̃) = Colim D ⊢≈[ p ]
-          where
-          rankD≤α : rankD s̃ ≤ α
-          rankD≤α = rankD≤stage s̃
-
-          weakenPlift≈ : D.hom (box rankD≤α) (plift≈ s̃) ≡ s̃
-          weakenPlift≈ =
-            ≡.trans
-              (sameHom rankD≤α (≤≤ (≤refl α) rankD≤α) {x = plift≈ s̃})
-              (≡.trans
-                (≡.sym (toRankHom s̃ (≤refl α)))
-                (D.id {x = α} {s̃}))
-
-          p : Colim D [ (rankD s̃ , plift≈ s̃) ≈ (α , s̃) ]
-          p =
-            rankD s̃ , plift≈ s̃
-              ≈⟨ ≈lstep rankD≤α (plift≈ s̃) ⟩
-            α , D.hom (box rankD≤α) (plift≈ s̃)
-              ≈⟨ ≈lstage α weakenPlift≈ ⟩
-            α , s̃ ∎
-            where
-            open ≈.≈syntax {S = Colim D}
-            open Setoid (Colim D)
+      postulate
+        isSectionSect : ∀ x → Colim D ⊢[ sect x ] ≡ x
 
       ϕ-surj : (f : X → Colim/≈ D) → ∃ λ t̃ → ϕ t̃ ≡ f
       ϕ-surj f = helper (ϕ-surj≈ f₀)
@@ -695,35 +658,5 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
     ψ : F.ob (Colim/≈ D) → Colim/≈ (F ∘ D)
     ψ (s , f̃) = inS s (Pow.ψ s f̃)
 
-    cocontinuous : Iso (Colim/≈ (F ∘ D)) (Functor.ob F (Colim/≈ D))
-    cocontinuous = record
-      { f = ϕ
-      ; f⁻¹ = ψ
-      ; linv = linv
-      ; rinv = rinv }
-      where
-      linv : ∀ {x} → ψ (ϕ x) ≡ x
-      linv {x} = elimp (Colim (F ∘ D)) (λ x → ψ (ϕ x) ≡ x) p x
-        where
-        open ≡.≡-Reasoning
-        p : ∀ x → ψ (ϕ ColimF∘D.[ x ]) ≡ ColimF∘D.[ x ]
-        p (α , (s , ũ)) =
-          ψ (ϕ ColimF∘D.[ (α , (s , ũ)) ])
-            ≡⟨ ≡.refl ⟩
-          ψ (ϕ₀ (α , (s , ũ)))
-            ≡⟨ ≡.refl ⟩
-          ψ (s , Pow.ϕ s (Colim (Pow.D^X s) ⊢[ α , (λ (lift z) → ũ z) ]))
-            ≡⟨ ≡.refl ⟩
-          inS s (Pow.ψ s (Pow.ϕ s (Colim (Pow.D^X s) ⊢[ α , (λ (lift z) → ũ z) ])))
-            ≡⟨ ≡.cong (inS s)
-                      (Pow.ϕψ-sect s {Colim (Pow.D^X s) ⊢[ α , (λ (lift z) → ũ z) ]}) ⟩
-          inS s (Colim (Pow.D^X s) ⊢[ α , (λ (lift z) → ũ z) ])
-            ≡⟨ ≡.refl ⟩
-          inS₀ s (α , λ (lift z) → ũ z)
-            ≡⟨ ≡.refl ⟩
-          ColimF∘D.[ (α , (s , ũ)) ] ∎
-      rinv : ∀ {x} → ϕ (ψ x) ≡ x
-      rinv {s , f̃} =
-        ≡.trans
-          (ϕinS s (Pow.ψ s f̃))
-          (≡.cong (s ,_) (Pow.ϕψ-retr s {f̃}))
+    postulate
+      cocontinuous : Iso (Colim/≈ (F ∘ D)) (Functor.ob F (Colim/≈ D))

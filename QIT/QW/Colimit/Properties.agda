@@ -171,10 +171,11 @@ module QIT.QW.Colimit.Properties {ℓI} {ℓ≤}
 
     F : ColimMorphism LimitCocone C'
     F .apexHom = f
-    F .commutes i = ≡.refl
+    F .commutes i = ≡.funExt λ x → rec-beta f₀ isRespecting (i , x)
 
     unq : (G : ColimMorphism LimitCocone C') → ∀ x̃ → G .apexHom x̃ ≡ f x̃
-    unq G = elimp (λ x̃ → G .apexHom x̃ ≡ f x̃) λ (i , x) → ≡.funExt⁻ (G .commutes i) x
+    unq G = elimp (λ x̃ → G .apexHom x̃ ≡ f x̃) λ (i , x) →
+      ≡.trans (≡.funExt⁻ (G .commutes i) x) (≡.sym (rec-beta f₀ isRespecting (i , x)))
 
   isLimitingCoconeLimitCocone : isLimitingCocone LimitCocone
   isLimitingCoconeLimitCocone = record

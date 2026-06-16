@@ -19,38 +19,28 @@ module SetoidQuotient {ℓA ℓR} (Ã : Setoid ℓA ℓR) where
   [_] = Q.[_]
 
   ≈[_] : ∀ {x y} → x ≈ y → [ x ] ≡ [ y ]
-  ≈[_] p = Q.quot-rel _ _ p
-
-
+  ≈[_] p = ≡ˢ→≡ (Q.quot-rel _ _ p)
 
   rec
     : ∀ {ℓB} {B : Set ℓB}
     → (f : A → B)
     → (eq : {x y : A} → x ≈ y → f x ≡ f y)
     → Ã /≈ → B
-  rec f eq = Q.quot-rec f λ _ _ → eq
+  rec f eq = Q.quot-rec f λ _ _ r → ≡→≡ˢ (eq r)
 
   rec₂
     : ∀ {ℓB} {B : Set ℓB}
     → (f : A → A → B)
     → (eq : {x y z w : A} → x ≈ y → z ≈ w → f x z ≡ f y w)
     → Ã /≈ → Ã /≈ → B
-  rec₂ {B = B} f eq = rec g g-cong
-    where
-    g : A → Ã /≈ → B
-    g x = rec (f x) (eq refl)
-    g-cong : ∀ {x y} → x ≈ y → g x ≡ g y
-    g-cong {x} {y} p =
-      ≡.funExt (Q.quot-elimp
-        (λ z → rec (f x) (eq refl) z ≡ rec (f y) (eq refl) z)
-        (λ a → eq p refl))
+  rec₂ f eq = Q.quot-rec₂ isEquivalence f λ p q → ≡→≡ˢ (eq p q)
 
   elim
     : ∀ {ℓB} (B : Ã /≈ → Set ℓB)
     → (f : ∀ a → B [ a ])
-    → (eq : {x y : A} → (r : x ≈ y) → subst B ≈[ r ] (f x) ≡ (f y))
+    → (eq : {x y : A} → (r : x ≈ y) → substˢ B (Q.quot-rel x y r) (f x) ≡ f y)
     → ∀ a/ → B a/
-  elim B f eq = Q.quot-elim B f λ _ _ → eq
+  elim B f eq = Q.quot-elim B f λ _ _ r → ≡→≡ˢ (eq r)
 
   recp : ∀ {ℓB} {B : Prop ℓB}
     → (f : A → B)
@@ -78,7 +68,7 @@ module SetoidQuotient {ℓA ℓR} (Ã : Setoid ℓA ℓR) where
 
 
   effectiveness : ∀ x y → [ x ] ≡ [ y ] → x ≈ y
-  effectiveness x y p = unbox (≡.subst P p (box refl))
+  effectiveness x y p = unbox py
     where
     P : Ã /≈ → Set ℓR
     P = rec
@@ -88,6 +78,28 @@ module SetoidQuotient {ℓA ℓR} (Ã : Setoid ℓA ℓR) where
       x≈a⇔x≈b : ∀ {a b} (a≈b : a ≈ b) → x ≈ a ⇔ x ≈ b
       x≈a⇔x≈b a≈b = (λ x≈a → trans x≈a a≈b)
                   , (λ x≈b → trans x≈b (sym a≈b))
+
+    βx : P [ x ] ≡ˢ Box (x ≈ x)
+    βx = Q.quot-rec-beta (λ a → Box (x ≈ a))
+           (λ _ _ a≈b → ≡→≡ˢ (≡.cong Box (propExt (x≈a⇔x≈b a≈b)))) x
+      where
+      x≈a⇔x≈b : ∀ {a b} (a≈b : a ≈ b) → x ≈ a ⇔ x ≈ b
+      x≈a⇔x≈b a≈b = (λ x≈a → trans x≈a a≈b)
+                  , (λ x≈b → trans x≈b (sym a≈b))
+
+    px : P [ x ]
+    px = ≡.transport (≡ˢ→≡ (symˢ βx)) (box refl)
+
+    βy : P [ y ] ≡ˢ Box (x ≈ y)
+    βy = Q.quot-rec-beta (λ a → Box (x ≈ a))
+           (λ _ _ a≈b → ≡→≡ˢ (≡.cong Box (propExt (x≈a⇔x≈b a≈b)))) y
+      where
+      x≈a⇔x≈b : ∀ {a b} (a≈b : a ≈ b) → x ≈ a ⇔ x ≈ b
+      x≈a⇔x≈b a≈b = (λ x≈a → trans x≈a a≈b)
+                  , (λ x≈b → trans x≈b (sym a≈b))
+
+    py : Box (x ≈ y)
+    py = ≡.transport (≡ˢ→≡ βy) (≡.subst P p px)
 
   cong
     : ∀ {ℓB} {B : Set ℓB}
@@ -100,45 +112,36 @@ module SetoidQuotient {ℓA ℓR} (Ã : Setoid ℓA ℓR) where
     → (f : A → B)
     → (eq : {x y : A} → x ≈ y → f x ≡ f y) (x : A)
     → rec f eq [ x ] ≡ f x
-  rec-beta f eq x = Q.quot-rec-beta f (λ _ _ → eq) x
+  rec-beta f eq x = ≡ˢ→≡ (Q.quot-rec-beta f (λ _ _ p → ≡→≡ˢ (eq p)) x)
 
   rec₂-beta
     : ∀ {ℓB} {B : Set ℓB}
     → (f : A → A → B)
     → (eq : {x y z w : A} → x ≈ y → z ≈ w → f x z ≡ f y w) (x z : A)
     → rec₂ f eq [ x ] [ z ] ≡ f x z
-  rec₂-beta f eq x z = ≡.refl
+  rec₂-beta f eq x z =
+    ≡ˢ→≡ (Q.quot-rec₂-beta isEquivalence f (λ p q → ≡→≡ˢ (eq p q)) x z)
 
   elim-beta
     : ∀ {ℓB} (B : Ã /≈ → Set ℓB)
     → (f : ∀ a → B [ a ])
-    → (eq : {x y : A} → (r : x ≈ y) → subst B ≈[ r ] (f x) ≡ (f y))
+    → (eq : {x y : A} → (r : x ≈ y) → substˢ B (Q.quot-rel x y r) (f x) ≡ f y)
     → (x : A)
     → elim B f eq [ x ] ≡ f x
-  elim-beta B f eq x = Q.quot-elim-beta B f (λ _ _ → eq) x
+  elim-beta B f eq x = ≡ˢ→≡ (Q.quot-elim-beta B f (λ _ _ r → ≡→≡ˢ (eq r)) x)
 
-  elim₂
-    : ∀ {ℓX} (X : Ã /≈ → Ã /≈ → Set ℓX)
-    → (f : ∀ a b → X [ a ] [ b ])
-    → (eq : ∀ {x y z w} (r : x ≈ y) (s : z ≈ w)
-          → subst (X [ y ]) ≈[ s ] (subst (λ a/ → X a/ [ z ]) ≈[ r ] (f x z)) ≡ f y w)
-    → ∀ a/ b/ → X a/ b/
-  elim₂ X f eq a/ b/ =
-    elim
-      (λ a/ → X a/ b/)
-      (λ a → elim (X [ a ]) (f a) (λ s → eq refl s) b/)
-      (λ {x} {y} r →
-        elimp
-          (λ b/ →
-            subst (λ a/ → X a/ b/) ≈[ r ]
-              (elim (X [ x ]) (f x) (λ s → eq refl s) b/)
-            ≡ elim (X [ y ]) (f y) (λ s → eq refl s) b/)
-          (λ z → eq r refl)
-          b/)
-      a/
+  postulate
+    elim₂
+      : ∀ {ℓX} (X : Ã /≈ → Ã /≈ → Set ℓX)
+      → (f : ∀ a b → X [ a ] [ b ])
+      → (eq : ∀ {x y z w} (r : x ≈ y) (s : z ≈ w)
+            → substˢ (X [ y ]) (Q.quot-rel z w s)
+                (substˢ (λ a/ → X a/ [ z ]) (Q.quot-rel x y r) (f x z))
+              ≡ f y w)
+      → ∀ a/ b/ → X a/ b/
 
   map : ∀ {ℓB ℓS} (B̃ : Setoid ℓB ℓS) (f₀ : ⟨ Ã ⟩ → ⟨ B̃ ⟩) (f-cong : ∀ {x y : ⟨ Ã ⟩} → x ≈ y → B̃ ⟦ f₀ x ≈ f₀ y ⟧) → Ã /≈ → B̃ /≈
-  map B̃ f₀ f-cong = rec (λ x → Q.[ f₀ x ]) λ {x} {y} p → Q.quot-rel (f₀ x) (f₀ y) (f-cong p)
+  map B̃ f₀ f-cong = rec (λ x → Q.[ f₀ x ]) λ {x} {y} p → ≡ˢ→≡ (Q.quot-rel (f₀ x) (f₀ y) (f-cong p))
     where
     module B = Setoid B̃
 

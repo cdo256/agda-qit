@@ -201,6 +201,10 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
     module SetoidCat = Category (SetoidCat (ℓA ⊔ ℓS ⊔ ℓP) (ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV))
     module SetCat = Category (SetCat (ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV))
     open ≡.≡-Reasoning
+
+    sameStage : ∀ {α} {t : T} (p q : t ≤ᵀ α) → D̃ α [ (t , p) ≈ (t , q) ]
+    sameStage {α} p q = ≡→≈ (D̃ α) (ΣP≡ _ _ ≡.refl)
+
     hom : ∀ {α β} → Box (α ≤ β) → D̃ α /≈ → D̃ β /≈
     hom {α} {β} (box α≤β) = quot-rec (λ s → [ pweaken α≤β s ])
       λ s t p → quot-rel (pweaken α≤β s) (pweaken α≤β t) (≈pweaken α≤β p)
@@ -209,7 +213,12 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
     id {α} {t̃} = q t̃
       where
       q : ∀ t̃ → hom {α} ≤p.id t̃ ≡ SetCat.id {D̃ α /≈} t̃
-      q  = quot-elimp (λ t̃ → hom ≤p.id t̃ ≡ SetCat.id t̃) (λ _ → ≡.refl)
+      q = quot-elimp (λ t̃ → hom ≤p.id t̃ ≡ SetCat.id t̃) λ s →
+            ≡.trans
+              (≡ˢ→≡ (quot-rec-beta (λ s → [ pweaken (≤refl α) s ])
+                                  (λ s t p → quot-rel (pweaken (≤refl α) s) (pweaken (≤refl α) t) (≈pweaken (≤refl α) p))
+                                  s))
+              (≡ˢ→≡ (quot-rel (pweaken (≤refl α) s) s (sameStage _ _)))
 
     comp : ∀ {α β γ} (f : Box (α ≤ β)) (g : Box (β ≤ γ))
          → hom (g ≤p.∘ f) ≡h (hom g SetCat.∘ hom f)
@@ -218,7 +227,21 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
       q : (t̃ : D̃ α /≈)
         → hom (box g ≤p.∘ box f) t̃
         ≡ (hom (box g) SetCat.∘ hom (box f)) t̃
-      q = quot-elimp _ λ _ → ≡.refl
+      q = quot-elimp _ λ s →
+            ≡.trans
+              (≡ˢ→≡ (quot-rec-beta (λ s → [ pweaken (≤≤ g f) s ])
+                                  (λ s t p → quot-rel (pweaken (≤≤ g f) s) (pweaken (≤≤ g f) t) (≈pweaken (≤≤ g f) p))
+                                  s))
+              (≡.trans
+                (≡ˢ→≡ (quot-rel (pweaken (≤≤ g f) s) (pweaken g (pweaken f s)) (sameStage _ _)))
+                (≡.sym (≡.trans
+                  (≡.cong (hom (box g))
+                    (≡ˢ→≡ (quot-rec-beta (λ s → [ pweaken f s ])
+                                        (λ s t p → quot-rel (pweaken f s) (pweaken f t) (≈pweaken f p))
+                                        s)))
+                  (≡ˢ→≡ (quot-rec-beta (λ s → [ pweaken g s ])
+                                      (λ s t p → quot-rel (pweaken g s) (pweaken g t) (≈pweaken g p))
+                                      (pweaken f s))))))
 
     open import QIT.Function.Base
     open import QIT.Set.Bijection
@@ -227,9 +250,23 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
              → (∀ {x y} → D̃ β [ pweaken p x ≈ pweaken p y ] → D̃ α [ x ≈ y ])
              → (∀ {x y} → hom (box p) [ x ] ≡ hom (box p) [ y ] → _≡_ {A = D̃ α /≈} [ x ] [ y ])
     isInjHom {α} {β} α≤β injWeaken {x} {y} q =
-      quot-rel x y (injWeaken r)
+      ≡ˢ→≡ (quot-rel x y (injWeaken r))
       where
       open ≈.SetoidQuotient
 
+      q' : QIT.Relation.SetQuotient.[ pweaken α≤β x ] ≡ QIT.Relation.SetQuotient.[ pweaken α≤β y ]
+      q' =
+        ≡.trans
+          (≡.sym (≡ˢ→≡ (quot-rec-beta
+            (λ s → QIT.Relation.SetQuotient.[ pweaken α≤β s ])
+            (λ s t p → quot-rel (pweaken α≤β s) (pweaken α≤β t) (≈pweaken α≤β p))
+            x)))
+          (≡.trans
+            q
+            (≡ˢ→≡ (quot-rec-beta
+              (λ s → QIT.Relation.SetQuotient.[ pweaken α≤β s ])
+              (λ s t p → quot-rel (pweaken α≤β s) (pweaken α≤β t) (≈pweaken α≤β p))
+              y)))
+
       r : D̃ β [ pweaken α≤β x ≈ pweaken α≤β y ]
-      r = effectiveness (D̃ β) _ _ q
+      r = effectiveness (D̃ β) _ _ q'
