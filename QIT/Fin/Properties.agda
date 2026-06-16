@@ -35,6 +35,9 @@ inhab⇔>0 {suc n} = p , q
   q₂ : ∥ B ∥ → ∥ A ∥
   q₂ ∣ x ∣ = ∣ from x ∣
 
+↔ˢto⇔ : ∀ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} → A ↔ˢ B → ∥ A ∥ ⇔ ∥ B ∥
+↔ˢto⇔ p = ↔to⇔ (↔ˢ→↔ p)
+
 ¬Fin0 : ¬ ∥ Fin 0 ∥
 ¬Fin0 ∣ () ∣
 
@@ -163,6 +166,17 @@ cantor-schröder-bernstein : ∀ {m n} → (f : Fin m → Fin n) (g : Fin n → 
                             m ≡ n
 cantor-schröder-bernstein f g f-inj g-inj = ≤-antisym
   (Fin-inj→≤ f f-inj) (Fin-inj→≤ g g-inj)
+
+Fin-injˢ→≤ : ∀ {m n} → (f : Fin m → Fin n) → IsInjectionˢ f → m ℕ.≤ n
+Fin-injˢ→≤ f f-inj = Fin-inj→≤ f (λ p → ≡ˢ→≡ (f-inj (≡→≡ˢ p)))
+
+cantor-schröder-bernsteinˢ : ∀ {m n} → (f : Fin m → Fin n) (g : Fin n → Fin m) →
+                             IsInjectionˢ f → IsInjectionˢ g →
+                             m ≡ˢ n
+cantor-schröder-bernsteinˢ f g f-inj g-inj =
+  ≡→≡ˢ (cantor-schröder-bernstein f g
+          (λ p → ≡ˢ→≡ (f-inj (≡→≡ˢ p)))
+          (λ p → ≡ˢ→≡ (g-inj (≡→≡ˢ p))))
 
 open import QIT.Relation.WellFounded
 
