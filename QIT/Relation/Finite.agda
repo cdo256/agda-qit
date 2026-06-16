@@ -13,14 +13,23 @@ module _ {ℓA} where
   isFiniteᵖ : (A : Set ℓA) → Prop _
   isFiniteᵖ A = ∃ λ n → ∥ Fin n ↔ A ∥
 
+  isFiniteᵖˢ : (A : Set ℓA) → Prop _
+  isFiniteᵖˢ A = ∃ λ n → ∥ Fin n ↔ˢ A ∥
+
   isFinite' : (A : Set ℓA) → Set _
   isFinite' A = ΣP ℕ λ n → ∥ Fin n ↔ A ∥
 
   isFinite : (A : Set ℓA) → Set _
   isFinite A = Σ ℕ λ n → Fin n ↔ A
 
+  isFiniteˢ : (A : Set ℓA) → Set _
+  isFiniteˢ A = Σ ℕ λ n → Fin n ↔ˢ A
+
   FinSet : Set (lsuc ℓA)
   FinSet = Σ (Set ℓA) isFinite
+
+  FinSetˢ : Set (lsuc ℓA)
+  FinSetˢ = Σ (Set ℓA) isFiniteˢ
 
   isFinite→Discrete : (A : Set ℓA) → isFinite A → Discrete A
   isFinite→Discrete A (n , f) x y =
@@ -31,6 +40,19 @@ module _ {ℓA} where
     open _↔_ f
     i = from x
     j = from y
+
+  isFiniteˢ→Discreteˢ : (A : Set ℓA) → isFiniteˢ A → Discreteˢ A
+  isFiniteˢ→Discreteˢ A (n , f) x y =
+    case (i ≟Finˢ j) of
+      λ{(no ¬p) → no (λ q → ¬p (congˢ from q))
+      ; (yes p) → yes (transˢ (symˢ (linv x)) (transˢ (congˢ to p) (linv y))) }
+    where
+    open _↔ˢ_ f
+    i = from x
+    j = from y
+
+  isFiniteˢ→isFinite : (A : Set ℓA) → isFiniteˢ A → isFinite A
+  isFiniteˢ→isFinite A (n , f) = n , ↔ˢ→↔ f
 
   isFiniteᵖ→isFinite' : {A : Set ℓA} → isFiniteᵖ A → isFinite' A
   isFiniteᵖ→isFinite' {A} isFiniteA = 
