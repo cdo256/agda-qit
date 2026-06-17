@@ -33,3 +33,8 @@ Trunc₁ R x = ∥ R x ∥
 -- Truncated binary relations - essential for setoid equality relations.
 Trunc₂ : {A : Set ℓ} {ℓ' : Level} → (A → A → Set ℓ') → (A → A → Prop ℓ')
 Trunc₂ R x y = ∥ R x y ∥
+
+record ∥_∥ᵉ (A : Set ℓ) : Set ℓ where
+  constructor ∣_∣ᵉ
+  field
+    @0 witness : A
