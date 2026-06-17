@@ -8,6 +8,8 @@ open import QIT.Relation.Nullary
 open import QIT.Relation.Binary
 open import QIT.Category.Base
 
+
+
 record Algebra : Set₁ where
   field
     CT : Set
