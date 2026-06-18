@@ -1,5 +1,7 @@
 module QIT.Relation.WISC where
 
+-- Adapted from fiore2022-quotient-inductive.
+
 open import QIT.Prelude
 open import QIT.Relation.Subset
 open import QIT.Relation.Base
@@ -12,66 +14,70 @@ open import QIT.Category.Preorder
 open import QIT.Category.Set
 open import QIT.Functor.Base
 
-Family : ∀ ℓ ℓ' → Set (lsuc ℓ ⊔ lsuc ℓ')
-Family ℓ ℓ' = Σ (Set ℓ) λ I → I → Set ℓ'
-
-OrdFamily : ∀ ℓI ℓX ℓ< → Set (lsuc ℓI ⊔ lsuc ℓX ⊔ lsuc ℓ<)
-OrdFamily ℓI ℓX ℓ< = Σ (Set ℓI) λ I → Σ (I → Set ℓX) λ X → ∀ i → IsOrdinal ℓ< (X i)
-
--- Cover : ∀ {ℓY} (Y : Set ℓY) → ∀ ℓI ℓX → Set (ℓY ⊔ lsuc ℓI ⊔ lsuc ℓX)  
--- Cover Y ℓI ℓX =
---   Σ (Family ℓI ℓX)
---   λ (I , X) → (i : I) → X i ↠ Y
--- 
--- OrdCover : ∀ {ℓY} (Y : Set ℓY) → ∀ ℓI ℓX ℓ< → Set (ℓY ⊔ lsuc ℓI ⊔ lsuc ℓX ⊔ lsuc ℓ<)
--- OrdCover Y ℓI ℓX ℓ< =
---   Σ (OrdFamily ℓI ℓX ℓ<)
---   λ (I , X , _) → (i : I) → X i ↠ Y
-
-record Cover {ℓY} (Y : Set ℓY) (ℓA : Level) : Set (ℓY ⊔ lsuc ℓA) where
-  field
-    A : Set ℓA
-    p : A → Y
-    surj : Surjective p
-
-record OrdKCover {ℓY} (Y : Set ℓY) (ℓA ℓα ℓ< : Level) : Set (ℓY ⊔ lsuc ℓA ⊔ lsuc ℓα ⊔ lsuc ℓ<) where
-  field
-    A : Set ℓA
-    p : A → Y
-    surj : Surjective p
-    α : A → Set ℓα
-    isOrd-α : (a : A) → IsOrdinal ℓ< (α a)
-
-CoverFamily : ∀ {ℓY} (Y : Set ℓY) → ∀ ℓI ℓA → Set _
-CoverFamily Y ℓI ℓA =
-  Σ (Set ℓI) λ I → I → Cover Y ℓA
-
-OrdCoverFamily : ∀ {ℓY} (Y : Set ℓY) → ∀ ℓI ℓA ℓO ℓ< → Set _
-OrdCoverFamily Y ℓI ℓA ℓO ℓ< =
-  Σ (Set ℓI) λ I → I → OrdKCover Y ℓA ℓO ℓ<
-
-IsWISCFamily :
-  ∀ {ℓY ℓI ℓA} ℓB → (Y : Set ℓY) →
-  CoverFamily Y ℓI ℓA → Prop (ℓY ⊔ ℓI ⊔ ℓA ⊔ lsuc ℓB)
-IsWISCFamily ℓB Y (I , C) =
-  ∀ (B : Cover Y ℓB) →
-  ∃ λ (i : I) → ∃ λ (f : C i .A → B .A) →
-  ∀ x → C i .p x ≡ B .p (f x)
+WISC : ∀ {ℓ} → (A : Set ℓ) (C : Set ℓ) (W : C → Set ℓ) → Prop _
+WISC {ℓ} A C W =
+  ∀ (E : Set ℓ)
+  → (q : E → A)
+  → Surjective q
+  → ∃ λ (c : C)
+  → ∃ λ (f : W c → E)
+  → Surjective (q ∘ f)
+  
+WeakAC : ∀ {ℓ} → (A : Set ℓ) (C : Set ℓ) (W : C → Set ℓ)
+       → WISC A C W
+       → (B : A → Set ℓ)
+       → (P : ∀ x → B x → Prop ℓ)
+       → (∀ x → ∃ (P x))
+       → ∃ λ (c : C)
+       → ∃ λ (p : W c → A)
+       → ∃ λ (q : ∀ z → B (p z))
+       → Surjective p
+       ∧ (∀ z → P (p z) (q z))
+WeakAC A C W w B P e = wac
   where
-  open Cover
+  D : Set _
+  D = ΣP (Σ A B) λ (x , y) → P x y
+  p' : D → A
+  p' ((x , _) , _) = x
+  isSurjection-p' : Surjective p'
+  isSurjection-p' x with e x
+  ... | ∣ y , pxy ∣ = ∣ (((x , y) , pxy) , ≡.refl) ∣
+  q' : ∀ z → B (p' z)
+  q' ((_ , b) , _) = b
+  u : ∃ λ (c : C) → ∃ λ (f : W c → D) → Surjective (p' ∘ f)
+  u = w D p' isSurjection-p'
+  wac : ∃ (λ (c : C) → ∃ (λ p → ∃ (λ q → Surjective p ∧ ((z : W c) → P (p z) (q z)))))
+  wac with w D p' isSurjection-p'
+  ... | ∣ c , ∣ f , surj-p'f ∣ ∣ = ∣ c , ∣ p' ∘ f , ∣ (λ z → q' (f z)) , surj-p'f , v ∣ ∣ ∣
+    where
+    v : (z : W c) → P ((p' ∘ f) z) (q' (f z))
+    v z = f z .snd
 
--- IsOWISCFamily :
---   ∀ {ℓY ℓI ℓA ℓO ℓ<} ℓB → (Y : Set ℓY) →
---   OrdCoverFamily Y ℓI ℓA ℓO ℓ< → Prop (ℓY ⊔ ℓI ⊔ ℓA ⊔ lsuc ℓB ⊔ lsuc ℓO ⊔ lsuc ℓ<)
--- IsOWISCFamily {ℓO = ℓO} {ℓ< = ℓ<} ℓB Y (I , C) =
---   (B : OrdKCover Y ℓB ℓO ℓ<) →
---   ∃' λ i → ((y : Y) → C i .A y → B .A y)
---   where open OrdKCover
+IWISC : ∀ ℓ → Prop (lsuc ℓ)
+IWISC ℓ = (A : Set ℓ) (F : A → Set ℓ)
+      → ∃ λ (C : Set ℓ)
+      → ∃ λ (W : C → Set ℓ)
+      → ∀ c → WISC (F c) C W
 
--- WISC : ∀ {ℓY} ℓI ℓA ℓB ℓα → (Y : Set ℓY)
---      → Set (ℓY ⊔ lsuc ℓI ⊔ lsuc ℓA ⊔ lsuc ℓB ⊔ lsuc ℓα)
--- WISC ℓI ℓA ℓB ℓα Y = ΣP (CoverFamily Y ℓI ℓA ℓα) (IsWISCFamily ℓB ℓα Y)
+module _  where
+  open import QIT.Container.Base
+  open import Data.Nat
+  data S : Set where
+    zeroˢ : S
+    sucˢ : S
+    supˢ : S
+  data P : S → Set where
+    sucᵖ : P sucˢ
+    supᵖ : ℕ → P supˢ
+  BT : Set
+  BT = W S P
 
--- OWISC : ∀ {ℓY} ℓI ℓA ℓB ℓα ℓ< → (Y : Set ℓY)
---       → Set (ℓY ⊔ lsuc ℓI ⊔ lsuc ℓA ⊔ lsuc ℓB ⊔ lsuc ℓα ⊔ lsuc ℓ<)
--- OWISC {ℓY} ℓI ℓA ℓB ℓα ℓ< Y = ΣP (OrdCoverFamily Y ℓI ℓA ℓα ℓ<) (IsOWISCFamily ℓB Y)
+  
+
+  encode : BT → Ordinal ℓ0 ℓ0
+  encode (sup (zeroˢ , _)) = {!!}
+  encode (sup (sucˢ , x)) = {!!}
+  encode (sup (supˢ , x)) = {!!}
+
+  module _ (α : ℕ → Ordinal ℓ0 ℓ0) (r : ∀ n → ∃ λ t → encode t ≡ α n)  (wℕ : WISC ℕ S P) where
+    

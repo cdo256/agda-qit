@@ -5,43 +5,7 @@ open import QIT.Prop
 open import Data.List
 open import QIT.Relation.Subset
 
-𝓟 : ∀ {ℓ𝓤} ℓ𝓟 → (𝓤 : Set ℓ𝓤) → Set (ℓ𝓤 ⊔ lsuc ℓ𝓟)
-𝓟 ℓ𝓟  𝓤 = 𝓤 → Prop ℓ𝓟
-
-module _ {ℓ𝓤 ℓ𝓟} {𝓤 : Set ℓ𝓤} where
-  𝓟𝓤 = 𝓟 ℓ𝓟 𝓤
-
-  infix 30 _∈_
-  infix 40 _∪_ _∩_
-  _∈_ : (x : 𝓤) (X : 𝓟𝓤) → Prop ℓ𝓟
-  x ∈ X = X x
-
-  ∅ : 𝓟𝓤
-  ∅ _ = ⊥p*
-
-  𝓤̇ : 𝓟𝓤
-  𝓤̇ _ = ⊤p*
-
-  [_]ᴾ : List 𝓤 → 𝓟 (ℓ𝓤 ⊔ ℓ𝓟) 𝓤
-  [ [] ]ᴾ _ = ⊥p*
-  [ x ∷ xs ]ᴾ y = (x ≡ y) ∨ ([ xs ]ᴾ y)
-
-  _∪_ : 𝓟𝓤 → 𝓟𝓤 → 𝓟𝓤
-  (X ∪ Y) x = x ∈ X ∨ x ∈ Y
-
-  _∩_ : 𝓟𝓤 → 𝓟𝓤 → 𝓟𝓤
-  (X ∩ Y) x = x ∈ X ∧ x ∈ Y
-
-  ⋃ : ∀ {ℓI} (I : Set ℓI) → (I → 𝓟𝓤) → 𝓟 (ℓ𝓟 ⊔ ℓI) 𝓤
-  ⋃ I X x = ∃ λ i → x ∈ X i
-
-  ⋂ : ∀ {ℓI} (I : Set ℓI) → (I → 𝓟𝓤) → 𝓟 (ℓ𝓟 ⊔ ℓI) 𝓤
-  ⋂ I X x = ∀ i → x ∈ X i
-
-  record _↔ₛ_ (X Y : 𝓟𝓤) : Set (ℓ𝓟 ⊔ ℓ𝓤) where
-    field
-      to   : ∀ x → X x → Y x
-      from : ∀ x → Y x → X x
+open Subset
 
 infix 40 _×ˢ_ _+ˢ_
 

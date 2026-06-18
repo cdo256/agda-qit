@@ -161,3 +161,6 @@ dtrans B refl refl refl refl = refl
    → (p : a1 ≡ a2) (q : subst B p b1 ≡ b2)
    → _≡_ {A = Σ A B} (a1 , b1) (a2 , b2)
 Σ≡ refl refl = refl
+
+≡→⇔ : ∀ {ℓA} {A B : Prop ℓA} → A ≡ B → A ⇔ B
+≡→⇔ {A = A} p = substp (A ⇔_) p ⇔refl

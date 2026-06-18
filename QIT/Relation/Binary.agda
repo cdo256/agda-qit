@@ -11,6 +11,9 @@ module _ {ℓA ℓR} {A : Set ℓA} (R : BinaryRel A ℓR) where
   Symmetric : Prop (ℓA ⊔ ℓR)
   Symmetric = ∀ {x y} → R x y → R y x
 
+  AntiSymmetric : Prop (ℓA ⊔ ℓR)
+  AntiSymmetric = ∀ {x y} → R x y → R y x → x ≡ y
+
   Transitive : Prop (ℓA ⊔ ℓR)
   Transitive = ∀ {x y z} → R x y → R y z → R x z
 
@@ -33,6 +36,12 @@ module _ {ℓA ℓR} {A : Set ℓA} (R : BinaryRel A ℓR) where
     field
       refl  : Reflexive
       trans : Transitive
+
+  record IsPartialOrder : Set (ℓR ⊔ ℓA) where
+    field
+      refl    : Reflexive
+      antisym : AntiSymmetric
+      trans   : Transitive
 
 Preorder : ∀ {ℓA} (S : Set ℓA) → ∀ ℓR → Set (ℓA ⊔ lsuc ℓR)
 Preorder S ℓR = Σ (BinaryRel S ℓR) IsPreorder

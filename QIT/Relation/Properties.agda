@@ -5,6 +5,7 @@ open import QIT.Prop
 open import QIT.Relation.Base
 open import QIT.Relation.Subset
 open import QIT.Relation.Nullary
+open import QIT.Relation.Binary
 import Data.Bool as Bool
 open Bool using (Bool; true; false)
 
@@ -22,3 +23,8 @@ Prop≅hProp-sect
   : ∀ {ℓA} → (A : hProp ℓA)
   → Prop→hProp (hProp→Prop A) .fst ↔ A .fst
 Prop≅hProp-sect (A , isPropA) = A!C-Prop A isPropA
+
+module _ {ℓA ℓ<} (A : Set ℓA) (_<_ : A → A → Prop ℓ<) where
+  Acc-irrefl : ∀ {α} → Acc _<_ α → ¬ (α < α)
+  Acc-irrefl (acc rs) α<α =
+    Acc-irrefl (rs _ α<α) α<α
