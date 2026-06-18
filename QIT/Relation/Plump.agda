@@ -3,6 +3,9 @@ open import QIT.Prop
 open import QIT.Relation.Binary
 open import QIT.Container.Base
 
+
+-- DEPRICATED
+
 module QIT.Relation.Plump {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
 
 open import QIT.Plump.W.Base S P public

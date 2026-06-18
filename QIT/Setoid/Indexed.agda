@@ -12,13 +12,13 @@ record Setoid ℓI ℓA ℓR : Set (lsuc (ℓI ⊔ ℓA ⊔ ℓR)) where
   field
     I             : Set ℓI
     A             : I → Set ℓA
-    R             : IndexedBinaryRel A ℓR
-    isEquivalence : IndexedBinary.IsEquivalence A R
+    R             : IndexedBinaryRelˢ A ℓR
+    isEquivalence : IndexedBinary.IsEquivalenceˢ A R
 
-  open IndexedBinary.IsEquivalence isEquivalence public
+  open IndexedBinary.IsEquivalenceˢ isEquivalence public
 
   infix 4 _≈_
-  _≈_ : ∀ {i j} → A i → A j → Prop _
+  _≈_ : ∀ {i j} → A i → A j → Set _
   _≈_ {i} {j} x y = R i j x y
 
 
@@ -28,7 +28,7 @@ module _ {ℓI ℓA ℓR} (S : Setoid ℓI ℓA ℓR) where
   ⟨_⟩ : (S .Setoid.I → Set ℓA)
   ⟨_⟩ = A
 
-  _[_≈_] : ∀ {i j} → A i → A j → Prop _
+  _[_≈_] : ∀ {i j} → A i → A j → Set _
   _[_≈_] {i} {j} x y = R i j x y
 
   -- Equational reasoning syntax for indexed setoids.

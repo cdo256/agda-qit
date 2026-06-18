@@ -122,10 +122,10 @@ dsubst₂ C {a1} {a2} {b1} {b2} p q x =
   transport (dcong₂ C p q) x
 
 isPropBox : ∀ {ℓ} {P : Prop ℓ} (p q : Box P) → p ≡ q
-isPropBox (box p) (box q) = r refl
-  where
-  r : p ≡ᵖ q → box p ≡ box q
-  r refl = refl
+isPropBox (box p) (box q) = refl
+
+isPropBoxˢ : ∀ {ℓ} {P : Prop ℓ} (p q : Box P) → p ≡ˢ q
+isPropBoxˢ (box p) (box q) = reflˢ
 
 funExt⁻ : ∀ {ℓA ℓB} → {A : Set ℓA} {B : A → Set ℓB} {f g : ∀ x → B x}
         → f ≡ g → (∀ x → f x ≡ g x)

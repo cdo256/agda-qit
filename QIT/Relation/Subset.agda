@@ -29,9 +29,21 @@ infixr 4 _,_
   C : ∀ a2 → a1 ≡ a2 → Prop (a ⊔ b)
   C a2 p = ∀ (b1 : B a1) (b2 : B a2) → _≡_ {A = ΣP A B} (a1 , b1) (a2 , b2)
 
+ΣP≡'ˢ : ∀ {a b} {A : Set a} {B : A → Prop b}
+    → (a1 a2 : A) → a1 ≡ˢ a2
+    → ∀ (b1 : B a1) (b2 : B a2) → _≡ˢ_ {A = ΣP A B} (a1 , b1) (a2 , b2)
+ΣP≡'ˢ {a} {b} {A = A} {B = B} a1 a2 p = Jˢ C p λ b1 b2 → ≡.reflˢ
+  where
+  C : ∀ a2 → a1 ≡ˢ a2 → Set (a ⊔ b)
+  C a2 p = ∀ (b1 : B a1) (b2 : B a2) → _≡ˢ_ {A = ΣP A B} (a1 , b1) (a2 , b2)
+
 ΣP≡ : ∀ {a b} {A : Set a} {B : A → Prop b}
     → (x y : ΣP A B) → x .fst ≡ y .fst → x ≡ y
 ΣP≡ x y p = ΣP≡' (x .fst) (y .fst) p (x .snd) (y .snd)
+
+ΣP≡ˢ : ∀ {a b} {A : Set a} {B : A → Prop b}
+    → (x y : ΣP A B) → x .fst ≡ˢ y .fst → x ≡ˢ y
+ΣP≡ˢ x y p = ΣP≡'ˢ (x .fst) (y .fst) p (x .snd) (y .snd)
 
 -- Logical existence on predicates.
 ∃ : ∀ {a b} {A : Set a} → (A → Prop b) → Prop (a ⊔ b)
@@ -41,11 +53,22 @@ infixr 4 _,_
 ∃' : ∀ {a b} {A : Set a} → (A → Set b) → Prop (a ⊔ b)
 ∃' {A = A} B = ∥ Σ A B ∥
 
-substΣP : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB} {a1 a2 : A} (p : a1 ≡ a2) (b : B a1) → Σ A B
+substΣP : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB}
+        → {a1 a2 : A} (p : a1 ≡ a2) (b : B a1) → Σ A B
 substΣP {B = B} {a2 = a2} p b = a2 , subst B p b
+
+substΣPˢ : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB}
+        → {a1 a2 : A} (p : a1 ≡ˢ a2) (b : B a1) → Σ A B
+substΣPˢ {B = B} {a2 = a2} p b = a2 , substˢ B p b
 
 Singleton : ∀ {ℓA} {A : Set ℓA} (a : A) → Set ℓA
 Singleton {A = A} a = ΣP A (_≡ a)
 
+Singletonˢ : ∀ {ℓA} {A : Set ℓA} (a : A) → Set ℓA
+Singletonˢ {A = A} a = Σ A (_≡ˢ a)
+
 inspect : ∀ {ℓA} {A : Set ℓA} (x : A) → Singleton x
 inspect x = x , ≡.refl
+
+inspectˢ : ∀ {ℓA} {A : Set ℓA} (x : A) → Singletonˢ x
+inspectˢ x = x , ≡.reflˢ

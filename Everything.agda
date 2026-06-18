@@ -28,6 +28,7 @@ import QIT.Relation.WellFounded
 import QIT.Relation.Tests
 import QIT.Relation.BarInduction
 import QIT.Relation.SetQuotient
+import QIT.Relation.SetQuotientProp
 import QIT.Relation.Ordinal
 import QIT.Relation.WISC
 import QIT.Relation

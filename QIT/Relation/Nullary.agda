@@ -63,22 +63,39 @@ const a _ = a
 isProp : ∀ {ℓA} → Set ℓA → Prop ℓA
 isProp A = ∀ (x y : A) → x ≡ y
 
+isPropˢ : ∀ {ℓA} → Set ℓA → Set ℓA
+isPropˢ A = ∀ (x y : A) → x ≡ˢ y
+
 hProp : ∀ ℓA → Set (lsuc ℓA)
 hProp ℓA = ΣP (Set ℓA) isProp
+
+hPropˢ : ∀ ℓA → Set (lsuc ℓA)
+hPropˢ ℓA = ΣP (Set ℓA) isProp
 
 hProp→Prop : ∀ {ℓA} → hProp ℓA → Prop ℓA
 hProp→Prop (A , _) = ∥ A ∥
 
-Prop→hProp : ∀ {ℓA} → Prop ℓA → hProp ℓA
-Prop→hProp A = Box A , ≡.isPropBox
+hProp→ˢProp : ∀ {ℓA} → hPropˢ ℓA → Prop ℓA
+hProp→ˢProp (A , _) = ∥ A ∥
+
+Prop→hPropˢ : ∀ {ℓA} → Prop ℓA → hPropˢ ℓA
+Prop→hPropˢ A = Box A , ≡.isPropBox
 
 isContr : ∀ {ℓA} → Set ℓA → Prop ℓA
 isContr A = ∃ λ (x : A) → ∀ y → x ≡ y
+
+isContrˢ : ∀ {ℓA} → Set ℓA → Set ℓA
+isContrˢ A = Σ A λ x → ∀ y → x ≡ˢ y
 
 mkIsContr
   : ∀ {ℓA} → (A : Set ℓA)
   → ∥ A ∥ → isProp A → isContr A
 mkIsContr A ∣ x ∣ isPropA = ∣ x , isPropA x ∣
+
+mkIsContrˢ
+  : ∀ {ℓA} → (A : Set ℓA)
+  → A → isPropˢ A → isContrˢ A
+mkIsContrˢ A x isPropA = x , isPropA x
 
 Σ≡Prop
   : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB}
@@ -87,8 +104,22 @@ mkIsContr A ∣ x ∣ isPropA = ∣ x , isPropA x ∣
 Σ≡Prop pB {x , u} {x , v} ≡.refl =
   ≡.cong (x ,_) (pB x u v)
 
+Σ≡Propˢ
+  : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB}
+  → ((x : A) → isPropˢ (B x)) → {u v : Σ A B}
+  → (p : u .proj₁ ≡ˢ v .proj₁) → u ≡ˢ v
+Σ≡Propˢ pB {x , u} {x , v} reflˢ =
+  congˢ (x ,_) (pB x u v)
+
 isSetSet : ∀ {ℓA} {A : Set ℓA} {x y : A} (p q : x ≡ y) → p ≡ᵖ q
 isSetSet ≡.refl ≡.refl = ≡.refl
 
+isSetSetˢ : ∀ {ℓA} {A : Set ℓA} {x y : A} (p q : x ≡ˢ y) → p ≡ q
+isSetSetˢ reflˢ reflˢ = ≡.refl
+
 postulate
   A!C : ∀ {ℓX} (X : Set ℓX) → isContr X → X
+
+-- Trivial
+A!Cˢ : ∀ {ℓX} (X : Set ℓX) → isContrˢ X → X
+A!Cˢ X (x , isPropX) = x

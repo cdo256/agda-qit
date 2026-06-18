@@ -84,3 +84,9 @@ module ≡ˢ-Reasoning {ℓ} {A : Set ℓ} where
   infix 3 _∎
   _∎ : ∀ (x : A) → x ≡ˢ x
   x ∎ = reflˢ
+
+
+Jpˢ : ∀ {ℓA ℓB} {A : Set ℓA} {x : A}
+  → (B : (y : A) → x ≡ˢ y → Prop ℓB)
+  → {y : A} (p : x ≡ˢ y) → B x reflˢ → B y p
+Jpˢ B reflˢ r = r

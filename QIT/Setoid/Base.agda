@@ -28,18 +28,18 @@ record Setoid ℓ ℓ' : Set (lsuc (ℓ ⊔ ℓ')) where
   infix 4 _≈_
   field
     Carrier       : Set ℓ
-    _≈_           : BinaryRel Carrier ℓ'
-    isEquivalence : IsEquivalence _≈_
+    _≈_           : BinaryRelˢ Carrier ℓ'
+    isEquivalence : IsEquivalenceˢ _≈_
 
   -- Export the equivalence properties (refl, sym, trans) for convenient use
-  open IsEquivalence isEquivalence public
+  open IsEquivalenceˢ isEquivalence public
 
 -- Convenient syntactic forms so we don't have to open each setoid.
 ⟨_⟩ : ∀ {ℓ ℓ'} → Setoid ℓ ℓ' → Set ℓ
 ⟨ S ⟩ = S .Setoid.Carrier
 
 -- Infix notation for the equivalence relation of a setoid.
-_[_≈_] : ∀ {ℓ ℓ'} → (S : Setoid ℓ ℓ') → (x y : S .Setoid.Carrier) → Prop _
+_[_≈_] : ∀ {ℓ ℓ'} → (S : Setoid ℓ ℓ') → (x y : S .Setoid.Carrier) → Set _
 S [ x ≈ y ] = S .Setoid._≈_ x y
 
 -- Standard chain reasoning syntax for setoid equivalence.
@@ -76,12 +76,16 @@ module ≈syntax {ℓ ℓ'} {S : Setoid ℓ ℓ'} where
 _/≡ : ∀ {ℓ} (B : Set ℓ) → Setoid ℓ ℓ
 _/≡ B = record
   { Carrier = B
-  ; _≈_ = _≡_
-  ; isEquivalence = isEquiv-≡ B }
+  ; _≈_ = _≡ˢ_
+  ; isEquivalence = isEquiv-≡ˢ B }
 
 -- If x ≡ y then x ≈ y in any setoid containing them.
 ≡→≈ : ∀ {ℓ ℓ'} → (A : Setoid ℓ ℓ') → {x y : ⟨ A ⟩} → x ≡ y → A [ x ≈ y ]
-≡→≈ A {x} p = unbox (subst (λ ○ → Box (x ≈ ○)) p (box refl))
+≡→≈ A {x} p = subst (x ≈_) p refl
+  where open Setoid A
+
+≡ˢ→≈ : ∀ {ℓ ℓ'} → (A : Setoid ℓ ℓ') → {x y : ⟨ A ⟩} → x ≡ˢ y → A [ x ≈ y ]
+≡ˢ→≈ A {x} p = substˢ (x ≈_) p refl
   where open Setoid A
 
 
@@ -91,11 +95,11 @@ _/≡ B = record
 LiftSetoid : ∀ {ℓ ℓ'} (ℓl ℓl' : Level) → Setoid ℓ ℓ' → Setoid (ℓ ⊔ ℓl) (ℓ' ⊔ ℓl')
 LiftSetoid ℓl ℓl' A = record
   { Carrier = Lift ℓl (Setoid.Carrier A)
-  ; _≈_ = λ x y → LiftP ℓl' (Setoid._≈_ A (lower x) (lower y))
+  ; _≈_ = λ x y → Lift ℓl' (Setoid._≈_ A (lower x) (lower y))
   ; isEquivalence = record
-    { refl = liftp (Setoid.refl A)
-    ; sym = λ (liftp p) → liftp (Setoid.sym A p)
-    ; trans = λ (liftp p) (liftp q) → liftp (Setoid.trans A p q)
+    { refl = lift (Setoid.refl A)
+    ; sym = λ (lift p) → lift (Setoid.sym A p)
+    ; trans = λ (lift p) (lift q) → lift (Setoid.trans A p q)
     }
   }
 

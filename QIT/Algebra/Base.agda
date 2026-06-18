@@ -5,7 +5,7 @@ open import QIT.Container.Base hiding (sup)
 open import QIT.Category.Base
 open import QIT.Category.Set
 import QIT.Set.Base as Set
-open Set using (_≡h_) renaming (_∘_ to _∘ₛ_)
+open Set using (_≡h_; _≡hˢ_) renaming (_∘_ to _∘ₛ_)
 open import QIT.Functor.Base
 
 -- Define algebras over setoid endofunctors. An algebra for a functor F

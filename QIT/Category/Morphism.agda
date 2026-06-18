@@ -30,8 +30,8 @@ IsoFlip iso = record { f = f⁻¹ ; f⁻¹ = f ; linv = rinv ; rinv = linv }
   where
   open Iso iso
 
-_≅_ : ∀ x y → Prop (ℓCh ⊔ ℓCe)
-x ≅ y = ∥ Iso x y ∥
+-- _≅_ : ∀ x y → Prop (ℓCh ⊔ ℓCe)
+-- x ≅ y = ∥ Iso x y ∥
 
 IsIso→Iso : ∀ {x y} {f : C [ x , y ]} → IsIso f → Iso x y
 IsIso→Iso {x} {y} {f} isIso = record
@@ -42,7 +42,7 @@ IsIso→Iso {x} {y} {f} isIso = record
   where
   open IsIso isIso
 
-isEquivalenceIso : IsEquivalence _≅_
+isEquivalenceIso : IsEquivalenceˢ Iso
 isEquivalenceIso = record
   { refl = isReflexive
   ; sym = isSymmetric
@@ -50,23 +50,23 @@ isEquivalenceIso = record
   }
   where
   -- Every object is isomorphic to itself via the identity morphism
-  isReflexive : Reflexive _≅_
-  isReflexive {S} = ∣ p ∣
+  isReflexive : Reflexiveˢ Iso
+  isReflexive {S} = p
     where
     p : Iso S S
     p = record { f = id ; f⁻¹ = id ; linv = identityˡ ; rinv = identity² }
 
   -- If S ≅ T then T ≅ S by flipping the isomorphism
-  isSymmetric : Symmetric _≅_
-  isSymmetric {S} {T} ∣ p ∣ = ∣ q ∣
+  isSymmetric : Symmetricˢ Iso
+  isSymmetric {S} {T} p = q
     where
     module p = Iso p
     q : Iso T S
     q = record { f = p.f⁻¹ ; f⁻¹ = p.f ; linv = p.rinv ; rinv = p.linv }
 
   -- Composition of isomorphisms: if S ≅ T and T ≅ U then S ≅ U
-  isTransitive : Transitive _≅_
-  isTransitive {S} {T} {U} ∣ p ∣ ∣ q ∣ = ∣ r ∣
+  isTransitive : Transitiveˢ Iso
+  isTransitive {S} {T} {U} p q = r
     where
     module p = Iso p
     module q = Iso q
@@ -106,6 +106,6 @@ isEquivalenceIso = record
 IsoSetoid : Setoid _ _
 IsoSetoid = record
   { Carrier = Obj
-  ; _≈_ = _≅_
+  ; _≈_ = Iso
   ; isEquivalence = isEquivalenceIso
   }

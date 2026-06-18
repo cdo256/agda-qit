@@ -26,3 +26,27 @@ module _
       refl  : Reflexive
       sym   : Symmetric
       trans : Transitive
+
+module _ 
+  {ℓI ℓA ℓR} {I : Set ℓI} (A : I → Set ℓA) (R : IndexedBinaryRelˢ A ℓR)
+  where
+
+  private
+    infix 4 _≈_
+    _≈_ : ∀ {i j} → A i → A j → Set ℓR
+    _≈_ {i} {j} x y = R i j x y
+
+  Reflexiveˢ : Set (ℓI ⊔ ℓA ⊔ ℓR)
+  Reflexiveˢ = ∀ {i} {x : A i} → x ≈ x
+
+  Symmetricˢ : Set (ℓI ⊔ ℓA ⊔ ℓR)
+  Symmetricˢ = ∀ {i j} {x : A i} {y : A j} → x ≈ y → y ≈ x
+
+  Transitiveˢ : Set (ℓI ⊔ ℓA ⊔ ℓR)
+  Transitiveˢ = ∀ {i j k} {x : A i} {y : A j} {z : A k} → x ≈ y → y ≈ z → x ≈ z
+
+  record IsEquivalenceˢ : Set (ℓI ⊔ ℓA ⊔ ℓR) where
+    field
+      refl  : Reflexiveˢ
+      sym   : Symmetricˢ
+      trans : Transitiveˢ

@@ -12,6 +12,7 @@ open import QIT.Category.Preorder
 open import QIT.Category.Set
 open import QIT.Functor.Base
 
+-- TODO: Check and clean up
 Family : ∀ ℓ ℓ' → Set (lsuc ℓ ⊔ lsuc ℓ')
 Family ℓ ℓ' = Σ (Set ℓ) λ I → I → Set ℓ'
 

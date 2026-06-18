@@ -14,7 +14,7 @@ record Category (o ℓ e : Level) : Set (lsuc (o ⊔ ℓ ⊔ e)) where
   field
     Obj : Set o
     _⇒_ : Obj → Obj → Set ℓ
-    _≈_ : ∀ {A B} → BinaryRel (A ⇒ B) e
+    _≈_ : ∀ {A B} → BinaryRelˢ (A ⇒ B) e
 
     id  : ∀ {A} → (A ⇒ A)
     _∘_ : ∀ {A B C} → (B ⇒ C) → (A ⇒ B) → (A ⇒ C)
@@ -30,10 +30,10 @@ record Category (o ℓ e : Level) : Set (lsuc (o ⊔ ℓ ⊔ e)) where
     -- We add a proof of "neutral" identity proof, in order to ensure the opposite of
     -- constant functor is definitionally equal to itself.
     identity² : ∀ {A} → id ∘ id {A} ≈ id {A}
-    equiv     : ∀ {A B} → Binary.IsEquivalence (_≈_ {A} {B})
+    equiv     : ∀ {A B} → Binary.IsEquivalenceˢ (_≈_ {A} {B})
     ∘-resp-≈  : ∀ {A B C} {f h : B ⇒ C} {g i : A ⇒ B} → f ≈ h → g ≈ i → f ∘ g ≈ h ∘ i
 
-  module Equiv {A B : Obj} = Binary.IsEquivalence (equiv {A} {B})
+  module Equiv {A B : Obj} = Binary.IsEquivalenceˢ (equiv {A} {B})
 
   open Equiv public
 
@@ -78,7 +78,7 @@ module _ {o ℓ e : Level} where
   _[_,_] : (C : Category o ℓ e) → (X : Category.Obj C) → (Y : Category.Obj C) → Set ℓ
   _[_,_] = Category._⇒_
 
-  _[_≈_] : (C : Category o ℓ e) → ∀ {X Y} (f g : C [ X , Y ]) → Prop e
+  _[_≈_] : (C : Category o ℓ e) → ∀ {X Y} (f g : C [ X , Y ]) → Set e
   _[_≈_] = Category._≈_
 
   _[_∘_] : (C : Category o ℓ e) → ∀ {X Y Z} (f : C [ Y , Z ]) → (g : C [ X , Y ]) → C [ X , Z ]

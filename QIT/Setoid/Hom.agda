@@ -1,7 +1,7 @@
 open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Setoid.Base
-open import QIT.Relation.Binary using (IsEquivalence)
+open import QIT.Relation.Binary using (IsEquivalenceˢ)
 
 -- Define homomorphisms (structure-preserving maps) between setoids.
 -- A setoid homomorphism f : S → T is a function that respects equivalence:
@@ -34,7 +34,7 @@ idHom {S = S} = record
      → Hom (X /≡) Y
 ≡Hom {Y = Y} f = record
   { to = f
-  ; cong = λ p → ≡→≈ Y (≡.cong f p) }
+  ; cong = λ p → ≡ˢ→≈ Y (congˢ f p) }
 
 -- Equivalence relation on homomorphisms: pointwise equivalence in codomain.
 -- Two homomorphisms f, g are equivalent if f(x) ≈_T g(x) for all x.
@@ -43,7 +43,7 @@ module _ {ℓS ℓS' ℓT ℓT'} {S : Setoid ℓS ℓS'} {T : Setoid ℓT ℓT'}
   private
     module T = Setoid T
 
-  _≈h_ : (f g : Hom S T) → Prop (ℓS ⊔ ℓT')
+  _≈h_ : (f g : Hom S T) → Set (ℓS ⊔ ℓT')
   _≈h_ f g = ∀ {x} → f.to x T.≈ g.to x
     where
     module f = Hom f
@@ -59,7 +59,7 @@ module _ {ℓS ℓS' ℓT ℓT'} {S : Setoid ℓS ℓS'} {T : Setoid ℓT ℓT'}
   ≈h-trans p q = T.trans p q
 
   -- IsEquivalence instance for homomorphism equivalence
-  ≈h-isEquivalence : IsEquivalence _≈h_
+  ≈h-isEquivalence : IsEquivalenceˢ _≈h_
   ≈h-isEquivalence = record
     { refl = λ {f} → ≈h-refl {f = f}
     ; sym = λ {f g} → ≈h-sym {f = f} {g = g}

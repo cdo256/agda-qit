@@ -21,13 +21,13 @@ record StrictCategory (o ℓ : Level) : Set (lsuc (o ⊔ ℓ)) where
     _∘_ : ∀ {A B C} → (B ⇒ C) → (A ⇒ B) → (A ⇒ C)
 
   field
-    assoc     : ∀ {A B C D} {f : A ⇒ B} {g : B ⇒ C} {h : C ⇒ D} → (h ∘ g) ∘ f ≡ h ∘ (g ∘ f)
+    assoc     : ∀ {A B C D} {f : A ⇒ B} {g : B ⇒ C} {h : C ⇒ D} → (h ∘ g) ∘ f ≡ˢ h ∘ (g ∘ f)
     -- We add a symmetric proof of associativity so that the opposite category of the
     -- opposite category is definitionally equal to the original category. See how
     -- `op` is implemented.
-    sym-assoc : ∀ {A B C D} {f : A ⇒ B} {g : B ⇒ C} {h : C ⇒ D} → h ∘ (g ∘ f) ≡ (h ∘ g) ∘ f
-    identityˡ : ∀ {A B} {f : A ⇒ B} → id ∘ f ≡ f
-    identityʳ : ∀ {A B} {f : A ⇒ B} → f ∘ id ≡ f
+    sym-assoc : ∀ {A B C D} {f : A ⇒ B} {g : B ⇒ C} {h : C ⇒ D} → h ∘ (g ∘ f) ≡ˢ (h ∘ g) ∘ f
+    identityˡ : ∀ {A B} {f : A ⇒ B} → id ∘ f ≡ˢ f
+    identityʳ : ∀ {A B} {f : A ⇒ B} → f ∘ id ≡ˢ f
     -- We add a proof of "neutral" identity proof, in order to ensure the opposite of
     -- constant functor is definitionally equal to itself.
     identity² : ∀ {A} → id ∘ id {A} ≡ id {A}
@@ -75,7 +75,7 @@ StrictCategory→Category : ∀ {ℓCo ℓCh} → StrictCategory ℓCo ℓCh →
 StrictCategory→Category C = record
   { Obj = Obj
   ; _⇒_ = _⇒_
-  ; _≈_ = _≡_
+  ; _≈_ = _≡ˢ_
   ; id = id
   ; _∘_ = _∘_
   ; assoc = assoc
@@ -83,7 +83,7 @@ StrictCategory→Category C = record
   ; identityˡ = identityˡ
   ; identityʳ = identityʳ
   ; identity² = λ {A} → identityˡ
-  ; equiv = isEquiv-≡ _
-  ; ∘-resp-≈ = ≡.cong₂ _∘_
+  ; equiv = isEquiv-≡ˢ _
+  ; ∘-resp-≈ = cong₂ˢ _∘_
   }
   where open StrictCategory C
