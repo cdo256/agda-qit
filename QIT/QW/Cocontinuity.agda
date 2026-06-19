@@ -4,6 +4,7 @@ open import QIT.Setoid
 open import QIT.Relation.Base
 open import QIT.Relation.Binary
 open import QIT.Relation.Subset
+open import QIT.Relation.Nullary
 open import QIT.Container.Base
 open import QIT.Functor.Base
 open import QIT.Functor.Properties
@@ -16,6 +17,7 @@ open import QIT.QW.Signature
 module QIT.QW.Cocontinuity {ℓS ℓP ℓE ℓV}
   (sig : Sig ℓS ℓP ℓE ℓV)
   (propExt : PropExt)
+  (a!c : A!C)
   where
 
 open Sig sig
@@ -623,7 +625,7 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
                             (isSectionSect (f x)))
 
       iso : Iso (Colim/≈ D^X) (X → Colim/≈ D)
-      iso = Bijection→Iso ϕ ((λ p → ϕ-inj (≡.funExt⁻ p)) , ϕ-surj)
+      iso = Bijection→Iso a!c ϕ ((λ p → ϕ-inj (≡.funExt⁻ p)) , ϕ-surj)
 
       ψ : (X → Colim/≈ D) → Colim/≈ D^X
       ψ = f⁻¹

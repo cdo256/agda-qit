@@ -1,9 +1,15 @@
 open import QIT.Prelude
 open import QIT.Prop
+open import QIT.Relation.Binary
+open import QIT.Relation.Nullary
+open import QIT.Relation.Subset
+open import QIT.Function.Base
+open import QIT.Functor.Base
 
 module QIT.Examples.Mobile.Cocontinuity
   (I : Set)
   (propExt : PropExt)
+  (a!c : A!C)
   where
 
 open import QIT.Examples.Mobile.Base I
@@ -11,7 +17,7 @@ open import QIT.Examples.Mobile.Base I
 import QIT.Plump.Algebra as Plump
 import QIT.Plump.W.Base as PlumpW
 import QIT.QW.Stage sig propExt as Stage
-import QIT.QW.Cocontinuity sig propExt as QW
+import QIT.QW.Cocontinuity sig propExt a!c as QW
 
 module ZW = PlumpW Sᵀ Pᵀ
 module ZAlg = Plump ZW.Sᶻ ZW.Pᶻ
@@ -21,10 +27,6 @@ module WithZ
   (extZA : ZAlg.IsExtensional ZA)
   where
 
-  open import QIT.Relation.Binary
-  open import QIT.Relation.Subset
-  open import QIT.Function.Base
-  open import QIT.Functor.Base
   open import QIT.Container.StrictFunctor Sᵀ Pᵀ (lsuc ℓ0)
 
   module SZ = Stage.WithZ ZA

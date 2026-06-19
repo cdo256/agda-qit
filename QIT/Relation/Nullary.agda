@@ -79,6 +79,5 @@ mkIsContr A ∣ x ∣ isPropA = ∣ x , isPropA x ∣
 isSetSet : ∀ {ℓA} {A : Set ℓA} {x y : A} (p q : x ≡ y) → p ≡ᵖ q
 isSetSet ≡.refl ≡.refl = ≡.refl
 
-postulate
-  A!C : ∀ {ℓX} (X : Set ℓX) → isContr X → X
-
+A!C : Agda.Primitive.Setω
+A!C = ∀ {ℓX} (X : Set ℓX) → isContr X → X

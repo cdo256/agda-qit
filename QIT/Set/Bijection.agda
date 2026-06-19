@@ -7,7 +7,6 @@ open import QIT.Relation.Nullary
 open import QIT.Category.Base
 open import QIT.Category.Set
 
-
 module QIT.Set.Bijection where
 
 module _ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} where
@@ -28,7 +27,7 @@ module _ {ℓA ℓP ℓB} {A : Set ℓA} {P : A → Prop ℓP} {Q : A → Prop �
   injΣP-restrict P⊆Q f f-inj {x , px} {y , py} r =
     ΣP≡ (x , px) (y , py) (≡.cong fst (f-inj r))
 
-module _ {ℓX} {A B : Set ℓX} where
+module _ {ℓX} {A B : Set ℓX} (a!c : A!C) where
   open import QIT.Category.Morphism (SetCat ℓX)
 
   open Category (SetCat ℓX)
@@ -40,7 +39,7 @@ module _ {ℓX} {A B : Set ℓX} where
     T y = ΣP A (λ x → f x ≡ y)
 
     f⁻¹T : ∀ y → T y
-    f⁻¹T y = A!C (T y) (isContrT (surj y))
+    f⁻¹T y = a!c (T y) (isContrT (surj y))
       where
       isContrT : (∃ λ x → f x ≡ y) → isContr (T y)
       isContrT ∣ x , ≡.refl ∣ = ∣ (x , ≡.refl) , (λ (x' , fx'≡fx) → ΣP≡ (x , _) (x' , _) (inj (≡.sym fx'≡fx))) ∣
@@ -56,13 +55,13 @@ module _ {ℓX} {A B : Set ℓX} where
       ; rinv = λ {y} → (snd (f⁻¹T y)) }
 
 
-module _ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} where
+module _ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} (a!c : A!C) where
   open import QIT.Category.Morphism (SetCat (ℓA ⊔ ℓB))
 
   open Category (SetCat (ℓA ⊔ ℓB))
 
   HetBijection→Iso : (f : A → B) → IsBijection f → Lift ℓB A ≅ Lift ℓA B
-  HetBijection→Iso f (inj , surj) = ∣ Bijection→Iso f' (inj' , surj') ∣
+  HetBijection→Iso f (inj , surj) = ∣ Bijection→Iso a!c f' (inj' , surj') ∣
     where
     f' : Lift ℓB A → Lift ℓA B
     f' (lift x) = lift (f x)

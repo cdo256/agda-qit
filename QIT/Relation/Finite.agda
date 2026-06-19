@@ -32,9 +32,9 @@ module _ {ℓA} where
     i = from x
     j = from y
 
-  isFiniteᵖ→isFinite' : {A : Set ℓA} → isFiniteᵖ A → isFinite' A
-  isFiniteᵖ→isFinite' {A} isFiniteA = 
-    A!C _ isContrΣSz
+  isFiniteᵖ→isFinite' : (a!c : A!C) {A : Set ℓA} → isFiniteᵖ A → isFinite' A
+  isFiniteᵖ→isFinite' a!c {A} isFiniteA = 
+    a!c _ isContrΣSz
     where
     Sz : (n : ℕ) → Prop ℓA
     Sz n = ∥ Fin n ↔ A ∥

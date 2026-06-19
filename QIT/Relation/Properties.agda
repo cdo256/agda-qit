@@ -11,18 +11,19 @@ open Bool using (Bool; true; false)
 
 open import QIT.Function.Base
 
-A!C-Prop : ∀ {ℓX} (X : Set ℓX)
-          → isProp X → (Box ∥ X ∥) ↔ X
-A!C-Prop X isPropX = record
-  { to = λ (box x) → A!C X (mkIsContr X x isPropX)
-  ; from = λ z → box ∣ z ∣
-  ; rinv = λ _ → ≡.isPropBox _ _
-  ; linv = λ _ → isPropX _ _ }
+module _ (a!c : A!C) where
+  a!c-Prop : ∀ {ℓX} (X : Set ℓX)
+            → isProp X → (Box ∥ X ∥) ↔ X
+  a!c-Prop X isPropX = record
+    { to = λ (box x) → a!c X (mkIsContr X x isPropX)
+    ; from = λ z → box ∣ z ∣
+    ; rinv = λ _ → ≡.isPropBox _ _
+    ; linv = λ _ → isPropX _ _ }
 
-Prop≅hProp-sect
-  : ∀ {ℓA} → (A : hProp ℓA)
-  → Prop→hProp (hProp→Prop A) .fst ↔ A .fst
-Prop≅hProp-sect (A , isPropA) = A!C-Prop A isPropA
+  Prop≅hProp-sect
+    : ∀ {ℓA} → (A : hProp ℓA)
+    → Prop→hProp (hProp→Prop A) .fst ↔ A .fst
+  Prop≅hProp-sect (A , isPropA) = a!c-Prop A isPropA
 
 module _ {ℓA ℓ<} (A : Set ℓA) (_<_ : A → A → Prop ℓ<) where
   Acc-irrefl : ∀ {α} → Acc _<_ α → ¬ (α < α)
