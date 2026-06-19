@@ -6,7 +6,9 @@ open import QIT.Setoid.Base renaming (_[_≈_] to _⟦_≈_⟧)
 open import QIT.Relation.Binary using (IsEquivalence)
 import QIT.Relation.SetQuotient as Q
 
-module QIT.Setoid.Quotient where
+module QIT.Setoid.Quotient
+    (propExt : PropExt)
+    where
 
 _/≈ : ∀ {ℓA ℓR} (Ã : Setoid ℓA ℓR) → Set (ℓA ⊔ ℓR)
 Ã /≈ = A Q./ _≈_

@@ -77,10 +77,15 @@ A ⇔ B = (A → B) ∧ (B → A)
      → A ⇔ B → B ⇔ C → A ⇔ C
 ⇔trans (p₁ , p₂) (q₁ , q₂) = (λ z → q₁ (p₁ z)) , (λ z → p₂ (q₂ z))
 
-postulate
-  propExt : ∀ {ℓA} → {A B : Prop ℓA}
-          → A ⇔ B → A ≡ B
+-- postulate
+--   propExt : ∀ {ℓA} → {A B : Prop ℓA}
+--           → A ⇔ B → A ≡ B
 
-P∧Q→P≡Q : ∀ {ℓP} {P Q : Prop ℓP} → P ∧ Q → P ≡ Q
-P∧Q→P≡Q (p , q) = propExt ((λ _ → q) , (λ _ → p))
+PropExt : Agda.Primitive.Propω
+PropExt = ∀ {ℓA} 
+  → {A B : Prop ℓA}
+  → A ⇔ B → A ≡ B
+
+-- P∧Q→P≡Q : ∀ {ℓP} {P Q : Prop ℓP} → P ∧ Q → P ≡ Q
+-- P∧Q→P≡Q (p , q) = propExt ((λ _ → q) , (λ _ → p))
 

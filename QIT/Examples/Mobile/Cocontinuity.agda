@@ -3,14 +3,15 @@ open import QIT.Prop
 
 module QIT.Examples.Mobile.Cocontinuity
   (I : Set)
+  (propExt : PropExt)
   where
 
 open import QIT.Examples.Mobile.Base I
 
 import QIT.Plump.Algebra as Plump
 import QIT.Plump.W.Base as PlumpW
-import QIT.QW.Stage sig as Stage
-import QIT.QW.Cocontinuity as QW
+import QIT.QW.Stage sig propExt as Stage
+import QIT.QW.Cocontinuity sig propExt as QW
 
 module ZW = PlumpW Sᵀ Pᵀ
 module ZAlg = Plump ZW.Sᶻ ZW.Pᶻ
@@ -27,8 +28,7 @@ module WithZ
   open import QIT.Container.StrictFunctor Sᵀ Pᵀ (lsuc ℓ0)
 
   module SZ = Stage.WithZ ZA
-  module C = QW sig
-  module QC = C.WithZ ZA
+  module QC = QW.WithZ ZA
 
   open SZ
   open SZ.Z

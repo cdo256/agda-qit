@@ -3,8 +3,6 @@ open import QIT.Prop
 open import QIT.Relation.Base
 open import QIT.Relation.Binary
 open import QIT.Relation.Subset
-open import QIT.Setoid
-open import QIT.Setoid.Quotient
 open import QIT.Set.Base
 open import QIT.Functor.Base
 open import QIT.Functor.Properties using (restrict-domain)
@@ -14,27 +12,32 @@ open import QIT.Category.Set
 
 module QIT.QW.Colimit.Properties {ℓI} {ℓ≤}
   {I : Set ℓI}
+  (propExt : PropExt)
   (≤p : Preorder I ℓ≤)
   (ℓD ℓD' : Level)
   (P : Functor (PreorderCat I ≤p) (SetCat (ℓD ⊔ ℓD')))
   where
+
+  open import QIT.Setoid
+  import QIT.Setoid.Quotient propExt as Quot
+  open Quot using (_/≈)
 
   private
     module ≤ = IsPreorder (≤p .proj₂)
     _≤_ : BinaryRel I ℓ≤
     _≤_ = ≤p .proj₁
 
-  open import QIT.QW.Colimit.Base ≤p ℓD ℓD' P public
+  open import QIT.QW.Colimit.Base propExt ≤p ℓD ℓD' P public
 
   open Functor P using () renaming (ob to P̂)
   module ≤p = QIT.Category.Preorder I ≤p
-  open SetoidQuotient Colim
+  open Quot.SetoidQuotient Colim
 
   RestrictDiagram : (α : I) → Functor (≤p.PreorderCat↓ α) (SetCat (ℓD ⊔ ℓD'))
   RestrictDiagram α = restrict-domain (≤p.include≤ α) P
 
   module Bounded (α : I) where
-    open import QIT.QW.Colimit.Base (≤p.Restrict≤ α) ℓD ℓD' (RestrictDiagram α) public
+    open import QIT.QW.Colimit.Base propExt (≤p.Restrict≤ α) ℓD ℓD' (RestrictDiagram α) public
       using ()
       renaming
         ( Colim₀ to Colim≤₀

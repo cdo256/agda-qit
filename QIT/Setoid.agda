@@ -28,12 +28,16 @@
 -- The module is organized with a submodule ≈ containing all definitions,
 -- then selectively re-exports the most commonly used items.
 
+open import QIT.Prop
 module QIT.Setoid where
 
 module ≈ where
   open import QIT.Setoid.Base public
-  open import QIT.Setoid.Quotient public
+  module Quotient (propExt : PropExt) where
+    open import QIT.Setoid.Quotient propExt public
   open import QIT.Setoid.Hom public
   open import QIT.Setoid.Iso public
 
-open ≈ using (Setoid; ⟨_⟩; _/≡; _/≈; _≈h_; _[_≈_]; ≡→≈) public
+module Quotient = ≈.Quotient
+
+open ≈ using (Setoid; ⟨_⟩; _/≡; _≈h_; _[_≈_]; ≡→≈) public

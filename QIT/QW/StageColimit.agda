@@ -19,13 +19,14 @@ open import QIT.QW.Signature
 -- ordinal stages, providing a constructive way to build infinite quotient structures.
 module QIT.QW.StageColimit {ℓS ℓP ℓE ℓV}
   (sig : Sig ℓS ℓP ℓE ℓV)
+  (propExt : PropExt)
   where
 
 open Sig sig
 
 import QIT.Plump.Algebra as Plump
 import QIT.Plump.W.Base as PlumpW
-import QIT.QW.Stage sig as Stage
+import QIT.QW.Stage sig propExt as Stage
 
 module ZW = PlumpW S P
 module ZAlg = Plump ZW.Sᶻ ZW.Pᶻ
@@ -39,6 +40,7 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
   -- Container functor
   open import QIT.Container.Base
   open import QIT.Container.StrictFunctor S P (ℓD ⊔ ℓD')
+  open import QIT.Setoid.Quotient propExt using (_/≈)
 
   module S = Stage.WithZ ZA
   open S public
@@ -46,7 +48,7 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
   open import QIT.QW.Algebra sig
 
   -- Colimits and cocontinuity
-  open import QIT.QW.Colimit Z.≤p ℓD ℓD' hiding (_≈ˡ_)
+  open import QIT.QW.Colimit propExt Z.≤p ℓD ℓD' hiding (_≈ˡ_)
 
   -- Module aliases for cleaner notation
   module F = Functor F

@@ -84,17 +84,6 @@ sucOrd (A , _<_ , isOrd-A) = (A ⊎ ⊤) , _<'_ , isOrdSuc
     <total {inj₂ tt} {inj₁ β} = ∨.inr (∨.inr (liftp tt))
     <total {inj₂ tt} {inj₂ tt} = ∨.inr (∨.inl ≡.refl)
 
-supOrd : ∀ {ℓI ℓA ℓ<} → (I : Set ℓI) → (I → Ordinal ℓA ℓ<) → Ordinal (ℓA ⊔ ℓI) ℓ<
-supOrd I A* = ΣA , {!!} , {!!}
-  where
-  A : I → Set _
-  A i = A* i .proj₁
-  ΣA = Σ I A
-  _⊢_<_ : ∀ i → A i → A i → Prop _
-  i ⊢ α < β = A* i .proj₂ .IsOrdinal._<_ α β 
-  _<_ : ΣA → ΣA → Prop _
-  (i , α) < (j , β) = {!!}
-
 module _ where
   -- van den Berg ordinals
   open import Data.List
@@ -116,7 +105,7 @@ module _ where
           → (sr : ∀ α → P α → P (s α))
           → (⋃r : ∀ (A : 𝓟Ord) → (∀ α → A α → P α) → P (⨆ A))
           → ∀ α → P α
-      ext : ∀ {α β} → (∀ γ → ⇓ α γ ≡ ⇓ β γ) → α ≡ β
+      ext : ∀ {α β} → (∀ γ → ⇓ α γ ⇔ ⇓ β γ) → α ≡ β
 
     _<_ : ∀ α β → Prop _
     α < β = ⇓ β α
@@ -190,7 +179,7 @@ module _ where
     isTransitive-⊆ {α} {β} {γ} p q δ δ<α = q δ (p δ δ<α)
 
     isAntiSymmetric-⊆ : AntiSymmetric _⊆_
-    isAntiSymmetric-⊆ {α} {β} α⊆β β⊆α = ext λ γ → propExt (α⊆β γ , β⊆α γ)
+    isAntiSymmetric-⊆ {α} {β} α⊆β β⊆α = ext λ γ → (α⊆β γ , β⊆α γ)
 
     isPartialOrder-⊆ : IsPartialOrder _⊆_
     isPartialOrder-⊆ = record
@@ -210,9 +199,9 @@ module _ where
     --   r β p α⊆β β<γ = p {!!} {!!} {!!} {!!}
     -- ⊆⊆ = isTransitive-⊆
 
-    <⇔s⊆ : ∀ α β → α < β ⇔ s α ⊆ β
-    <⇔s⊆ α β = <→s⊆ , s⊆→<
-      where
-      <→s⊆ : α < β → s α ⊆ β
-      <→s⊆ p γ γ<sα = {!!}
-      s⊆→< : s α ⊆ β → α < β
+    -- <⇔s⊆ : ∀ α β → α < β ⇔ s α ⊆ β
+    -- <⇔s⊆ α β = <→s⊆ , s⊆→<
+    --   where
+    --   <→s⊆ : α < β → s α ⊆ β
+    --   <→s⊆ p γ γ<sα = {!!}
+    --   s⊆→< : s α ⊆ β → α < β

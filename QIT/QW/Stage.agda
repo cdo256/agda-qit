@@ -6,7 +6,7 @@ open import QIT.QW.Signature
 -- This builds the quotient in stages indexed by ordinals, ensuring that
 -- equations are satisfied at each stage. The construction uses diagrams
 -- indexed by the plump ordinal order to control the complexity of terms.
-module QIT.QW.Stage {ℓS ℓP ℓE ℓV} (sig : Sig ℓS ℓP ℓE ℓV) where
+module QIT.QW.Stage {ℓS ℓP ℓE ℓV} (sig : Sig ℓS ℓP ℓE ℓV) (propExt : PropExt) where
 open Sig sig
 
 import QIT.Plump.Algebra as Plump
@@ -22,6 +22,7 @@ open import QIT.Relation.Binary
 open import QIT.Container.Base
 open import QIT.Container.StrictFunctor S P (ℓS ⊔ ℓP ⊔ ℓV)
 open import QIT.Setoid
+open import QIT.Setoid.Quotient propExt
 open import QIT.Set.Base using (_≡h_)
 open import QIT.Relation.Subset
 open import QIT.Relation.SetQuotient
@@ -229,7 +230,7 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
     isInjHom {α} {β} α≤β injWeaken {x} {y} q =
       quot-rel x y (injWeaken r)
       where
-      open ≈.SetoidQuotient
+      module Qβ = SetoidQuotient (D̃ β)
 
       r : D̃ β [ pweaken α≤β x ≈ pweaken α≤β y ]
-      r = effectiveness (D̃ β) _ _ q
+      r = Qβ.effectiveness _ _ q
