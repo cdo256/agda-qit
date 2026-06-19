@@ -29,12 +29,13 @@
 -- then selectively re-exports the most commonly used items.
 
 open import QIT.Prop
+import QIT.Relation.SetQuotient as Quot
 module QIT.Setoid where
 
 module ≈ where
   open import QIT.Setoid.Base public
-  module Quotient (propExt : PropExt) where
-    open import QIT.Setoid.Quotient propExt public
+  module Quotient (propExt : PropExt) (sq : Quot.SetQuotients) (sqe : Quot.SetQuotientsElim) where
+    open import QIT.Setoid.Quotient propExt sq sqe public
   open import QIT.Setoid.Hom public
   open import QIT.Setoid.Iso public
 

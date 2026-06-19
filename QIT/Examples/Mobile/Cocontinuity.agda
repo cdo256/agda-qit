@@ -5,10 +5,13 @@ open import QIT.Relation.Nullary
 open import QIT.Relation.Subset
 open import QIT.Function.Base
 open import QIT.Functor.Base
+import QIT.Relation.SetQuotient as Quot
 
 module QIT.Examples.Mobile.Cocontinuity
   (I : Set)
   (propExt : PropExt)
+  (sq : Quot.SetQuotients)
+  (sqe : Quot.SetQuotientsElim)
   (a!c : A!C)
   where
 
@@ -16,8 +19,8 @@ open import QIT.Examples.Mobile.Base I
 
 import QIT.Plump.Algebra as Plump
 import QIT.Plump.W.Base as PlumpW
-import QIT.QW.Stage sig propExt as Stage
-import QIT.QW.Cocontinuity sig propExt a!c as QW
+import QIT.QW.Stage sig propExt sq sqe as Stage
+import QIT.QW.Cocontinuity sig propExt sq sqe a!c as QW
 
 module ZW = PlumpW Sᵀ Pᵀ
 module ZAlg = Plump ZW.Sᶻ ZW.Pᶻ

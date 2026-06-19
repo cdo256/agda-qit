@@ -9,17 +9,20 @@ open import QIT.Functor.Properties using (restrict-domain)
 open import QIT.Category.Base hiding (_[_≈_]; _[_,_]; _[_∘_])
 open import QIT.Category.Preorder
 open import QIT.Category.Set
+import QIT.Relation.SetQuotient as QuotRel
 
 module QIT.QW.Colimit.Properties {ℓI} {ℓ≤}
   {I : Set ℓI}
   (propExt : PropExt)
+  (sq : QuotRel.SetQuotients)
+  (sqe : QuotRel.SetQuotientsElim)
   (≤p : Preorder I ℓ≤)
   (ℓD ℓD' : Level)
   (P : Functor (PreorderCat I ≤p) (SetCat (ℓD ⊔ ℓD')))
   where
 
   open import QIT.Setoid
-  import QIT.Setoid.Quotient propExt as Quot
+  import QIT.Setoid.Quotient propExt sq sqe as Quot
   open Quot using (_/≈)
 
   private
@@ -27,7 +30,7 @@ module QIT.QW.Colimit.Properties {ℓI} {ℓ≤}
     _≤_ : BinaryRel I ℓ≤
     _≤_ = ≤p .proj₁
 
-  open import QIT.QW.Colimit.Base propExt ≤p ℓD ℓD' P public
+  open import QIT.QW.Colimit.Base propExt sq sqe ≤p ℓD ℓD' P public
 
   open Functor P using () renaming (ob to P̂)
   module ≤p = QIT.Category.Preorder I ≤p
@@ -37,7 +40,7 @@ module QIT.QW.Colimit.Properties {ℓI} {ℓ≤}
   RestrictDiagram α = restrict-domain (≤p.include≤ α) P
 
   module Bounded (α : I) where
-    open import QIT.QW.Colimit.Base propExt (≤p.Restrict≤ α) ℓD ℓD' (RestrictDiagram α) public
+    open import QIT.QW.Colimit.Base propExt sq sqe (≤p.Restrict≤ α) ℓD ℓD' (RestrictDiagram α) public
       using ()
       renaming
         ( Colim₀ to Colim≤₀
@@ -174,10 +177,11 @@ module QIT.QW.Colimit.Properties {ℓI} {ℓ≤}
 
     F : ColimMorphism LimitCocone C'
     F .apexHom = f
-    F .commutes i = ≡.refl
+    F .commutes i = ≡.funExt λ x → rec-beta f₀ isRespecting (i , x)
 
     unq : (G : ColimMorphism LimitCocone C') → ∀ x̃ → G .apexHom x̃ ≡ f x̃
-    unq G = elimp (λ x̃ → G .apexHom x̃ ≡ f x̃) λ (i , x) → ≡.funExt⁻ (G .commutes i) x
+    unq G = elimp (λ x̃ → G .apexHom x̃ ≡ f x̃) λ (i , x) →
+      ≡.trans (≡.funExt⁻ (G .commutes i) x) (≡.sym (rec-beta f₀ isRespecting (i , x)))
 
   isLimitingCoconeLimitCocone : isLimitingCocone LimitCocone
   isLimitingCoconeLimitCocone = record

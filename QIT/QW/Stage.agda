@@ -1,12 +1,18 @@
 open import QIT.Prelude
 open import QIT.Prop
 open import QIT.QW.Signature
+import QIT.Relation.SetQuotient as QuotRel
 
 -- Define staged construction of quotient W-types using plump ordinals.
 -- This builds the quotient in stages indexed by ordinals, ensuring that
 -- equations are satisfied at each stage. The construction uses diagrams
 -- indexed by the plump ordinal order to control the complexity of terms.
-module QIT.QW.Stage {ℓS ℓP ℓE ℓV} (sig : Sig ℓS ℓP ℓE ℓV) (propExt : PropExt) where
+module QIT.QW.Stage {ℓS ℓP ℓE ℓV}
+  (sig : Sig ℓS ℓP ℓE ℓV)
+  (propExt : PropExt)
+  (sq : QuotRel.SetQuotients)
+  (sqe : QuotRel.SetQuotientsElim)
+  where
 open Sig sig
 
 import QIT.Plump.Algebra as Plump
@@ -22,7 +28,9 @@ open import QIT.Relation.Binary
 open import QIT.Container.Base
 open import QIT.Container.StrictFunctor S P (ℓS ⊔ ℓP ⊔ ℓV)
 open import QIT.Setoid
-open import QIT.Setoid.Quotient propExt
+open import QIT.Setoid.Quotient propExt sq sqe
+module Quot = QuotRel.WithSetQuotients sq sqe
+open Quot using ([_]; quot-rec; quot-elimp; quot-rec-beta; quot-rel)
 open import QIT.Set.Base using (_≡h_)
 open import QIT.Relation.Subset
 open import QIT.Relation.SetQuotient
@@ -202,6 +210,10 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
     module SetoidCat = Category (SetoidCat (ℓA ⊔ ℓS ⊔ ℓP) (ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV))
     module SetCat = Category (SetCat (ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV))
     open ≡.≡-Reasoning
+
+    sameStage : ∀ {α} {t : T} (p q : t ≤ᵀ α) → D̃ α [ (t , p) ≈ (t , q) ]
+    sameStage {α} p q = ≡→≈ (D̃ α) (ΣP≡ _ _ ≡.refl)
+
     hom : ∀ {α β} → Box (α ≤ β) → D̃ α /≈ → D̃ β /≈
     hom {α} {β} (box α≤β) = quot-rec (λ s → [ pweaken α≤β s ])
       λ s t p → quot-rel (pweaken α≤β s) (pweaken α≤β t) (≈pweaken α≤β p)
@@ -210,7 +222,12 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
     id {α} {t̃} = q t̃
       where
       q : ∀ t̃ → hom {α} ≤p.id t̃ ≡ SetCat.id {D̃ α /≈} t̃
-      q  = quot-elimp (λ t̃ → hom ≤p.id t̃ ≡ SetCat.id t̃) (λ _ → ≡.refl)
+      q = quot-elimp (λ t̃ → hom ≤p.id t̃ ≡ SetCat.id t̃) λ s →
+            ≡.trans
+              (quot-rec-beta (λ s → [ pweaken (≤refl α) s ])
+                             (λ s t p → quot-rel (pweaken (≤refl α) s) (pweaken (≤refl α) t) (≈pweaken (≤refl α) p))
+                             s)
+              (quot-rel (pweaken (≤refl α) s) s (sameStage _ _))
 
     comp : ∀ {α β γ} (f : Box (α ≤ β)) (g : Box (β ≤ γ))
          → hom (g ≤p.∘ f) ≡h (hom g SetCat.∘ hom f)
@@ -219,7 +236,21 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
       q : (t̃ : D̃ α /≈)
         → hom (box g ≤p.∘ box f) t̃
         ≡ (hom (box g) SetCat.∘ hom (box f)) t̃
-      q = quot-elimp _ λ _ → ≡.refl
+      q = quot-elimp _ λ s →
+            ≡.trans
+              (quot-rec-beta (λ s → [ pweaken (≤≤ g f) s ])
+                             (λ s t p → quot-rel (pweaken (≤≤ g f) s) (pweaken (≤≤ g f) t) (≈pweaken (≤≤ g f) p))
+                             s)
+              (≡.trans
+                (quot-rel (pweaken (≤≤ g f) s) (pweaken g (pweaken f s)) (sameStage _ _))
+                (≡.sym (≡.trans
+                  (≡.cong (hom (box g))
+                    (quot-rec-beta (λ s → [ pweaken f s ])
+                                   (λ s t p → quot-rel (pweaken f s) (pweaken f t) (≈pweaken f p))
+                                   s))
+                  (quot-rec-beta (λ s → [ pweaken g s ])
+                                 (λ s t p → quot-rel (pweaken g s) (pweaken g t) (≈pweaken g p))
+                                 (pweaken f s)))))
 
     open import QIT.Function.Base
     open import QIT.Set.Bijection
@@ -232,5 +263,18 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
       where
       module Qβ = SetoidQuotient (D̃ β)
 
+      q' : Qβ.[ pweaken α≤β x ] ≡ Qβ.[ pweaken α≤β y ]
+      q' =
+        ≡.trans
+          (≡.sym (quot-rec-beta
+            (λ s → [ pweaken α≤β s ])
+            (λ s t p → quot-rel (pweaken α≤β s) (pweaken α≤β t) (≈pweaken α≤β p))
+            x))
+          (≡.trans q
+            (quot-rec-beta
+              (λ s → [ pweaken α≤β s ])
+              (λ s t p → quot-rel (pweaken α≤β s) (pweaken α≤β t) (≈pweaken α≤β p))
+              y))
+
       r : D̃ β [ pweaken α≤β x ≈ pweaken α≤β y ]
-      r = Qβ.effectiveness _ _ q
+      r = Qβ.effectiveness _ _ q'

@@ -7,17 +7,20 @@ open import QIT.Functor.Base
 open import QIT.Category.Base hiding (_[_≈_]; _[_,_]; _[_∘_])
 open import QIT.Category.Preorder
 open import QIT.Category.Set
+import QIT.Relation.SetQuotient as Quot
 
 module QIT.QW.Colimit.Base {ℓI} {ℓ≤}
   {I : Set ℓI}
   (propExt : PropExt)
+  (sq : Quot.SetQuotients)
+  (sqe : Quot.SetQuotientsElim)
   (≤p : Preorder I ℓ≤)
   (ℓD ℓD' : Level)
   (P : Functor (PreorderCat I ≤p) (SetCat (ℓD ⊔ ℓD')))
   where
 
   open import QIT.Setoid
-  open import QIT.Setoid.Quotient propExt using (_/≈)
+  open import QIT.Setoid.Quotient propExt sq sqe using (_/≈)
 
   private
     module ≤ = IsPreorder (≤p .proj₂)

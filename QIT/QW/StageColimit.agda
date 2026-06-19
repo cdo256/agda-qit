@@ -10,6 +10,7 @@ open import QIT.Relation.Subset
 
 -- Setoid theory
 open import QIT.Setoid as ≈
+import QIT.Relation.SetQuotient as Quot
 
 -- QW machinery
 open import QIT.QW.Signature
@@ -20,13 +21,15 @@ open import QIT.QW.Signature
 module QIT.QW.StageColimit {ℓS ℓP ℓE ℓV}
   (sig : Sig ℓS ℓP ℓE ℓV)
   (propExt : PropExt)
+  (sq : Quot.SetQuotients)
+  (sqe : Quot.SetQuotientsElim)
   where
 
 open Sig sig
 
 import QIT.Plump.Algebra as Plump
 import QIT.Plump.W.Base as PlumpW
-import QIT.QW.Stage sig propExt as Stage
+import QIT.QW.Stage sig propExt sq sqe as Stage
 
 module ZW = PlumpW S P
 module ZAlg = Plump ZW.Sᶻ ZW.Pᶻ
@@ -40,7 +43,7 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
   -- Container functor
   open import QIT.Container.Base
   open import QIT.Container.StrictFunctor S P (ℓD ⊔ ℓD')
-  open import QIT.Setoid.Quotient propExt using (_/≈)
+  open import QIT.Setoid.Quotient propExt sq sqe using (_/≈)
 
   module S = Stage.WithZ ZA
   open S public
@@ -48,7 +51,7 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
   open import QIT.QW.Algebra sig
 
   -- Colimits and cocontinuity
-  open import QIT.QW.Colimit propExt Z.≤p ℓD ℓD' hiding (_≈ˡ_)
+  open import QIT.QW.Colimit propExt sq sqe Z.≤p ℓD ℓD' hiding (_≈ˡ_)
 
   -- Module aliases for cleaner notation
   module F = Functor F
