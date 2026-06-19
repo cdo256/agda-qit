@@ -17,20 +17,19 @@ data ⊥p : Prop where
 ⊥ : Set
 ⊥ = Box ⊥p
 ⊥p* : ∀ {ℓA} → Prop ℓA
-⊥p* {ℓA} = Liftp ℓA ⊥p
+⊥p* {ℓA} = LiftP ℓA ⊥p
 ⊥* : ∀ {ℓA} → Set ℓA
 ⊥* {ℓA} = Lift ℓA ⊥
 
 data ⊤p : Prop where
   tt : ⊤p
-⊤ : Set
-⊤ = Box ⊤p
+data ⊤ : Set where
+  tt : ⊤
 ⊤p* : ∀ {ℓA} → Prop ℓA
-⊤p* {ℓA} = Liftp ℓA ⊤p
+⊤p* {ℓA} = LiftP ℓA ⊤p
 ⊤* : ∀ {ℓA} → Set ℓA
 ⊤* {ℓA} = Lift ℓA ⊤
 
-pattern ttˢ = box tt
 pattern tt* = liftp tt
 pattern tt* = lift tt
 
@@ -40,7 +39,6 @@ open import Agda.Builtin.Sigma public
   renaming (fst to proj₁; snd to proj₂)
   hiding (module Σ)
 
-
 module Σ = Agda.Builtin.Sigma.Σ
   renaming (fst to proj₁; snd to proj₂)
 
@@ -48,7 +46,10 @@ open Σ public
 {-# DISPLAY Agda.Builtin.Sigma.Σ.fst = proj₁ #-}
 {-# DISPLAY Agda.Builtin.Sigma.Σ.snd = proj₂ #-}
 
-record ΣP {a b} (A : Set a) (B : A → Prop b) : Set (a ⊔ b) where
+_×_ : ∀ {ℓA ℓB} (A : Set ℓA) (B : Set ℓB) → Set (ℓA ⊔ ℓB)
+A × B = Σ A λ _ → B
+
+record ΣP {ℓA ℓB} (A : Set ℓA) (B : A → Prop ℓB) : Set (ℓA ⊔ ℓB) where
   constructor _,_
   field
     fst : A
@@ -56,13 +57,18 @@ record ΣP {a b} (A : Set a) (B : A → Prop b) : Set (a ⊔ b) where
 
 open ΣP public
 
-⟨_⟩ᴾ : ∀ {a b} {A : Set a} {B : A → Prop b} → ΣP A B → A
+⟨_⟩ᴾ : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Prop ℓB} → ΣP A B → A
 ⟨ x , _ ⟩ᴾ = x
 
 module ⊎ where
   data _⊎_ {ℓA ℓB} (A : Set ℓA) (B : Set ℓB) : Set (ℓA ⊔ ℓB) where
     inj₁ : A → A ⊎ B
     inj₂ : B → A ⊎ B
+  [_,_] : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : Set ℓB} {C : Set ℓC}
+        → (A → C) → (B → C) → A ⊎ B → C
+  [ f , g ] (inj₁ x) = f x
+  [ f , g ] (inj₂ x) = g x
+
 open ⊎ using (_⊎_; inj₁; inj₂) public
 
 data Bool : Set where

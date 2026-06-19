@@ -70,8 +70,8 @@ _∨ᶻ_ : Z → Z → Z
 _∨ᶻ_ α β = sup (∨ˢ , f)
   where
   f : Pᶻ ∨ˢ → W Sᶻ Pᶻ
-  f (lift (inj₁ tt)) = α
-  f (lift (inj₂ tt)) = β
+  f (lift (inj₁ _)) = α
+  f (lift (inj₂ _)) = β
 
 -- Canonical inclusion from base trees T into plump ordinals Z:
 -- map each original node shape s to the embedded shape ιˢ s.

@@ -4,7 +4,7 @@ open import QIT.Prelude
 open import QIT.Functor.Base
 open import QIT.Category.Set
 open import QIT.Category.Slice
-open import Data.Nat
+open import QIT.Nat
 
 record ICont {ℓ} (I : Set ℓ) : Set (lsuc ℓ) where
   constructor icont
@@ -38,6 +38,7 @@ module Examples where
     P {suc i} (inj₁ tt) = ⊥ -- fzero
     P {suc i} (inj₂ tt) = ⊤ -- fsuc
     J : ∀ {i} {s : S i} → P s → ℕ
+    J {suc i} {inj₁ tt} ()
     J {suc i} {inj₂ tt} tt = i
 
   Vec : (A : Set) → ICont ℕ

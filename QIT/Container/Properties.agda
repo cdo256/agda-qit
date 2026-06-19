@@ -3,7 +3,7 @@
 open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Container.Base
-open import Data.Nat.Base hiding (_⊔_)
+open import QIT.Nat
 
 module QIT.Container.Properties where
 

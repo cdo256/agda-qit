@@ -3,12 +3,9 @@ module QIT.Relation.BarInduction where
 open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Relation.Subset
-open import Data.Nat
-open import Data.List
--- open import Data.Sigma
-open import Data.Sum
-open import Data.Maybe
-open import Data.Empty
+open import QIT.Nat
+open import QIT.List
+open import QIT.Maybe as Maybe
 open import QIT.Container.Base
 
 module _ {ℓ} (A : Set ℓ) where
@@ -23,7 +20,7 @@ module _ {ℓ} (A : Set ℓ) where
   prefixFin zero xs = just []
   prefixFin (suc n) [] = nothing
   prefixFin (suc n) (x ∷ xs) =
-    Data.Maybe.map (x ∷_) (prefixFin n xs)
+    Maybe.map (x ∷_) (prefixFin n xs)
 
   isBar : (B : FinSeq → Prop ℓ) → Prop ℓ
   isBar B = ∀ (α : InfSeq) → ∃ λ i → B (prefix i α)
@@ -36,7 +33,7 @@ module _ {ℓ} (A : Set ℓ) where
     : (B : FinSeq → Prop ℓ)
     → (xs : FinSeq) → Prop ℓ
   FinSeqCrossesBar B xs = ∃ λ i →
-    MaybeProp→Prop (Data.Maybe.map B (prefixFin i xs))
+    MaybeProp→Prop (Maybe.map B (prefixFin i xs))
 
   data Bar {ℓ} {A : Set ℓ} (P : List A → Set ℓ)
        : (xs : List A) → Set ℓ where

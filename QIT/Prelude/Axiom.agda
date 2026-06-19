@@ -10,5 +10,9 @@ PropExt = ∀ {ℓA}
   → {A B : Prop ℓA}
   → A ⇔ B → A ≡ B
 
+-- P∧Q→P≡Q : ∀ {ℓP} {P Q : Prop ℓP} → P ∧ Q → P ≡ Q
+-- P∧Q→P≡Q (p , q) = propExt ((λ _ → q) , (λ _ → p))
+
 A!C : Agda.Primitive.Setω
 A!C = ∀ {ℓX} (X : Set ℓX) → isContr X → X
+

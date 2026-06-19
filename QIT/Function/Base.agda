@@ -3,7 +3,6 @@ module QIT.Function.Base where
 
 open import QIT.Prelude
 open import QIT.Prop
-open import QIT.Relation.Subset
 
 variable
   ℓA ℓB : Level
@@ -52,11 +51,5 @@ module ↔ where
     where
     module p = _↔_ p
     module q = _↔_ q
-
-  open import QIT.Set.Bijection using (IsInjection)
-  ↔to-Injection : ∀ {ℓX ℓY} {X : Set ℓX} {Y : Set ℓY}
-                → (p : X ↔ Y) → IsInjection (p .to)
-  ↔to-Injection {ℓX} {ℓY} {X} {Y} p {x} {y} q =
-    ≡.trans (≡.sym (p .rinv x)) (≡.trans (≡.cong (p .from) q) (p .rinv y))
 
 open ↔ using (_↔_; ↔to-Injection) public

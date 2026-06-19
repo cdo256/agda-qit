@@ -2,18 +2,7 @@ module Everything where
 
 -- Base
 import QIT.Prelude
-import QIT.Nat
-import QIT.Fin.Base
-import QIT.Fin.Properties
-import QIT.Function.Base
-import QIT.Prop.Base
-import QIT.Prop.Logic
-import QIT.Prop.Path
-import QIT.Prop.Data
-import QIT.Prop.Properties
 import QIT.Prop
-import QIT.Set.Base
-import QIT.Set.Bijection
 
 -- Relations
 import QIT.Relation.Base
@@ -24,12 +13,25 @@ import QIT.Relation.Plump
 import QIT.Relation.Nullary
 import QIT.Relation.Finite
 import QIT.Relation.WellFounded
-import QIT.Relation.Tests
 import QIT.Relation.BarInduction
 import QIT.Relation.SetQuotient
 import QIT.Relation.Ordinal
 import QIT.Relation.WISC
 import QIT.Relation
+
+import QIT.Nat
+import QIT.Fin.Base
+import QIT.Fin.Properties
+
+import QIT.Function.Base
+import QIT.Prop.Base
+import QIT.Prop.Logic
+import QIT.Prop.Path
+import QIT.Prop.Data
+import QIT.Prop.Properties
+import QIT.Prop
+import QIT.Set.Base
+import QIT.Set.Bijection
 
 -- Category
 import QIT.Category.Base
@@ -75,53 +77,54 @@ import QIT.Container.Base
 import QIT.Container.Functor
 import QIT.Container.StrictFunctor
 import QIT.Container.Indexed
+import QIT.Container.Properties
 
 -- Plump ordinals
 import QIT.Plump
 
 -- QW type definition
 import QIT.QW.W
-import QIT.QW.Equation
-import QIT.QW.Signature
-import QIT.QW.Algebra
-import QIT.QW.Stage
-import QIT.QW.StageColimit
-import QIT.QW.Colimit
-import QIT.QW.Locality
-import QIT.QW.Cocontinuity
-import QIT.QW
+-- import QIT.QW.Equation
+-- import QIT.QW.Signature
+-- import QIT.QW.Algebra
+-- import QIT.QW.Stage
+-- import QIT.QW.StageColimit
+-- import QIT.QW.Colimit
+-- import QIT.QW.Locality
+-- import QIT.QW.Cocontinuity
+-- import QIT.QW
 
--- Extended Type Theories
-import QIT.IIT.Cont1
--- -- import QIT.IIT.Codes -- incomplete
--- -- import QIT.QIIT -- very incomplete
+-- -- Extended Type Theories
+-- import QIT.IIT.Cont1
+-- -- -- import QIT.IIT.Codes -- incomplete
+-- -- -- import QIT.QIIT -- very incomplete
 
--- Kaposi-Kovacs-Altenkirch Syntax
-import QIT.KKA2019.Syntax
--- import QIT.KK2020.Level
--- -- import QIT.KK2020.Syntax -- incomplete
+-- -- Kaposi-Kovacs-Altenkirch Syntax
+-- import QIT.KKA2019.Syntax
+-- -- import QIT.KK2020.Level
+-- -- -- import QIT.KK2020.Syntax -- incomplete
 
--- -- Examples
-import QIT.Examples.Mobile.Base
-import QIT.Examples.Mobile.Cocontinuity
-import QIT.Examples.CauchyReals
-import QIT.Examples.ConTy
-import QIT.Examples.HoleList
-import QIT.Examples.ListBag
-import QIT.Examples.PartialityMonad
-import QIT.Examples.RotTree
-import QIT.Examples.SGL
-import QIT.Examples.T
-import QIT.Examples.Trunc
-import QIT.Examples.WFTree
-import QIT.Examples.Lambda
-import QIT.Examples.Surreal
-import QIT.Examples.PartialityMonad
+-- -- -- Examples
+-- import QIT.Examples.Mobile.Base
+-- import QIT.Examples.Mobile.Cocontinuity
+-- import QIT.Examples.CauchyReals
+-- import QIT.Examples.ConTy
+-- import QIT.Examples.HoleList
+-- import QIT.Examples.ListBag
+-- import QIT.Examples.PartialityMonad
+-- import QIT.Examples.RotTree
+-- import QIT.Examples.SGL
+-- import QIT.Examples.T
+-- import QIT.Examples.Trunc
+-- import QIT.Examples.WFTree
+-- import QIT.Examples.Lambda
+-- import QIT.Examples.Surreal
+-- import QIT.Examples.PartialityMonad
 
--- -- Topology - TODO: Move to a different repo
--- import QIT.Topology.Base
--- import QIT.Topology.BishopReals
--- import QIT.Topology.Category
--- import QIT.Topology.Constructions
--- import QIT.Topology.Examples
--- import QIT.Topology.Subset
+-- -- -- Topology - TODO: Move to a different repo
+-- -- import QIT.Topology.Base
+-- -- import QIT.Topology.BishopReals
+-- -- import QIT.Topology.Category
+-- -- import QIT.Topology.Constructions
+-- -- import QIT.Topology.Examples
+-- -- import QIT.Topology.Subset

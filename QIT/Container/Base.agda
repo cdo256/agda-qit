@@ -9,7 +9,7 @@ module QIT.Container.Base where
 -- Example: For lists, S = ℕ (length) and P n = Fin n (positions).
 -- Then ⟦ S ◁ P ⟧ X = Σ n. (Fin n → X) ≅ List X.
 ⟦_◁_⟧ : ∀ {ℓS ℓP ℓX} → (S : Set ℓS) (P : S → Set ℓP) → Set ℓX → Set (ℓS ⊔ ℓP ⊔ ℓX)
-⟦ S ◁ P ⟧ X = Σ[ s ∈ S ] (P s → X)
+⟦ S ◁ P ⟧ X = Σ S λ s → (P s → X)
 
 module _ {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
   -- W-types: well-founded trees with shapes S and branching P.

@@ -1,5 +1,6 @@
 open import QIT.Prelude
 open import QIT.Prop
+open import QIT.Function.Base
 open import QIT.Relation.Base
 open import QIT.Relation.Binary
 open import QIT.Relation.Subset
@@ -70,3 +71,8 @@ module _ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} (a!c : A!C) where
     surj' : IsSurjection f'
     surj' (lift y) with surj y
     ... | ∣ x , p ∣ = ∣ lift x , ≡.cong lift p ∣
+
+↔to-Injection : ∀ {ℓX ℓY} {X : Set ℓX} {Y : Set ℓY}
+              → (p : X ↔ Y) → IsInjection (p .↔.to)
+↔to-Injection {ℓX} {ℓY} {X} {Y} p {x} {y} q =
+  ≡.trans (≡.sym (p .↔.rinv x)) (≡.trans (≡.cong (p .↔.from) q) (p .↔.rinv y))

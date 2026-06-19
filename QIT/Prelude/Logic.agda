@@ -5,26 +5,13 @@ open import QIT.Prelude.Truncation
 
 module QIT.Prelude.Logic where
 
-absurdp : ∀ {ℓA} {ℓA : Set ℓA} → ⊥p → ℓA
-absurdp ()
-absurd : ∀ {ℓA} {ℓA : Set ℓA} → ⊥ → ℓA
-absurd ()
-absurdp' : ∀ {ℓ} {A : Prop ℓ} → ⊥p → A
-absurdp' ()
-
-⊥→⊥p : ⊥ → ⊥p
-⊥→⊥p ()
-
 infix 6 ¬_
 ¬_ : ∀ {ℓ} (X : Prop ℓ) → Prop ℓ
 ¬ X = X → ⊥p
 
-_≢_ : ∀ {ℓ} {A : Set ℓ} (x y : A) → Prop ℓ
-x ≢ y = ¬ (x ≡ y)
-
 module ∧ {ℓ ℓ'} where
-  infixr 5 _∧ᵖ_
-  infixr 5 _∧_
+  infixr 2 _∧ᵖ_
+  infixr 2 _∧_
   infixr 4 _,_
   record _∧ᵖ_ (A : Prop ℓ) (B : A → Prop ℓ') : Prop (ℓ ⊔ ℓ') where
     constructor _,_
@@ -39,7 +26,7 @@ module ∧ {ℓ ℓ'} where
 open ∧ public using (_∧ᵖ_; _∧_; _,_)
 
 module ∨ {ℓ ℓ'} (A : Prop ℓ) (B : Prop ℓ') where
-  infixr 3 _∨_
+  infixr 1 _∨_
   data _∨_ : Prop (ℓ ⊔ ℓ') where
     inl : A → _∨_
     inr : B → _∨_
@@ -47,7 +34,7 @@ module ∨ {ℓ ℓ'} (A : Prop ℓ) (B : Prop ℓ') where
 open ∨ public using (_∨_)
 
 -- Bi-implication for propositions.
-infix 3 _⇔_
+infix 1 _⇔_
 _⇔_ : ∀ {ℓA ℓB} (A : Prop ℓA) (B : Prop ℓB) → Prop (ℓA ⊔ ℓB)
 A ⇔ B = (A → B) ∧ (B → A)
 

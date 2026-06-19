@@ -6,25 +6,25 @@ open import QIT.Relation.Base
 open import QIT.Relation.Subset
 open import QIT.Relation.Nullary
 open import QIT.Function.Base 
-open import Data.Fin as Fin hiding (_≟_; pred) public
-open import Data.Nat as ℕ renaming (_>_ to _>ᴺ_)
-open import Data.Nat.Properties as ℕₚ using (≤-total)
+-- open import Data.Fin as Fin hiding (_≟_; pred) public
+-- open import Data.Nat as ℕ renaming (_>_ to _>ᴺ_)
+-- open import Data.Nat.Properties as ℕₚ using (≤-total)
 open import QIT.Fin.Base
 open import QIT.Nat
 
-inhab⇔>0 : ∀ {n} → ∥ Fin n ∥ ⇔ ∥ n >ᴺ 0 ∥
+inhab⇔>0 : ∀ {n} → ∥ Fin n ∥ ⇔ (n > 0)
 inhab⇔>0 {zero} = p , q
   where
-  p : ∥ Fin zero ∥ → ∥ zero >ᴺ 0 ∥
+  p : ∥ Fin zero ∥ → zero > 0
   p ∣ () ∣
-  q : ∥ zero >ᴺ 0 ∥ → ∥ Fin zero ∥
-  q ∣ () ∣
+  q : zero > 0 → ∥ Fin zero ∥
+  q ()
 inhab⇔>0 {suc n} = p , q
   where
-  p : ∥ Fin (suc n) ∥ → ∥ suc n >ᴺ 0 ∥
-  p _ = ∣ s≤s z≤n ∣
-  q : ∥ suc n >ᴺ 0 ∥ → ∥ Fin (suc n) ∥
-  q = λ _ → ∣ zero ∣
+  p : ∥ Fin (suc n) ∥ → suc n > 0
+  p _ = (s≤s z≤n)
+  q : suc n > 0 → ∥ Fin (suc n) ∥
+  q _ = ∣ zero ∣
 
 ↔to⇔ : ∀ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} → A ↔ B → ∥ A ∥ ⇔ ∥ B ∥
 ↔to⇔ {A = A} {B} p = q₁ , q₂
@@ -125,10 +125,10 @@ Fin↔-injective {suc m} {zero} p = absurdp' (¬Fin0 ∣ to zero ∣)
 Fin↔-injective {suc m} {suc n} p = ≡.cong suc (Fin↔-injective (Fin↔-suc p))
 
 open import QIT.Set.Bijection
-Fin-inj→≤ : ∀ {m n} → (f : Fin m → Fin n) → IsInjection f → m ℕ.≤ n
+Fin-inj→≤ : ∀ {m n} → (f : Fin m → Fin n) → IsInjection f → m ≤ n
 Fin-inj→≤ {zero} {zero} f f-inj = z≤n
 Fin-inj→≤ {zero} {suc n} f f-inj = z≤n
-Fin-inj→≤ {suc m} {zero} f f-inj = absurdp (¬Fin0 ∣ f zero ∣)
+Fin-inj→≤ {suc m} {zero} f f-inj = absurdp' (¬Fin0 ∣ f zero ∣)
 Fin-inj→≤ {suc m} {suc n} f f-inj = s≤s (Fin-inj→≤ g g-inj)
   where
   g : Fin m → Fin n
@@ -154,7 +154,7 @@ Fin-inj→≤ {suc m} {suc n} f f-inj = s≤s (Fin-inj→≤ g g-inj)
   ... | suc c , p | suc d , q | suc e , r =
     Fin-suc-injective (f-inj (≡.trans (≡.sym q) (≡.trans (≡.cong suc s) r)))
 
-≤-antisym : ∀ {m n} → m ℕ.≤ n → n ℕ.≤ m → m ≡ n 
+≤-antisym : ∀ {m n} → m ≤ n → n ≤ m → m ≡ n 
 ≤-antisym z≤n       z≤n       = ≡.refl
 ≤-antisym (s≤s m≤n) (s≤s n≤m) = ≡.cong suc (≤-antisym m≤n n≤m)
 
@@ -167,21 +167,21 @@ cantor-schröder-bernstein f g f-inj g-inj = ≤-antisym
 open import QIT.Relation.WellFounded
 
 
-≤refl-ℕ : ∀ {m} → m ℕ.≤ m
+≤refl-ℕ : ∀ {m} → m ≤ m
 ≤refl-ℕ {zero} = z≤n
 ≤refl-ℕ {suc m} = s≤s ≤refl-ℕ
 
-≤suc-ℕ : ∀ {m} → m ℕ.≤ suc m
+≤suc-ℕ : ∀ {m} → m ≤ suc m
 ≤suc-ℕ {zero} = z≤n
 ≤suc-ℕ {suc m} = s≤s ≤suc-ℕ
 
-≤trans-ℕ : ∀ {l m n} → l ℕ.≤ m → m ℕ.≤ n → l ℕ.≤ n
+≤trans-ℕ : ∀ {l m n} → l ≤ m → m ≤ n → l ≤ n
 ≤trans-ℕ z≤n q = z≤n
 ≤trans-ℕ (s≤s p) (s≤s q) = s≤s (≤trans-ℕ p q)
 
-≤suc∧≢→≤ : ∀ {m n} → m ℕ.≤ suc n → m ≢ suc n → m ℕ.≤ n
+≤suc∧≢→≤ : ∀ {m n} → m ≤ suc n → m ≢ suc n → m ≤ n
 ≤suc∧≢→≤ {zero} m≤sn m≢sn = z≤n
-≤suc∧≢→≤ {suc zero} {zero} (s≤s z≤n) m≢sn = absurdp (m≢sn ≡.refl)
+≤suc∧≢→≤ {suc zero} {zero} (s≤s z≤n) m≢sn = absurdp' (m≢sn ≡.refl)
 ≤suc∧≢→≤ {suc (suc m)} {zero} (s≤s ()) m≢sn
 ≤suc∧≢→≤ {suc m} {suc n} (s≤s m≤sn) m≢sn =
   s≤s (≤suc∧≢→≤ m≤sn (λ q → m≢sn (≡.cong suc q)))
@@ -189,42 +189,45 @@ open import QIT.Relation.WellFounded
 minℕ : ∀ {ℓP} → (P : ℕ → Prop ℓP)
      → (∀ n → Decᵖ (P n))
      → ∃ P
-     → ∃ (λ n → P n ∧ ∀ m → P m → ∥ n ℕ.≤ m ∥)
-minℕ P decP ∣ n , pn ∣ = rec n ∣ n , pn , ∣ ≤refl-ℕ ∣ ∣
+     → ∃ (λ n → P n ∧ ∀ m → P m → n ≤ m)
+minℕ P decP ∣ n , pn ∣ = rec n ∣ n , pn , ≤refl-ℕ ∣
   where
   P' : ℕ → Prop _
-  P' m = ∃ λ n → P n ∧ ∥ n ℕ.≤ m ∥
+  P' m = ∃ λ n → P n ∧ (n ≤ m)
   decP' : (n : ℕ) → Decᵖ (P' n)
   decP' zero with decP 0
-  ... | yes p0 = yes ∣ 0 , p0 , ∣ z≤n ∣ ∣
-  ... | no ¬p0 = no λ {(∣ 0 , p0 , ∣ z≤n ∣ ∣) → ¬p0 p0}
+  ... | yes p0 = yes ∣ 0 , p0 , z≤n ∣
+  ... | no ¬p0 = no λ {(∣ 0 , p0 , z≤n ∣) → ¬p0 p0}
   decP' (suc n) with decP' n | decP (suc n)
   ... | yes p<n | _ = yes (u p<n)
     where
     u : P' n → P' (suc n)
-    u ∣ m , pm , ∣ m≤n ∣ ∣ = ∣ m , pm , ∣ ≤trans-ℕ m≤n ≤suc-ℕ ∣ ∣
-  ... | no ¬p<n | yes pn' = yes ∣ suc n , pn' , ∣ ≤refl-ℕ ∣ ∣
+    u ∣ m , pm , m≤n ∣ = ∣ m , pm , ≤trans-ℕ m≤n ≤suc-ℕ ∣
+  ... | no ¬p<n | yes pn' = yes ∣ suc n , pn' , ≤refl-ℕ ∣
   ... | no ¬p<n | no ¬pn' = no ¬p<n'
     where
     ¬p<n' : ¬ P' (suc n)
-    ¬p<n' ∣ m , pm , ∣ m≤n' ∣ ∣ with m ≟ℕ suc n
+    ¬p<n' ∣ m , pm , m≤n' ∣ with m ≟ℕ suc n
     ... | yes ≡.refl = ¬pn' pm
-    ... | no m≠n' = ¬p<n ∣ m , pm , ∣ ≤suc∧≢→≤ m≤n' m≠n' ∣ ∣
-  least : ∀ {max} → ¬ P' max → ∀ m → P m → ∥ suc max ℕ.≤ m ∥
+    ... | no m≠n' = ¬p<n ∣ m , pm , ≤suc∧≢→≤ m≤n' m≠n' ∣
+  least : ∀ {max} → ¬ P' max → ∀ m → P m → suc max ≤ m
   least {max} ¬p< m pm with ≤-total m (suc max)
-  ... | inj₁ m≤sn with m ≟ℕ suc max
-  ...   | yes ≡.refl = ∣ ≤refl-ℕ ∣
-  ...   | no m≢sn = absurdp' (¬p< ∣ m , pm , ∣ ≤suc∧≢→≤ m≤sn m≢sn ∣ ∣)
-  least ¬p< m pm | inj₂ sn≤m = ∣ sn≤m ∣
+  ... | ∨.inl m≤sn with m ≟ℕ suc max
+  ...   | yes ≡.refl = ≤refl-ℕ
+  ...   | no m≢sn = absurdp' (¬p< ∣ m , pm , ≤suc∧≢→≤ m≤sn m≢sn ∣)
+  least ¬p< m pm | ∨.inr sn≤m = sn≤m
   rec : (max : ℕ)
-      → ∃ (λ n → P n ∧ ∥ n ℕ.≤ max ∥)
-      → ∃ (λ n → P n ∧ ∀ m → P m → ∥ n ℕ.≤ m ∥)
-  rec zero ∣ zero , pn , n≤max ∣ = ∣ zero , pn , (λ m z → ∣ z≤n ∣) ∣
-  rec zero ∣ suc n , pn , ∣ () ∣ ∣
+      → ∃ (λ n → P n ∧ n ≤ max)
+      → ∃ (λ n → P n ∧ ∀ m → P m → n ≤ m)
+  rec zero ∣ zero , pn , n≤max ∣ = ∣ zero , pn , (λ m z → z≤n) ∣
+  rec zero ∣ suc n , pn , () ∣
   rec (suc max) ex with decP' max
   ... | yes p< = rec max p<
   ... | no ¬p< with ex
-  ...   | ∣ zero , p0 , ∣ z≤n ∣ ∣ = absurdp' (¬p< ∣ zero , p0 , ∣ z≤n ∣ ∣)
-  ...   | ∣ suc n , psn , ∣ n≤max ∣ ∣ with n ≟ℕ max
+  ...   | ∣ zero , p0 , z≤n ∣ = absurdp' (¬p< ∣ zero , p0 , z≤n ∣)
+  ...   | ∣ suc n , psn , n≤max ∣ with n ≟ℕ max
   ...     | yes ≡.refl = ∣ suc max , psn , least ¬p< ∣
-  ...     | no n≠max = absurdp' (¬p< ∣ suc n , psn , ∣ ≤suc∧≢→≤ n≤max (λ q → n≠max (ℕ-suc-injective q)) ∣ ∣)
+  ...     | no n≠max = absurdp' (¬p< ∣ suc n , psn , ≤suc∧≢→≤ n≤max (λ q → n≠max (ℕ-suc-injective q)) ∣)
+  -- 
+  -- 
+  -- 

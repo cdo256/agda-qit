@@ -8,8 +8,8 @@ record Lift {ℓA} ℓA' (A : Set ℓA) : Set (ℓA ⊔ ℓA') where
 
 open Lift public
 
-record Liftp {ℓA} ℓA' (A : Prop ℓA) : Prop (ℓA ⊔ ℓA') where
+record LiftP {ℓA} ℓA' (A : Prop ℓA) : Prop (ℓA ⊔ ℓA') where
   constructor liftp
   field lowerp : A
 
-open Liftp public
+open LiftP public
