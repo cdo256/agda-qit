@@ -7,7 +7,8 @@ open import QIT.Relation.Subset
 open import QIT.Relation.Nullary
 open import QIT.Function.Base 
 open import QIT.Fin.Base
-open import Data.Nat
+open import QIT.Fin.Properties
+open import QIT.Nat
 
 module _ {ℓA} where
   isFiniteᵖ : (A : Set ℓA) → Prop _
@@ -42,7 +43,6 @@ module _ {ℓA} where
     isPropΣSz (m , ∣ p ∣) (n , ∣ q ∣) = ΣP≡ _ _ m≡n
       where
       open ↔
-      open import QIT.Fin.Properties
       [m]↔[n] : Fin m ↔ Fin n
       [m]↔[n] = flip q ∘ p
       m≡n : m ≡ n
@@ -51,4 +51,4 @@ module _ {ℓA} where
         (↔to-Injection [m]↔[n])
         (↔to-Injection (flip [m]↔[n]))
     isContrΣSz : isContr (ΣP ℕ Sz)
-    isContrΣSz = mkIsContr _ isFiniteA isPropΣSz
+    -- isContrΣSz = mkIsContr _ isFiniteA isPropΣSz

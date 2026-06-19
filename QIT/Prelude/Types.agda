@@ -17,20 +17,19 @@ data ⊥p : Prop where
 ⊥ : Set
 ⊥ = Box ⊥p
 ⊥p* : ∀ {ℓA} → Prop ℓA
-⊥p* {ℓA} = Liftp ℓA ⊥p
+⊥p* {ℓA} = LiftP ℓA ⊥p
 ⊥* : ∀ {ℓA} → Set ℓA
 ⊥* {ℓA} = Lift ℓA ⊥
 
 data ⊤p : Prop where
   tt : ⊤p
-⊤ : Set
-⊤ = Box ⊤p
+data ⊤ : Set where
+  tt : ⊤
 ⊤p* : ∀ {ℓA} → Prop ℓA
-⊤p* {ℓA} = Liftp ℓA ⊤p
+⊤p* {ℓA} = LiftP ℓA ⊤p
 ⊤* : ∀ {ℓA} → Set ℓA
 ⊤* {ℓA} = Lift ℓA ⊤
 
-pattern ttˢ = box tt
 pattern tt* = liftp tt
 pattern tt* = lift tt
 
@@ -39,7 +38,6 @@ infixr 4 _,_
 open import Agda.Builtin.Sigma public
   renaming (fst to proj₁; snd to proj₂)
   hiding (module Σ)
-
 
 module Σ = Agda.Builtin.Sigma.Σ
   renaming (fst to proj₁; snd to proj₂)

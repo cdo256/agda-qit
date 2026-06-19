@@ -1,3 +1,4 @@
+{-# OPTIONS --injective-type-constructors #-}
 module QIT.Prelude.Identity where
 
 infix 4 _≡_

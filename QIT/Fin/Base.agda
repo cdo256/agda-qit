@@ -2,12 +2,11 @@ module QIT.Fin.Base where
 
 open import QIT.Prelude
 open import QIT.Prop
-open import QIT.Relation.Base
-open import QIT.Relation.Subset
-open import QIT.Relation.Nullary
-open import QIT.Function.Base 
-open import Data.Fin as Fin hiding (_≟_; pred) public
 open import QIT.Nat
+
+data Fin : ℕ → Set where
+  zero : ∀ {n} → Fin (suc n)
+  suc : ∀ {n} → Fin n → Fin (suc n)
 
 Fin-suc-injective : ∀ {m} {a : Fin m} {b : Fin m}
                   → suc a ≡ suc b → a ≡ b

@@ -5,22 +5,9 @@ open import QIT.Prelude.Truncation
 
 module QIT.Prelude.Logic where
 
-absurdp : ∀ {ℓA} {ℓA : Set ℓA} → ⊥p → ℓA
-absurdp ()
-absurd : ∀ {ℓA} {ℓA : Set ℓA} → ⊥ → ℓA
-absurd ()
-absurdp' : ∀ {ℓ} {A : Prop ℓ} → ⊥p → A
-absurdp' ()
-
-⊥→⊥p : ⊥ → ⊥p
-⊥→⊥p ()
-
 infix 6 ¬_
 ¬_ : ∀ {ℓ} (X : Prop ℓ) → Prop ℓ
 ¬ X = X → ⊥p
-
-_≢_ : ∀ {ℓ} {A : Set ℓ} (x y : A) → Prop ℓ
-x ≢ y = ¬ (x ≡ y)
 
 module ∧ {ℓ ℓ'} where
   infixr 5 _∧ᵖ_
