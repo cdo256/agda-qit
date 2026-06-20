@@ -37,7 +37,7 @@ open import QIT.Relation.SetQuotient
 open import QIT.QW.W S P
 open import QIT.Algebra F
 open import QIT.Algebra.Lift S P ℓV
-open import Data.Maybe
+open import QIT.Maybe
 open import QIT.QW.Equation S P ℓV
 open import QIT.Category.Preorder
 open import QIT.Category.Setoid

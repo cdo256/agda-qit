@@ -34,7 +34,7 @@ module QIT.QW.Colimit.Base {ℓI} {ℓ≤}
   Pf p = P.hom (box p)
 
   Colim₀ : Set (ℓI ⊔ ℓD ⊔ ℓD')
-  Colim₀ = Σ[ i ∈ I ] P̂ i
+  Colim₀ = Σ I P̂
 
   data _≈ˡ_ : Colim₀ → Colim₀ → Prop (ℓ≤ ⊔ ℓI ⊔ ℓD ⊔ ℓD') where
     ≈lstage : ∀ i → {x x' : P̂ i} → x ≡ x'

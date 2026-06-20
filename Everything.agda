@@ -84,14 +84,14 @@ import QIT.Plump
 
 -- QW type definition
 import QIT.QW.W
--- import QIT.QW.Equation
--- import QIT.QW.Signature
--- import QIT.QW.Algebra
--- import QIT.QW.Stage
--- import QIT.QW.StageColimit
--- import QIT.QW.Colimit
--- import QIT.QW.Locality
--- import QIT.QW.Cocontinuity
+import QIT.QW.Equation
+import QIT.QW.Signature
+import QIT.QW.Algebra
+import QIT.QW.Stage
+import QIT.QW.StageColimit
+import QIT.QW.Colimit
+import QIT.QW.Locality
+import QIT.QW.Cocontinuity
 -- import QIT.QW
 
 -- -- Extended Type Theories

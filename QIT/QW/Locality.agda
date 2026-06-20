@@ -20,7 +20,7 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
 
   module Z = ZP.AlgProperties ZA
 
-  open import Data.Nat.Base hiding (_⊔_)
+  open import QIT.Nat
   open import QIT.Relation.Subset
   open import QIT.Container.Base
   open import QIT.Container.Properties

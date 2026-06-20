@@ -64,8 +64,8 @@ module ⊎ where
   data _⊎_ {ℓA ℓB} (A : Set ℓA) (B : Set ℓB) : Set (ℓA ⊔ ℓB) where
     inj₁ : A → A ⊎ B
     inj₂ : B → A ⊎ B
-  [_,_] : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : Set ℓB} {C : Set ℓC}
-        → (A → C) → (B → C) → A ⊎ B → C
+  [_,_] : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : Set ℓB} {C : A ⊎ B → Set ℓC}
+        → ((a : A) → C (inj₁ a)) → ((b : B) → C (inj₂ b)) → (x : A ⊎ B) → C x
   [ f , g ] (inj₁ x) = f x
   [ f , g ] (inj₂ x) = g x
 
