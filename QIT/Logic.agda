@@ -1,5 +1,5 @@
 open import QIT.Prelude
-open import QIT.Identity
+open import QIT.Prelude.Identity
 
 module QIT.Logic where
 
