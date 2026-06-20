@@ -90,9 +90,18 @@ module WithSetQuotients
     where
 
     open SetQuotientStr (sq A R) using ([_]; quot-rel) public
+    {-# DISPLAY SetQuotientStr.[_] _ x = [ x ] #-}
+    {-# DISPLAY SetQuotientStr.quot-rel _ x y r = quot-rel x y r #-}
+
     module _ {ℓB} where
       open SetQuotientElimStr (sqe (sq A R) ℓB) using ( quot-elim ; quot-elim-beta ; quot-rec
                                     ; quot-rec-beta ; quot-recp ; quot-elimp) public
+      {-# DISPLAY SetQuotientElimStr.quot-elim _ B f eq q = quot-elim B f eq q #-}
+      {-# DISPLAY SetQuotientElimStr.quot-elim-beta _ B f eq x = quot-elim-beta B f eq x #-}
+      {-# DISPLAY SetQuotientElimStr.quot-rec _ f eq q = quot-rec f eq q #-}
+      {-# DISPLAY SetQuotientElimStr.quot-rec-beta _ f eq x = quot-rec-beta f eq x #-}
+      {-# DISPLAY SetQuotientElimStr.quot-recp _ f q = quot-recp f q #-}
+      {-# DISPLAY SetQuotientElimStr.quot-elimp _ B f q = quot-elimp B f q #-}
 
   open SetQuotient public
 
