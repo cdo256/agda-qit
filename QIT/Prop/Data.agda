@@ -2,8 +2,8 @@ module QIT.Prop.Data where
 
 open import QIT.Prelude
 open import QIT.Prop.Base
-open import QIT.Prop.Logic
-open import QIT.Prop.Path
+open import QIT.Logic
+open import QIT.Identity
 open import QIT.Prop.Properties
 
 data Maybep {ℓ} (X : Prop ℓ) :  Prop ℓ where

@@ -1,6 +1,6 @@
 open import QIT.Prelude
 
-module QIT.Identity.Properties where
+module QIT.Identity where
 
 open import QIT.Prelude.Identity public
 
@@ -18,7 +18,6 @@ postulate
     → (B : (y : A) → x ≡ y → Set ℓB)
     → {y : A} (p : x ≡ y) → B x refl → B y p
 
-
 {-# REWRITE subst-id #-}
 {-# REWRITE subst-const #-}
 
@@ -33,7 +32,6 @@ Jp B refl x = x
 ≡→≡ˢ : ∀ {ℓA} {A : Set ℓA} {x y : A} → x ≡ y → x ≡ˢ y
 ≡→≡ˢ {x = x} {y} p = J (λ y p → x ≡ˢ y) p reflˢ
 
--- Two variants on cubical's Σ≡Prop in a standard Agda environment.
 ΣP≡' : ∀ {a b} {A : Set a} {B : A → Prop b}
     → (a1 a2 : A) → a1 ≡ a2
     → ∀ (b1 : B a1) (b2 : B a2)

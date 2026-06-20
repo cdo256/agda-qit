@@ -1,6 +1,6 @@
 open import QIT.Prelude
 open import QIT.Prop
-open import QIT.Prop.Logic
+open import QIT.Logic
 import QIT.Container.Base as W
 
 module QIT.Plump.Extensional.Properties {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where

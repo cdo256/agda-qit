@@ -1,8 +1,8 @@
 module QIT.IIT.Cont1 where
 
 open import QIT.Prelude
-open import Data.Nat.Base hiding (_+_)
-open import Data.Fin.Base hiding (_+_)
+open import QIT.Nat
+open import QIT.Fin.Base
 
 module _ where
   data SortSig : Set

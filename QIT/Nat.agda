@@ -49,6 +49,22 @@ m > n = n < m
 _≥_ : ℕ → ℕ → Prop
 m ≥ n = n ≤ m
 
+≤-refl : ∀ {m} → m ≤ m
+≤-refl {zero} = z≤n
+≤-refl {suc m} = s≤s ≤-refl
+
+n≤1+n : ∀ n → n ≤ suc n
+n≤1+n zero = z≤n
+n≤1+n (suc n) = s≤s (n≤1+n n)
+
+m≤n⇒m≤1+n : ∀ {m n} → m ≤ n → m ≤ suc n
+m≤n⇒m≤1+n z≤n = z≤n
+m≤n⇒m≤1+n (s≤s p) = s≤s (m≤n⇒m≤1+n p)
+
+≤-trans : ∀ {l m n} → l ≤ m → m ≤ n → l ≤ n
+≤-trans z≤n q = z≤n
+≤-trans (s≤s p) (s≤s q) = s≤s (≤-trans p q)
+
 ≤-total : ∀ m n → m ≤ n ∨ n ≤ m
 ≤-total zero zero = ∨.inl z≤n
 ≤-total zero (suc n) = ∨.inl z≤n
@@ -56,4 +72,3 @@ m ≥ n = n ≤ m
 ≤-total (suc m) (suc n) with ≤-total m n
 ... | ∨.inl p = ∨.inl (s≤s p)
 ... | ∨.inr q = ∨.inr (s≤s q)
-

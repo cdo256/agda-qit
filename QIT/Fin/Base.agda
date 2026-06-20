@@ -8,6 +8,13 @@ data Fin : ℕ → Set where
   zero : ∀ {n} → Fin (suc n)
   suc : ∀ {n} → Fin n → Fin (suc n)
 
+inject₁ : ∀ {n} → Fin n → Fin (suc n)
+inject₁ = suc
+
+fromℕ : ∀ n → Fin (suc n)
+fromℕ zero = zero
+fromℕ (suc n) = suc (fromℕ n)
+
 Fin-suc-injective : ∀ {m} {a : Fin m} {b : Fin m}
                   → suc a ≡ suc b → a ≡ b
 Fin-suc-injective ≡.refl = ≡.refl

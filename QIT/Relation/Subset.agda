@@ -2,7 +2,7 @@ module QIT.Relation.Subset where
 
 open import QIT.Prelude
 open import QIT.Prelude.Types using (ΣP; _,_; fst; snd; ⟨_⟩ᴾ) public
-open import QIT.Identity.Properties using (ΣP≡; ΣP≡'; substΣP) public
+open import QIT.Identity using (ΣP≡; ΣP≡'; substΣP) public
 open import QIT.Prop
 
 Singleton : ∀ {ℓA} {A : Set ℓA} (a : A) → Set ℓA

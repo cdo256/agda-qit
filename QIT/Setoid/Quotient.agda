@@ -1,7 +1,7 @@
 open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Prop.Properties using (isPropBox)
-open import QIT.Prop.Logic
+open import QIT.Logic
 open import QIT.Setoid.Base renaming (_[_≈_] to _⟦_≈_⟧)
 open import QIT.Relation.Binary using (IsEquivalence)
 import QIT.Relation.SetQuotient as Quot

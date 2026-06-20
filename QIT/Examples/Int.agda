@@ -47,7 +47,6 @@ postulate
     → r ≡ˢ elim A
 
 module Examples where
-  open import Data.Bool
   open ≡
   -1ℤ 0ℤ 1ℤ 2ℤ : ℤ
   -1ℤ = p z

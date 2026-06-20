@@ -3,7 +3,7 @@ module QIT.Examples.Nat where
 open import QIT.Prelude
 open import QIT.Relation.Nullary
 open import QIT.Prop hiding (_≡ˢ_)
-open import Data.Bool.Properties 
+open import QIT.Bool
 
 postulate
   ℕ : Set
@@ -38,7 +38,6 @@ postulate
     → r ≡ˢ elim A
 
 module Examples where
-  open import Data.Bool
   0ℕ : ℕ
   0ℕ = z
   1ℕ : ℕ
@@ -77,7 +76,7 @@ module Examples where
     not (isEven (s n))
       ≡⟨ ≡.cong not isEven.sˢ ⟩
     not (not (isEven n))
-      ≡⟨ ≡ˢ→≡ (not-involutive _) ⟩
+      ≡⟨ not-involutive _ ⟩
     isEven n ∎
     where
     open ≡.≡-Reasoning

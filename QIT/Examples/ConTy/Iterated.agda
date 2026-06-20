@@ -4,9 +4,7 @@ open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Relation.Binary using (IsEquivalence)
 open import QIT.Category.Base
-open import Data.Nat.Base using (ℕ; zero; suc)
-open import Data.Nat.Properties using (≤-refl; m≤n⇒m≤1+n; n≤1+n)
-open import Data.Nat.Base using (_≤_; z≤n; s≤s)
+open import QIT.Nat using (ℕ; zero; suc; _≤_; z≤n; s≤s; ≤-refl; m≤n⇒m≤1+n; n≤1+n)
 
 -- Iterated ConTy algebra.
 --

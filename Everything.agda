@@ -24,9 +24,9 @@ import QIT.Fin.Base
 import QIT.Fin.Properties
 
 import QIT.Function.Base
+import QIT.Identity
 import QIT.Prop.Base
-import QIT.Prop.Logic
-import QIT.Prop.Path
+import QIT.Logic
 import QIT.Prop.Data
 import QIT.Prop.Properties
 import QIT.Prop

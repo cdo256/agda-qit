@@ -1,6 +1,6 @@
 open import QIT.Prelude
 open import QIT.Prop
-open import QIT.Prop.Logic
+open import QIT.Logic
 open import QIT.Function.Base
 import QIT.Container.Base as W
 

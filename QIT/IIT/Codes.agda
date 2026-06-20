@@ -1,8 +1,8 @@
 module QIT.IIT.Codes where
 
 open import QIT.Prelude
-open import Data.Nat.Base hiding (_+_)
-open import Data.Fin.Base hiding (_+_)
+open import QIT.Nat
+open import QIT.Fin.Base
 
 -- data Con : Set
 

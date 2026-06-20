@@ -52,4 +52,4 @@ module ↔ where
     module p = _↔_ p
     module q = _↔_ q
 
-open ↔ using (_↔_; ↔to-Injection) public
+open ↔ using (_↔_) public

@@ -2,8 +2,8 @@ module QIT.Prop.Properties where
 
 open import QIT.Prelude
 open import QIT.Prop.Base
-open import QIT.Prop.Logic
-open import QIT.Prop.Path
+open import QIT.Logic
+open import QIT.Identity
 
 sym : ∀ {ℓ} {A : Set ℓ} {x y : A} → x ≡ y → y ≡ x
 sym refl = refl

@@ -3,7 +3,7 @@
 module QIT.Prop.HetPath where
 
 open import QIT.Prelude
-open import QIT.Prop.Path
+open import QIT.Identity
 
 private
   variable

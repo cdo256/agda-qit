@@ -2,7 +2,7 @@ module QIT.Plump.Extensional.Base {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP
 
 open import QIT.Prelude
 open import QIT.Prop
-open import QIT.Prop.Logic
+open import QIT.Logic
 import QIT.Container.Base as W
 open W hiding (sup)
 open import QIT.Setoid
