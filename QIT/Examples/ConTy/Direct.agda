@@ -96,7 +96,7 @@ _∘_ {A} {B} {C} g f = record
         ≡⟨ ≡.cong (subst C.Ty (g.▷ᴿ _)) (tyᴿ-subst g (f.▷ᴿ a) (f.tyᴿ _ b)) ⟩
       subst C.Ty (g.▷ᴿ (f.tyᴿ _ a))
                  (subst C.Ty (≡.cong g.conᴿ (f.▷ᴿ a)) (g.tyᴿ _ (f.tyᴿ _ b)))
-        ≡⟨ ≡.subst-subst {P = C.Ty} (≡.cong g.conᴿ (f.▷ᴿ a)) {g.▷ᴿ (f.tyᴿ _ a)} ⟩
+        ≡⟨ ≡.subst-subst C.Ty (≡.cong g.conᴿ (f.▷ᴿ a)) (g.▷ᴿ (f.tyᴿ _ a)) _ ⟩
       subst C.Ty (≡.trans (≡.cong g.conᴿ (f.▷ᴿ a)) (g.▷ᴿ (f.tyᴿ _ a)))
                  (g.tyᴿ _ (f.tyᴿ _ b)) ∎
   v : ∀ {γ} a b
@@ -123,7 +123,7 @@ _∘_ {A} {B} {C} g f = record
         ≡⟨ ≡.cong (subst C.Ty (g.▷ᴿ _)) (tyᴿ-subst g (f.▷ᴿ a) (f.tyᴿ _ b)) ⟩
       subst C.Ty (g.▷ᴿ (f.tyᴿ _ a))
                  (subst C.Ty (≡.cong g.conᴿ (f.▷ᴿ a)) (g.tyᴿ _ (f.tyᴿ _ b)))
-        ≡⟨ ≡.subst-subst {P = C.Ty} (≡.cong g.conᴿ (f.▷ᴿ a)) {g.▷ᴿ (f.tyᴿ _ a)} ⟩
+        ≡⟨ ≡.subst-subst C.Ty (≡.cong g.conᴿ (f.▷ᴿ a)) (g.▷ᴿ (f.tyᴿ _ a)) _ ⟩
       subst C.Ty (≡.trans (≡.cong g.conᴿ (f.▷ᴿ a)) (g.▷ᴿ (f.tyᴿ _ a)))
                  (g.tyᴿ _ (f.tyᴿ _ b)) ∎
 

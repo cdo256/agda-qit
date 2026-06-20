@@ -271,5 +271,5 @@ AlgebraComp {A} {B} r f = record
       subst B.Tyᴬ f.▷ʰ (f.tyʰ (subst A.Tyᴬ r.▷ᴿ (r.tyᴿ B)))
         ≡⟨ ≡.cong (subst B.Tyᴬ f.▷ʰ) (tyʰ-subst f r.▷ᴿ (r.tyᴿ B)) ⟩
       subst B.Tyᴬ f.▷ʰ (subst B.Tyᴬ (≡.cong f.conʰ r.▷ᴿ) (f.tyʰ (r.tyᴿ B)))
-        ≡⟨ ≡.subst-subst {P = B.Tyᴬ} (≡.cong f.conʰ r.▷ᴿ) {f.▷ʰ} ⟩
+        ≡⟨ ≡.subst-subst B.Tyᴬ (≡.cong f.conʰ r.▷ᴿ) f.▷ʰ (f.tyʰ (r.tyᴿ B)) ⟩
       subst B.Tyᴬ (≡.trans (≡.cong f.conʰ r.▷ᴿ) f.▷ʰ) (f.tyʰ (r.tyᴿ B)) ∎
