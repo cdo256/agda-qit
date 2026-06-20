@@ -21,10 +21,10 @@ postulate
 {-# REWRITE subst-id #-}
 {-# REWRITE subst-const #-}
 
-Jp : ∀ {ℓA ℓB} {A : Set ℓA} {x : A}
-  → (B : (y : A) → x ≡ y → Prop ℓB)
+Jp : ∀ {ℓA ℓB} {A : Set ℓA} {x : A} → (B : (y : A) → x ≡ y → Prop ℓB)
   → {y : A} (p : x ≡ y) → B x refl → B y p
 Jp B refl x = x
+
 
 ≡ˢ→≡ : ∀ {ℓA} {A : Set ℓA} {x y : A} → x ≡ˢ y → x ≡ y
 ≡ˢ→≡ reflˢ = refl
@@ -49,3 +49,15 @@ Jp B refl x = x
 substΣP : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB}
         → {a1 a2 : A} (p : a1 ≡ a2) (b : B a1) → Σ A B
 substΣP {B = B} {a2 = a2} p b = a2 , subst B p b
+
+subst-Π : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : Set ℓB} (C : A → B → Set ℓC)
+        → {x y : A} (p : x ≡ y)
+        → (g : ∀ z → C x z)
+        → (z : B)
+        → subst (λ a → ∀ b → C a b) p g z
+        ≡ subst (λ a → C a z) p (g z)
+subst-Π {A = A} {B} C {x} p =
+  Jp (λ _ p → (g : ∀ b → C x b) (z : B)
+            → subst (λ a → ∀ b → C a b) p g z
+            ≡ subst (λ a → C a z) p (g z))
+     p (λ _ _ → refl)
