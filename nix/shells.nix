@@ -22,8 +22,6 @@
           pkgs.julia-mono
         ];
         shellHook = ''
-          #export FONTCONFIG_FILE=$HOME/.config/fontconfig/fonts.conf
-          #export FONTCONFIG_PATH=${pkgs.fontconfig.out}/etc/fonts
           fc-cache -f
         '';
       };

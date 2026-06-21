@@ -1,0 +1,5 @@
+name: agda-logic
+depend: standard-library
+include: .
+flags: --prop --rewriting
+
