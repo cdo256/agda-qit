@@ -26,9 +26,9 @@ open import QIT.Functor.Base
 
 expr→Z : {V : Set ℓV} → Expr V → Z
 expr→Z (W.sup (inj₁ v , f)) = ⊥ᶻ
-expr→Z (W.sup (inj₂ s , f)) = Z.sup (ιˢ s , λ i → expr→Z (f i))
+expr→Z (W.sup (inj₂ s , f)) = sup (ιˢ s , λ i → expr→Z (f i))
 
-_≤ᴱ_ : {V : Set ℓV} → Expr V → Z → Prop ℓA
+_≤ᴱ_ : {V : Set ℓV} → Expr V → Z → Prop (ℓS ⊔ ℓP)
 e ≤ᴱ α = expr→Z e Z.≤ α
 
 record OccurrenceAtDepth {V : Set ℓV} (v : V) (e : Expr V) (n : ℕ) : Set (ℓS ⊔ ℓP ⊔ ℓV) where
@@ -42,18 +42,18 @@ OccursAtDepth : {V : Set ℓV} (v : V)
               → Prop (ℓS ⊔ ℓP ⊔ ℓV)
 OccursAtDepth v e n = ∥ OccurrenceAtDepth v e n ∥
 
-record DepthPreservingEquation (E : Equation) : Prop (ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓV) where
+record DepthPreservingEquation (E : Equation) : Prop (ℓS ⊔ ℓP ⊔ ℓV) where
   module E = Equation E
   field
     var : ∀ (v : E.V) (n : ℕ)
         → OccursAtDepth v E.lhs n ⇔ OccursAtDepth v E.rhs n
     eq : ∀ (α : Z) → E.lhs ≤ᴱ α ⇔ E.rhs ≤ᴱ α
 
-record DepthPreservingSig : Prop (ℓE ⊔ ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓV) where
+record DepthPreservingSig : Prop (ℓE ⊔ ℓS ⊔ ℓP ⊔ ℓV) where
   field
     dp : ∀ (e : E) → DepthPreservingEquation (Ξ e)
 
-LocalEquation : (E : Equation) → (α : Z) → Prop ℓA
+LocalEquation : (E : Equation) → (α : Z) → Prop (ℓS ⊔ ℓP)
 LocalEquation E α = E.lhs ≤ᴱ α ∧ E.rhs ≤ᴱ α
   where
   module E = Equation E

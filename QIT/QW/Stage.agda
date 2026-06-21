@@ -178,6 +178,21 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
       ; sym = ≈psym
       ; trans = ≈ptrans } }
 
+  import QIT.Setoid.Indexed as Ix
+  D̃* : Ix.Setoid {!!} {!!} {!!}
+  D̃* = record
+    { I = Z
+    ; A = D₀
+    ; R = λ α β ŝ t̂ → (α ∨ᶻ β) ⊢ pweaken ∨ᶻ-l ŝ ≈ᵇ pweaken ∨ᶻ-r t̂
+    ; isEquivalence = record
+      { refl = ≈prefl
+      ; sym = {!≈psym*!}
+      ; trans = {!!} } }
+      where
+      ≈psym* : ∀ {α} {β} {ŝ} {t̂}
+             → ((α ∨ᶻ β) ⊢ pweaken ∨ᶻ-l ŝ ≈ᵇ pweaken ∨ᶻ-r t̂)
+             → ((β ∨ᶻ α) ⊢ pweaken ∨ᶻ-l t̂ ≈ᵇ pweaken ∨ᶻ-r ŝ)
+
   D̃/≈ : Z → Set (ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV)
   D̃/≈ α = D̃ α /≈
 
@@ -197,6 +212,25 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
     hom {α} {β} (box α≤β) = record
       { to = pweaken α≤β
       ; cong = ≈pweaken α≤β }
+
+    D̃-≤-irrel : ∀ {α} {t : T} (p q : t ≤ᵀ α) → D̃ α [ (t , p) ≈ (t , q) ]
+    D̃-≤-irrel p q = ≡→≈ (D̃ _) (ΣP≡ (_ , p) (_ , q) ≡.refl)
+
+    cast-rhs : ∀ {γ s t} {ps : s ≤ᵀ γ} {pt qt : t ≤ᵀ γ}
+      → D̃ γ [ (s , ps) ≈ (t , pt) ]
+      → D̃ γ [ (s , ps) ≈ (t , qt) ]
+    cast-rhs {γ} {s = s} {t = t} {ps = ps} {pt = pt} {qt = qt} p =
+      ≡.substp (λ ○ → D̃ γ [ (s , ps) ≈ ○ ]) (ΣP≡ (t , pt) (t , qt) ≡.refl) p
+
+    cast-lhs : ∀ {γ s t} {ps qs : s ≤ᵀ γ} {pt : t ≤ᵀ γ}
+      → D̃ γ [ (s , ps) ≈ (t , pt) ]
+      → D̃ γ [ (s , qs) ≈ (t , pt) ]
+    cast-lhs {γ} {s = s} {t = t} {ps = ps} {qs = qs} {pt = pt} p =
+      ≡.substp (λ ○ → D̃ γ [ ○ ≈ (t , pt) ]) (ΣP≡ (s , ps) (s , qs) ≡.refl) p
+
+    subst-D₀-fst : ∀ {γ δ} (p : γ ≡ δ) (û : D₀ γ) → (subst D₀ p û) .fst ≡ û .fst
+    subst-D₀-fst ≡.refl û = ≡.refl
+
 
   D : Diagram/≈ (ℓA ⊔ ℓS ⊔ ℓP) (ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV)
   D = record
