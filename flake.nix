@@ -1,5 +1,5 @@
 {
-  description = "MSc Project on Virtual Sets";
+  description = "Studying Quotient Inductive Types using Agda";
 
   inputs = {
     flake-parts.url = "github:hercules-ci/flake-parts";
