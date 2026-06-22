@@ -5,38 +5,51 @@ open import QIT.Prelude.Truncation
 
 module QIT.Prelude.Logic where
 
+data ⊥ : Prop where
+⊥* : Prop ℓA
+⊥* = LiftP _ ⊥
+
+data ⊤ : Prop where
+  tt : ⊤
+⊤* : Prop ℓA
+⊤* = LiftP _ ⊤
+
+pattern tt* = liftp tt
+
 infix 6 ¬_
-¬_ : ∀ {ℓ} (X : Prop ℓ) → Prop ℓ
-¬ X = X → ⊥p
+¬_ : Prop ℓA → Prop ℓA
+¬ X = X → ⊥
 
-module ∧ {ℓ ℓ'} where
-  infixr 2 _∧ᵖ_
-  infixr 2 _∧_
-  infixr 4 _,_
-  record _∧ᵖ_ (A : Prop ℓ) (B : A → Prop ℓ') : Prop (ℓ ⊔ ℓ') where
-    constructor _,_
-    field
-      fst : A
-      snd : B fst
-  open _∧ᵖ_ public
+infixr 2 _∧ᵖ_
+infixr 2 _∧_
+record _∧ᵖ_ (A : Prop ℓA) (B : A → Prop ℓB) : Prop (ℓA ⊔ ℓB) where
+  constructor ∧i
+  field
+    ∧e₁ : A
+    ∧e₂ : B ∧e₁
+open _∧ᵖ_ public
 
-  _∧_ : (A : Prop ℓ) (B : Prop ℓ') → Prop (ℓ ⊔ ℓ') 
-  A ∧ B = A ∧ᵖ λ _ → B
+_∧_ : (A : Prop ℓA) (B : Prop ℓB) → Prop (ℓA ⊔ ℓB) 
+A ∧ B = A ∧ᵖ λ _ → B
 
-open ∧ public using (_∧ᵖ_; _∧_; _,_)
+infixr 1 _∨_
+data _∨_ (A : Prop ℓA) (B : Prop ℓB) : Prop (ℓA ⊔ ℓB) where
+  ∨i₁ : A → A ∨ B
+  ∨i₂ : B → A ∨ B
 
-module ∨ {ℓ ℓ'} (A : Prop ℓ) (B : Prop ℓ') where
-  infixr 1 _∨_
-  data _∨_ : Prop (ℓ ⊔ ℓ') where
-    inl : A → _∨_
-    inr : B → _∨_
-
-open ∨ public using (_∨_)
+∨e : {A : Prop ℓA} {B : Prop ℓB} {C : Prop ℓC}
+   → (A → C) → (B → C) → (A ∨ B) → C
+∨e f g (∨i₁ a) = f a
+∨e f g (∨i₂ b) = g b
 
 -- Bi-implication for propositions.
 infix 1 _⇔_
-_⇔_ : ∀ {ℓA ℓB} (A : Prop ℓA) (B : Prop ℓB) → Prop (ℓA ⊔ ℓB)
+_⇔_ : (A : Prop ℓA) (B : Prop ℓB) → Prop (ℓA ⊔ ℓB)
 A ⇔ B = (A → B) ∧ (B → A)
 
-∃ : ∀ {a b} {A : Set a} → (A → Prop b) → Prop (a ⊔ b)
-∃ {A = A} B = ∥ ΣP A B ∥
+data ∃ {A : Set ℓA} (B : A → Prop ℓB) : Prop (ℓA ⊔ ℓB) where
+  ∃i : (a : A) → (b : B a) → ∃ B
+
+∃e : {A : Set ℓA} {B : A → Prop ℓB} {C : Prop ℓC}
+   → (∀ a → B a → C) → ∃ B → C
+∃e f (∃i a b) = f a b

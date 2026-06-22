@@ -219,9 +219,9 @@ substΣP : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB}
 substΣP {B = B} {a2 = a2} p b = a2 , subst B p b
 
 subst-ΣP : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : A → Set ℓB} (C : ∀ a → B a → Prop ℓC)
-        → {a1 a2 : A} (p : a1 ≡ a2) (u : ΣP (B a1) (C a1))
-        → subst (λ a → ΣP (B a) (C a)) p u
-        ≡ (subst B p (u .fst) , dsubstp₂ C p refl (u .snd))
+         → {a1 a2 : A} (p : a1 ≡ a2) (u : ΣP (B a1) (C a1))
+         → subst (λ a → ΣP (B a) (C a)) p u
+         ≡ (subst B p (u .fst) , dsubstp₂ C p refl (u .snd))
 subst-ΣP C refl u = refl
 
 subst-Π : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : Set ℓB} (C : A → B → Set ℓC)
@@ -248,3 +248,4 @@ subst-cong C f {x} {y} p c = Jp Q p refl
   Q : ∀ y (p : x ≡ y) → Prop _
   Q _ p = subst (λ x → C (f x)) p c
         ≡ subst C (cong f p) c
+        -- 

@@ -55,14 +55,23 @@ module _ where
   -- Uses the unit type ⊤ as the index set, so there's only one index.
   UnindexedSetoid→IndexedSetoid : ∀ {ℓA ℓR} → Unindexed.Setoid ℓA ℓR → Setoid ℓ0 ℓA ℓR
   UnindexedSetoid→IndexedSetoid S = record
-      { I = ⊤
-      ; A = λ _ → S.Carrier
-      ; R = λ _ _ x y → x S.≈ y
-      ; isEquivalence = record
-        { refl = S.refl
-        ; sym = S.sym
-        ; trans = S.trans } }
+    { I = ⊤
+    ; A = λ _ → S.Carrier
+    ; R = λ _ _ x y → x S.≈ y
+    ; isEquivalence = record
+      { refl = S.refl
+      ; sym = S.sym
+      ; trans = S.trans } }
     where module S = Unindexed.Setoid S
+
+  FiberSetoid : ∀ {ℓI ℓA ℓR} (S : Setoid ℓI ℓA ℓR) → S .Setoid.I → Unindexed.Setoid ℓA ℓR
+  FiberSetoid S i = record
+    { Carrier = A i
+    ; _≈_ = R i i
+    ; isEquivalence = record
+      { refl = refl ; sym = sym ; trans = trans } }
+    where
+    open Setoid S
 
   -- Convert an indexed setoid (at level ℓ0) to a regular setoid.
   -- Takes the dependent sum Σ I A as the carrier, and defines equality

@@ -38,7 +38,7 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
 
   private
     ℓD = ℓA ⊔ ℓS ⊔ ℓP
-    ℓD' = ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV
+    ℓD' = ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV
 
   -- Container functor
   open import QIT.Container.Base

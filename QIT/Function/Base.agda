@@ -1,11 +1,7 @@
-{-# OPTIONS --universe-polymorphism #-}
 module QIT.Function.Base where
 
 open import QIT.Prelude
 open import QIT.Prop
-
-variable
-  ℓA ℓB : Level
 
 Surjective : ∀ {A : Set ℓA} {B : Set ℓB}
            → (A → B) → Prop _
@@ -17,39 +13,39 @@ Surjection A B = ΣP (A → B) Surjective
 _↠_ = Surjection
 
 -- Bijections between sets - one-to-one correspondences with explicit inverses.
-module ↔ where
-  record _↔_ {ℓX ℓY} (X : Set ℓX) (Y : Set ℓY) : Set (ℓX ⊔ ℓY) where
+module ≅ˢ where
+  record _≅ˢ_ (X : Set ℓX) (Y : Set ℓY) : Set (ℓX ⊔ ℓY) where
     field
       to : X → Y
       from : Y → X
       rinv : ∀ x → from (to x) ≡ x
       linv : ∀ y → to (from y) ≡ y
 
-  open _↔_ public
+  open _≅ˢ_ public
 
-  refl : ∀ {ℓX} {X : Set ℓX} → X ↔ X
+  refl : {X : Set ℓX} → X ≅ˢ X
   refl = record
     { to = λ x → x
     ; from = λ x → x
     ; rinv = λ _ → ≡.refl
     ; linv = λ _ → ≡.refl }
 
-  flip : ∀ {ℓX ℓY} {X : Set ℓX} {Y : Set ℓY} → X ↔ Y → Y ↔ X
-  flip X↔Y = record
-    { to = X↔Y .from
-    ; from = X↔Y .to
-    ; rinv = X↔Y .linv
-    ; linv = X↔Y .rinv }
-    where open _↔_ X↔Y
+  sym : {X : Set ℓX} {Y : Set ℓY} → X ≅ˢ Y → Y ≅ˢ X
+  sym X≅Y = record
+    { to = X≅Y .from
+    ; from = X≅Y .to
+    ; rinv = X≅Y .linv
+    ; linv = X≅Y .rinv }
+    where open _≅ˢ_ X≅Y
 
-  _∘_ : ∀ {ℓX ℓY ℓZ} {X : Set ℓX} {Y : Set ℓY} {Z : Set ℓZ} → Y ↔ Z → X ↔ Y → X ↔ Z
+  _∘_ : {X : Set ℓX} {Y : Set ℓY} {Z : Set ℓZ} → Y ≅ˢ Z → X ≅ˢ Y → X ≅ˢ Z
   q ∘ p = record
     { to = λ x → q.to (p.to x)
     ; from = λ z → p.from (q.from z)
     ; rinv = λ x → ≡.trans (≡.cong p.from (q.rinv (p.to x))) (p.rinv x)
     ; linv = λ z → ≡.trans (≡.cong q.to (p.linv (q.from z))) (q.linv z) }
     where
-    module p = _↔_ p
-    module q = _↔_ q
+    module p = _≅ˢ_ p
+    module q = _≅ˢ_ q
 
-open ↔ using (_↔_) public
+open ≅ˢ using (_≅ˢ_) public

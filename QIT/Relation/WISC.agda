@@ -59,25 +59,18 @@ IWISC ℓ = (A : Set ℓ) (F : A → Set ℓ)
       → ∃ λ (W : C → Set ℓ)
       → ∀ c → WISC (F c) C W
 
--- module _  where
---   open import QIT.Container.Base
---   open import Data.Nat
---   data S : Set where
---     zeroˢ : S
---     sucˢ : S
---     supˢ : S
---   data P : S → Set where
---     sucᵖ : P sucˢ
---     supᵖ : ℕ → P supˢ
---   BT : Set
---   BT = W S P
-
-  
-
---   encode : BT → Ordinal ℓ0 ℓ0
---   encode (sup (zeroˢ , _)) = {!!}
---   encode (sup (sucˢ , x)) = {!!}
---   encode (sup (supˢ , x)) = {!!}
-
---   module _ (α : ℕ → Ordinal ℓ0 ℓ0) (r : ∀ n → ∃ λ t → encode t ≡ α n)  (wℕ : WISC ℕ S P) where
-    
+module _ {ℓ} (iwisc : IWISC ℓ) where
+  WeakAC'
+    : ∀ (A : Set ℓ)
+    → ∃ λ (C : Set ℓ)
+    → ∃ λ (W : C → Set ℓ)
+    → (B : A → Set ℓ)
+    → (P : ∀ x → B x → Prop ℓ)
+    → (∀ x → ∃ (P x))
+    → ∃ λ (c : C)
+    → ∃ λ (p : W c → A)
+    → ∃ λ (q : ∀ z → B (p z))
+    → Surjective p
+    ∧ (∀ z → P (p z) (q z))
+  WeakAC' A with iwisc ⊤* (λ _ → A)
+  ... | ∣ C , ∣ W , w ∣ ∣ = ∣ C , ∣ W , WeakAC A C W (w tt*) ∣ ∣
