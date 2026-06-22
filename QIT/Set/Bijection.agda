@@ -43,7 +43,7 @@ module _ {ℓX} {A B : Set ℓX} (a!c : A!C) where
     f⁻¹T y = a!c (T y) (isContrT (surj y))
       where
       isContrT : (∃ λ x → f x ≡ y) → isContr (T y)
-      isContrT ∣ x , ≡.refl ∣ = ∣ (x , ≡.refl) , (λ (x' , fx'≡fx) → ΣP≡ (x , _) (x' , _) (inj (≡.sym fx'≡fx))) ∣
+      isContrT (∃.∃i x ≡.refl) = ∃.∃i (x , ≡.refl) (λ (x' , fx'≡fx) → ΣP≡ (x , _) (x' , _) (inj (≡.sym fx'≡fx)))
 
     f⁻¹ : B → A
     f⁻¹ y = fst (f⁻¹T y)
@@ -70,7 +70,7 @@ module _ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} (a!c : A!C) where
     inj' {lift x} {lift y} p = ≡.cong lift (inj (≡.cong lower p))
     surj' : IsSurjection f'
     surj' (lift y) with surj y
-    ... | ∣ x , p ∣ = ∣ lift x , ≡.cong lift p ∣
+    ... | ∃.∃i x p = ∃.∃i (lift x) (≡.cong lift p)
 
 ↔to-Injection : ∀ {ℓX ℓY} {X : Set ℓX} {Y : Set ℓY}
               → (p : X ↔ Y) → IsInjection (p .↔.to)

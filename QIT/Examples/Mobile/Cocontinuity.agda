@@ -44,8 +44,8 @@ module WithZ
 
   depth-preserving≤≥ : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → (ιᶻ (ŝ .fst) ≤ ιᶻ (t̂ .fst)) ∧ (ιᶻ (t̂ .fst) ≤ ιᶻ (ŝ .fst))
   depth-preserving≤≥ α (s , s≤α) (t , t≤α) (≈pcong a μ f g r) =
-      sup≤ (λ i → <sup i (p i .∧.fst))
-    , sup≤ (λ i → <sup i (p i .∧.snd))
+      sup≤ (λ i → <sup i (p i .fst))
+    , sup≤ (λ i → <sup i (p i .snd))
     where
     p : ∀ i → (ιᶻ (f i .fst) ≤ ιᶻ (g i .fst)) ∧ (ιᶻ (g i .fst) ≤ ιᶻ (f i .fst))
     p i = depth-preserving≤≥ (μ i) (f i) (g i) (r i)
@@ -67,8 +67,8 @@ module WithZ
   depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ιᶻ (ŝ .fst) ≡ ιᶻ (t̂ .fst)
   depth-preserving α ŝ t̂ p = antisym s≤t t≤s
     where
-    s≤t = depth-preserving≤≥ α ŝ t̂ p .∧.fst
-    t≤s = depth-preserving≤≥ α ŝ t̂ p .∧.snd
+    s≤t = depth-preserving≤≥ α ŝ t̂ p .fst
+    t≤s = depth-preserving≤≥ α ŝ t̂ p .snd
 
   cocontinuousIso = QC.cocontinuous depth-preserving
 

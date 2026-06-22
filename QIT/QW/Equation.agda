@@ -28,7 +28,7 @@ Sʰ V = V ⊎ S
 
 -- Extended positions: variables are nullary, constructors keep original arity
 Pʰ : (V : Set ℓV) → Sʰ V → Set ℓP
-Pʰ V = ⊎.[ (λ _ → ⊥*) , P ]
+Pʰ V = ⊎.[ (λ _ → ⊥ˢ*) , P ]
 
 Expr : (V : Set ℓV) → Set (ℓS ⊔ ℓP ⊔ ℓV)
 Expr V = W (Sʰ V) (Pʰ V)

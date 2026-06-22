@@ -3,10 +3,7 @@ module QIT.Examples.PartialityMonad.QW where
 open import QIT.Prelude renaming (⊤ to ⊤'; ⊥ to ⊥')
 open import QIT.Prop
 open import QIT.Relation.Subset
-import Data.Nat as ℕ
-open ℕ using (ℕ; zero; suc)
-import Data.Bool as 𝔹
-open 𝔹 using (Bool; false; true)
+open import QIT.Nat as ℕ
 
 interleaved mutual
   infix 4 _≤_ _≈_

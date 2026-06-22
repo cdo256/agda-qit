@@ -52,4 +52,4 @@ module _ {ℓA} where
         (↔to-Injection [m]↔[n])
         (↔to-Injection (flip [m]↔[n]))
     isContrΣSz : isContr (ΣP ℕ Sz)
-    isContrΣSz = mkIsContr _ isFiniteA isPropΣSz
+    isContrΣSz = mkIsContr _ (∃e (λ n p → ∣ (n , p) ∣) isFiniteA) isPropΣSz

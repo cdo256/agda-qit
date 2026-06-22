@@ -1,5 +1,5 @@
 -- Basic foundations
-open import QIT.Prelude
+open import QIT.Prelude hiding (ℓD)
 open import QIT.Prop
 open import QIT.Functor.Base
 open import QIT.Functor.Properties

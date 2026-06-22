@@ -37,7 +37,7 @@ data Sᵀ : Set where
 -- Arity function: leaves have no positions, nodes have I positions.
 -- This gives us the standard I-ary tree structure.
 Pᵀ : Sᵀ → Set
-Pᵀ l = ⊥*
+Pᵀ l = ⊥ˢ*
 Pᵀ n = I
 
 -- The underlying W-type: I-branching trees without quotient.
@@ -51,7 +51,7 @@ Fᵀ X = Σ Sᵀ λ s → Pᵀ s → X
 
 -- Technical lemma: leaf constructors are unique regardless of their
 -- (impossible) children. This follows because ⊥* → T has a unique element.
-leaf≡leaf : ∀ (f g : ⊥* → T) → sup (l , f) ≡ sup (l , g)
+leaf≡leaf : ∀ (f g : ⊥ˢ* → T) → sup (l , f) ≡ sup (l , g)
 leaf≡leaf f g =
   ≡.cong (λ ○ → sup (l , ○)) (≡.funExt λ ())
 

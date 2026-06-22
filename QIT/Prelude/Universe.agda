@@ -3,7 +3,7 @@ module QIT.Prelude.Universe where
 open import Agda.Primitive renaming (lzero to ℓ0) public
 
 variable
-  ℓA ℓB ℓC ℓD ℓE ℓF ℓI ℓP ℓQ ℓX ℓY ℓZ : Level
+  ℓA ℓB ℓC ℓD ℓE ℓF ℓI ℓP ℓQ ℓR ℓS ℓX ℓY ℓZ : Level
 
 record Lift ℓA' (A : Set ℓA) : Set (ℓA ⊔ ℓA') where
   constructor lift

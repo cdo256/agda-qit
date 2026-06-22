@@ -49,7 +49,7 @@ open import QIT.Functor.Properties
 module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
   module Z = ZP.AlgProperties ZA
 
-  open ZW using (ιˢ)
+  open ZW using (ιₛ)
   open Z
 
   -- Diagram is a functor from a preorder category to setoids
@@ -78,7 +78,7 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
 
   -- Constructor for stage elements: build a tree with given shape and children.
   -- The ordinal bound is computed from the children's bounds using plump structure.
-  psup : ∀ a μ (f : ∀ i → D₀ (μ i)) → D₀ (Z.sup (ιˢ a , μ))
+  psup : ∀ a μ (f : ∀ i → D₀ (μ i)) → D₀ (Z.sup (ιₛ a , μ))
   psup a μ f = W.sup (a , λ i → ⟨ f i ⟩ᴾ) , sup≤ (λ i → <sup i (f i .snd))
 
   -- Weakening: if α ≤ β then stage α embeds into stage β.
@@ -90,7 +90,7 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
   -- Variables have minimal complexity ⊥ᶻ, constructors have complexity based on arguments.
   ιᵉ : {V : Set ℓV} → Expr V → Z
   ιᵉ (varᴱ v) = ⊥ᶻ
-  ιᵉ (supᴱ s f) = Z.sup (ιˢ s , λ i → ιᵉ (f i))
+  ιᵉ (supᴱ s f) = Z.sup (ιₛ s , λ i → ιᵉ (f i))
 
   -- Expression-ordinal comparison: when an expression fits within a stage.
   _≤ᴱ_ : {V : Set ℓV} → Expr V → Z → Prop ℓA
@@ -121,7 +121,7 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
     -- Congruence: constructor applications respect equivalence
     ≈pcong : ∀ a μ (f g : ∀ i → D₀ (μ i))
           → (r : ∀ i → μ i ⊢ f i ≈ᵇ g i)
-          → Z.sup (ιˢ a , μ) ⊢ psup a μ f ≈ᵇ psup a μ g
+          → Z.sup (ιₛ a , μ) ⊢ psup a μ f ≈ᵇ psup a μ g
 
     -- Equation satisfaction: enforce the equations from the signature
     ≈psat : ∀ {α} (e : E) (ϕ : Assignment T-alg* (Ξ e))

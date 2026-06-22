@@ -9,7 +9,7 @@ import QIT.Plump.W.Base S P as PlumpW
 import QIT.Plump.Properties S P as Plump
 
 open PlumpW public
-  using (Sᶻ ; Pᶻ ; ιˢ ; ∨ˢ ; ⊥ˢ)
+  using (Sᶻ ; Pᶻ ; ιₛ ; ∨ₛ ; ⊥ₛ)
   renaming ( Z to Z₀; _≤_ to _≤₀_; _<_ to _<₀_; _≤≥_ to _≤≥₀_
            ; ≤≤ to ≤≤₀ ; ≤< to ≤<₀ ; <≤ to <≤₀
            ; sup≤ to sup≤₀ ; <sup to <sup₀)

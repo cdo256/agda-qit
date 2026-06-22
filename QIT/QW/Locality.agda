@@ -6,4 +6,4 @@ module QIT.QW.Locality {ℓS ℓP ℓE ℓV}
   (sig : Sig ℓS ℓP ℓE ℓV)
   where
 
-open import QIT.QW.Definitions public
+-- open import QIT.QW.Definitions public

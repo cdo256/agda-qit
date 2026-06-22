@@ -10,10 +10,6 @@ open import QIT.QW.Equation
 -- This definition follows closely the one defined in Fiore et al. 2022.
 module QIT.QW.Signature where
 
-private
-  variable
-    ℓS ℓP ℓE ℓV : Level
-
 -- A QW signature consists of:
 -- - (S, P): container specifying constructors and their arities
 -- - E: set of equation names

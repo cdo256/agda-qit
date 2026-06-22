@@ -1,4 +1,4 @@
-open import QIT.Prelude
+open import QIT.Prelude hiding (ℓD)
 open import QIT.Prop
 open import QIT.Setoid
 open import QIT.Relation.Base
@@ -48,7 +48,7 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
   module Stage = StageBase.WithZ ZA
   module StageColimit = StageColimitBase.WithZ ZA
 
-  open ZW using (ιˢ)
+  open ZW using (ιₛ)
   open import QIT.QW.Algebra sig
   open StageColimit public
   open import QIT.QW.Colimit propExt sq sqe ≤p ℓD ℓD' hiding (_≈ˡ_)

@@ -14,7 +14,7 @@ Prop→hProp A = Box A , ≡.isPropBox
 mkIsContr
   : ∀ {ℓA} → (A : Set ℓA)
   → ∥ A ∥ → isProp A → isContr A
-mkIsContr A ∣ x ∣ isPropA = ∃i x (isPropA x)
+mkIsContr A ∣ x ∣ isPropA = ∃.∃i x (isPropA x)
 
 Σ≡Prop
   : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB}

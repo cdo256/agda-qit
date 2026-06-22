@@ -5,13 +5,13 @@ module QIT.Logic where
 
 open import QIT.Prelude.Logic public
 
-absurdp : ∀ {ℓ} {A : Set ℓ} → ⊥p → A
-absurdp ()
+⊥e' : ∀ {ℓ} {A : Set ℓ} → ⊥ → A
+⊥e' ()
 
-⊥e : ∀ {ℓ} {A : Prop ℓ} → ⊥p → A
+⊥e : ∀ {ℓ} {A : Prop ℓ} → ⊥ → A
 ⊥e ()
 
-⊥→⊥p : ⊥ → ⊥p
+⊥→⊥p : ⊥ˢ → ⊥
 ⊥→⊥p ()
 
 _≢_ : ∀ {ℓ} {A : Set ℓ} (x y : A) → Prop ℓ

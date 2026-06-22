@@ -26,7 +26,7 @@ DiscreteCat : ∀ {ℓA} → Set ℓA → Category ℓA ℓA ℓA
 DiscreteCat A = StrictCategory→Category (DiscreteStrCat A)
 
 ⊤Cat : Category ℓ0 ℓ0 ℓ0
-⊤Cat = DiscreteCat ⊤
+⊤Cat = DiscreteCat ⊤ˢ
 
 ⊥Cat : Category ℓ0 ℓ0 ℓ0
-⊥Cat = DiscreteCat ⊥
+⊥Cat = DiscreteCat ⊥ˢ

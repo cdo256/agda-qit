@@ -10,9 +10,9 @@ open import QIT.QW
 sig : (A : Set) → QW.Sig ℓ0 ℓ0 ℓ0 ℓ0
 sig A = record
   { S = A
-  ; P = λ _ → ⊥
-  ; E = ⊤
+  ; P = λ _ → ⊥ˢ
+  ; E = ⊤ˢ
   ; Ξ = λ _ → record
-    { V = ⊤ ⊎ ⊤
+    { V = ⊤ˢ ⊎ ⊤ˢ
     ; lhs = QW.varᴱ (inj₁ tt) {λ()}
     ; rhs = QW.varᴱ (inj₂ tt) {λ()} } }

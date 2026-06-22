@@ -1,7 +1,24 @@
 module Everything where
 
+-- Changes:
+--  - QIT.Prelude.Universe: Export universe variables.
+--  - QIT.Prelude.Logic: Rename intro and elim rules.
+
 -- Base
+import QIT.Prelude.Universe
+import QIT.Prelude.Truncation
+import QIT.Prelude.Types
+import QIT.Prelude.Logic
+import QIT.Prelude.Identity
+import QIT.Prelude.HLevel
+import QIT.Prelude.Axiom
+import QIT.Prelude.Decidability
 import QIT.Prelude
+
+-- Propositions
+import QIT.Prop.Base
+import QIT.Prop.Data
+import QIT.Prop.Properties
 import QIT.Prop
 
 -- Relations
@@ -92,39 +109,30 @@ import QIT.QW.StageColimit
 import QIT.QW.Colimit
 import QIT.QW.Locality
 import QIT.QW.Cocontinuity
--- import QIT.QW
+import QIT.QW
 
--- -- Extended Type Theories
--- import QIT.IIT.Cont1
--- -- -- import QIT.IIT.Codes -- incomplete
--- -- -- import QIT.QIIT -- very incomplete
+-- Extended Type Theories
+import QIT.IIT.Cont1
+-- import QIT.IIT.Codes -- incomplete
+-- import QIT.QIIT -- very incomplete
 
--- -- Kaposi-Kovacs-Altenkirch Syntax
--- import QIT.KKA2019.Syntax
--- -- import QIT.KK2020.Level
--- -- -- import QIT.KK2020.Syntax -- incomplete
+-- Kaposi-Kovacs-Altenkirch Syntax
+import QIT.KKA2019.Syntax
+-- import QIT.KK2020.Level
+-- -- import QIT.KK2020.Syntax -- incomplete
 
--- -- -- Examples
--- import QIT.Examples.Mobile.Base
+-- -- Examples
+import QIT.Examples.Mobile.Base
 -- import QIT.Examples.Mobile.Cocontinuity
 -- import QIT.Examples.CauchyReals
--- import QIT.Examples.ConTy
--- import QIT.Examples.HoleList
--- import QIT.Examples.ListBag
--- import QIT.Examples.PartialityMonad
+import QIT.Examples.ConTy
+import QIT.Examples.HoleList
+import QIT.Examples.ListBag
+import QIT.Examples.PartialityMonad
 -- import QIT.Examples.RotTree
 -- import QIT.Examples.SGL
--- import QIT.Examples.T
--- import QIT.Examples.Trunc
+import QIT.Examples.T
+import QIT.Examples.Trunc
 -- import QIT.Examples.WFTree
 -- import QIT.Examples.Lambda
 -- import QIT.Examples.Surreal
--- import QIT.Examples.PartialityMonad
-
--- -- -- Topology - TODO: Move to a different repo
--- -- import QIT.Topology.Base
--- -- import QIT.Topology.BishopReals
--- -- import QIT.Topology.Category
--- -- import QIT.Topology.Constructions
--- -- import QIT.Topology.Examples
--- -- import QIT.Topology.Subset

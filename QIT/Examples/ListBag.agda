@@ -1,6 +1,7 @@
 module QIT.Examples.ListBag (A : Set) where
 
 open import QIT.Prelude
+open import QIT.Prelude.Types
 open import QIT.Container.Base
 open import QIT.QW
 
@@ -9,21 +10,21 @@ data Sᵀ : Set where
   _∷ˢ : A → Sᵀ
 
 Pᵀ : Sᵀ → Set
-Pᵀ []ˢ = ⊥
-Pᵀ (x ∷ˢ) = ⊤
+Pᵀ []ˢ = ⊥ˢ
+Pᵀ (x ∷ˢ) = ⊤ˢ
 
 -- Plain lists
 T = W Sᵀ Pᵀ
 
 swap : A × A → QW.Equation Sᵀ Pᵀ ℓ0
 swap (x , y) = record
-  { V = ⊤
+  { V = ⊤ˢ
   ; lhs = QW.supᴱ (x ∷ˢ) λ _ → QW.supᴱ (y ∷ˢ) λ _ → QW.varᴱ tt {λ()}
   ; rhs = QW.supᴱ (y ∷ˢ) λ _ → QW.supᴱ (x ∷ˢ) λ _ → QW.varᴱ tt {λ()} }
 
 contraction : A → QW.Equation Sᵀ Pᵀ ℓ0
 contraction x = record 
-  { V = ⊤
+  { V = ⊤ˢ
   ; lhs = QW.supᴱ (x ∷ˢ) λ _ → QW.supᴱ (x ∷ˢ) λ _ → QW.varᴱ tt {λ()}
   ; rhs = QW.supᴱ (x ∷ˢ) λ _ → QW.varᴱ tt {λ()} }
 

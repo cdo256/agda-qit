@@ -32,11 +32,11 @@ module Examples where
   Fin = icont S P J
     where
     S : ℕ → Set
-    S zero = ⊥
-    S (suc x) = ⊤ ⊎ ⊤
+    S zero = ⊥ˢ
+    S (suc x) = ⊤ˢ ⊎ ⊤ˢ
     P : ∀ {i} → S i → Set
-    P {suc i} (inj₁ tt) = ⊥ -- fzero
-    P {suc i} (inj₂ tt) = ⊤ -- fsuc
+    P {suc i} (inj₁ tt) = ⊥ˢ -- fzero
+    P {suc i} (inj₂ tt) = ⊤ˢ -- fsuc
     J : ∀ {i} {s : S i} → P s → ℕ
     J {suc i} {inj₁ tt} ()
     J {suc i} {inj₂ tt} tt = i
@@ -45,9 +45,9 @@ module Examples where
   Vec A = icont S P J
     where
     S : ℕ → Set
-    S zero = ⊥
+    S zero = ⊥ˢ
     S (suc x) = A
     P : ∀ {i} → S i → Set
-    P {suc i} a = ⊤
+    P {suc i} a = ⊤ˢ
     J : ∀ {i} {s : S i} → P s → ℕ
     J {suc i} {a} tt = i

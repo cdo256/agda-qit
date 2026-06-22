@@ -55,7 +55,7 @@ module _ where
   -- Uses the unit type ⊤ as the index set, so there's only one index.
   UnindexedSetoid→IndexedSetoid : ∀ {ℓA ℓR} → Unindexed.Setoid ℓA ℓR → Setoid ℓ0 ℓA ℓR
   UnindexedSetoid→IndexedSetoid S = record
-      { I = ⊤
+      { I = ⊤ˢ
       ; A = λ _ → S.Carrier
       ; R = λ _ _ x y → x S.≈ y
       ; isEquivalence = record
