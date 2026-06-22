@@ -170,6 +170,12 @@ dsubst₂ : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : A → Set ℓB} (C : ∀ a 
 dsubst₂ C {a1} {a2} {b1} {b2} p q x =
   transport (dcong₂ C p q) x
 
+dsubstp₂ : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : A → Set ℓB} (C : ∀ a → B a → Prop ℓC)
+       → {a1 a2 : A} {b1 : B a1} {b2 : B a2}
+       → (p : a1 ≡ a2) (q : subst B p b1 ≡ b2)
+       → C a1 b1 → C a2 b2
+dsubstp₂ C refl refl x = x
+
 isPropBox : ∀ {ℓ} {P : Prop ℓ} (p q : Box P) → p ≡ q
 isPropBox (box p) (box q) = r refl
   where
@@ -212,6 +218,12 @@ substΣP : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB}
         → {a1 a2 : A} (p : a1 ≡ a2) (b : B a1) → Σ A B
 substΣP {B = B} {a2 = a2} p b = a2 , subst B p b
 
+subst-ΣP : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : A → Set ℓB} (C : ∀ a → B a → Prop ℓC)
+         → {a1 a2 : A} (p : a1 ≡ a2) (u : ΣP (B a1) (C a1))
+         → subst (λ a → ΣP (B a) (C a)) p u
+         ≡ (subst B p (u .fst) , dsubstp₂ C p refl (u .snd))
+subst-ΣP C refl u = refl
+
 subst-Π : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : Set ℓB} (C : A → B → Set ℓC)
         → {x y : A} (p : x ≡ y)
         → (g : ∀ z → C x z)
@@ -236,3 +248,4 @@ subst-cong C f {x} {y} p c = Jp Q p refl
   Q : ∀ y (p : x ≡ y) → Prop _
   Q _ p = subst (λ x → C (f x)) p c
         ≡ subst C (cong f p) c
+        -- 

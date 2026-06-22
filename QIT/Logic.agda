@@ -8,8 +8,8 @@ open import QIT.Prelude.Logic public
 absurdp : ∀ {ℓ} {A : Set ℓ} → ⊥p → A
 absurdp ()
 
-absurdp' : ∀ {ℓ} {A : Prop ℓ} → ⊥p → A
-absurdp' ()
+⊥e : ∀ {ℓ} {A : Prop ℓ} → ⊥p → A
+⊥e ()
 
 ⊥→⊥p : ⊥ → ⊥p
 ⊥→⊥p ()
@@ -18,11 +18,11 @@ _≢_ : ∀ {ℓ} {A : Set ℓ} (x y : A) → Prop ℓ
 x ≢ y = ¬ (x ≡ y)
 
 ⇔refl : ∀ {ℓA} {A : Prop ℓA} → A ⇔ A
-⇔refl = (λ z → z) , (λ z → z)
+⇔refl = ∧i (λ z → z) (λ z → z)
 
 ⇔sym : ∀ {ℓA ℓB} {A : Prop ℓA} {B : Prop ℓB} → A ⇔ B → B ⇔ A
-⇔sym (p₁ , p₂) = p₂ , p₁
+⇔sym (∧i p₁ p₂) = ∧i p₂ p₁
 
 ⇔trans : ∀ {ℓA ℓB ℓC} {A : Prop ℓA} {B : Prop ℓB} {C : Prop ℓC}
      → A ⇔ B → B ⇔ C → A ⇔ C
-⇔trans (p₁ , p₂) (q₁ , q₂) = (λ z → q₁ (p₁ z)) , (λ z → p₂ (q₂ z))
+⇔trans (∧i p₁ p₂) (∧i q₁ q₂) = ∧i (λ z → q₁ (p₁ z)) (λ z → p₂ (q₂ z))

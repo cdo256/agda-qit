@@ -2,11 +2,7 @@ module QIT.Prelude.Truncation where
 
 open import QIT.Prelude.Universe
 
-private
-  variable
-    ℓA ℓB ℓC ℓD ℓE ℓI ℓP ℓQ ℓX ℓY ℓZ : Level
-
-data ∥_∥ {ℓA} (A : Set ℓA) : Prop ℓA where
+data ∥_∥ (A : Set ℓA) : Prop ℓA where
   ∣_∣ : A → ∥ A ∥
 
 Trunc₁ : {A : Set ℓA} {ℓB : Level} → (A → Set ℓB) → (A → Prop ℓB)
