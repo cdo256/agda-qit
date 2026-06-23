@@ -1,6 +1,9 @@
 open import QIT.Prelude hiding (ℓS; ℓP)
 
-module QIT.Plump.Extensional.Base {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
+module QIT.Plump.Extensional.Base
+  ⦃ pathElim* : PathElim ⦄
+  {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP)
+  where
 
 open import QIT.Prop
 open import QIT.Logic

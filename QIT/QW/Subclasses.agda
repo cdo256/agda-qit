@@ -2,9 +2,9 @@ open import QIT.Prelude
 open import QIT.Prop
 open import QIT.QW.Signature
 
-module QIT.QW.Subclasses {ℓS ℓP ℓE ℓV}
-  (sig : Sig ℓS ℓP ℓE ℓV)
-  where
+module QIT.QW.Subclasses ⦃ a!c* : A!C ⦄ ⦃ fe* : FunExt ⦄ {ℓS ℓP ℓE ℓV}
+ (sig : Sig ℓS ℓP ℓE ℓV)
+ where
 
 open Sig sig
 

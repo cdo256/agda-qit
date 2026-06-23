@@ -1,6 +1,6 @@
 open import QIT.Prelude
 
-module QIT.Maybe where
+module QIT.Maybe ⦃ a!c* : A!C ⦄ where
 
 data Maybe {ℓA} (A : Set ℓA) : Set ℓA where 
   nothing : Maybe A

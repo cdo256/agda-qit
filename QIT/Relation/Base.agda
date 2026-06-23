@@ -1,3 +1,5 @@
+open import QIT.Prelude
+
 module QIT.Relation.Base where
 
 open import QIT.Prelude

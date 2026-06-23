@@ -5,7 +5,14 @@ open import QIT.Prop
 -- Expressions are terms built from variables and constructors, used to
 -- state equations that should hold in the quotient. This provides the
 -- equational theory component of quotient inductive type signatures.
-module QIT.QW.Equation {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) (ℓV : Level) where
+module QIT.QW.Equation
+  ⦃ a!c* : A!C ⦄ 
+  ⦃ pathElim* : PathElim ⦄
+  ⦃ funExt* : FunExt ⦄
+  {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) (ℓV : Level)
+  where
+
+open FunExt funExt*
 
 open import QIT.Container.Base
 open import QIT.Container.Properties

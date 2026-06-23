@@ -1,4 +1,6 @@
-module QIT.Examples.PartialityMonad.Direct where
+open import QIT.Prelude
+
+module QIT.Examples.PartialityMonad.Direct ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude hiding (⊥; ⊥*)
 open import QIT.Prop hiding (⊥; ⊥*)

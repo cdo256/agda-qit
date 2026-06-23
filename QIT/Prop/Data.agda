@@ -1,10 +1,10 @@
-module QIT.Prop.Data where
+open import QIT.Prelude
+
+module QIT.Prop.Data ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop.Base
-open import QIT.Logic
-open import QIT.Identity
-open import QIT.Prop.Properties
+open import QIT.Prelude.Logic
 
 data Maybep {ℓ} (X : Prop ℓ) :  Prop ℓ where
   nothing : Maybep X

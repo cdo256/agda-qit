@@ -8,7 +8,9 @@ open import QIT.Relation.Subset
 open import QIT.Relation.Nullary
 open import QIT.Category.Base
 
-module QIT.Category.Initial {ℓCo} {ℓCh} {ℓCe} (C : Category ℓCo ℓCh ℓCe) where
+module QIT.Category.Initial
+  ⦃ pathElim* : PathElim ⦄
+  {ℓCo} {ℓCh} {ℓCe} (C : Category ℓCo ℓCh ℓCe) where
 
 open Category C
 

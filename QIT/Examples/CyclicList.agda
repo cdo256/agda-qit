@@ -1,4 +1,6 @@
-module QIT.Examples.CyclicList where
+open import QIT.Prelude
+
+module QIT.Examples.CyclicList ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop

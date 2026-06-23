@@ -6,7 +6,7 @@ open import QIT.Relation.Binary
 open import QIT.Category.Base
 open import QIT.Category.Strict
 
-module QIT.Category.Set where
+module QIT.Category.Set ⦃ pathElim* : PathElim ⦄ where
 
 SetCat : ∀ ℓA → Category (lsuc ℓA) ℓA ℓA
 SetCat ℓA = record

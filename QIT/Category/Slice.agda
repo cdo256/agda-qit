@@ -1,4 +1,6 @@
-module QIT.Category.Slice where
+open import QIT.Prelude
+
+module QIT.Category.Slice ⦃ pathElim* : PathElim ⦄ where
 
 open import QIT.Prelude
 open import QIT.Relation.Subset

@@ -1,4 +1,6 @@
-module QIT.Examples.WFTree where
+open import QIT.Prelude
+
+module QIT.Examples.WFTree ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop

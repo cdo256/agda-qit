@@ -1,4 +1,6 @@
-module QIT.KK2020.Syntax where
+open import QIT.Prelude
+
+module QIT.KK2020.Syntax ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude hiding (_,_)
 open import QIT.KK2020.Level

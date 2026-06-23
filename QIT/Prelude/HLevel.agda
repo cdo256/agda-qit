@@ -6,9 +6,6 @@ open import QIT.Prelude.Truncation
 open import QIT.Prelude.Identity
 open import QIT.Prelude.Logic
 
-const : {A : Set ℓA} {B : Set ℓB} → A → B → A
-const a _ = a
-
 isProp : Set ℓA → Prop ℓA
 isProp A = ∀ (x y : A) → x ≡ y
 

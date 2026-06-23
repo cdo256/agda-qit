@@ -1,4 +1,6 @@
-module QIT.Relation.WISC where
+open import QIT.Prelude
+
+module QIT.Relation.WISC ⦃ pathElim* : PathElim ⦄ where
 
 -- Adapted from fiore2022-quotient-inductive.
 

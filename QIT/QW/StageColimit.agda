@@ -18,12 +18,12 @@ open import QIT.QW.Signature
 -- Colimit construction for the staged diagram D used in building quotient W-types.
 -- The colimit represents the "completion" of approximations built through plump
 -- ordinal stages, providing a constructive way to build infinite quotient structures.
-module QIT.QW.StageColimit {ℓS ℓP ℓE ℓV}
-  (sig : Sig ℓS ℓP ℓE ℓV)
-  (propExt : PropExt)
-  (sq : Quot.SetQuotients)
-  (sqe : Quot.SetQuotientsElim)
-  where
+module QIT.QW.StageColimit ⦃ a!c* : A!C ⦄ ⦃ fe* : FunExt ⦄ {ℓS ℓP ℓE ℓV}
+ (sig : Sig ℓS ℓP ℓE ℓV)
+ (propExt : PropExt)
+ (sq : Quot.SetQuotients)
+ (sqe : Quot.SetQuotientsElim)
+ where
 
 open Sig sig
 

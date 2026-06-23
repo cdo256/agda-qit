@@ -7,13 +7,18 @@ import QIT.Relation.SetQuotient as QuotRel
 -- This builds the quotient in stages indexed by ordinals, ensuring that
 -- equations are satisfied at each stage. The construction uses diagrams
 -- indexed by the plump ordinal order to control the complexity of terms.
-module QIT.QW.Stage {ℓS ℓP ℓE ℓV}
+module QIT.QW.Stage
+  ⦃ a!c* : A!C ⦄ 
+  ⦃ pathElim* : PathElim ⦄
+  ⦃ funExt* : FunExt ⦄
+  ⦃ propExt* : PropExt ⦄
+  ⦃ sq* : QuotRel.SetQuotients ⦄
+  {ℓS ℓP ℓE ℓV}
   (sig : Sig ℓS ℓP ℓE ℓV)
-  (propExt : PropExt)
-  (sq : QuotRel.SetQuotients)
-  (sqe : QuotRel.SetQuotientsElim)
   where
 open Sig sig
+
+open FunExt funExt*
 
 import QIT.Plump.Algebra as Plump
 import QIT.Plump.W.Base as PlumpW
@@ -28,8 +33,8 @@ open import QIT.Relation.Binary
 open import QIT.Container.Base
 open import QIT.Container.StrictFunctor S P (ℓS ⊔ ℓP ⊔ ℓV)
 open import QIT.Setoid
-open import QIT.Setoid.Quotient propExt sq sqe
-module Quot = QuotRel.WithSetQuotients sq sqe
+open import QIT.Setoid.Quotient
+module Quot = QuotRel
 open Quot using ([_]; quot-rec; quot-elimp; quot-rec-beta; quot-rel)
 open import QIT.Set.Base using (_≡h_)
 open import QIT.Relation.Subset

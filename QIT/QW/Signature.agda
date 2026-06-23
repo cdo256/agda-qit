@@ -8,7 +8,11 @@ open import QIT.QW.Equation
 -- the equations that should hold in the quotient. This extends ordinary
 -- inductive type signatures with equational constraints.
 -- This definition follows closely the one defined in Fiore et al. 2022.
-module QIT.QW.Signature where
+module QIT.QW.Signature
+  ⦃ a!c* : A!C ⦄ 
+  ⦃ pathElim* : PathElim ⦄
+  ⦃ fe* : FunExt ⦄
+  where
 
 -- A QW signature consists of:
 -- - (S, P): container specifying constructors and their arities

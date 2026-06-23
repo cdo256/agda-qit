@@ -1,4 +1,6 @@
-module QIT.Examples.Queue where
+open import QIT.Prelude
+
+module QIT.Examples.Queue ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop

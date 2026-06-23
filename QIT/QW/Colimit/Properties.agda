@@ -11,15 +11,15 @@ open import QIT.Category.Preorder
 open import QIT.Category.Set
 import QIT.Relation.SetQuotient as QuotRel
 
-module QIT.QW.Colimit.Properties {ℓI} {ℓ≤}
-  {I : Set ℓI}
-  (propExt : PropExt)
-  (sq : QuotRel.SetQuotients)
-  (sqe : QuotRel.SetQuotientsElim)
-  (≤p : Preorder I ℓ≤)
-  (ℓD ℓD' : Level)
-  (P : Functor (PreorderCat I ≤p) (SetCat (ℓD ⊔ ℓD')))
-  where
+module QIT.QW.Colimit.Properties ⦃ a!c* : A!C ⦄ ⦃ fe* : FunExt ⦄ {ℓI} {ℓ≤}
+ {I : Set ℓI}
+ (propExt : PropExt)
+ (sq : QuotRel.SetQuotients)
+ (sqe : QuotRel.SetQuotientsElim)
+ (≤p : Preorder I ℓ≤)
+ (ℓD ℓD' : Level)
+ (P : Functor (PreorderCat I ≤p) (SetCat (ℓD ⊔ ℓD')))
+ where
 
   open import QIT.Setoid
   import QIT.Setoid.Quotient propExt sq sqe as Quot

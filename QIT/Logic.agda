@@ -1,8 +1,8 @@
 open import QIT.Prelude
-open import QIT.Prelude.Identity
 
-module QIT.Logic where
+module QIT.Logic ⦃ pathElim* : PathElim ⦄ where
 
+open import QIT.Identity
 open import QIT.Prelude.Logic public
 
 ⊥e' : ∀ {ℓ} {A : Set ℓ} → ⊥ → A
@@ -26,3 +26,6 @@ x ≢ y = ¬ (x ≡ y)
 ⇔trans : ∀ {ℓA ℓB ℓC} {A : Prop ℓA} {B : Prop ℓB} {C : Prop ℓC}
      → A ⇔ B → B ⇔ C → A ⇔ C
 ⇔trans (∧i p₁ p₂) (∧i q₁ q₂) = ∧i (λ z → q₁ (p₁ z)) (λ z → p₂ (q₂ z))
+
+≡→⇔ : ∀ {ℓA} {A B : Prop ℓA} → A ≡ B → A ⇔ B
+≡→⇔ {A = A} p = substp (A ⇔_) p ⇔refl

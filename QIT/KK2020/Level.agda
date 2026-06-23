@@ -1,4 +1,6 @@
-module QIT.KK2020.Level where
+open import QIT.Prelude
+
+module QIT.KK2020.Level ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop

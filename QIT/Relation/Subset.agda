@@ -1,4 +1,6 @@
-module QIT.Relation.Subset where
+open import QIT.Prelude
+
+module QIT.Relation.Subset ⦃ pathElim* : PathElim ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prelude.Types using (ΣP; _,_; fst; snd; ⟨_⟩ᴾ) public

@@ -3,7 +3,7 @@ open import QIT.Prop
 open import QIT.Logic
 import QIT.Container.Base as W
 
-module QIT.Plump.Extensional.Properties {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
+module QIT.Plump.Extensional.Properties ⦃ pathElim* : PathElim ⦄ {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
 
 import QIT.Plump.W.Base S P as PlumpW
 import QIT.Plump.Properties S P as Plump

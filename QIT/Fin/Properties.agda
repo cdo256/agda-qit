@@ -1,4 +1,6 @@
-module QIT.Fin.Properties where
+open import QIT.Prelude
+
+module QIT.Fin.Properties ⦃ pathElim* : PathElim ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop

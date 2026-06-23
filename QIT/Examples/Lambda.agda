@@ -1,4 +1,6 @@
-module QIT.Examples.Lambda where
+open import QIT.Prelude
+
+module QIT.Examples.Lambda ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import Data.Nat

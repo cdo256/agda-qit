@@ -1,4 +1,6 @@
-module QIT.Examples.HoleList where
+open import QIT.Prelude
+
+module QIT.Examples.HoleList ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 

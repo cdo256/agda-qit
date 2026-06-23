@@ -1,4 +1,6 @@
-module QIT.Topology.Subset where
+open import QIT.Prelude
+
+module QIT.Topology.Subset ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop

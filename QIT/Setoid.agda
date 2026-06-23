@@ -1,3 +1,5 @@
+open import QIT.Prelude
+
 -- Setoids and categorical structures based on equivalence relations.
 --
 -- This module provides the categorical foundations for working with quotient
@@ -30,12 +32,15 @@
 
 open import QIT.Prop
 import QIT.Relation.SetQuotient as Quot
-module QIT.Setoid where
+module QIT.Setoid ⦃ a!c* : A!C ⦄ ⦃ fe* : FunExt ⦄ where
 
 module ≈ where
   open import QIT.Setoid.Base public
-  module Quotient (propExt : PropExt) (sq : Quot.SetQuotients) (sqe : Quot.SetQuotientsElim) where
-    open import QIT.Setoid.Quotient propExt sq sqe public
+  module Quotient ⦃ propExt : PropExt ⦄
+                  ⦃ pathElim* : PathElim ⦄
+                  ⦃ sq* : Quot.SetQuotients ⦄
+                  where
+    open import QIT.Setoid.Quotient public
   open import QIT.Setoid.Hom public
   open import QIT.Setoid.Iso public
 

@@ -1,4 +1,6 @@
-module QIT.Container.Indexed where
+open import QIT.Prelude
+
+module QIT.Container.Indexed ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Functor.Base

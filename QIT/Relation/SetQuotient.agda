@@ -1,4 +1,6 @@
-module QIT.Relation.SetQuotient where
+open import QIT.Prelude
+
+module QIT.Relation.SetQuotient ⦃ pathElim* : PathElim ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop
@@ -39,8 +41,8 @@ record SetQuotientElimStr {ℓA ℓR}
   quot-rec {B} f eq =
     quot-elim (λ _ → B) f
       (λ x y r →
-        ≡.trans (eq x y r)
-          (≡.sym (≡.subst-const B (f y) (quot-rel x y r))))
+        ≡.trans (≡.subst-const B (f x) (quot-rel x y r))
+          (eq x y r))
 
   quot-rec-beta : {B : Set ℓB}
     → (f : A → B)
@@ -50,8 +52,8 @@ record SetQuotientElimStr {ℓA ℓR}
   quot-rec-beta {B} f eq x =
     quot-elim-beta (λ _ → B) f
       (λ x y r →
-        ≡.trans (eq x y r)
-          (≡.sym (≡.subst-const B (f y) (quot-rel x y r))))
+        ≡.trans (≡.subst-const B (f x) (quot-rel x y r))
+          (eq x y r))
       x
 
   quot-recp : {B : Prop ℓB}
@@ -67,21 +69,21 @@ record SetQuotientElimStr {ℓA ℓR}
     unbox (quot-elim (λ x → Box (B x)) (λ x → box (f x)) (λ _ _ _ → ≡.isPropBox _ _) q)
 
 
-SetQuotients : Agda.Primitive.Setω
-SetQuotients = ∀ {ℓA ℓR} (A : Set ℓA) (R : A → A → Prop ℓR) → SetQuotientStr A R
-SetQuotientsElim : Agda.Primitive.Setω
-SetQuotientsElim = 
-  ∀ {ℓA ℓR}
-  → {A : Set ℓA}
-  → {R : A → A → Prop ℓR}
-  → (sq : SetQuotientStr A R)
-  → (ℓB : Level)
-  → SetQuotientElimStr sq ℓB
+record SetQuotients : Agda.Primitive.Setω where
+  field
+    sq : ∀ {ℓA ℓR} (A : Set ℓA) (R : A → A → Prop ℓR) → SetQuotientStr A R
+    sqe :
+      ∀ {ℓA ℓR}
+      → {A : Set ℓA}
+      → {R : A → A → Prop ℓR}
+      → (sq : SetQuotientStr A R)
+      → (ℓB : Level)
+      → SetQuotientElimStr sq ℓB
 
-module WithSetQuotients
-  (sq : SetQuotients)
-  (sqe : SetQuotientsElim)
+module _
+  ⦃ sq* : SetQuotients ⦄
   where
+  open SetQuotients sq*
 
   _/_ : ∀ {ℓA ℓR} → (A : Set ℓA) (R : A → A → Prop ℓR) → Set (ℓA ⊔ ℓR)
   A / R = SetQuotientStr.Q (sq A R)
@@ -108,7 +110,9 @@ module WithSetQuotients
   quot-drel : ∀ {ℓA ℓB ℓR} → {A : Set ℓA} (B : A → Set ℓB) (R : ∀ {x} → B x → B x → Prop ℓR)
       → {x y : A} (u : B x) (v : B y) (p : x ≡ y)
       → R (subst B p u) v → ≡.subst (λ ○ → B ○ / R) p [ u ] ≡ [ v ]
-  quot-drel B R u v ≡.refl ruv = quot-rel u v ruv
+  quot-drel B R u v ≡.refl ruv =
+    ≡.trans (≡.subst-refl [ u ])
+      (quot-rel u v (≡.substp (λ z → R z v) (≡.subst-refl u) ruv))
 
   -- {-# REWRITE quot-rec-beta #-}
   -- {-# REWRITE quot-elim-beta #-}

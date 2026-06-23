@@ -1,7 +1,9 @@
+open import QIT.Prelude
+
 -- An example of propositional truncation
 -- Note that we don't get elimination to prop, so this isn't full
 -- truncation.
-module QIT.Examples.Trunc where
+module QIT.Examples.Trunc ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Container.Base

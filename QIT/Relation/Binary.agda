@@ -1,3 +1,5 @@
+open import QIT.Prelude
+
 module QIT.Relation.Binary where
 
 open import QIT.Prelude

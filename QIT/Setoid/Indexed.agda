@@ -1,4 +1,6 @@
-module QIT.Setoid.Indexed where
+open import QIT.Prelude
+
+module QIT.Setoid.Indexed ⦃ pathElim* : PathElim ⦄ where
 
 open import QIT.Prelude
 open import QIT.Relation.Base

@@ -1,3 +1,5 @@
+open import QIT.Prelude
+
 -- Permutation invariant trees: An example of quotient inductive types.
 --
 -- This module defines "mobiles" - tree structures where the order of branches
@@ -20,7 +22,7 @@
 -- - Unordered tree structures (syntax trees, decision trees)
 -- - Combinatorial objects with inherent symmetries
 -- - Data structures where permutation equivalence is natural
-module QIT.Examples.Mobile.Base (I : Set) where
+module QIT.Examples.Mobile.Base ⦃ a!c* : A!C ⦄ ⦃ fe* : FunExt ⦄ (I : Set) where
 
 open import QIT.Prelude
 open import QIT.Prop

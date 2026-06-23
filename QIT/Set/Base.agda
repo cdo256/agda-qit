@@ -3,7 +3,7 @@ open import QIT.Prop
 open import QIT.Relation.Base
 open import QIT.Relation.Binary
 
-module QIT.Set.Base where
+module QIT.Set.Base ⦃ pathElim* : PathElim ⦄ where
 
 module ≡syntax {ℓ} {A : Set ℓ} where
 

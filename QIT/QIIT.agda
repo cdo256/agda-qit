@@ -1,5 +1,7 @@
 {-# OPTIONS --type-in-type #-}
-module QIT.QIIT where
+open import QIT.Prelude
+
+module QIT.QIIT ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop

@@ -8,7 +8,7 @@ open import QIT.Relation.Nullary
 open import QIT.Category.Base
 open import QIT.Category.Set
 
-module QIT.Set.Bijection where
+module QIT.Set.Bijection ⦃ pathElim* : PathElim ⦄ where
 
 module _ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} where
 
@@ -28,7 +28,9 @@ module _ {ℓA ℓP ℓB} {A : Set ℓA} {P : A → Prop ℓP} {Q : A → Prop �
   injΣP-restrict P⊆Q f f-inj {x , px} {y , py} r =
     ΣP≡ (x , px) (y , py) (≡.cong fst (f-inj r))
 
-module _ {ℓX} {A B : Set ℓX} (a!c : A!C) where
+module _ {ℓX} {A B : Set ℓX} (ac : A!C) where
+  open A!C ac
+
   open import QIT.Category.Morphism (SetCat ℓX)
 
   open Category (SetCat ℓX)
@@ -56,13 +58,13 @@ module _ {ℓX} {A B : Set ℓX} (a!c : A!C) where
       ; rinv = λ {y} → (snd (f⁻¹T y)) }
 
 
-module _ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} (a!c : A!C) where
+module _ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} (ac : A!C) where
   open import QIT.Category.Morphism (SetCat (ℓA ⊔ ℓB))
 
   open Category (SetCat (ℓA ⊔ ℓB))
 
   HetBijection→Iso : (f : A → B) → IsBijection f → Lift ℓB A ≅ Lift ℓA B
-  HetBijection→Iso f (inj , surj) = ∣ Bijection→Iso a!c f' (inj' , surj') ∣
+  HetBijection→Iso f (inj , surj) = ∣ Bijection→Iso ac f' (inj' , surj') ∣
     where
     f' : Lift ℓB A → Lift ℓA B
     f' (lift x) = lift (f x)

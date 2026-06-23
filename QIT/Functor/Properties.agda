@@ -3,7 +3,7 @@ open import QIT.Category.Base
 open import QIT.Functor.Base
 open import QIT.Setoid.Base
 
-module QIT.Functor.Properties where
+module QIT.Functor.Properties ⦃ pathElim* : PathElim ⦄ where
 
 Id : ∀ {ℓCo ℓCh ℓCe}
      → {C : Category ℓCo ℓCh ℓCe}

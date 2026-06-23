@@ -1,6 +1,6 @@
 open import QIT.Prelude
 
-module QIT.Nat where
+module QIT.Nat ⦃ pathElim* : PathElim ⦄ where
 
 open import QIT.Prop
 -- open import QIT.Relation.Base

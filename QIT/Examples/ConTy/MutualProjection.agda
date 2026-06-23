@@ -1,5 +1,7 @@
 {-# OPTIONS --allow-unsolved-metas #-}
-module QIT.Examples.ConTy.MutualProjection where
+open import QIT.Prelude
+
+module QIT.Examples.ConTy.MutualProjection ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop

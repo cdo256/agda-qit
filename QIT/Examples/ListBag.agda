@@ -1,4 +1,6 @@
-module QIT.Examples.ListBag (A : Set) where
+open import QIT.Prelude
+
+module QIT.Examples.ListBag ⦃ a!c* : A!C ⦄ (A : Set) where
 
 open import QIT.Prelude
 open import QIT.Prelude.Types

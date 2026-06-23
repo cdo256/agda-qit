@@ -13,7 +13,7 @@ module QIT.Examples.Mobile.Cocontinuity
   (sq : Quot.SetQuotients)
   (sqe : Quot.SetQuotientsElim)
   (a!c : A!C)
-  where
+  ⦃ fe* : FunExt ⦄ where
 
 open import QIT.Examples.Mobile.Base I
 

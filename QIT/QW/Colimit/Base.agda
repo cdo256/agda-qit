@@ -9,15 +9,15 @@ open import QIT.Category.Preorder
 open import QIT.Category.Set
 import QIT.Relation.SetQuotient as Quot
 
-module QIT.QW.Colimit.Base {ℓI} {ℓ≤}
-  {I : Set ℓI}
-  (propExt : PropExt)
-  (sq : Quot.SetQuotients)
-  (sqe : Quot.SetQuotientsElim)
-  (≤p : Preorder I ℓ≤)
-  (ℓD ℓD' : Level)
-  (P : Functor (PreorderCat I ≤p) (SetCat (ℓD ⊔ ℓD')))
-  where
+module QIT.QW.Colimit.Base ⦃ a!c* : A!C ⦄ ⦃ fe* : FunExt ⦄ {ℓI} {ℓ≤}
+ {I : Set ℓI}
+ (propExt : PropExt)
+ (sq : Quot.SetQuotients)
+ (sqe : Quot.SetQuotientsElim)
+ (≤p : Preorder I ℓ≤)
+ (ℓD ℓD' : Level)
+ (P : Functor (PreorderCat I ≤p) (SetCat (ℓD ⊔ ℓD')))
+ where
 
   open import QIT.Setoid
   open import QIT.Setoid.Quotient propExt sq sqe using (_/≈)

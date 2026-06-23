@@ -8,7 +8,7 @@ open import QIT.Relation.Base
 open import QIT.Relation.Nullary
 open import QIT.Examples.ConTy.Erased
 
-module QIT.Examples.ConTy.DisplayedReduction (D : DisplayedAlgebra) (rec : ∀ A → ∃!Rec A) where
+module QIT.Examples.ConTy.DisplayedReduction ⦃ a!c* : A!C ⦄ (D : DisplayedAlgebra) (rec : ∀ A → ∃!Rec A) where
 
 module D = DisplayedAlgebra D
 A : Algebra

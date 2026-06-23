@@ -1,4 +1,6 @@
-module QIT.Relation.BarInduction where
+open import QIT.Prelude
+
+module QIT.Relation.BarInduction ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop

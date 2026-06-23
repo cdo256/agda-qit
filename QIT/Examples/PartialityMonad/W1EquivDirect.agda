@@ -1,4 +1,6 @@
-module QIT.Examples.PartialityMonad.W1EquivDirect where
+open import QIT.Prelude
+
+module QIT.Examples.PartialityMonad.W1EquivDirect ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude renaming (⊤ to ⊤'; ⊥ to ⊥')
 open import QIT.Prop

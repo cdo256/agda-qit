@@ -1,4 +1,9 @@
-module QIT.Relation.Finite where
+open import QIT.Prelude
+
+module QIT.Relation.Finite
+  ⦃ pathElim* : PathElim ⦄
+  ⦃ a!c* : A!C ⦄
+  where
 
 open import QIT.Prelude
 open import QIT.Prop
@@ -36,7 +41,7 @@ module _ {ℓA} where
 
   isFiniteᵖ→isFinite' : (a!c : A!C) {A : Set ℓA} → isFiniteᵖ A → isFinite' A
   isFiniteᵖ→isFinite' a!c {A} isFiniteA = 
-    a!c _ isContrΣSz
+    A!C.a!c a!c _ isContrΣSz
     where
     Sz : (n : ℕ) → Prop ℓA
     Sz n = ∥ Fin n ↔ A ∥

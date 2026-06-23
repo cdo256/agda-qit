@@ -8,7 +8,10 @@ open import QIT.Container.Base
 -- This definition was copied from Fiore et al. 2022, and their earlier work (Pitts et al. 2021).
 -- Start with an shape and position. This represents the 'shape' of
 -- the underlying W-type being constructed.
-module QIT.Plump.W.Base {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
+module QIT.Plump.W.Base
+  ⦃ pathElim* : PathElim ⦄
+  {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP)
+  where
 
 private
   T = W S P

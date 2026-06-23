@@ -1,4 +1,6 @@
-module QIT.Examples.T where
+open import QIT.Prelude
+
+module QIT.Examples.T ⦃ a!c* : A!C ⦄ where
 
 -- open import QIT.Prelude renaming (⊤ to ⊤'; ⊥ to ⊥') hiding (_≟_)
 -- open import QIT.Relation.Subset

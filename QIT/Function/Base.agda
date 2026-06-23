@@ -1,7 +1,7 @@
-{-# OPTIONS --universe-polymorphism #-}
-module QIT.Function.Base where
-
 open import QIT.Prelude
+
+module QIT.Function.Base ⦃ pathElim* : PathElim ⦄ where
+
 open import QIT.Prop
 
 Surjective : ∀ {A : Set ℓA} {B : Set ℓB}

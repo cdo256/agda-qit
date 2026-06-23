@@ -1,3 +1,5 @@
+open import QIT.Prelude
+
 -- Quotient W-types: The main construction for quotient inductive types (QITs).
 --
 -- This module implements quotient W-types as colimits of staged approximations.
@@ -27,7 +29,7 @@
 -- This provides a systematic method for implementing QITs in type theory
 -- without requiring them as primitives in the type system.
 
-module QIT.QW where
+module QIT.QW ⦃ a!c* : A!C ⦄ where
 
 module QW where
   open import QIT.QW.Equation public

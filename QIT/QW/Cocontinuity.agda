@@ -16,14 +16,18 @@ open import QIT.QW.Signature
 import QIT.Relation.SetQuotient as Quot
 
 module QIT.QW.Cocontinuity {ℓS ℓP ℓE ℓV}
+  ⦃ a!c* : A!C ⦄
+  ⦃ funExt* : FunExt ⦄ 
   (sig : Sig ℓS ℓP ℓE ℓV)
   (propExt : PropExt)
   (sq : Quot.SetQuotients)
   (sqe : Quot.SetQuotientsElim)
-  (a!c : A!C)
   where
 
 open Sig sig
+
+open A!C a!c*
+open FunExt funExt*
 
 import QIT.Plump.Algebra as Plump
 import QIT.Plump.W.Base as PlumpW
@@ -139,20 +143,30 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
 
         transport≈ : ∀ {γ δ} (p : γ ≡ δ) {x y : D₀ γ}
           → D̃ γ [ x ≈ y ] → D̃ δ [ subst D₀ p x ≈ subst D₀ p y ]
-        transport≈ ≡.refl r = r
+        transport≈ {γ} ≡.refl {x} {y} r =
+          ≡.substp₂ (D̃ γ [_≈_])
+            (≡.sym (≡.subst-refl x))
+            (≡.sym (≡.subst-refl y))
+            r
 
-        subst-D₀-fst : ∀ {γ δ} (p : γ ≡ δ) (û : D₀ γ) → (subst D₀ p û) .fst ≡ û .fst
-        subst-D₀-fst ≡.refl û = ≡.refl
+        subst-D₀-fst : ∀ {γ δ : Z} (p : γ ≡ δ) (û : D₀ γ)
+                     → subst D₀ p û .fst ≡ û .fst
+        subst-D₀-fst {γ} ≡.refl û =
+          ≡.cong {A = D₀ γ} {B = T} fst
+                 {≡.subst D₀ ≡.refl û} {û}
+                 (≡.subst-refl û)
 
         plift-fst : ∀ {γ} (û : D₀ γ) → (plift û) .fst ≡ û .fst
         plift-fst û = ≡.refl
 
         plift-psup : ∀ a μ (f : ∀ i → D₀ (μ i))
-          → plift (psup a μ f) ≡ psup a (λ i → rankD₀ (f i)) (λ i → plift (f i))
-        plift-psup a μ f = ΣP≡ _ _ (≡.refl)
+          → plift (psup a μ f)
+          ≡ psup a (λ i → rankD₀ (f i)) (λ i → plift (f i))
+        plift-psup a μ f = ΣP≡ _ _ ≡.refl
 
         exactify : ∀ {γ} {ŝ t̂ : D₀ γ} (p : D̃ γ [ ŝ ≈ t̂ ])
-          → D̃ (rankD₀ ŝ) [ plift ŝ ≈ subst D₀ (≡.sym (rankD-cong p)) (plift t̂) ]
+          → D̃ (rankD₀ ŝ) [ plift ŝ
+                         ≈ subst D₀ (≡.sym (rankD-cong p)) (plift t̂) ]
         exactify (≈pcong a μ f₁ g r) = castˡ (plift-psup a μ f₁) (castʳ rhs≈ base)
           where
           δi : ∀ i → rankD₀ (f₁ i) ≡ rankD₀ (g i)
@@ -183,7 +197,8 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
           base = ≈psat e ϕ (≤refl _) (≡.substp (rhs' e ϕ ≤ᵀ_) (≡.sym dp) (≤refl _))
           rhs≈ : (rhs' e ϕ , ≡.substp (rhs' e ϕ ≤ᵀ_) (≡.sym dp) (≤refl _)) ≡ subst D₀ (≡.sym dp) (plift (rhs' e ϕ , r≤α))
           rhs≈ = ΣP≡ _ _ (≡.sym (subst-D₀-fst (≡.sym dp) (plift (rhs' e ϕ , r≤α))))
-        exactify ≈prefl = ≈prefl
+        exactify {ŝ = ŝ} {t̂ = t̂} ≈prefl =
+          ≡→≈ (D̃ (rankD₀ ŝ)) (≡.sym (≡.subst-refl (plift ŝ)))
         exactify {ŝ = ŝ} {t̂ = t̂} (≈psym p) =
           castˡ {z = subst D₀ dp (plift t̂)} lhs≈ (transport≈ dp (≈psym (exactify p)))
           where
@@ -206,7 +221,8 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
         shiftRepresentative : ∀ {γ δ} {û : D₀ δ} (p : γ ≡ δ)
           → subst (λ β → D̃ β /≈) p (D̃ γ ⊢[ subst D₀ (≡.sym p) û ])
           ≡ D̃ δ ⊢[ û ]
-        shiftRepresentative ≡.refl = ≡.refl
+        shiftRepresentative {γ} {δ} {û} ≡.refl =
+          ≡.trans (≡.subst-refl _) (≡.cong (D̃ γ ⊢[_]) (≡.subst-refl û))
 
         plift₀-cong : ∀ {γ} {ŝ t̂ : D₀ γ} (p : D̃ γ [ ŝ ≈ t̂ ])
           → subst D̃/≈ (rankD-cong p) (plift₀ ŝ) ≡ plift₀ t̂

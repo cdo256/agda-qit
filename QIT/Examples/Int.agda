@@ -1,4 +1,6 @@
-module QIT.Examples.Int where
+open import QIT.Prelude
+
+module QIT.Examples.Int ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Bool

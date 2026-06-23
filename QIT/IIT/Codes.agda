@@ -1,4 +1,6 @@
-module QIT.IIT.Codes where
+open import QIT.Prelude
+
+module QIT.IIT.Codes ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Nat

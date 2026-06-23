@@ -1,4 +1,6 @@
-module QIT.Examples.Surreal where
+open import QIT.Prelude
+
+module QIT.Examples.Surreal ⦃ a!c* : A!C ⦄ where
 open import QIT.Prelude
 open import Data.Nat using (ℕ)
 open import QIT.Prop

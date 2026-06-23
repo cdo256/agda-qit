@@ -1,4 +1,6 @@
-module QIT.Relation.Properties where
+open import QIT.Prelude
+
+module QIT.Relation.Properties ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop

@@ -1,5 +1,7 @@
+open import QIT.Prelude
+
 -- DEPRICATED
-module QIT.Prop.Base where
+module QIT.Prop.Base ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude.Truncation public
 open import QIT.Prelude.Types public

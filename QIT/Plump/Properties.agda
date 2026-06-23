@@ -4,7 +4,7 @@ open import QIT.Logic
 open import QIT.Function.Base
 import QIT.Container.Base as W
 
-module QIT.Plump.Properties {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
+module QIT.Plump.Properties ⦃ pathElim* : PathElim ⦄ {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
 
 open import QIT.Relation.Subset
 import QIT.Plump.W.Base S P as PlumpW

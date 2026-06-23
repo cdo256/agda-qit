@@ -9,8 +9,8 @@ open import QIT.Relation.Subset
 
 open import QIT.Set.Base
 
-module QIT.Category.Preorder
-  {ℓA ℓ≤} (A : Set ℓA) (≤p : Preorder A ℓ≤) where
+module QIT.Category.Preorder ⦃ pathElim* : PathElim ⦄
+ {ℓA ℓ≤} (A : Set ℓA) (≤p : Preorder A ℓ≤) where
 
 private
   module ≤ = IsPreorder (≤p .proj₂)

@@ -1,6 +1,8 @@
 {-# OPTIONS --injective-type-constructors #-}
 
-module QIT.Prop.HetPath where
+open import QIT.Prelude
+
+module QIT.Prop.HetPath ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Identity

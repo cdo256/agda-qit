@@ -1,4 +1,6 @@
-module QIT.Examples.ConTy where
+open import QIT.Prelude
+
+module QIT.Examples.ConTy ⦃ a!c* : A!C ⦄ where
 
 import QIT.Examples.ConTy.Direct
 -- import QIT.Examples.ConTy.DisplayedReduction

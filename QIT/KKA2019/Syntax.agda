@@ -1,6 +1,6 @@
 open import QIT.Prelude hiding (_,_)
 
-module QIT.KKA2019.Syntax where
+module QIT.KKA2019.Syntax ⦃ a!c* : A!C ⦄ where
 
 interleaved mutual
   infix 10 _≈ᵀ_ _≈ᵗ_ _≈ˢ_

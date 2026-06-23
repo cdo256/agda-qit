@@ -1,4 +1,6 @@
-module QIT.Examples.CauchyReals where
+open import QIT.Prelude
+
+module QIT.Examples.CauchyReals ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude renaming (⊤ to ⊤'; ⊥ to ⊥')
 open import QIT.Prop
