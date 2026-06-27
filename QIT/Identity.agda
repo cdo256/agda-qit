@@ -48,6 +48,9 @@ subst B = J (λ v _ → B v)
 substp : {A : Set ℓA} (B : A → Prop ℓB) {a1 a2 : A} (p : a1 ≡ a2) → B a1 → B a2
 substp B = Jp (λ v _ → B v)
 
+transportp : {A A' : Prop ℓA} (p : A ≡ A') → A → A'
+transportp = Jp (λ v _ → v)
+
 substp' : {A : Prop ℓA} (B : A → Prop ℓB) {a1 a2 : A} → B a1 → B a2
 substp' B x = x
 
