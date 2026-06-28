@@ -11,11 +11,7 @@ import QIT.Prelude.Axiom
 import QIT.Prelude.Decidability
 import QIT.Prelude
 
--- Propositions
 import QIT.Logic
-import QIT.Prop.Base
-import QIT.Prop.Data
-import QIT.Prop.Properties
 import QIT.Prop
 
 -- Relations
@@ -37,13 +33,10 @@ import QIT.Nat
 import QIT.Fin.Base
 import QIT.Fin.Properties
 
+-- Set
 import QIT.Function.Base
 import QIT.Identity
-import QIT.Prop.Base
 import QIT.Logic
-import QIT.Prop.Data
-import QIT.Prop.Properties
-import QIT.Prop
 import QIT.Set.Base
 import QIT.Set.Bijection
 
