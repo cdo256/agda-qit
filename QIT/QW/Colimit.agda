@@ -7,16 +7,19 @@ open import QIT.Functor.Base
 open import QIT.Category.Base hiding (_[_≈_]; _[_,_]; _[_∘_])
 open import QIT.Category.Preorder
 open import QIT.Category.Set
-import QIT.Relation.SetQuotient as Quot
+open import QIT.Relation.SetQuotient
 
-module QIT.QW.Colimit ⦃ a!c* : A!C ⦄ ⦃ fe* : FunExt ⦄ {ℓI} {ℓ≤}
- {I : Set ℓI}
- (propExt : PropExt)
- (sq : Quot.SetQuotients)
- (sqe : Quot.SetQuotientsElim)
- (≤p : Preorder I ℓ≤)
- (ℓD ℓD' : Level)
- (P : Functor (PreorderCat I ≤p) (SetCat (ℓD ⊔ ℓD')))
- where
+module QIT.QW.Colimit
+  ⦃ pathElim* : PathElim ⦄
+  ⦃ a!c* : A!C ⦄
+  ⦃ fe* : FunExt ⦄
+  ⦃ propExt* : PropExt ⦄
+  ⦃ sq* : SetQuotients ⦄
+  {ℓI} {ℓ≤}
+  {I : Set ℓI}
+  (≤p : Preorder I ℓ≤)
+  (ℓD ℓD' : Level)
+  (P : Functor (PreorderCat I ≤p) (SetCat (ℓD ⊔ ℓD')))
+  where
 
-open import QIT.QW.Colimit.Properties propExt sq sqe ≤p ℓD ℓD' P public
+open import QIT.QW.Colimit.Properties ≤p ℓD ℓD' P public

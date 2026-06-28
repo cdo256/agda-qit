@@ -88,7 +88,7 @@ module _
   _/_ : ∀ {ℓA ℓR} → (A : Set ℓA) (R : A → A → Prop ℓR) → Set (ℓA ⊔ ℓR)
   A / R = SetQuotientStr.Q (sq A R)
 
-  module SetQuotient {ℓA ℓR} {A : Set ℓA} {R : A → A → Prop ℓR}
+  module Q {ℓA ℓR} {A : Set ℓA} {R : A → A → Prop ℓR}
     where
 
     open SetQuotientStr (sq A R) using ([_]; quot-rel) public
@@ -105,14 +105,14 @@ module _
       {-# DISPLAY SetQuotientElimStr.quot-recp _ f q = quot-recp f q #-}
       {-# DISPLAY SetQuotientElimStr.quot-elimp _ B f q = quot-elimp B f q #-}
 
-  open SetQuotient public
+  module Qd
+    {ℓA ℓB ℓR} {A : Set ℓA} (B : A → Set ℓB) (R : ∀ {x} → B x → B x → Prop ℓR)
+    where
+    open Q
 
-  quot-drel : ∀ {ℓA ℓB ℓR} → {A : Set ℓA} (B : A → Set ℓB) (R : ∀ {x} → B x → B x → Prop ℓR)
-      → {x y : A} (u : B x) (v : B y) (p : x ≡ y)
+    quot-drel
+      : {x y : A} (u : B x) (v : B y) (p : x ≡ y)
       → R (subst B p u) v → ≡.subst (λ ○ → B ○ / R) p [ u ] ≡ [ v ]
-  quot-drel B R u v ≡.refl ruv =
-    ≡.trans (≡.subst-refl [ u ])
-      (quot-rel u v (≡.substp (λ z → R z v) (≡.subst-refl u) ruv))
-
-  -- {-# REWRITE quot-rec-beta #-}
-  -- {-# REWRITE quot-elim-beta #-}
+    quot-drel u v ≡.refl ruv =
+      ≡.trans (≡.subst-refl [ u ])
+        (quot-rel u v (≡.substp (λ z → R z v) (≡.subst-refl u) ruv))

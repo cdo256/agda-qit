@@ -4,25 +4,25 @@ open import QIT.Prop.Properties using (isPropBox)
 open import QIT.Logic
 open import QIT.Setoid.Base renaming (_[_≈_] to _⟦_≈_⟧)
 open import QIT.Relation.Binary using (IsEquivalence)
-import QIT.Relation.SetQuotient as Q
+open import QIT.Relation.SetQuotient
 
 module QIT.Setoid.Quotient
   ⦃ pathElim* : PathElim ⦄
   ⦃ fe* : FunExt ⦄
   ⦃ propExt* : PropExt ⦄
   ⦃ funExt* : FunExt ⦄
-  ⦃ sq* : Q.SetQuotients ⦄
+  ⦃ sq* : SetQuotients ⦄
   where
 
 open PropExt propExt*
 open FunExt funExt*
 
 _/≈ : ∀ {ℓA ℓR} (Ã : Setoid ℓA ℓR) → Set (ℓA ⊔ ℓR)
-Ã /≈ = A Q./ _≈_
+Ã /≈ = A / _≈_
   where
   open Setoid Ã renaming (Carrier to A)
 
-module SetoidQuotient {ℓA ℓR} (Ã : Setoid ℓA ℓR) where
+module SQ {ℓA ℓR} (Ã : Setoid ℓA ℓR) where
   abstract
     open Setoid Ã renaming (Carrier to A)
     [_] : A → Ã /≈
@@ -212,7 +212,7 @@ module SetoidQuotient {ℓA ℓR} (Ã : Setoid ℓA ℓR) where
     where
     module B = Setoid B̃
 
-open SetoidQuotient using () renaming ([_] to _⊢[_]; ≈[_] to _⊢≈[_]) public
+open SQ using () renaming ([_] to _⊢[_]; ≈[_] to _⊢≈[_]) public
 
 record QuotRelWitness {ℓA ℓA≈ ℓB ℓB≈ ℓR} (A : Setoid ℓA ℓA≈) (B : Setoid ℓB ℓB≈)
         (R : ⟨ A ⟩ → ⟨ B ⟩ → Prop ℓR)
@@ -242,8 +242,8 @@ QuotHetRel∀→∃ : ∀ {ℓA ℓB ℓB≈ ℓR} {A : Set ℓA} (B : A → Set
         → QuotHetRel∀ B R bx by → QuotHetRel∃ B R bx by
 QuotHetRel∀→∃ B R {x} {y} bx by = Bx.elimp P f bx by
   where
-  module Bx = SetoidQuotient (B x)
-  module By = SetoidQuotient (B y)
+  module Bx = SQ (B x)
+  module By = SQ (B y)
 
   P : B x /≈ → Prop _
   P bx = ∀ by → QuotHetRel∀ B R bx by → QuotHetRel∃ B R bx by
@@ -274,7 +274,7 @@ QuotHomRel∀→∃ : ∀ {ℓB ℓB≈ ℓR} (B : Setoid ℓB ℓB≈)
         → QuotHomRel∀ B R x y → QuotHomRel∃ B R x y
 QuotHomRel∀→∃ B R x y = elimp P f x y
   where
-  open SetoidQuotient B
+  open SQ B
   P : B /≈ → Prop _
   P x = ∀ y → QuotHomRel∀ B R x y → QuotHomRel∃ B R x y
 

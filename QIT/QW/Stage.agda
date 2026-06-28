@@ -1,7 +1,7 @@
 open import QIT.Prelude
 open import QIT.Prop
 open import QIT.QW.Signature
-import QIT.Relation.SetQuotient as QuotRel
+open import QIT.Relation.SetQuotient
 
 -- Define staged construction of quotient W-types using plump ordinals.
 -- This builds the quotient in stages indexed by ordinals, ensuring that
@@ -12,7 +12,7 @@ module QIT.QW.Stage
   ⦃ pathElim* : PathElim ⦄
   ⦃ funExt* : FunExt ⦄
   ⦃ propExt* : PropExt ⦄
-  ⦃ sq* : QuotRel.SetQuotients ⦄
+  ⦃ sq* : SetQuotients ⦄
   {ℓS ℓP ℓE ℓV}
   (sig : Sig ℓS ℓP ℓE ℓV)
   where
@@ -34,8 +34,6 @@ open import QIT.Container.Base
 open import QIT.Container.StrictFunctor S P (ℓS ⊔ ℓP ⊔ ℓV)
 open import QIT.Setoid
 open import QIT.Setoid.Quotient
-module Quot = QuotRel
-open Quot using ([_]; quot-rec; quot-elimp; quot-rec-beta; quot-rel)
 open import QIT.Set.Base using (_≡h_)
 open import QIT.Relation.Subset
 open import QIT.Relation.SetQuotient
@@ -68,9 +66,9 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
   D ^ X = record
     { ob   = λ α → X → D.ob α
     ; hom  = λ p f x → D.hom p (f x)
-    ; id   = ≡.funExt λ _ → D.id
-    ; comp = λ f g → ≡.funExt λ _ → D.comp f g
-    ; resp = λ p → ≡.funExt λ _ → D.resp p
+    ; id   = funExt λ _ → D.id
+    ; comp = λ f g → funExt λ _ → D.comp f g
+    ; resp = λ p → funExt λ _ → D.resp p
     }
     where module D = Functor D
 
@@ -203,14 +201,7 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
       { to = pweaken α≤β
       ; cong = ≈pweaken α≤β }
 
-  D : Diagram/≈ (ℓA ⊔ ℓS ⊔ ℓP) (ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV)
-  D = record
-    { ob = λ α → D̃ α /≈
-    ; hom = hom
-    ; id = id
-    ; comp = comp
-    ; resp = λ _ → ≡.refl }
-    module D/≈ where
+  module D/≈ where
     module ≤p = Category (PreorderCat Z ≤p)
     module SetoidCat = Category (SetoidCat (ℓA ⊔ ℓS ⊔ ℓP) (ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV))
     module SetCat = Category (SetCat (ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV))
@@ -220,11 +211,12 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
     sameStage {α} p q = ≡→≈ (D̃ α) (ΣP≡ _ _ ≡.refl)
 
     hom : ∀ {α β} → Box (α ≤ β) → D̃ α /≈ → D̃ β /≈
-    hom {α} {β} (box α≤β) = Qα.rec (λ s → Qβ.[ pweaken α≤β s ])
-      λ p → Qβ.≈[ ≈pweaken α≤β p ]
+    hom {α} {β} (box α≤β) =
+      Qα.rec (λ s → Qβ.[ pweaken α≤β s ])
+             (λ p → Qβ.≈[ ≈pweaken α≤β p ])
       where
-      module Qα = SetoidQuotient (D̃ α)
-      module Qβ = SetoidQuotient (D̃ β)
+      module Qα = SQ (D̃ α)
+      module Qβ = SQ (D̃ β)
 
     hom-beta : ∀ {α β} → (p : Box (α ≤ β)) → (s : D₀ α)
              → hom p (D̃ α ⊢[ s ]) ≡ D̃ β ⊢[ pweaken (unbox p) s ]
@@ -232,13 +224,13 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
       Qα.rec-beta (λ (s : D₀ α) → Qβ.[ pweaken α≤β s ])
       (λ p → Qβ.≈[ ≈pweaken α≤β p ]) s
       where
-      module Qα = SetoidQuotient (D̃ α)
-      module Qβ = SetoidQuotient (D̃ β)
+      module Qα = SQ (D̃ α)
+      module Qβ = SQ (D̃ β)
 
     id : ∀ {α} → hom (≤p.id {α}) ≡h SetCat.id
     id {α} {t̃} = q t̃
       where
-      module Qα = SetoidQuotient (D̃ α)
+      module Qα = SQ (D̃ α)
       q : ∀ t̃ → hom {α} ≤p.id t̃ ≡ SetCat.id {D̃ α /≈} t̃
       q = Qα.elimp (λ t̃ → hom ≤p.id t̃ ≡ SetCat.id t̃)
                     (hom-beta ≤p.id)
@@ -246,7 +238,7 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
          → hom (g ≤p.∘ f) ≡h (hom g SetCat.∘ hom f)
     comp {α} {β} {γ} (box f) (box g) {t̃} = Qα.elimp _ r t̃
       where
-      module Qα = SetoidQuotient (D̃ α)
+      module Qα = SQ (D̃ α)
       r : (s : D₀ α)
         → hom (box g ≤p.∘ box f) (D̃ α ⊢[ s ])
         ≡ (hom (box g) SetCat.∘ hom (box f)) (D̃ α ⊢[ s ])
@@ -259,6 +251,13 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
           ≡⟨ ≡.cong (hom (box g)) (≡.sym (hom-beta (box f) s)) ⟩
         hom (box g) (hom (box f) (D̃ α ⊢[ s ])) ∎
 
+    D : Diagram/≈ (ℓA ⊔ ℓS ⊔ ℓP) (ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV)
+    D .Functor.ob = D̃/≈
+    D .Functor.hom = hom
+    D .Functor.id = id
+    D .Functor.comp = comp
+    D .Functor.resp _ = ≡.refl
+
     open import QIT.Function.Base
     open import QIT.Set.Bijection
 
@@ -269,8 +268,8 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
     isInjHom {α} {β} α≤β injWeaken {x} {y} q =
       D̃ α ⊢≈[ injWeaken r ]
       where
-      module Qα = SetoidQuotient (D̃ α)
-      module Qβ = SetoidQuotient (D̃ β)
+      module Qα = SQ (D̃ α)
+      module Qβ = SQ (D̃ β)
 
       q' : Qβ.[ pweaken α≤β x ] ≡ Qβ.[ pweaken α≤β y ]
       q' =
@@ -284,3 +283,5 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
 
       r : D̃ β [ pweaken α≤β x ≈ pweaken α≤β y ]
       r = Qβ.effectiveness _ _ q'
+
+  open D/≈ using (D) public

@@ -36,14 +36,8 @@ module QIT.Setoid ⦃ a!c* : A!C ⦄ ⦃ fe* : FunExt ⦄ where
 
 module ≈ where
   open import QIT.Setoid.Base public
-  module Quotient ⦃ propExt : PropExt ⦄
-                  ⦃ pathElim* : PathElim ⦄
-                  ⦃ sq* : Quot.SetQuotients ⦄
-                  where
-    open import QIT.Setoid.Quotient public
+  open import QIT.Setoid.Quotient public
   open import QIT.Setoid.Hom public
   open import QIT.Setoid.Iso public
 
-module Quotient = ≈.Quotient
-
-open ≈ using (Setoid; ⟨_⟩; _/≡; _≈h_; _[_≈_]; ≡→≈) public
+open ≈ using (Setoid; ⟨_⟩; _/≡; _≈h_; _[_≈_]; ≡→≈; _/≈) public

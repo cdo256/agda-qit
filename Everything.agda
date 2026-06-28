@@ -1,9 +1,5 @@
 module Everything where
 
--- Changes:
---  - QIT.Prelude.Universe: Export universe variables.
---  - QIT.Prelude.Logic: Rename intro and elim rules.
-
 -- Base
 import QIT.Prelude.Universe
 import QIT.Prelude.Truncation

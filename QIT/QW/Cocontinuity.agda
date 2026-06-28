@@ -13,15 +13,16 @@ open import QIT.Category.Preorder
 open import QIT.Category.Set
 open import QIT.Set.Bijection
 open import QIT.QW.Signature
-import QIT.Relation.SetQuotient as Quot
+open import QIT.Relation.SetQuotient
 
-module QIT.QW.Cocontinuity {ℓS ℓP ℓE ℓV}
+module QIT.QW.Cocontinuity 
+  ⦃ pathElim* : PathElim ⦄
   ⦃ a!c* : A!C ⦄
   ⦃ funExt* : FunExt ⦄ 
+  ⦃ propExt* : PropExt ⦄ 
+  ⦃ sq : SetQuotients ⦄
+  {ℓS ℓP ℓE ℓV}
   (sig : Sig ℓS ℓP ℓE ℓV)
-  (propExt : PropExt)
-  (sq : Quot.SetQuotients)
-  (sqe : Quot.SetQuotientsElim)
   where
 
 open Sig sig
@@ -31,9 +32,8 @@ open FunExt funExt*
 
 import QIT.Plump.Algebra as Plump
 import QIT.Plump.W.Base as PlumpW
-import QIT.QW.Stage sig propExt sq sqe as StageBase
-import QIT.QW.StageColimit sig propExt sq sqe as StageColimitBase
-module RawQ = Quot.WithSetQuotients sq sqe
+import QIT.QW.Stage sig as StageBase
+import QIT.QW.StageColimit sig as StageColimitBase
 
 module ZW = PlumpW S P
 module ZAlg = Plump ZW.Sᶻ ZW.Pᶻ
@@ -47,7 +47,7 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
   open import QIT.Container.Base
   open import QIT.Container.StrictFunctor S P (ℓD ⊔ ℓD')
   open import QIT.Category.Morphism (SetCat (ℓD ⊔ ℓD'))
-  open import QIT.Setoid.Quotient propExt sq sqe
+  open import QIT.Setoid.Quotient
 
   module Stage = StageBase.WithZ ZA
   module StageColimit = StageColimitBase.WithZ ZA
@@ -55,7 +55,7 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
   open ZW using (ιₛ)
   open import QIT.QW.Algebra sig
   open StageColimit public
-  open import QIT.QW.Colimit propExt sq sqe ≤p ℓD ℓD' hiding (_≈ˡ_)
+  open import QIT.QW.Colimit ≤p ℓD ℓD' hiding (_≈ˡ_)
 
   private
     ℓc = ℓA ⊔ ℓS ⊔ ℓP
@@ -66,10 +66,10 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
   Cocontinuous F D =
     Colim/≈ (F ∘ D) ≅ Functor.ob F (Colim/≈ D)
 
-  module ColimF∘D = SetoidQuotient (Colim (F ∘ D))
-  module ColimD = SetoidQuotient (Colim D)
+  module ColimF∘D = SQ (Colim (F ∘ D))
+  module ColimD = SQ (Colim D)
   module Ob = Functor F
-  open SetoidQuotient
+  open SQ
 
   module _ (depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ιᶻ (ŝ .fst) ≡ ιᶻ (t̂ .fst)) where
     module PreservationByPowers
@@ -127,7 +127,7 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
       same-stage p q = ≡→≈ (D̃ _) (ΣP≡ (_ , p) (_ , q) ≡.refl)
 
       module Plift≈Helper {α} where
-        module Dα = SetoidQuotient (D̃ α)
+        module Dα = SQ (D̃ α)
         open ≡.≡-Reasoning
 
         castʳ : ∀ {γ} {x y z : D₀ γ} → y ≡ z → D̃ γ [ x ≈ y ] → D̃ γ [ x ≈ z ]
@@ -187,7 +187,7 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
           rhs≈ = ΣP≡ _ _ rhsfst
             where
             rhsfst : (psup a μ' g') .fst ≡ (subst D₀ (≡.sym dp) (plift (psup a μ g))) .fst
-            rhsfst = ≡.trans (≡.cong (λ h → W.sup (a , h)) (≡.funExt g'fst))
+            rhsfst = ≡.trans (≡.cong (λ h → W.sup (a , h)) (funExt g'fst))
                               (≡.sym (subst-D₀-fst (≡.sym dp) (plift (psup a μ g))))
         exactify (≈psat e ϕ l≤α r≤α) = castʳ rhs≈ base
           where
@@ -317,8 +317,8 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
     --   ~∃→∀ : ∀ {α β} (ŝ : D̃ α /≈) (t̂ : D̃ β /≈) → ŝ ~∃ t̂ → ŝ ~∀ t̂
     --   ~∃→∀ {α} {β} ŝ t̂ ∣ qrwitness (s' , s'≤α) (t' , t'≤β) r ps' pt' ∣ (s , s≤α) (t , t≤β) ps pt = p
     --     where
-    --     module Dα = SetoidQuotient (D̃ α)
-    --     module Dβ = SetoidQuotient (D̃ β)
+    --     module Dα = SQ (D̃ α)
+    --     module Dβ = SQ (D̃ β)
 
     --     rs : D̃ α [ (s , s≤α) ≈ (s' , s'≤α) ]
     --     rs = Dα.effectiveness _ _ (≡.trans ps (≡.sym ps'))
@@ -366,8 +366,8 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
     --     rank~ : ∀ {γ δ} {û : D̃ γ /≈} {v̂ : D̃ δ /≈} → û ~∀ v̂ → rankD û ≡ rankD v̂
     --     rank~ {γ} {δ} {û} {v̂} u~v = Dγ.elimp Pred f û v̂ u~v
     --       where
-    --       module Dγ = SetoidQuotient (D̃ γ)
-    --       module Dδ = SetoidQuotient (D̃ δ)
+    --       module Dγ = SQ (D̃ γ)
+    --       module Dδ = SQ (D̃ δ)
 
     --       Pred : D̃ γ /≈ → Prop _
     --       Pred û = ∀ v̂ → û ~∀ v̂ → rankD û ≡ rankD v̂
@@ -420,7 +420,7 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
     --   D^X : Diagram/≈ ℓc ℓc'
     --   D^X = _^_ {ℓc} {ℓc'} D (Lift (ℓA ⊔ ℓS) X)
     --   module D^X = Functor D^X
-    --   module ColimD^X = SetoidQuotient (Colim D^X)
+    --   module ColimD^X = SQ (Colim D^X)
 
     --   ϕ₀ : Colim₀ D^X → X → Colim₀ D
     --   ϕ₀ (α , t̂) x = α , t̂ (lift x)
@@ -454,7 +454,7 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
     --     sameBounded {γ} {α} p q {y} = B.≈l≤trans (B.≈l≤step (≤refl α) y) (B.≈l≤stage (α , q) eq)
     --       where
     --       module B = Bounded D γ
-    --       module Dα = SetoidQuotient (D̃ α)
+    --       module Dα = SQ (D̃ α)
     --       module D∣γ = Functor (RestrictDiagram D γ)
     --       hom-refl : (y : D̃ α /≈) → D∣γ.hom {α , p} {α , p} (box (≤refl α)) y ≡ y
     --       hom-refl = Dα.elimp (λ y → D∣γ.hom {α , p} {α , p} (box (≤refl α)) y ≡ y) h
@@ -540,7 +540,7 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
     --             → D.hom (box p) x ≡ D.hom (box q) x
     --     sameHom {α} {γ} p q {x} = Dα.elimp B h x
     --       where
-    --       module Dα = SetoidQuotient (D̃ α)
+    --       module Dα = SQ (D̃ α)
     --       B : D̃ α /≈ → Prop _
     --       B x = D.hom (box p) x ≡ D.hom (box q) x
     --       h : ∀ û → B (D̃ α ⊢[ û ])
@@ -759,7 +759,7 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
     -- -- ϕinS s = ColimPow.elimp B h
     -- --   where
     -- --   module Ps = Pow s
-    -- --   module ColimPow = SetoidQuotient (Colim (Ps.D^X))
+    -- --   module ColimPow = SQ (Colim (Ps.D^X))
 
     -- --   B : Colim/≈ (Ps.D^X) → Prop _
     -- --   B q = ϕ (inS s q) ≡ (s , Ps.ϕ q)

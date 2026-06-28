@@ -9,184 +9,189 @@ open import QIT.Functor.Properties using (restrict-domain)
 open import QIT.Category.Base hiding (_[_≈_]; _[_,_]; _[_∘_])
 open import QIT.Category.Preorder
 open import QIT.Category.Set
-import QIT.Relation.SetQuotient as QuotRel
+open import QIT.Relation.SetQuotient
 
-module QIT.QW.Colimit.Properties ⦃ a!c* : A!C ⦄ ⦃ fe* : FunExt ⦄ {ℓI} {ℓ≤}
- {I : Set ℓI}
- (propExt : PropExt)
- (sq : QuotRel.SetQuotients)
- (sqe : QuotRel.SetQuotientsElim)
- (≤p : Preorder I ℓ≤)
- (ℓD ℓD' : Level)
- (P : Functor (PreorderCat I ≤p) (SetCat (ℓD ⊔ ℓD')))
- where
+module QIT.QW.Colimit.Properties
+  ⦃ pathElim* : PathElim ⦄
+  ⦃ a!c* : A!C ⦄
+  ⦃ funExt* : FunExt ⦄
+  ⦃ propExt* : PropExt ⦄
+  ⦃ sq : SetQuotients ⦄
+  {ℓI} {ℓ≤}
+  {I : Set ℓI}
+  (≤p : Preorder I ℓ≤)
+  (ℓD ℓD' : Level)
+  (P : Functor (PreorderCat I ≤p) (SetCat (ℓD ⊔ ℓD')))
+  where
 
-  open import QIT.Setoid
-  import QIT.Setoid.Quotient propExt sq sqe as Quot
-  open Quot using (_/≈)
+open FunExt funExt*
 
-  private
-    module ≤ = IsPreorder (≤p .proj₂)
-    _≤_ : BinaryRel I ℓ≤
-    _≤_ = ≤p .proj₁
+open import QIT.Setoid
+open import QIT.Setoid.Quotient
 
-  open import QIT.QW.Colimit.Base propExt sq sqe ≤p ℓD ℓD' P public
+private
+  module ≤ = IsPreorder (≤p .proj₂)
+  _≤_ : BinaryRel I ℓ≤
+  _≤_ = ≤p .proj₁
 
-  open Functor P using () renaming (ob to P̂)
-  module ≤p = QIT.Category.Preorder I ≤p
-  open Quot.SetoidQuotient Colim
+open import QIT.QW.Colimit.Base ≤p ℓD ℓD' P public
 
-  RestrictDiagram : (α : I) → Functor (≤p.PreorderCat↓ α) (SetCat (ℓD ⊔ ℓD'))
-  RestrictDiagram α = restrict-domain (≤p.include≤ α) P
+open Functor P using () renaming (ob to P̂)
+module ≤p = QIT.Category.Preorder I ≤p
 
-  module Bounded (α : I) where
-    open import QIT.QW.Colimit.Base propExt sq sqe (≤p.Restrict≤ α) ℓD ℓD' (RestrictDiagram α) public
-      using ()
-      renaming
-        ( Colim₀ to Colim≤₀
-        ; _≈ˡ_ to _≈ˡ≤_
-        ; recˡ to recˡ≤
-        ; ≈lrefl to ≈lrefl≤
-        ; Colim to Colim≤~
-        ; Colim/≈ to Colim≤
-        ; ≈lstage to ≈l≤stage
-        ; ≈lstep to ≈l≤step
-        ; ≈lsym to ≈l≤sym
-        ; ≈ltrans to ≈l≤trans
-        )
+RestrictDiagram : (α : I) → Functor (≤p.PreorderCat↓ α) (SetCat (ℓD ⊔ ℓD'))
+RestrictDiagram α = restrict-domain (≤p.include≤ α) P
 
-    forget₀ : Colim≤₀ → Colim₀
-    forget₀ (i≤α , x) = i≤α .fst , x
+module Bounded (α : I) where
+  open import QIT.QW.Colimit.Base (≤p.Restrict≤ α) ℓD ℓD' (RestrictDiagram α) public
+    using ()
+    renaming
+      ( Colim₀ to Colim≤₀
+      ; _≈ˡ_ to _≈ˡ≤_
+      ; recˡ to recˡ≤
+      ; ≈lrefl to ≈lrefl≤
+      ; Colim to Colim≤~
+      ; Colim/≈ to Colim≤
+      ; ≈lstage to ≈l≤stage
+      ; ≈lstep to ≈l≤step
+      ; ≈lsym to ≈l≤sym
+      ; ≈ltrans to ≈l≤trans
+      )
 
-    forget≈≤ : ∀ {s t} → s ≈ˡ≤ t → forget₀ s ≈ˡ forget₀ t
-    forget≈≤ (≈lstage i e) = ≈lstage (i .fst) e
-    forget≈≤ (≈lstep p x) = ≈lstep p x
-    forget≈≤ (≈lsym r) = ≈lsym (forget≈≤ r)
-    forget≈≤ (≈ltrans r₁ r₂) = ≈ltrans (forget≈≤ r₁) (forget≈≤ r₂)
+  forget₀ : Colim≤₀ → Colim₀
+  forget₀ (i≤α , x) = i≤α .fst , x
 
-    recˡ≤' : ∀ {ℓ ℓ'}
-         → (C≤ : ∀ {s t} → s ≈ˡ≤ t → Prop ℓ)
-         → (C  : ∀ {s t} → s ≈ˡ t → Prop ℓ')
-         → (c-stage : ∀ (i : ≤p.Below α) {x x'} (e : x ≡ x') → C≤ (≈l≤stage i e))
-         → (c-step  : ∀ {i j : ≤p.Below α} (p : i .fst ≤ j .fst) (x : Functor.ob (RestrictDiagram α) i) → C≤ (≈l≤step p x))
-         → (c-sym   : ∀ {s t} (r : s ≈ˡ≤ t) → C≤ r → C≤ (≈l≤sym r))
-         → (c-trans : ∀ {s t u} (r₁ : s ≈ˡ≤ t) (r₂ : t ≈ˡ≤ u) → C≤ r₁ → C≤ r₂ → C≤ (≈l≤trans r₁ r₂))
-         → (forgetC : ∀ {s t} (r : s ≈ˡ≤ t) → C≤ r → C (forget≈≤ r))
-         → ∀ {s t} (r : s ≈ˡ≤ t) → C (forget≈≤ r)
-    recˡ≤' C≤ C c-stage c-step c-sym c-trans forgetC r = forgetC r (go r)
-      where
-      go : ∀ {s t} (r : s ≈ˡ≤ t) → C≤ r
-      go (≈lstage i e) = c-stage i e
-      go (≈lstep {i} {j} p x) = c-step {i} {j} p x
-      go (≈lsym r) = c-sym r (go r)
-      go (≈ltrans r₁ r₂) = c-trans r₁ r₂ (go r₁) (go r₂)
+  forget≈≤ : ∀ {s t} → s ≈ˡ≤ t → forget₀ s ≈ˡ forget₀ t
+  forget≈≤ (≈lstage i e) = ≈lstage (i .fst) e
+  forget≈≤ (≈lstep p x) = ≈lstep p x
+  forget≈≤ (≈lsym r) = ≈lsym (forget≈≤ r)
+  forget≈≤ (≈ltrans r₁ r₂) = ≈ltrans (forget≈≤ r₁) (forget≈≤ r₂)
 
-  record BoundedFactor (s t : Colim₀) : Set (ℓI ⊔ ℓ≤ ⊔ ℓD ⊔ ℓD') where
-    field
-      α : I
-      s≤α : s .proj₁ ≤ α
-      t≤α : t .proj₁ ≤ α
-      r≤ : let module B = Bounded α in B._≈ˡ≤_ ((s .proj₁ , s≤α) , s .proj₂) ((t .proj₁ , t≤α) , t .proj₂)
-
-  recˡ↑ : ∀ {ℓ≤' ℓ}
-       → (C : ∀ {s t} → s ≈ˡ t → Prop ℓ)
-       → (factor : ∀ {s t} (r : s ≈ˡ t) → BoundedFactor s t)
-       → (C≤ : ∀ α {s t} → let module B = Bounded α in B._≈ˡ≤_ s t → Prop ℓ≤')
-       → (c-stage : ∀ α (i : ≤p.Below α) {x x'} (e : x ≡ x') → C≤ α (Bounded.≈l≤stage {α = α} i e))
-       → (c-step  : ∀ α {i j : ≤p.Below α} (p : i .fst ≤ j .fst) (x : Functor.ob (RestrictDiagram α) i)
-                 → C≤ α (Bounded.≈l≤step {α = α} {i = i} {j = j} p x))
-       → (c-sym   : ∀ α {s t} (r : let module B = Bounded α in B._≈ˡ≤_ s t)
-                 → C≤ α r → C≤ α (Bounded.≈l≤sym {α = α} r))
-       → (c-trans : ∀ α {s t u}
-                 (r₁ : let module B = Bounded α in B._≈ˡ≤_ s t)
-                 (r₂ : let module B = Bounded α in B._≈ˡ≤_ t u)
-                 → C≤ α r₁ → C≤ α r₂ → C≤ α (Bounded.≈l≤trans {α = α} r₁ r₂))
-       → (forgetC : ∀ α {s t} (r : let module B = Bounded α in B._≈ˡ≤_ s t)
-                 → C≤ α r → C (Bounded.forget≈≤ α r))
-       → (stable : ∀ {s t} (p q : s ≈ˡ t) → C q → C p)
-       → ∀ {s t} (r : s ≈ˡ t) → C r
-  recˡ↑ C factor C≤ c-stage c-step c-sym c-trans forgetC stable r =
-    stable r (B.forget≈≤ (F.r≤)) pr
+  recˡ≤' : ∀ {ℓ ℓ'}
+        → (C≤ : ∀ {s t} → s ≈ˡ≤ t → Prop ℓ)
+        → (C  : ∀ {s t} → s ≈ˡ t → Prop ℓ')
+        → (c-stage : ∀ (i : ≤p.Below α) {x x'} (e : x ≡ x') → C≤ (≈l≤stage i e))
+        → (c-step  : ∀ {i j : ≤p.Below α} (p : i .fst ≤ j .fst) (x : Functor.ob (RestrictDiagram α) i) → C≤ (≈l≤step p x))
+        → (c-sym   : ∀ {s t} (r : s ≈ˡ≤ t) → C≤ r → C≤ (≈l≤sym r))
+        → (c-trans : ∀ {s t u} (r₁ : s ≈ˡ≤ t) (r₂ : t ≈ˡ≤ u) → C≤ r₁ → C≤ r₂ → C≤ (≈l≤trans r₁ r₂))
+        → (forgetC : ∀ {s t} (r : s ≈ˡ≤ t) → C≤ r → C (forget≈≤ r))
+        → ∀ {s t} (r : s ≈ˡ≤ t) → C (forget≈≤ r)
+  recˡ≤' C≤ C c-stage c-step c-sym c-trans forgetC r = forgetC r (go r)
     where
-    f = factor r
-    module F = BoundedFactor f
-    module B = Bounded (F.α)
-    pr : C (B.forget≈≤ (F.r≤))
-    pr = B.recˡ≤' (C≤ (F.α)) C (c-stage (F.α)) (c-step (F.α)) (c-sym (F.α)) (c-trans (F.α)) (forgetC (F.α)) (F.r≤)
+    go : ∀ {s t} (r : s ≈ˡ≤ t) → C≤ r
+    go (≈lstage i e) = c-stage i e
+    go (≈lstep {i} {j} p x) = c-step {i} {j} p x
+    go (≈lsym r) = c-sym r (go r)
+    go (≈ltrans r₁ r₂) = c-trans r₁ r₂ (go r₁) (go r₂)
 
-  module _ where
-    open Bounded renaming (_≈ˡ≤_ to _⊢_≈ˡ≤_)
-    -- recˡ↑ : 
-    -- recˡ↑ : ∀ {ℓ ℓ'}
-    --      → (C≤ : ∀ α {s t} → α ⊢ s ≈ˡ≤ t → Prop ℓ)
-    --      → (C  : ∀ {s t} → s ≈ˡ t → Prop ℓ')
-    --      → (c-stage : ∀ α (i : ≤p.Below α) {x x' : ?} (e : x ≡ x') → C≤ α (≈l≤stage i e))
-    --      → (c-step  : ∀ α {i j : ≤p.Below α} (p : i .fst ≤ j .fst) (x : Functor.ob (RestrictDiagram α) i) → C≤ α (≈l≤step p x))
-    --      → (c-sym   : ∀ α {s t} (r : α ⊢ s ≈ˡ≤ t) → C≤ r → C≤ (≈l≤sym r))
-    --      → (c-trans : ∀ α {s t u} (r₁ : α ⊢ s ≈ˡ≤ t) (r₂ : α ⊢ t ≈ˡ≤ u) → C≤ r₁ → C≤ r₂ → C≤ (≈l≤trans r₁ r₂))
-    --      → (forgetC : ∀ α {s t} (r : α ⊢ s ≈ˡ≤ t) → C≤ r → C (forget≈≤ r))
-    --      → ∀ {s t} (r : s ≈ˡ t) → C r
-    -- recˡ↑ C≤ C c-stage c-step c-sym c-trans forgetC r = ?
+record BoundedFactor (s t : Colim₀) : Set (ℓI ⊔ ℓ≤ ⊔ ℓD ⊔ ℓD') where
+  field
+    α : I
+    s≤α : s .proj₁ ≤ α
+    t≤α : t .proj₁ ≤ α
+    r≤ : let module B = Bounded α in B._≈ˡ≤_ ((s .proj₁ , s≤α) , s .proj₂) ((t .proj₁ , t≤α) , t .proj₂)
 
-  record Cocone : Set (lsuc (ℓ≤ ⊔ ℓD' ⊔ ℓD ⊔ ℓI)) where
-    field
-      Apex     : Set (ℓI ⊔ ℓ≤ ⊔ ℓD ⊔ ℓD')
-      inj      : ∀ i → P̂ i → Apex
-      commutes : ∀ {i j} (p : i ≤ j)
-               → inj i ≡ (inj j ∘ Functor.hom P (box p))
+recˡ↑ : ∀ {ℓ≤' ℓ}
+      → (C : ∀ {s t} → s ≈ˡ t → Prop ℓ)
+      → (factor : ∀ {s t} (r : s ≈ˡ t) → BoundedFactor s t)
+      → (C≤ : ∀ α {s t} → let module B = Bounded α in B._≈ˡ≤_ s t → Prop ℓ≤')
+      → (c-stage : ∀ α (i : ≤p.Below α) {x x'} (e : x ≡ x') → C≤ α (Bounded.≈l≤stage {α = α} i e))
+      → (c-step  : ∀ α {i j : ≤p.Below α} (p : i .fst ≤ j .fst) (x : Functor.ob (RestrictDiagram α) i)
+                → C≤ α (Bounded.≈l≤step {α = α} {i = i} {j = j} p x))
+      → (c-sym   : ∀ α {s t} (r : let module B = Bounded α in B._≈ˡ≤_ s t)
+                → C≤ α r → C≤ α (Bounded.≈l≤sym {α = α} r))
+      → (c-trans : ∀ α {s t u}
+                (r₁ : let module B = Bounded α in B._≈ˡ≤_ s t)
+                (r₂ : let module B = Bounded α in B._≈ˡ≤_ t u)
+                → C≤ α r₁ → C≤ α r₂ → C≤ α (Bounded.≈l≤trans {α = α} r₁ r₂))
+      → (forgetC : ∀ α {s t} (r : let module B = Bounded α in B._≈ˡ≤_ s t)
+                → C≤ α r → C (Bounded.forget≈≤ α r))
+      → (stable : ∀ {s t} (p q : s ≈ˡ t) → C q → C p)
+      → ∀ {s t} (r : s ≈ˡ t) → C r
+recˡ↑ C factor C≤ c-stage c-step c-sym c-trans forgetC stable r =
+  stable r (B.forget≈≤ (F.r≤)) pr
+  where
+  f = factor r
+  module F = BoundedFactor f
+  module B = Bounded (F.α)
+  pr : C (B.forget≈≤ (F.r≤))
+  pr = B.recˡ≤' (C≤ (F.α)) C (c-stage (F.α)) (c-step (F.α)) (c-sym (F.α)) (c-trans (F.α)) (forgetC (F.α)) (F.r≤)
 
-  open Cocone
+module _ where
+  open Bounded renaming (_≈ˡ≤_ to _⊢_≈ˡ≤_)
+  -- recˡ↑ : 
+  -- recˡ↑ : ∀ {ℓ ℓ'}
+  --      → (C≤ : ∀ α {s t} → α ⊢ s ≈ˡ≤ t → Prop ℓ)
+  --      → (C  : ∀ {s t} → s ≈ˡ t → Prop ℓ')
+  --      → (c-stage : ∀ α (i : ≤p.Below α) {x x' : ?} (e : x ≡ x') → C≤ α (≈l≤stage i e))
+  --      → (c-step  : ∀ α {i j : ≤p.Below α} (p : i .fst ≤ j .fst) (x : Functor.ob (RestrictDiagram α) i) → C≤ α (≈l≤step p x))
+  --      → (c-sym   : ∀ α {s t} (r : α ⊢ s ≈ˡ≤ t) → C≤ r → C≤ (≈l≤sym r))
+  --      → (c-trans : ∀ α {s t u} (r₁ : α ⊢ s ≈ˡ≤ t) (r₂ : α ⊢ t ≈ˡ≤ u) → C≤ r₁ → C≤ r₂ → C≤ (≈l≤trans r₁ r₂))
+  --      → (forgetC : ∀ α {s t} (r : α ⊢ s ≈ˡ≤ t) → C≤ r → C (forget≈≤ r))
+  --      → ∀ {s t} (r : s ≈ˡ t) → C r
+  -- recˡ↑ C≤ C c-stage c-step c-sym c-trans forgetC r = ?
 
-  LimitCocone : Cocone
-  LimitCocone = record
-    { Apex     = Colim /≈
-    ; inj      = λ i x → [ i , x ]
-    ; commutes = λ p → ≡.funExt λ x → ≈[ ≈lstep p x ]
-    }
+record Cocone : Set (lsuc (ℓ≤ ⊔ ℓD' ⊔ ℓD ⊔ ℓI)) where
+  field
+    Apex     : Set (ℓI ⊔ ℓ≤ ⊔ ℓD ⊔ ℓD')
+    inj      : ∀ i → P̂ i → Apex
+    commutes : ∀ {i j} (p : i ≤ j)
+              → inj i ≡ (inj j ∘ Functor.hom P (box p))
 
-  record ColimMorphism (C C' : Cocone) : Set (ℓI ⊔ ℓ≤ ⊔ ℓD ⊔ ℓD') where
-    field
-      apexHom  : (C .Apex) → (C' .Apex)
-      commutes : ∀ i → (apexHom ∘ C .inj i) ≡ (C' .inj i)
+open Cocone
 
-  open ColimMorphism
+LimitCocone : Cocone
+LimitCocone = record
+  { Apex     = Colim /≈
+  ; inj      = λ i x → Colim ⊢[ i , x ]
+  ; commutes = λ p → funExt λ x → Colim ⊢≈[ ≈lstep p x ]
+  }
 
-  record isLimitingCocone (C : Cocone) : Set (lsuc ℓI ⊔ lsuc ℓ≤ ⊔ lsuc ℓD ⊔ lsuc ℓD') where
-    field
-      hom    : ∀ C' → ColimMorphism C C'
-      unique : ∀ C' → (F : ColimMorphism C C')
-             → ∀ x̃ → F .apexHom x̃ ≡ hom C' .apexHom x̃
+record ColimMorphism (C C' : Cocone) : Set (ℓI ⊔ ℓ≤ ⊔ ℓD ⊔ ℓD') where
+  field
+    apexHom  : (C .Apex) → (C' .Apex)
+    commutes : ∀ i → (apexHom ∘ C .inj i) ≡ (C' .inj i)
 
-  module IsLimitingCocone (C' : Cocone) where
-    module C' = Cocone C'
+open ColimMorphism
 
-    open isLimitingCocone
-    open ≈.Hom
+record isLimitingCocone (C : Cocone) : Set (lsuc ℓI ⊔ lsuc ℓ≤ ⊔ lsuc ℓD ⊔ lsuc ℓD') where
+  field
+    hom    : ∀ C' → ColimMorphism C C'
+    unique : ∀ C' → (F : ColimMorphism C C')
+            → ∀ x̃ → F .apexHom x̃ ≡ hom C' .apexHom x̃
 
-    f₀ : Colim₀ → C'.Apex
-    f₀ (i , x) = C'.inj i x
+module IsLimitingCocone (C' : Cocone) where
+  module C' = Cocone C'
 
-    isRespecting : ∀ {i j x y} → (i , x) ≈ˡ (j , y) → f₀ (i , x) ≡ f₀ (j , y)
-    isRespecting (≈lstage i x≈y) = ≡.cong (C'.inj i) x≈y
-    isRespecting {i} {j} {x} {y} (≈lstep p x) = ≡.funExt⁻ (C'.commutes p) x
-    isRespecting (≈lsym r) = ≡.sym (isRespecting r)
-    isRespecting (≈ltrans r s) = ≡.trans (isRespecting r) (isRespecting s)
+  open isLimitingCocone
+  open ≈.Hom
+  module Colim/≈ = SQ Colim
 
-    f : Colim /≈ → C'.Apex
-    f = rec f₀ isRespecting
+  f₀ : Colim₀ → C'.Apex
+  f₀ (i , x) = C'.inj i x
 
-    F : ColimMorphism LimitCocone C'
-    F .apexHom = f
-    F .commutes i = ≡.funExt λ x → rec-beta f₀ isRespecting (i , x)
+  isRespecting : ∀ {i j x y} → (i , x) ≈ˡ (j , y) → f₀ (i , x) ≡ f₀ (j , y)
+  isRespecting (≈lstage i x≈y) = ≡.cong (C'.inj i) x≈y
+  isRespecting {i} {j} {x} {y} (≈lstep p x) = ≡.funExt⁻ (C'.commutes p) x
+  isRespecting (≈lsym r) = ≡.sym (isRespecting r)
+  isRespecting (≈ltrans r s) = ≡.trans (isRespecting r) (isRespecting s)
 
-    unq : (G : ColimMorphism LimitCocone C') → ∀ x̃ → G .apexHom x̃ ≡ f x̃
-    unq G = elimp (λ x̃ → G .apexHom x̃ ≡ f x̃) λ (i , x) →
-      ≡.trans (≡.funExt⁻ (G .commutes i) x) (≡.sym (rec-beta f₀ isRespecting (i , x)))
+  f : Colim /≈ → C'.Apex
+  f = Colim/≈.rec f₀ isRespecting
 
-  isLimitingCoconeLimitCocone : isLimitingCocone LimitCocone
-  isLimitingCoconeLimitCocone = record
-    { hom    = F
-    ; unique = unq
-    }
-    where
-    open IsLimitingCocone
+  F : ColimMorphism LimitCocone C'
+  F .apexHom = f
+  F .commutes i = funExt λ x → Colim/≈.rec-beta f₀ isRespecting (i , x)
+
+  unq : (G : ColimMorphism LimitCocone C') → ∀ x̃ → G .apexHom x̃ ≡ f x̃
+  unq G = Colim/≈.elimp (λ x̃ → G .apexHom x̃ ≡ f x̃) λ (i , x) →
+    ≡.trans (≡.funExt⁻ (G .commutes i) x)
+            (≡.sym (Colim/≈.rec-beta f₀ isRespecting (i , x)))
+
+isLimitingCoconeLimitCocone : isLimitingCocone LimitCocone
+isLimitingCoconeLimitCocone = record
+  { hom    = F
+  ; unique = unq
+  }
+  where
+  open IsLimitingCocone
