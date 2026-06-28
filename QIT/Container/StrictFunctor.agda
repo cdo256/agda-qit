@@ -1,5 +1,5 @@
 open import QIT.Prelude
-open import QIT.Prop hiding (_,_)
+open import QIT.Prop
 open import QIT.Setoid
 open import QIT.Functor.Base
 open import QIT.Category.Set
