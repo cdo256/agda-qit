@@ -11,7 +11,6 @@ import QIT.Prelude.Axiom
 import QIT.Prelude.Decidability
 import QIT.Prelude
 
-
 -- Propositions
 import QIT.Logic
 import QIT.Prop.Base
@@ -24,7 +23,7 @@ import QIT.Relation.Base
 import QIT.Relation.Binary
 import QIT.Relation.IndexedBinary
 import QIT.Relation.Subset
--- import QIT.Relation.Plump
+import QIT.Relation.Plump
 import QIT.Relation.Nullary
 import QIT.Relation.Finite
 import QIT.Relation.WellFounded

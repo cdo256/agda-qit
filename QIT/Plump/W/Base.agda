@@ -230,9 +230,8 @@ x ⊆⊇ y = (x ⊆ y) ∧ (y ⊆ x)
 -- the cocontinuity arguments (where we mainly compare ordinals via the
 -- induced < relation).
 isQuasiExtensionalZ : ∀ {x y} → (x ≤≥ y) ⇔ (x ⊆⊇ y)
-isQuasiExtensionalZ =
-  (λ (α≤β , β≤α) → ≤→⊆ α≤β , ≤→⊆ β≤α) ,
-  (λ (α⊆β , β⊆α) → ⊆→≤ α⊆β , ⊆→≤ β⊆α)
+isQuasiExtensionalZ .∧e₁ (∧i α≤β , β≤α) = ∧i ≤→⊆ α≤β , ≤→⊆ β≤α
+isQuasiExtensionalZ .∧e₂ (∧i α⊆β , β⊆α) = ∧i ⊆→≤ α⊆β , ⊆→≤ β⊆α
 
 -- Congruence for ≤: pointwise ≤ on children implies ≤ on sups.
 ≤cong : ∀ s (μ τ : Pᶻ s → Z) → (r : ∀ i → μ i ≤ τ i)
@@ -240,17 +239,17 @@ isQuasiExtensionalZ =
 ≤cong s μ τ r = sup≤ λ i → <sup i (r i)
 
 ≤≥-refl : ∀ {x} → x ≤≥ x
-≤≥-refl {x} = ≤refl x , ≤refl x
+≤≥-refl {x} = ∧i ≤refl x , ≤refl x
 
 ≤≥-sym : ∀ {x y} → x ≤≥ y → y ≤≥ x
-≤≥-sym (x≤y , y≤x) = y≤x , x≤y
+≤≥-sym (∧i x≤y , y≤x) = ∧i y≤x , x≤y
 
 ≤≥-trans : ∀ {x y z} → x ≤≥ y → y ≤≥ z → x ≤≥ z
-≤≥-trans (x≤y , y≤x) (y≤z , z≤y) = ≤≤ y≤z x≤y , ≤≤ y≤x z≤y
+≤≥-trans (∧i x≤y , y≤x) (∧i y≤z , z≤y) = ∧i ≤≤ y≤z x≤y , ≤≤ y≤x z≤y
 
 ≤≥-cong : ∀ s (μ τ : Pᶻ s → Z) → (r : ∀ i → μ i ≤≥ τ i)
         → sup (s , μ) ≤≥ sup (s , τ)
-≤≥-cong s μ τ r = sup≤ (λ i → <sup i (r i .fst)) , sup≤ (λ i → <sup i (r i .snd))
+≤≥-cong s μ τ r = ∧i (sup≤ (λ i → <sup i (r i .∧e₁))) , (sup≤ (λ i → <sup i (r i .∧e₂)))
 
 -- Strict and non-strict comparisons for join. These are the basic
 -- facts used when combining bounds in proofs (especially in ψ-cong and

@@ -36,7 +36,7 @@ module _ {ℓX} {A B : Set ℓX} (ac : A!C) where
   open Category (SetCat ℓX)
 
   Bijection→Iso : (f : A → B) → IsBijection f → Iso A B
-  Bijection→Iso f (inj , surj) = iso
+  Bijection→Iso f (∧i inj , surj) = iso
     where
     T : B → Set _
     T y = ΣP A (λ x → f x ≡ y)
@@ -45,7 +45,7 @@ module _ {ℓX} {A B : Set ℓX} (ac : A!C) where
     f⁻¹T y = a!c (T y) (isContrT (surj y))
       where
       isContrT : (∃ λ x → f x ≡ y) → isContr (T y)
-      isContrT (∃.∃i x ≡.refl) = ∃.∃i (x , ≡.refl) (λ (x' , fx'≡fx) → ΣP≡ (x , _) (x' , _) (inj (≡.sym fx'≡fx)))
+      isContrT (∃.∃i x , ≡.refl) = ∃.∃i (x , ≡.refl) , (λ (x' , fx'≡fx) → ΣP≡ (x , _) (x' , _) (inj (≡.sym fx'≡fx)))
 
     f⁻¹ : B → A
     f⁻¹ y = fst (f⁻¹T y)
@@ -64,7 +64,7 @@ module _ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} (ac : A!C) where
   open Category (SetCat (ℓA ⊔ ℓB))
 
   HetBijection→Iso : (f : A → B) → IsBijection f → Lift ℓB A ≅ Lift ℓA B
-  HetBijection→Iso f (inj , surj) = ∣ Bijection→Iso ac f' (inj' , surj') ∣
+  HetBijection→Iso f (∧i inj , surj) = ∣ Bijection→Iso ac f' (∧i inj' , surj') ∣
     where
     f' : Lift ℓB A → Lift ℓA B
     f' (lift x) = lift (f x)
@@ -72,7 +72,7 @@ module _ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} (ac : A!C) where
     inj' {lift x} {lift y} p = ≡.cong lift (inj (≡.cong lower p))
     surj' : IsSurjection f'
     surj' (lift y) with surj y
-    ... | ∃.∃i x p = ∃.∃i (lift x) (≡.cong lift p)
+    ... | ∃.∃i x , p = ∃.∃i lift x , ≡.cong lift p
 
 ↔to-Injection : ∀ {ℓX ℓY} {X : Set ℓX} {Y : Set ℓY}
               → (p : X ↔ Y) → IsInjection (p .↔.to)

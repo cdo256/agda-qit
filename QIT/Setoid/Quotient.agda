@@ -91,33 +91,25 @@ module SQ {ℓA ℓR} (Ã : Setoid ℓA ℓR) where
     effectiveness : ∀ x y → [ x ] ≡ [ y ] → x ≈ y
     effectiveness x y p = unbox py
       where
+      x≈a⇔x≈b : ∀ {a b} (a≈b : a ≈ b) → x ≈ a ⇔ x ≈ b
+      x≈a⇔x≈b a≈b .∧e₁ x≈a = trans x≈a a≈b
+      x≈a⇔x≈b a≈b .∧e₂ x≈b = trans x≈b (sym a≈b)
+
       P : Ã /≈ → Set ℓR
       P = rec
             (λ a → Box (x ≈ a))
             (λ a≈b → ≡.cong Box (propExt (x≈a⇔x≈b a≈b)))
-        where
-        x≈a⇔x≈b : ∀ {a b} (a≈b : a ≈ b) → x ≈ a ⇔ x ≈ b
-        x≈a⇔x≈b a≈b = (λ x≈a → trans x≈a a≈b)
-                    , (λ x≈b → trans x≈b (sym a≈b))
 
       βx : P [ x ] ≡ Box (x ≈ x)
       βx = Q.quot-rec-beta (λ a → Box (x ≈ a))
-            (λ _ _ a≈b → ≡.cong Box (propExt (x≈a⇔x≈b' a≈b))) x
-        where
-        x≈a⇔x≈b' : ∀ {a b} (a≈b : a ≈ b) → x ≈ a ⇔ x ≈ b
-        x≈a⇔x≈b' a≈b = (λ x≈a → trans x≈a a≈b)
-                    , (λ x≈b → trans x≈b (sym a≈b))
+            (λ _ _ a≈b → ≡.cong Box (propExt (x≈a⇔x≈b a≈b))) x
 
       px : P [ x ]
       px = ≡.subst (λ X → X) (≡.sym βx) (box refl)
 
       βy : P [ y ] ≡ Box (x ≈ y)
       βy = Q.quot-rec-beta (λ a → Box (x ≈ a))
-            (λ _ _ a≈b → ≡.cong Box (propExt (x≈a⇔x≈b' a≈b))) y
-        where
-        x≈a⇔x≈b' : ∀ {a b} (a≈b : a ≈ b) → x ≈ a ⇔ x ≈ b
-        x≈a⇔x≈b' a≈b = (λ x≈a → trans x≈a a≈b)
-                    , (λ x≈b → trans x≈b (sym a≈b))
+            (λ _ _ a≈b → ≡.cong Box (propExt (x≈a⇔x≈b a≈b))) y
 
       py : Box (x ≈ y)
       py = ≡.subst (λ X → X) βy (≡.subst P p px)

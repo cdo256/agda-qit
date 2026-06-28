@@ -66,9 +66,9 @@ m≤n⇒m≤1+n (s≤s p) = s≤s (m≤n⇒m≤1+n p)
 ≤-trans (s≤s p) (s≤s q) = s≤s (≤-trans p q)
 
 ≤-total : ∀ m n → m ≤ n ∨ n ≤ m
-≤-total zero zero = inl z≤n
-≤-total zero (suc n) = inl z≤n
-≤-total (suc m) zero = inr z≤n
+≤-total zero zero = ∨i₁ z≤n
+≤-total zero (suc n) = ∨i₁ z≤n
+≤-total (suc m) zero = ∨i₂ z≤n
 ≤-total (suc m) (suc n) with ≤-total m n
-... | inl p = inl (s≤s p)
-... | inr q = inr (s≤s q)
+... | ∨i₁ p = ∨i₁ (s≤s p)
+... | ∨i₂ q = ∨i₂ (s≤s q)

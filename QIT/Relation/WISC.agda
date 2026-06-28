@@ -43,14 +43,14 @@ WeakAC A C W w B P e = wac
   p' ((x , _) , _) = x
   isSurjection-p' : Surjective p'
   isSurjection-p' x with e x
-  ... | ∃i y pxy = ∃i (((x , y) , pxy)) ≡.refl
+  ... | ∃i y , pxy = ∃i (((x , y) , pxy)) , ≡.refl
   q' : ∀ z → B (p' z)
   q' ((_ , b) , _) = b
   u : ∃ λ (c : C) → ∃ λ (f : W c → D) → Surjective (p' ∘ f)
   u = w D p' isSurjection-p'
   wac : ∃ (λ (c : C) → ∃ (λ p → ∃ (λ q → Surjective p ∧ ((z : W c) → P (p z) (q z)))))
   wac with w D p' isSurjection-p'
-  ... | ∃i c (∃i f surj-p'f) = ∃i c (∃i (p' ∘ f) (∃i (λ z → q' (f z)) (surj-p'f , v)))
+  ... | ∃i c , ∃i f , surj-p'f = ∃i c , ∃i (p' ∘ f) , ∃i (λ z → q' (f z)) , ∧i surj-p'f , v
     where
     v : (z : W c) → P ((p' ∘ f) z) (q' (f z))
     v z = f z .snd
@@ -60,26 +60,3 @@ IWISC ℓ = (A : Set ℓ) (F : A → Set ℓ)
       → ∃ λ (C : Set ℓ)
       → ∃ λ (W : C → Set ℓ)
       → ∀ c → WISC (F c) C W
-
--- module _  where
---   open import QIT.Container.Base
---   open import Data.Nat
---   data S : Set where
---     zeroˢ : S
---     sucˢ : S
---     supˢ : S
---   data P : S → Set where
---     sucᵖ : P sucˢ
---     supᵖ : ℕ → P supˢ
---   BT : Set
---   BT = W S P
-
-  
-
---   encode : BT → Ordinal ℓ0 ℓ0
---   encode (sup (zeroˢ , _)) = {!!}
---   encode (sup (sucˢ , x)) = {!!}
---   encode (sup (supˢ , x)) = {!!}
-
---   module _ (α : ℕ → Ordinal ℓ0 ℓ0) (r : ∀ n → ∃ λ t → encode t ≡ α n)  (wℕ : WISC ℕ S P) where
-    

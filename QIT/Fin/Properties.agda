@@ -15,27 +15,14 @@ open import QIT.Fin.Base
 open import QIT.Nat
 
 inhab⇔>0 : ∀ {n} → ∥ Fin n ∥ ⇔ (n > 0)
-inhab⇔>0 {zero} = p , q
-  where
-  p : ∥ Fin zero ∥ → zero > 0
-  p ∣ () ∣
-  q : zero > 0 → ∥ Fin zero ∥
-  q ()
-inhab⇔>0 {suc n} = p , q
-  where
-  p : ∥ Fin (suc n) ∥ → suc n > 0
-  p _ = (s≤s z≤n)
-  q : suc n > 0 → ∥ Fin (suc n) ∥
-  q _ = ∣ zero ∣
+inhab⇔>0 {zero} .∧e₁ ∣ () ∣
+inhab⇔>0 {zero} .∧e₂ ()
+inhab⇔>0 {suc n} .∧e₁ _ = s≤s z≤n
+inhab⇔>0 {suc n} .∧e₂ _ = ∣ zero ∣
 
 ↔to⇔ : ∀ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} → A ↔ B → ∥ A ∥ ⇔ ∥ B ∥
-↔to⇔ {A = A} {B} p = q₁ , q₂
-  where
-  open _↔_ p
-  q₁ : ∥ A ∥ → ∥ B ∥
-  q₁ ∣ x ∣ = ∣ to x ∣
-  q₂ : ∥ B ∥ → ∥ A ∥
-  q₂ ∣ x ∣ = ∣ from x ∣
+↔to⇔ {A = A} {B} p .∧e₁ ∣ x ∣ = ∣ p .↔.to x ∣
+↔to⇔ {A = A} {B} p .∧e₂ ∣ y ∣ = ∣ p .↔.from y ∣
 
 ¬Fin0 : ¬ ∥ Fin 0 ∥
 ¬Fin0 ∣ () ∣
@@ -192,44 +179,41 @@ minℕ : ∀ {ℓP} → (P : ℕ → Prop ℓP)
      → (∀ n → Decᵖ (P n))
      → ∃ P
      → ∃ (λ n → P n ∧ ∀ m → P m → n ≤ m)
-minℕ P decP (∃i n pn) = rec n (∃i n (pn , ≤refl-ℕ))
+minℕ P decP (∃i n , pn) = rec n (∃i n , ∧i pn , ≤refl-ℕ)
   where
   P' : ℕ → Prop _
   P' m = ∃ λ n → P n ∧ (n ≤ m)
   decP' : (n : ℕ) → Decᵖ (P' n)
   decP' zero with decP 0
-  ... | yes p0 = yes (∃i 0 (p0 , z≤n))
-  ... | no ¬p0 = no λ {(∃i 0 (p0 , z≤n)) → ¬p0 p0}
+  ... | yes p0 = yes (∃i 0 , (∧i p0 , z≤n))
+  ... | no ¬p0 = no λ {(∃i 0 , (∧i p0 , z≤n)) → ¬p0 p0}
   decP' (suc n) with decP' n | decP (suc n)
   ... | yes p<n | _ = yes (u p<n)
     where
     u : P' n → P' (suc n)
-    u (∃i m (pm , m≤n)) = ∃i m (pm , ≤trans-ℕ m≤n ≤suc-ℕ)
-  ... | no ¬p<n | yes pn' = yes (∃i (suc n) (pn' , ≤refl-ℕ))
+    u (∃i m , (∧i pm , m≤n)) = ∃i m , ∧i pm , ≤trans-ℕ m≤n ≤suc-ℕ
+  ... | no ¬p<n | yes pn' = yes (∃i (suc n) , ∧i pn' , ≤refl-ℕ)
   ... | no ¬p<n | no ¬pn' = no ¬p<n'
     where
     ¬p<n' : ¬ P' (suc n)
-    ¬p<n' (∃i m (pm , m≤n')) with m ≟ℕ suc n
+    ¬p<n' (∃i m , ∧i pm , m≤n') with m ≟ℕ suc n
     ... | yes ≡.refl = ¬pn' pm
-    ... | no m≠n' = ¬p<n (∃i m (pm , ≤suc∧≢→≤ m≤n' m≠n'))
+    ... | no m≠n' = ¬p<n (∃i m , ∧i pm , ≤suc∧≢→≤ m≤n' m≠n')
   least : ∀ {max} → ¬ P' max → ∀ m → P m → suc max ≤ m
   least {max} ¬p< m pm with ≤-total m (suc max)
-  ... | inl m≤sn with m ≟ℕ suc max
+  ... | ∨i₂ sn≤m = sn≤m
+  ... | ∨i₁ m≤sn with m ≟ℕ suc max
   ...   | yes ≡.refl = ≤refl-ℕ
-  ...   | no m≢sn = ⊥e (¬p< (∃i m (pm , ≤suc∧≢→≤ m≤sn m≢sn)))
-  least ¬p< m pm | inr sn≤m = sn≤m
+  ...   | no m≢sn = ⊥e (¬p< (∃i m , ∧i pm , ≤suc∧≢→≤ m≤sn m≢sn))
   rec : (max : ℕ)
       → ∃ (λ n → P n ∧ n ≤ max)
       → ∃ (λ n → P n ∧ ∀ m → P m → n ≤ m)
-  rec zero (∃i zero (pn , n≤max)) = ∃i zero (pn , (λ m z → z≤n))
-  rec zero (∃i (suc n) (pn , ()))
+  rec zero (∃i zero , ∧i pn , n≤max) = ∃i zero , ∧i pn , (λ m z → z≤n)
+  rec zero (∃i (suc n) , (∧i pn , ()))
   rec (suc max) ex with decP' max
   ... | yes p< = rec max p<
   ... | no ¬p< with ex
-  ...   | ∃i zero (p0 , z≤n) = ⊥e (¬p< (∃i zero (p0 , z≤n)))
-  ...   | ∃i (suc n) (psn , n≤max) with n ≟ℕ max
-  ...     | yes ≡.refl = ∃i (suc max) (psn , least ¬p<)
-  ...     | no n≠max = ⊥e (¬p< (∃i (suc n) (psn , ≤suc∧≢→≤ n≤max (λ q → n≠max (ℕ-suc-injective q)))))
-  -- 
-  -- 
-  -- 
+  ...   | ∃i zero , (∧i p0 , z≤n) = ⊥e (¬p< (∃i zero , ∧i p0 , z≤n))
+  ...   | ∃i (suc n) , ∧i psn , n≤max with n ≟ℕ max
+  ...     | yes ≡.refl = ∃i (suc max) , ∧i psn , least ¬p<
+  ...     | no n≠max = ⊥e (¬p< (∃i (suc n) , (∧i psn , ≤suc∧≢→≤ n≤max (λ q → n≠max (ℕ-suc-injective q)))))
