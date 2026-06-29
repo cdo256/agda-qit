@@ -9,7 +9,7 @@ open import QIT.Category.Setoid
 -- Define isomorphisms between setoids: bijective homomorphisms with
 -- inverse operations. An isomorphism witnesses that two setoids are
 -- "essentially the same" - they have the same structure up to renaming.
-module QIT.Setoid.Iso {ℓA ℓA≈} where
+module QIT.Setoid.Iso ⦃ pathElim* : PathElim ⦄ {ℓA ℓA≈} where
 
 open import QIT.Category.Morphism (SetoidCat ℓA ℓA≈)
 

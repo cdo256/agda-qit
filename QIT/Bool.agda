@@ -1,4 +1,6 @@
-module QIT.Bool where
+open import QIT.Prelude
+
+module QIT.Bool ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop

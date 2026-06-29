@@ -5,7 +5,7 @@ open import QIT.Prop
 open import QIT.Container.Base
 open import QIT.Nat
 
-module QIT.Container.Properties where
+module QIT.Container.Properties ⦃ a!c* : A!C ⦄ ⦃ pathElim* : PathElim ⦄ where
 
 module _ {ℓS ℓP} {S : Set ℓS} {P : S → Set ℓP} where
   getShape : W S P → S
@@ -53,7 +53,7 @@ module _ {ℓS ℓP} {S : Set ℓS} {P : S → Set ℓP} where
                → (p : sup (s , f) ≡ sup (s' , f'))
                → (i : P s)
                → f i ≡ f' (subst P (≡.cong getShape p) i)
-  sup-child-eq ≡.refl i = ≡.refl
+  sup-child-eq {f = f} ≡.refl i = ≡.cong f (≡.sym (≡.subst-refl i))
 
 module _ where
   open import QIT.Relation.Finite

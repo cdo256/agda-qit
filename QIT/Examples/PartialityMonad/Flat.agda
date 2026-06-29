@@ -1,4 +1,6 @@
-module QIT.Examples.PartialityMonad.Flat where
+open import QIT.Prelude
+
+module QIT.Examples.PartialityMonad.Flat ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude renaming (⊤ to ⊤'; ⊥ to ⊥')
 open import QIT.Prop

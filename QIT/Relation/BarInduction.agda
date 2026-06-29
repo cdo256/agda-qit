@@ -1,4 +1,6 @@
-module QIT.Relation.BarInduction where
+open import QIT.Prelude
+
+module QIT.Relation.BarInduction ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop
@@ -26,7 +28,7 @@ module _ {ℓ} (A : Set ℓ) where
   isBar B = ∀ (α : InfSeq) → ∃ λ i → B (prefix i α)
 
   MaybeProp→Prop : Maybe (Prop ℓ) → Prop ℓ
-  MaybeProp→Prop nothing = ⊥p*
+  MaybeProp→Prop nothing = ⊥*
   MaybeProp→Prop (just X) = X
 
   FinSeqCrossesBar

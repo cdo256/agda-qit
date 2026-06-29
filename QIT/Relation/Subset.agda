@@ -1,4 +1,6 @@
-module QIT.Relation.Subset where
+open import QIT.Prelude
+
+module QIT.Relation.Subset ⦃ pathElim* : PathElim ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prelude.Types using (ΣP; _,_; fst; snd; ⟨_⟩ᴾ) public
@@ -24,13 +26,13 @@ module Subset {ℓ𝓤} ℓ𝓟 (𝓤 : Set ℓ𝓤) where
   x ∈ X = X x
 
   ∅ : 𝓟𝓤
-  ∅ _ = ⊥p*
+  ∅ _ = ⊥*
 
   𝓤̇ : 𝓟𝓤
-  𝓤̇ _ = ⊤p*
+  𝓤̇ _ = ⊤*
 
   [_]ᴾ : List 𝓤 → 𝓟 (ℓ𝓤 ⊔ ℓ𝓟) 𝓤
-  [ [] ]ᴾ _ = ⊥p*
+  [ [] ]ᴾ _ = ⊥*
   [ x ∷ xs ]ᴾ y = (x ≡ y) ∨ ([ xs ]ᴾ y)
 
   _∪_ : 𝓟𝓤 → 𝓟𝓤 → 𝓟𝓤

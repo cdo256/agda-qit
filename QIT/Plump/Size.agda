@@ -38,4 +38,3 @@ module SizedTypes {ℓZ} {Z : Set ℓZ} (sz : SizeStr Z) where
       {fst<} : fst < α
       snd : A fst {fst<}
   open Σᵇ public
-

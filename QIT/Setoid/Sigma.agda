@@ -3,10 +3,10 @@ open import QIT.Prop
 open import QIT.Setoid.Base
 open import QIT.Setoid.Hom
 
-module QIT.Setoid.Sigma
-  {ℓI} {ℓS} {ℓS'}
-  (I : Set ℓI) (S : I → Setoid ℓS ℓS')
-  where
+module QIT.Setoid.Sigma ⦃ pathElim* : PathElim ⦄
+ {ℓI} {ℓS} {ℓS'}
+ (I : Set ℓI) (S : I → Setoid ℓS ℓS')
+ where
 
   Carrier = Σ I λ i → ⟨ S i ⟩
 

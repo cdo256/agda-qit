@@ -7,7 +7,7 @@ open import QIT.Relation.Base
 open import QIT.Relation.Nullary
 open import QIT.Examples.ConTy.Erased 
 
-module QIT.Examples.ConTy.ErasedRec (A : Algebra) where
+module QIT.Examples.ConTy.ErasedRec ⦃ a!c* : A!C ⦄ (A : Algebra) where
 
 module PlainAlgebra  where
   open Algebra A

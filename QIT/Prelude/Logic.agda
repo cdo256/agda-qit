@@ -1,6 +1,5 @@
 open import QIT.Prelude.Universe
 open import QIT.Prelude.Types
-open import QIT.Prelude.Identity
 open import QIT.Prelude.Truncation
 
 module QIT.Prelude.Logic where
@@ -22,8 +21,9 @@ infix 6 ¬_
 
 infixr 2 _∧ᵖ_
 infixr 2 _∧_
+infixr 5 ∧i_,_
 record _∧ᵖ_ (A : Prop ℓA) (B : A → Prop ℓB) : Prop (ℓA ⊔ ℓB) where
-  constructor ∧i
+  constructor ∧i_,_
   field
     ∧e₁ : A
     ∧e₂ : B ∧e₁
@@ -47,9 +47,10 @@ infix 1 _⇔_
 _⇔_ : (A : Prop ℓA) (B : Prop ℓB) → Prop (ℓA ⊔ ℓB)
 A ⇔ B = (A → B) ∧ (B → A)
 
+infixr 5 ∃i_,_
 data ∃ {A : Set ℓA} (B : A → Prop ℓB) : Prop (ℓA ⊔ ℓB) where
-  ∃i : (a : A) → (b : B a) → ∃ B
+  ∃i_,_ : (a : A) → (b : B a) → ∃ B
 
 ∃e : {A : Set ℓA} {B : A → Prop ℓB} {C : Prop ℓC}
    → (∀ a → B a → C) → ∃ B → C
-∃e f (∃i a b) = f a b
+∃e f (∃i a , b) = f a b

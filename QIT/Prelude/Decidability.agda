@@ -4,14 +4,15 @@ open import QIT.Prelude.Universe
 open import QIT.Prelude.Types
 open import QIT.Prelude.Truncation
 open import QIT.Prelude.Identity
+open import QIT.Prelude.Logic
 
 data Dec (A : Set ℓA) : Set ℓA where
   yes : A → Dec A
-  no : (A → ⊥p) → Dec A
+  no : (A → ⊥) → Dec A
 
 data Decᵖ (A : Prop ℓA) : Set ℓA where
   yes : A → Decᵖ A
-  no : (A → ⊥p) → Decᵖ A
+  no : (A → ⊥) → Decᵖ A
 
 data True : Bool → Prop where
   true : True true

@@ -1,15 +1,14 @@
-module QIT.Examples.PartialityMonad.DirectAlgebra where
+open import QIT.Prelude
+
+module QIT.Examples.PartialityMonad.DirectAlgebra ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude renaming (⊤ to ⊤'; ⊥ to ⊥')
-open import QIT.Prop
+open import QIT.Prop hiding (⊥)
 open import QIT.Relation.Subset
 open import QIT.Relation.Binary
 open import QIT.Relation.Nullary
 open import QIT.Category.Base
-import Data.Nat as ℕ
-open ℕ using (ℕ; zero; suc)
-import Data.Bool as 𝔹
-open 𝔹 using (Bool; false; true)
+open import QIT.Nat as ℕ hiding (_≤_)
 
 record Algebra : Set₁ where
   infix 4 _≤_

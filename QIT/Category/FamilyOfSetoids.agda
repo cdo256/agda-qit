@@ -1,5 +1,7 @@
 {-# OPTIONS --type-in-type #-}
-module QIT.Category.FamilyOfSetoids where
+open import QIT.Prelude
+
+module QIT.Category.FamilyOfSetoids ⦃ pathElim* : PathElim ⦄ where
 -- Based off https://github.com/agda/agda-categories/blob/14e7fa985f115c77f154a04ecfd4973560293505/src/Categories/Category/Instance/FamilyOfSetoids.agda
 
 open import QIT.Prelude

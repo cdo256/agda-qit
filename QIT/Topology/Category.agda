@@ -1,4 +1,6 @@
-module QIT.Topology.Category where
+open import QIT.Prelude
+
+module QIT.Topology.Category ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop

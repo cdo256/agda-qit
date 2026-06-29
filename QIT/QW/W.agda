@@ -9,7 +9,9 @@ open import QIT.Set.Base
 -- This extends ordinary W-types with equations, allowing us to quotient
 -- out unwanted distinctions. The result is the foundation for defining
 -- quotient inductive types (QITs) with both constructors and equations.
-module QIT.QW.W {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
+module QIT.QW.W ⦃ pathElim* : PathElim ⦄ ⦃ funExt* : FunExt ⦄ {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
+
+open FunExt funExt*
 
 open import QIT.Container.StrictFunctor S P (ℓS ⊔ ℓP)
 
@@ -43,7 +45,7 @@ module Rec (Yβ : Algebra) where
     f.hom (sup (s , g))
       ≡⟨ ≡.sym f.comm ⟩
     β (s , λ i → f.hom (g i)) 
-      ≡⟨ ≡.cong β (≡.cong (λ ○ → s , ○) (≡.funExt λ (i : P s) → unique f {g i})) ⟩
+      ≡⟨ ≡.cong β (≡.cong (λ ○ → s , ○) (funExt λ (i : P s) → unique f {g i})) ⟩
     β (s , λ i → rec (g i))
       ≡⟨ ≡.refl ⟩
     rec (sup (s , g)) ∎

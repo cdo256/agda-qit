@@ -5,7 +5,7 @@ open import QIT.Relation.Binary
 open import QIT.Setoid.Base
 import QIT.Setoid.Indexed as Ix
 
-module QIT.Setoid.Properties where
+module QIT.Setoid.Properties ⦃ a!c* : A!C ⦄ where
 
 module _ {ℓS ℓS'} (S : Setoid ℓS ℓS') where
   private

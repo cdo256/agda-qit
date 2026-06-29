@@ -1,4 +1,6 @@
-module QIT.Topology.Examples where
+open import QIT.Prelude
+
+module QIT.Topology.Examples ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop

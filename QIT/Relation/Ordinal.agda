@@ -1,4 +1,6 @@
-module QIT.Relation.Ordinal where
+open import QIT.Prelude
+
+module QIT.Relation.Ordinal ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Relation.Subset

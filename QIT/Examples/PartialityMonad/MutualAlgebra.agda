@@ -1,13 +1,12 @@
-module QIT.Examples.PartialityMonad.MutualAlgebra where
+open import QIT.Prelude
+
+module QIT.Examples.PartialityMonad.MutualAlgebra ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude renaming (⊤ to ⊤'; ⊥ to ⊥')
-open import QIT.Prop
+open import QIT.Prop hiding (⊥)
 open import QIT.Relation.Subset
 open import QIT.Relation.Nullary
-import Data.Nat as ℕ
-open ℕ using (ℕ; zero; suc)
-import Data.Bool as 𝔹
-open 𝔹 using (Bool; false; true)
+open import QIT.Nat as ℕ
 
 record Algebra : Set₁ where
   field

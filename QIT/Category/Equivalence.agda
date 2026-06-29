@@ -1,4 +1,6 @@
-module QIT.Category.Equivalence where
+open import QIT.Prelude
+
+module QIT.Category.Equivalence ⦃ pathElim* : PathElim ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop

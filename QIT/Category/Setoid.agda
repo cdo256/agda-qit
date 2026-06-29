@@ -1,4 +1,6 @@
-module QIT.Category.Setoid where
+open import QIT.Prelude
+
+module QIT.Category.Setoid ⦃ pathElim* : PathElim ⦄ where
 
 open import QIT.Prelude
 open import QIT.Category.Base

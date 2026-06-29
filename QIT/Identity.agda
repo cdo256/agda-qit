@@ -1,59 +1,37 @@
 open import QIT.Prelude
 
-module QIT.Identity where
+module QIT.Identity ⦃ pathElim* : PathElim ⦄ where
 
-open import QIT.Prelude
-open import QIT.Logic
+open PathElim pathElim*
 
 open import QIT.Prelude.Identity public
 
-postulate
-  funExt : ∀ {ℓA ℓB} → {A : Set ℓA} {B : A → Set ℓB} {f g : ∀ x → B x}
-          → (∀ x → f x ≡ g x) → f ≡ g
-  subst : ∀ {ℓA ℓB} {A : Set ℓA} (B : A → Set ℓB) {a1 a2 : A} (p : a1 ≡ a2) → B a1 → B a2
-  subst-id : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB}
-           → {x : A} (p : x ≡ x) (b : B x)
-           → subst B p b ≡ b
-  subst-const : ∀ {ℓA ℓB} {A : Set ℓA} (B : Set ℓB)
-              → ∀ {x y : A} (z : B) (p : x ≡ y)
-              → subst (λ _ → B) p z ≡ z
-  J : ∀ {ℓA ℓB} {A : Set ℓA} {x : A}
-    → (B : (y : A) → x ≡ y → Set ℓB)
-    → {y : A} (p : x ≡ y) → B x refl → B y p
+isSetSetˢ : {A : Set ℓA} {x y : A} (p q : x ≡ˢ y) → p ≡ˢ q
+isSetSetˢ reflˢ reflˢ = reflˢ
 
-{-# REWRITE subst-id #-}
-{-# REWRITE subst-const #-}
+isSetSetˢᵖ : {A : Set ℓA} {x y : A} (p q : x ≡ˢ y) → p ≡ q
+isSetSetˢᵖ reflˢ reflˢ = refl
+
+≡ˢ→≡ : {A : Set ℓA} {x y : A} → x ≡ˢ y → x ≡ y
+≡ˢ→≡ reflˢ = refl
+
+≡→≡ˢ : {A : Set ℓA} {x y : A} → x ≡ y → x ≡ˢ y
+≡→≡ˢ {x = x} {y = y} p = J (λ y p → x ≡ˢ y) p reflˢ
+
+Jˢ : {A : Set ℓA} {x : A}
+    → (B : (y : A) → x ≡ˢ y → Set ℓB)
+    → {y : A} (p : x ≡ˢ y) → B x reflˢ → B y p
+Jˢ B reflˢ Brefl = Brefl
 
 Jp : ∀ {ℓA ℓB} {A : Set ℓA} {x : A} → (B : (y : A) → x ≡ y → Prop ℓB)
   → {y : A} (p : x ≡ y) → B x refl → B y p
 Jp B refl x = x
 
-
-≡ˢ→≡ : ∀ {ℓA} {A : Set ℓA} {x y : A} → x ≡ˢ y → x ≡ y
-≡ˢ→≡ reflˢ = refl
-
-≡→≡ˢ : ∀ {ℓA} {A : Set ℓA} {x y : A} → x ≡ y → x ≡ˢ y
-≡→≡ˢ {x = x} {y} p = J (λ y p → x ≡ˢ y) p reflˢ
-
-ΣP≡' : ∀ {a b} {A : Set a} {B : A → Prop b}
-    → (a1 a2 : A) → a1 ≡ a2
-    → ∀ (b1 : B a1) (b2 : B a2)
-    → _≡_ {A = ΣP A B} (a1 , b1) (a2 , b2)
-ΣP≡' {a} {b} {A = A} {B = B} a1 a2 p = Jp C p λ b1 b2 → refl
-  where
-  C : ∀ a2 → a1 ≡ a2 → Prop (a ⊔ b)
-  C a2 p = ∀ (b1 : B a1) (b2 : B a2)
-         → _≡_ {A = ΣP A B} (a1 , b1) (a2 , b2)
-
-ΣP≡ : ∀ {a b} {A : Set a} {B : A → Prop b}
-    → (x y : ΣP A B) → x .fst ≡ y .fst → x ≡ y
-ΣP≡ x y p = ΣP≡' (x .fst) (y .fst) p (x .snd) (y .snd)
-
-Σ≡ : ∀ {ℓA ℓB} → {A : Set ℓA} {B : A → Set ℓB}
-   → {a1 a2 : A} {b1 : B a1} {b2 : B a2}
-   → (p : a1 ≡ a2) (q : subst B p b1 ≡ b2)
-   → _≡_ {A = Σ A B} (a1 , b1) (a2 , b2)
-Σ≡ refl refl = refl
+Jˢ-refl : {A : Set ℓA} {x : A}
+      → (B : (y : A) → x ≡ˢ y → Set ℓB)
+      → (Brefl : B x reflˢ)
+      → Jˢ B reflˢ Brefl ≡ˢ Brefl
+Jˢ-refl B Brefl = reflˢ
 
 sym : ∀ {ℓ} {A : Set ℓ} {x y : A} → x ≡ y → y ≡ x
 sym refl = refl
@@ -62,7 +40,34 @@ trans : ∀ {ℓ} {A : Set ℓ} {x y z : A} → x ≡ y → y ≡ z → x ≡ z
 trans refl refl = refl
 
 transport : ∀ {ℓA} {A A' : Set ℓA} → A ≡ A' → A → A'
-transport = subst (λ x → x)
+transport = J (λ X _ → X)
+
+subst : {A : Set ℓA} (B : A → Set ℓB) {a1 a2 : A} (p : a1 ≡ a2) → B a1 → B a2
+subst B = J (λ v _ → B v)
+
+substp : {A : Set ℓA} (B : A → Prop ℓB) {a1 a2 : A} (p : a1 ≡ a2) → B a1 → B a2
+substp B = Jp (λ v _ → B v)
+
+transportp : {A A' : Prop ℓA} (p : A ≡ A') → A → A'
+transportp = Jp (λ v _ → v)
+
+substp' : {A : Prop ℓA} (B : A → Prop ℓB) {a1 a2 : A} → B a1 → B a2
+substp' B x = x
+
+subst-id : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB}
+          → {x : A} (p : x ≡ x) (b : B x)
+          → subst B p b ≡ b
+subst-id {B = B} refl b = J-refl (λ x _ → B x) b
+
+subst-refl : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB}
+          → {x : A} (b : B x)
+          → subst B refl b ≡ b
+subst-refl {B = B} b = J-refl (λ x _ → B x) b
+
+subst-const : ∀ {ℓA ℓB} {A : Set ℓA} (B : Set ℓB)
+            → ∀ {x y : A} (z : B) (p : x ≡ y)
+            → subst (λ _ → B) p z ≡ z
+subst-const B z refl = J-refl (λ y _ → B) z
 
 subst₂ : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : Set ℓB} (C : A → B → Set ℓC)
        → {a1 a2 : A} {b1 b2 : B}
@@ -71,12 +76,6 @@ subst₂ : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : Set ℓB} (C : A → B → S
 subst₂ C {a1} {a2} {b1} {b2} p q x =
   subst (λ ○ → C ○ b2) p
     (subst (C a1) q x)
-
--- substp for Prop-valued families can pattern match on refl
-substp : ∀ {ℓA ℓB} {A : Set ℓA} (B : A → Prop ℓB)
-       → {a1 a2 : A} (p : a1 ≡ a2)
-       → B a1 → B a2
-substp B refl x = x
 
 substp₂ : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : Set ℓB} (C : A → B → Prop ℓC)
        → {a1 a2 : A} {b1 b2 : B}
@@ -92,6 +91,7 @@ substp-Set : ∀ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} (C : B → Prop ℓA)
            → {b1 b2 : B} (p : b1 ≡ b2)
            → C b1 → C b2
 substp-Set C refl x = x
+
 
 cong : ∀ {a b} {A : Set a} {B : Set b} (f : A → B)
       → ∀ {x y} → x ≡ y → f x ≡ f y
@@ -117,10 +117,10 @@ prop-subst : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Prop ℓB}
            → {x y : A} → (p : x ≡ y) → B x → B y
 prop-subst refl x = x
 
-subst-uip : ∀ {ℓ} {A : Set ℓ} {P : A → Set} {x : A} {p q : x ≡ x}
-            (h : p ≡ᵖ q) (u : P x)
-          → subst P p u ≡ subst P q u
-subst-uip refl u = refl
+subst-uip : {A : Set ℓA} {B : A → Set ℓB}
+          → {x : A} {p q : x ≡ x} (u : B x)
+          → subst B p u ≡ subst B q u
+subst-uip u = refl
 
 module ≡-Reasoning {ℓ} {A : Set ℓ} where
   infix 1 begin_
@@ -139,29 +139,32 @@ module ≡-Reasoning {ℓ} {A : Set ℓ} where
 subst-subst : ∀ {ℓA ℓP} {A : Set ℓA} (P : A → Set ℓP) {x y z : A}
             → (x≡y : x ≡ y) (y≡z : y ≡ z) (p : P x)
             → subst P y≡z (subst P x≡y p) ≡ subst P (trans x≡y y≡z) p
-subst-subst P refl refl p = refl
+subst-subst P refl refl p =
+  subst-refl (subst P refl p)
 
 subst-inv : ∀ {ℓA ℓP} {A : Set ℓA} (P : A → Set ℓP) {x y : A}
             → (p : x ≡ y) {u : P x}
             → subst P (sym p) (subst P p u) ≡ u
-subst-inv P refl = refl
+subst-inv P refl {u} =
+  trans (subst-subst P refl refl u)
+        (subst-refl u)
 
-dcong : ∀ {a b} {A : Set a} {B : A → Set b} (f : (x : A) → B x) {x y}
-      → (p : x ≡ y) → subst B p (f x) ≡ f y
-dcong f refl = refl
+dcong : {A : Set ℓA} {B : A → Set ℓB} (f : (x : A) → B x)
+      → ∀ {x y} → (p : x ≡ y) → subst B p (f x) ≡ f y
+dcong f {x = x} refl = subst-refl (f x)
 
-dcong₂ : ∀ {a b c} {A : Set a} {B : A → Set b} {C : Set c}
-         (f : (x : A) → B x → C) {x₁ x₂ y₁ y₂}
+dcong₂ : {A : Set ℓA} {B : A → Set ℓB} {C : Set ℓC}
+         (f : (x : A) → B x → C) → ∀ {x₁ x₂ y₁ y₂}
        → (p : x₁ ≡ x₂) → subst B p y₁ ≡ y₂
        → f x₁ y₁ ≡ f x₂ y₂
-dcong₂ f refl refl = refl
+dcong₂ {C = C} f {x₁} {x₂} {y₁} {y₂} refl refl =
+  substp (λ y → f x₁ y₁ ≡ f x₁ y) (sym (subst-refl y₁)) refl
 
 dcongsp : ∀ {a b c} {A : Set a} {B : A → Prop b} {C : Set c}
          (f : (x : A) → B x → C) {x₁ x₂ y₁ y₂}
        → (p : x₁ ≡ x₂)
        → f x₁ y₁ ≡ f x₂ y₂
 dcongsp f refl = refl
-
 
 dsubst₂ : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : A → Set ℓB} (C : ∀ a → B a → Set ℓC)
        → {a1 a2 : A} {b1 : B a1} {b2 : B a2}
@@ -174,34 +177,34 @@ dsubstp₂ : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : A → Set ℓB} (C : ∀ a
        → {a1 a2 : A} {b1 : B a1} {b2 : B a2}
        → (p : a1 ≡ a2) (q : subst B p b1 ≡ b2)
        → C a1 b1 → C a2 b2
-dsubstp₂ C refl refl x = x
+dsubstp₂ C {a1 = a1} {b1 = b1} refl refl x =
+  substp (C a1) (sym (subst-refl b1)) x
 
 isPropBox : ∀ {ℓ} {P : Prop ℓ} (p q : Box P) → p ≡ q
-isPropBox (box p) (box q) = r refl
-  where
-  r : p ≡ᵖ q → box p ≡ box q
-  r refl = refl
+isPropBox (box p) (box q) = refl
 
 funExt⁻ : ∀ {ℓA ℓB} → {A : Set ℓA} {B : A → Set ℓB} {f g : ∀ x → B x}
-        → f ≡ g → (∀ x → f x ≡ g x)
+       → f ≡ g → (∀ x → f x ≡ g x)
 funExt⁻ refl _ = refl
 
 -- Commutation of subst with function composition
 subst-∘ : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : Set ℓB} {C : B → Set ℓC}
-        → (f : A → B) {x y : A} (p : x ≡ y) (z : C (f x))
-        → subst C (cong f p) z ≡ subst (λ a → C (f a)) p z
-subst-∘ f refl z = refl
+       → (f : A → B) {x y : A} (p : x ≡ y) (z : C (f x))
+       → subst C (cong f p) z ≡ subst (λ a → C (f a)) p z
+subst-∘ f refl z =
+  trans (subst-refl z)
+        (sym (subst-refl z))
 
 drefl : ∀ {ℓA ℓB} {A : Set ℓA} (B : A → Set ℓB) {a : A} {b : B a}
       → subst B refl b ≡ b
-drefl B = refl
+drefl B = subst-refl _
 
 dsym : ∀ {ℓA ℓB} {A : Set ℓA}
       → (B : A → Set ℓB) {a1 a2 : A} {b1 : B a1} {b2 : B a2}
       → (p : a1 ≡ a2)
       → subst B p b1 ≡ b2
       → subst B (sym p) b2 ≡ b1
-dsym B refl refl = refl
+dsym B refl refl = subst-inv B refl
 
 dtrans : ∀ {ℓA ℓB} {A : Set ℓA}
       → (B : A → Set ℓB) {a1 a2 a3 : A} {b1 : B a1} {b2 : B a2} {b3 : B a3}
@@ -209,10 +212,28 @@ dtrans : ∀ {ℓA ℓB} {A : Set ℓA}
       → subst B p b1 ≡ b2
       → subst B q b2 ≡ b3
       → subst B (trans p q) b1 ≡ b3
-dtrans B refl refl refl refl = refl
+dtrans B refl refl refl refl = trans (subst-refl _) (sym (subst-inv B refl))
 
-≡→⇔ : ∀ {ℓA} {A B : Prop ℓA} → A ≡ B → A ⇔ B
-≡→⇔ {A = A} p = substp (A ⇔_) p ⇔refl
+ΣP≡' : ∀ {a b} {A : Set a} {B : A → Prop b}
+    → (a1 a2 : A) → a1 ≡ a2
+    → ∀ (b1 : B a1) (b2 : B a2)
+    → _≡_ {A = ΣP A B} (a1 , b1) (a2 , b2)
+ΣP≡' {a} {b} {A = A} {B = B} a1 a2 p = Jp C p λ b1 b2 → refl
+  where
+  C : ∀ a2 → a1 ≡ a2 → Prop (a ⊔ b)
+  C a2 p = ∀ (b1 : B a1) (b2 : B a2)
+         → _≡_ {A = ΣP A B} (a1 , b1) (a2 , b2)
+
+ΣP≡ : ∀ {a b} {A : Set a} {B : A → Prop b}
+    → (x y : ΣP A B) → x .fst ≡ y .fst → x ≡ y
+ΣP≡ x y p = ΣP≡' (x .fst) (y .fst) p (x .snd) (y .snd)
+
+Σ≡ : ∀ {ℓA ℓB} → {A : Set ℓA} {B : A → Set ℓB}
+   → {a1 a2 : A} {b1 : B a1} {b2 : B a2}
+   → (p : a1 ≡ a2) (q : subst B p b1 ≡ b2)
+   → _≡_ {A = Σ A B} (a1 , b1) (a2 , b2)
+Σ≡ {A = A} {B} {a1 = a1} {b1 = b1} refl refl =
+  cong (a1 ,_) (sym (subst-refl b1))
 
 substΣP : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB}
         → {a1 a2 : A} (p : a1 ≡ a2) (b : B a1) → Σ A B
@@ -222,7 +243,8 @@ subst-ΣP : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : A → Set ℓB} (C : ∀ a 
          → {a1 a2 : A} (p : a1 ≡ a2) (u : ΣP (B a1) (C a1))
          → subst (λ a → ΣP (B a) (C a)) p u
          ≡ (subst B p (u .fst) , dsubstp₂ C p refl (u .snd))
-subst-ΣP C refl u = refl
+subst-ΣP C refl (x , y) =
+  trans (subst-refl _) (dcongsp _,_ (sym (subst-refl _)))
 
 subst-Π : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : Set ℓB} (C : A → B → Set ℓC)
         → {x y : A} (p : x ≡ y)
@@ -230,11 +252,8 @@ subst-Π : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : Set ℓB} (C : A → B → S
         → (z : B)
         → subst (λ a → ∀ b → C a b) p g z
         ≡ subst (λ a → C a z) p (g z)
-subst-Π {A = A} {B} C {x} p =
-  Jp (λ _ p → (g : ∀ b → C x b) (z : B)
-            → subst (λ a → ∀ b → C a b) p g z
-            ≡ subst (λ a → C a z) p (g z))
-     p (λ _ _ → refl)
+subst-Π {A = A} {B} C {x} refl g z =
+  trans (funExt⁻ (subst-refl g) z) (sym (subst-refl (g z)))
 
 subst-cong
   : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : Set ℓB} (C : B → Set ℓC)
@@ -243,9 +262,10 @@ subst-cong
   → (c : C (f x))
   → subst (λ x → C (f x)) p c
   ≡ subst C (cong f p) c
-subst-cong C f {x} {y} p c = Jp Q p refl
+subst-cong C f {x} {y} p c = Jp Q p u
   where
   Q : ∀ y (p : x ≡ y) → Prop _
   Q _ p = subst (λ x → C (f x)) p c
         ≡ subst C (cong f p) c
-        -- 
+  u : subst (λ x → C (f x)) refl c ≡ subst C refl c
+  u = trans (subst-refl c) (sym (subst-refl c))

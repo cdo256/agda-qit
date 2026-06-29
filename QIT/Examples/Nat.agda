@@ -1,4 +1,6 @@
-module QIT.Examples.Nat where
+open import QIT.Prelude
+
+module QIT.Examples.Nat ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Relation.Nullary

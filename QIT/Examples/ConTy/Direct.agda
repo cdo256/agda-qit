@@ -1,4 +1,6 @@
-module QIT.Examples.ConTy.Direct where
+open import QIT.Prelude
+
+module QIT.Examples.ConTy.Direct ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop

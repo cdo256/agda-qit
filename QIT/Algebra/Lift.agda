@@ -8,8 +8,10 @@ open import QIT.Prop
 -- The key insight: instead of lifting the carrier, we create an adapter that translates
 -- between the low-level and high-level functor representations while preserving semantics.
 module QIT.Algebra.Lift
+  ⦃ pathElim* : PathElim ⦄
+  ⦃ fe* : FunExt ⦄
   {ℓS ℓP : Level} (S : Set ℓS) (P : S → Set ℓP)
-  (ℓV : Level)  -- The additional level we need to accommodate
+  (ℓV : Level) -- The additional level we need to accommodate
   where
 
 open import QIT.Algebra.Base

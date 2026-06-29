@@ -6,10 +6,10 @@ open import QIT.Relation.Binary
 open import QIT.Relation.Base
 open import QIT.Category.Base
 
-module QIT.Category.Morphism
-       {ℓCo} {ℓCh} {ℓCe}
-       (C : Category ℓCo ℓCh ℓCe)
-       where
+module QIT.Category.Morphism ⦃ pathElim* : PathElim ⦄
+ {ℓCo} {ℓCh} {ℓCe}
+ (C : Category ℓCo ℓCh ℓCe)
+ where
 open Category C
 
 record IsIso {x y} (f : C [ x , y ]) : Set (ℓCh ⊔ ℓCe) where

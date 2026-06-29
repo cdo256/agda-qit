@@ -9,7 +9,7 @@ open import QIT.Relation.Nullary
 open import QIT.Category.Base
 open import QIT.Category.SetoidEnriched
 
-module QIT.Category.Terminal where
+module QIT.Category.Terminal ⦃ pathElim* : PathElim ⦄ where
 private
   variable
     ℓCo ℓCh ℓCe : Level

@@ -1,4 +1,6 @@
-module QIT.Examples.PartialityMonad where
+open import QIT.Prelude
+
+module QIT.Examples.PartialityMonad ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Examples.PartialityMonad.Combined
 open import QIT.Examples.PartialityMonad.Direct
@@ -10,5 +12,5 @@ open import QIT.Examples.PartialityMonad.MutualAlgebra
 -- open import QIT.Examples.PartialityMonad.MutualDirectEquiv
 -- open import QIT.Examples.PartialityMonad.QW
 open import QIT.Examples.PartialityMonad.W1EquivDirect
-open import QIT.Examples.PartialityMonad.WellFormed
-open import QIT.Examples.PartialityMonad.WellFormedW
+-- open import QIT.Examples.PartialityMonad.WellFormed
+-- open import QIT.Examples.PartialityMonad.WellFormedW

@@ -1,4 +1,6 @@
-module QIT.Examples.ConTy.WeaklyTagged where
+open import QIT.Prelude
+
+module QIT.Examples.ConTy.WeaklyTagged ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop

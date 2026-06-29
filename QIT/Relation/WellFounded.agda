@@ -1,4 +1,6 @@
-module QIT.Relation.WellFounded where
+open import QIT.Prelude
+
+module QIT.Relation.WellFounded ⦃ pathElim* : PathElim ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop

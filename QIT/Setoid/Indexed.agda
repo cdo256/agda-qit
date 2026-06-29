@@ -1,4 +1,6 @@
-module QIT.Setoid.Indexed where
+open import QIT.Prelude
+
+module QIT.Setoid.Indexed ⦃ pathElim* : PathElim ⦄ where
 
 open import QIT.Prelude
 open import QIT.Relation.Base
@@ -55,13 +57,13 @@ module _ where
   -- Uses the unit type ⊤ as the index set, so there's only one index.
   UnindexedSetoid→IndexedSetoid : ∀ {ℓA ℓR} → Unindexed.Setoid ℓA ℓR → Setoid ℓ0 ℓA ℓR
   UnindexedSetoid→IndexedSetoid S = record
-    { I = ⊤
-    ; A = λ _ → S.Carrier
-    ; R = λ _ _ x y → x S.≈ y
-    ; isEquivalence = record
-      { refl = S.refl
-      ; sym = S.sym
-      ; trans = S.trans } }
+      { I = ⊤ˢ
+      ; A = λ _ → S.Carrier
+      ; R = λ _ _ x y → x S.≈ y
+      ; isEquivalence = record
+        { refl = S.refl
+        ; sym = S.sym
+        ; trans = S.trans } }
     where module S = Unindexed.Setoid S
 
   FiberSetoid : ∀ {ℓI ℓA ℓR} (S : Setoid ℓI ℓA ℓR) → S .Setoid.I → Unindexed.Setoid ℓA ℓR

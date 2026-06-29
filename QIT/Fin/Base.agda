@@ -1,6 +1,6 @@
-module QIT.Fin.Base where
-
 open import QIT.Prelude
+
+module QIT.Fin.Base ⦃ pathElim* : PathElim ⦄ where
 open import QIT.Prop
 open import QIT.Nat
 

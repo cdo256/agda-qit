@@ -1,4 +1,6 @@
-module QIT.Examples.ConTy.Iterated where
+open import QIT.Prelude
+
+module QIT.Examples.ConTy.Iterated ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop

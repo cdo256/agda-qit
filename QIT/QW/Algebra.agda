@@ -9,7 +9,12 @@ open import QIT.QW.Signature
 -- These are container algebras equipped with proofs that they satisfy
 -- all equations in the signature. The initial such algebra gives the
 -- quotient inductive type itself.
-module QIT.QW.Algebra {ℓS ℓP ℓE ℓV} (sig : Sig ℓS ℓP ℓE ℓV) where
+module QIT.QW.Algebra
+  ⦃ a!c* : A!C ⦄ 
+  ⦃ pathElim* : PathElim ⦄
+  ⦃ fe* : FunExt ⦄
+  {ℓS ℓP ℓE ℓV} (sig : Sig ℓS ℓP ℓE ℓV)
+  where
 
 open Sig sig
 open import QIT.Container.StrictFunctor S P (ℓS ⊔ ℓP ⊔ ℓV) using (F)

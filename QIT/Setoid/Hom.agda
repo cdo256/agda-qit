@@ -7,7 +7,7 @@ open import QIT.Relation.Binary using (IsEquivalence)
 -- A setoid homomorphism f : S → T is a function that respects equivalence:
 -- if x ≈_S y, then f(x) ≈_T f(y). This ensures the function is well-defined
 -- on equivalence classes.
-module QIT.Setoid.Hom where
+module QIT.Setoid.Hom ⦃ pathElim* : PathElim ⦄ where
 
 -- A homomorphism consists of an underlying function and a proof that it
 -- preserves the equivalence relation (congruence condition).
@@ -107,4 +107,3 @@ g ∘ f = record
   where
   module C = Setoid C
   module g₁ = Hom g₁
-

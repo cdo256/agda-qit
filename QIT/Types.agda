@@ -1,10 +1,6 @@
-module QIT.Prop.Data where
-
 open import QIT.Prelude
-open import QIT.Prop.Base
-open import QIT.Logic
-open import QIT.Identity
-open import QIT.Prop.Properties
+
+module QIT.Types where
 
 data Maybep {ℓ} (X : Prop ℓ) :  Prop ℓ where
   nothing : Maybep X

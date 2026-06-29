@@ -1,4 +1,6 @@
-module QIT.Examples.SGL where
+open import QIT.Prelude
+
+module QIT.Examples.SGL ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop

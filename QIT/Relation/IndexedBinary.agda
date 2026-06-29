@@ -1,4 +1,6 @@
-module QIT.Relation.IndexedBinary where
+open import QIT.Prelude
+
+module QIT.Relation.IndexedBinary ⦃ pathElim* : PathElim ⦄ where
 
 open import QIT.Prelude
 open import QIT.Relation.Base 

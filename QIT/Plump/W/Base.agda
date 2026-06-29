@@ -8,7 +8,10 @@ open import QIT.Container.Base
 -- This definition was copied from Fiore et al. 2022, and their earlier work (Pitts et al. 2021).
 -- Start with an shape and position. This represents the 'shape' of
 -- the underlying W-type being constructed.
-module QIT.Plump.W.Base {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
+module QIT.Plump.W.Base
+  ⦃ pathElim* : PathElim ⦄
+  {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP)
+  where
 
 private
   T = W S P
@@ -27,9 +30,9 @@ private
 -- The join is not required to be a least upper bound; we only need it
 -- to be an upper bound with α ≤ α ∨ᶻ β and β ≤ α ∨ᶻ β.
 data Sᶻ : Set ℓS where
-  ⊥ˢ : Sᶻ
-  ∨ˢ : Sᶻ
-  ιˢ : S → Sᶻ
+  ⊥ₛ : Sᶻ
+  ∨ₛ : Sᶻ
+  ιₛ : S → Sᶻ
 
 -- Positions for the extended shapes:
 -- - ⊥ˢ has no positions (so sup(⊥ˢ,_) is a leaf).
@@ -38,9 +41,9 @@ data Sᶻ : Set ℓS where
 --
 -- Lift is used only to keep the universe level uniform.
 Pᶻ : Sᶻ → Set ℓP
-Pᶻ ⊥ˢ = Lift _ ⊥
-Pᶻ ∨ˢ = Lift _ (⊤ ⊎ ⊤)
-Pᶻ (ιˢ s) = P s
+Pᶻ ⊥ₛ = Lift _ ⊥ˢ
+Pᶻ ∨ₛ = Lift _ (⊤ˢ ⊎ ⊤ˢ)
+Pᶻ (ιₛ s) = P s
 
 open import QIT.Plump.Algebra Sᶻ Pᶻ
 
@@ -51,14 +54,14 @@ Z = W Sᶻ Pᶻ
 
 -- Canonical bottom element: a leaf with shape ⊥ˢ.
 ⊥ᶻ : Z
-⊥ᶻ = sup (⊥ˢ , λ ())
+⊥ᶻ = sup (⊥ₛ , λ ())
 
 -- A simple "successor-like" operation obtained via the binary join
 -- node, with both children equal to α. This is not the usual ordinal
 -- successor; it is just a convenient way to produce a strictly larger
 -- bound (proved later as α < sucᶻ α).
 sucᶻ : Z → Z
-sucᶻ α = sup (∨ˢ , λ _ → α)
+sucᶻ α = sup (∨ₛ , λ _ → α)
 
 -- Define branching/join.
 -- α ∨ᶻ β is a 2-branch node whose left child is α and right child is β.
@@ -67,9 +70,9 @@ sucᶻ α = sup (∨ˢ , λ _ → α)
 -- upper bound.)
 infixl 10 _∨ᶻ_
 _∨ᶻ_ : Z → Z → Z
-_∨ᶻ_ α β = sup (∨ˢ , f)
+_∨ᶻ_ α β = sup (∨ₛ , f)
   where
-  f : Pᶻ ∨ˢ → W Sᶻ Pᶻ
+  f : Pᶻ ∨ₛ → W Sᶻ Pᶻ
   f (lift (inj₁ _)) = α
   f (lift (inj₂ _)) = β
 
@@ -77,7 +80,7 @@ _∨ᶻ_ α β = sup (∨ˢ , f)
 -- map each original node shape s to the embedded shape ιˢ s.
 -- This lets us compare/bound base terms t : T by ordinals α : Z.
 ιᶻ : T → Z
-ιᶻ (sup (s , f)) = sup (ιˢ s , λ α → ιᶻ (f α))
+ιᶻ (sup (s , f)) = sup (ιₛ s , λ α → ιᶻ (f α))
 
 -- Define a well-founded order (≤, <) on Z.
 --
@@ -143,7 +146,7 @@ mutual
 -- Helper: for any x and any inhabited P s, x is strictly below the
 -- one-node tree with shape ιˢ s and all children equal to x.
 -- This is used when we need "at least one branch exists" to witness <.
-<supᶻ : ∀ {s} x → ∥ P s ∥ → x < sup (ιˢ s , λ _ → x)
+<supᶻ : ∀ {s} x → ∥ P s ∥ → x < sup (ιₛ s , λ _ → x)
 <supᶻ x ∣ α ∣ = <sup α (≤refl x)
 
 -- α is strictly below sucᶻ α because sucᶻ α = sup(∨ˢ, _↦α), and we
@@ -227,9 +230,8 @@ x ⊆⊇ y = (x ⊆ y) ∧ (y ⊆ x)
 -- the cocontinuity arguments (where we mainly compare ordinals via the
 -- induced < relation).
 isQuasiExtensionalZ : ∀ {x y} → (x ≤≥ y) ⇔ (x ⊆⊇ y)
-isQuasiExtensionalZ =
-  (λ (α≤β , β≤α) → ≤→⊆ α≤β , ≤→⊆ β≤α) ,
-  (λ (α⊆β , β⊆α) → ⊆→≤ α⊆β , ⊆→≤ β⊆α)
+isQuasiExtensionalZ .∧e₁ (∧i α≤β , β≤α) = ∧i ≤→⊆ α≤β , ≤→⊆ β≤α
+isQuasiExtensionalZ .∧e₂ (∧i α⊆β , β⊆α) = ∧i ⊆→≤ α⊆β , ⊆→≤ β⊆α
 
 -- Congruence for ≤: pointwise ≤ on children implies ≤ on sups.
 ≤cong : ∀ s (μ τ : Pᶻ s → Z) → (r : ∀ i → μ i ≤ τ i)
@@ -237,17 +239,17 @@ isQuasiExtensionalZ =
 ≤cong s μ τ r = sup≤ λ i → <sup i (r i)
 
 ≤≥-refl : ∀ {x} → x ≤≥ x
-≤≥-refl {x} = ≤refl x , ≤refl x
+≤≥-refl {x} = ∧i ≤refl x , ≤refl x
 
 ≤≥-sym : ∀ {x y} → x ≤≥ y → y ≤≥ x
-≤≥-sym (x≤y , y≤x) = y≤x , x≤y
+≤≥-sym (∧i x≤y , y≤x) = ∧i y≤x , x≤y
 
 ≤≥-trans : ∀ {x y z} → x ≤≥ y → y ≤≥ z → x ≤≥ z
-≤≥-trans (x≤y , y≤x) (y≤z , z≤y) = ≤≤ y≤z x≤y , ≤≤ y≤x z≤y
+≤≥-trans (∧i x≤y , y≤x) (∧i y≤z , z≤y) = ∧i ≤≤ y≤z x≤y , ≤≤ y≤x z≤y
 
 ≤≥-cong : ∀ s (μ τ : Pᶻ s → Z) → (r : ∀ i → μ i ≤≥ τ i)
         → sup (s , μ) ≤≥ sup (s , τ)
-≤≥-cong s μ τ r = sup≤ (λ i → <sup i (r i .∧.fst)) , sup≤ (λ i → <sup i (r i .∧.snd))
+≤≥-cong s μ τ r = ∧i (sup≤ (λ i → <sup i (r i .∧e₁))) , (sup≤ (λ i → <sup i (r i .∧e₂)))
 
 -- Strict and non-strict comparisons for join. These are the basic
 -- facts used when combining bounds in proofs (especially in ψ-cong and
@@ -259,10 +261,10 @@ isQuasiExtensionalZ =
 ∨ᶻ-r< {α} {β} = <sup (lift (inj₂ tt)) (≤refl β)
 
 ∨ᶻ-l : {α β : Z} → α ≤ α ∨ᶻ β
-∨ᶻ-l = child≤ ∨ˢ _ (lift (inj₁ tt))
+∨ᶻ-l = child≤ ∨ₛ _ (lift (inj₁ tt))
 
 ∨ᶻ-r : {α β : Z} → β ≤ α ∨ᶻ β
-∨ᶻ-r = child≤ ∨ˢ _ (lift (inj₂ tt))
+∨ᶻ-r = child≤ ∨ₛ _ (lift (inj₂ tt))
 
 -- Commutativity up to ≤: β ∨ᶻ α ≤ α ∨ᶻ β.
 -- Again, this is not saying join is a lub; it just gives a convenient
@@ -270,7 +272,7 @@ isQuasiExtensionalZ =
 ∨ᶻ-flip : {α β : Z} → β ∨ᶻ α ≤ α ∨ᶻ β
 ∨ᶻ-flip {α} {β} = sup≤ g
   where
-  g : (i : Pᶻ ∨ˢ) → _ < (α ∨ᶻ β)
+  g : (i : Pᶻ ∨ₛ) → _ < (α ∨ᶻ β)
   g (lift (inj₁ tt)) = <sup (lift (inj₂ tt)) (≤refl β)
   g (lift (inj₂ tt)) = <sup (lift (inj₁ tt)) (≤refl α)
 

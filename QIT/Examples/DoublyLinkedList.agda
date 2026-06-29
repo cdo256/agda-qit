@@ -1,4 +1,6 @@
-module QIT.Examples.DoublyLinkedList where
+open import QIT.Prelude
+
+module QIT.Examples.DoublyLinkedList ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop

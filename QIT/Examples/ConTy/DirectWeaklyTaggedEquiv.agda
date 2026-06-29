@@ -1,4 +1,6 @@
-module QIT.Examples.ConTy.DirectWeaklyTaggedEquiv where
+open import QIT.Prelude
+
+module QIT.Examples.ConTy.DirectWeaklyTaggedEquiv ⦃ a!c* : A!C ⦄ where
 
 import QIT.Examples.ConTy.Direct as D
 import QIT.Examples.ConTy.WeaklyTagged as W

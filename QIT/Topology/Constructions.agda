@@ -1,4 +1,6 @@
-module QIT.Topology.Constructions where
+open import QIT.Prelude
+
+module QIT.Topology.Constructions ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop

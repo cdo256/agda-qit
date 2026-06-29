@@ -1,5 +1,5 @@
 open import QIT.Prelude
-open import QIT.Prop hiding (_,_)
+open import QIT.Prop
 open import QIT.Setoid
 open import QIT.Functor.Base
 open import QIT.Category.Set
@@ -11,7 +11,13 @@ open import QIT.Container.Base
 -- This lifts the container interpretation to work with setoids, creating
 -- a functor that preserves equivalence relations. The resulting functor
 -- maps setoids to setoids and homomorphisms to homomorphisms.
-module QIT.Container.StrictFunctor {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) (ℓA : Level) where
+module QIT.Container.StrictFunctor
+  ⦃ pathElim* : PathElim ⦄
+  ⦃ funExt* : FunExt ⦄
+  {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP)
+  (ℓA : Level) where
+
+open FunExt funExt*
 
 -- The complete setoid functor induced by container (S ◁ P)
 F : Functor (SetCat ℓA) (SetCat (ℓS ⊔ ℓP ⊔ ℓA))
@@ -21,4 +27,4 @@ F = record
   ; id = ≡.refl
   ; comp = λ _ _ → ≡.refl
   ; resp = λ {X} {Y} {f} {g} p →
-    λ {(s , h)} → ≡.cong (s ,_) (≡.funExt λ _ → p) }
+    λ {(s , h)} → ≡.cong (s ,_) (funExt λ _ → p) }

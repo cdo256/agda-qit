@@ -1,4 +1,6 @@
-module QIT.Examples.RotTree (A : Set) where
+open import QIT.Prelude
+
+module QIT.Examples.RotTree ⦃ a!c* : A!C ⦄ (A : Set) where
 
 -- Binary trees with rotation equation demonstrating a quotient inductive type
 -- that implements associativity of branching. This serves as a canonical example

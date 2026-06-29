@@ -7,7 +7,7 @@ open import QIT.Relation.Binary
 open import QIT.Category.Strict
 open import QIT.Category.Base
 
-module QIT.Category.Discrete where
+module QIT.Category.Discrete ⦃ pathElim* : PathElim ⦄ where
 
 DiscreteStrCat : ∀ {ℓA} → Set ℓA → StrictCategory ℓA ℓA
 DiscreteStrCat A = record
@@ -26,7 +26,7 @@ DiscreteCat : ∀ {ℓA} → Set ℓA → Category ℓA ℓA ℓA
 DiscreteCat A = StrictCategory→Category (DiscreteStrCat A)
 
 ⊤Cat : Category ℓ0 ℓ0 ℓ0
-⊤Cat = DiscreteCat ⊤
+⊤Cat = DiscreteCat ⊤ˢ
 
 ⊥Cat : Category ℓ0 ℓ0 ℓ0
-⊥Cat = DiscreteCat ⊥
+⊥Cat = DiscreteCat ⊥ˢ

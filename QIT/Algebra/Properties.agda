@@ -7,7 +7,7 @@ open import QIT.Set.Base
 open import QIT.Functor.Base
 open import QIT.Algebra.Base
 
-module QIT.Algebra.Properties where
+module QIT.Algebra.Properties ⦃ pathElim* : PathElim ⦄ where
 
 Forget : ∀ {ℓS} → (F : Functor (SetCat ℓS) (SetCat ℓS))
        → Functor (AlgebraCategory F) (SetCat ℓS)

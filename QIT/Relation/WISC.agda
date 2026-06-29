@@ -1,4 +1,6 @@
-module QIT.Relation.WISC where
+open import QIT.Prelude
+
+module QIT.Relation.WISC ⦃ pathElim* : PathElim ⦄ where
 
 -- Adapted from fiore2022-quotient-inductive.
 
@@ -41,14 +43,14 @@ WeakAC A C W w B P e = wac
   p' ((x , _) , _) = x
   isSurjection-p' : Surjective p'
   isSurjection-p' x with e x
-  ... | ∣ y , pxy ∣ = ∣ (((x , y) , pxy) , ≡.refl) ∣
+  ... | ∃i y , pxy = ∃i (((x , y) , pxy)) , ≡.refl
   q' : ∀ z → B (p' z)
   q' ((_ , b) , _) = b
   u : ∃ λ (c : C) → ∃ λ (f : W c → D) → Surjective (p' ∘ f)
   u = w D p' isSurjection-p'
   wac : ∃ (λ (c : C) → ∃ (λ p → ∃ (λ q → Surjective p ∧ ((z : W c) → P (p z) (q z)))))
   wac with w D p' isSurjection-p'
-  ... | ∣ c , ∣ f , surj-p'f ∣ ∣ = ∣ c , ∣ p' ∘ f , ∣ (λ z → q' (f z)) , surj-p'f , v ∣ ∣ ∣
+  ... | ∃i c , ∃i f , surj-p'f = ∃i c , ∃i (p' ∘ f) , ∃i (λ z → q' (f z)) , ∧i surj-p'f , v
     where
     v : (z : W c) → P ((p' ∘ f) z) (q' (f z))
     v z = f z .snd

@@ -1,12 +1,11 @@
-module QIT.Examples.PartialityMonad.Direct where
+open import QIT.Prelude
+
+module QIT.Examples.PartialityMonad.Direct ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude hiding (⊥; ⊥*)
-open import QIT.Prop
+open import QIT.Prop hiding (⊥; ⊥*)
 open import QIT.Relation.Subset
-import Data.Nat as ℕ
-open ℕ using (ℕ; zero; suc)
-import Data.Bool as 𝔹
-open 𝔹 using (Bool; false; true)
+open import QIT.Nat as ℕ hiding (_≤_)
 
 interleaved mutual
   infix 4 _≤_ _≈_

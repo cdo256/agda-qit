@@ -1,12 +1,11 @@
-module QIT.Examples.PartialityMonad.MutualDirectEquiv where
+open import QIT.Prelude
+
+module QIT.Examples.PartialityMonad.MutualDirectEquiv ⦃ a!c* : A!C ⦄ ⦃ fe* : FunExt ⦄ where
 
 open import QIT.Prelude renaming (⊤ to ⊤'; ⊥ to ⊥')
 open import QIT.Prop
 open import QIT.Relation.Subset
-import Data.Nat as ℕ
-open ℕ using (ℕ; zero; suc)
-import Data.Bool as 𝔹
-open 𝔹 using (Bool; false; true)
+open import QIT.Nat as ℕ
 
 import QIT.Examples.PartialityMonad.DirectAlgebra as DA
 import QIT.Examples.PartialityMonad.MutualAlgebra as MA

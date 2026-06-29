@@ -16,7 +16,7 @@ open import QIT.Relation.Binary
 -- predicates (Prop) rather than types (Set) for the equivalence
 -- relation and its properties. This is consistent with the QIT
 -- library's approach to propositions.
-module QIT.Setoid.Base where
+module QIT.Setoid.Base ⦃ pathElim* : PathElim ⦄ where
 
 -- The usual definition of setoid but with _≈_ and isEquivalence being predicates.
 --

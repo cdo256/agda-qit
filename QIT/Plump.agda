@@ -1,3 +1,5 @@
+open import QIT.Prelude
+
 module QIT.Plump where
 
 module Algebra where

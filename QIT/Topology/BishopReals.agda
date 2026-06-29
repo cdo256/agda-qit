@@ -1,4 +1,6 @@
-module QIT.Topology.BishopReals where
+open import QIT.Prelude
+
+module QIT.Topology.BishopReals ⦃ a!c* : A!C ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop

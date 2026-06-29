@@ -4,7 +4,10 @@ open import QIT.Container.Base as W using (⟦_◁_⟧)
 open import QIT.Relation.Binary using (WellFounded)
 open import QIT.Relation.Subset
 
-module QIT.Plump.Algebra {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
+module QIT.Plump.Algebra
+  ⦃ pathElim* : PathElim ⦄       
+  {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP)
+  where
 
 record Algebra ℓA : Set (lsuc ℓA ⊔ lsuc ℓS ⊔ lsuc ℓP) where
   field
@@ -29,7 +32,8 @@ record Algebra ℓA : Set (lsuc ℓA ⊔ lsuc ℓS ⊔ lsuc ℓP) where
 
     ≤refl : ∀ α → α ≤ α
 
-    iswf< : WellFounded _<_
+    -- iswf< : WellFounded _<_
+
 
 record Displayed ℓA (Zᴬ : Algebra ℓA) 
   : Set (ℓS ⊔ ℓP ⊔ lsuc ℓA) where
@@ -173,10 +177,23 @@ record IsExtensionalᴰ {ℓA} {ZA : Algebra ℓA} (ZD : Displayed ℓA ZA) : Pr
             → subst Zᴰ (antisym p q) x ≡ y
 
 module _ {ℓA} {ZA ZB : Algebra ℓA} where
+  const-subst : ∀ {α β : ZA .Algebra.Z} (r : α ≡ β) (x : ZB .Algebra.Z)
+              → subst (Displayed.Zᴰ (Constᴰ {ZA = ZA} {ZB = ZB})) r x ≡ x
+  const-subst {α} r x = ≡.Jp Q r u
+    where
+    Q : ∀ β (r : α ≡ β) → Prop _
+    Q β r = subst (Displayed.Zᴰ (Constᴰ {ZA = ZA} {ZB = ZB})) r x ≡ x
+
+    u : subst (Displayed.Zᴰ (Constᴰ {ZA = ZA} {ZB = ZB})) ≡.refl x ≡ x
+    u = ≡.subst-refl x
+
   const-isExtensionalᴰ : IsExtensional ZA → IsExtensional ZB → IsExtensionalᴰ (Constᴰ {ZA = ZA} {ZB = ZB})
   const-isExtensionalᴰ extZA extZB = record
     { isExtZA = extZA
-    ; antisymᴰ = λ _ _ xy yx → IsExtensional.antisym extZB xy yx
+    ; antisymᴰ = λ p q {x} {y} xy yx →
+      ≡.trans
+        (const-subst (IsExtensional.antisym extZA p q) x)
+        (IsExtensional.antisym extZB xy yx)
     }
 
 record IsInitial {ℓA} (ZA : Algebra ℓA) : Set (ℓS ⊔ ℓP ⊔ lsuc ℓA) where
