@@ -74,7 +74,7 @@ module _ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} (ac : A!C) where
     surj' (lift y) with surj y
     ... | ∃.∃i x , p = ∃.∃i lift x , ≡.cong lift p
 
-↔to-Injection : ∀ {ℓX ℓY} {X : Set ℓX} {Y : Set ℓY}
-              → (p : X ↔ Y) → IsInjection (p .↔.to)
-↔to-Injection {ℓX} {ℓY} {X} {Y} p {x} {y} q =
-  ≡.trans (≡.sym (p .↔.rinv x)) (≡.trans (≡.cong (p .↔.from) q) (p .↔.rinv y))
+≅-to-Injection : ∀ {ℓX ℓY} {X : Set ℓX} {Y : Set ℓY}
+              → (p : X ≅ˢ Y) → IsInjection (p .≅ˢ.to)
+≅-to-Injection {ℓX} {ℓY} {X} {Y} p {x} {y} q =
+  ≡.trans (≡.sym (p .≅ˢ.rinv x)) (≡.trans (≡.cong (p .≅ˢ.from) q) (p .≅ˢ.rinv y))

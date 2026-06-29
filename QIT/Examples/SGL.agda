@@ -1,6 +1,6 @@
 open import QIT.Prelude
 
-module QIT.Examples.SGL ⦃ a!c* : A!C ⦄ where
+module QIT.Examples.SGL ⦃ pathElim* : PathElim ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop
@@ -15,18 +15,18 @@ record Graph : Set₁ where
 
 zG : Graph
 zG = record
-  { N = ⊤
-  ; L = λ _ _ → ⊥
+  { N = ⊤ˢ
+  ; L = λ _ _ → ⊥ˢ
   ; root = tt }
 
 sG : Graph → Graph
 sG G = record
-  { N = ⊤ ⊎ G.N
+  { N = ⊤ˢ ⊎ G.N
   ; L = L
   ; root = inj₁ tt }
   where
   module G = Graph G
-  data L : ⊤ ⊎ G.N → ⊤ ⊎ G.N → Set where
+  data L : ⊤ˢ ⊎ G.N → ⊤ˢ ⊎ G.N → Set where
     Lι : ∀ x y → G.L x y → L (inj₂ x) (inj₂ y)
     Lsuc : L (inj₁ tt) (inj₂ G.root)
 
@@ -54,10 +54,10 @@ record Iso (G H : Graph) : Set where
   module G = Graph G
   module H = Graph H
   field
-    iN : G.N ↔ H.N
-  module iN = _↔_ iN 
+    iN : G.N ≅ˢ H.N
+  module iN = _≅ˢ_ iN 
   field
-    iL : ∀ x y → G.L x y ↔ H.L (iN.to x) (iN.to y)
+    iL : ∀ x y → G.L x y ≅ˢ H.L (iN.to x) (iN.to y)
     iroot : iN.to G.root ≡ H.root
 
 data _≈_ : Graph → Graph → Prop₁ where

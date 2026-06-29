@@ -200,7 +200,7 @@ D→T da = record
   Ty'→Ty {con γ , kγ} (ty a , ka) =
     subst Ty (con-inj (t̂-inj ka)) a
 
-  TyIso : Σ Con Ty ↔ Σ Con' Ty'
+  TyIso : Σ Con Ty ≅ˢ Σ Con' Ty'
   TyIso = record
     { to = λ (γ , a) → Con→Con' γ , Ty→Ty' a
     ; from = λ (γ , a) → Con'→Con γ , Ty'→Ty a
