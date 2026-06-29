@@ -2,7 +2,7 @@ open import QIT.Prelude
 open import QIT.Prop
 open import QIT.QW.Signature
 open import QIT.Relation.SetQuotient
-import QIT.Plump.Algebra as Plump
+open import QIT.Plump.Algebra
 
 -- Define staged construction of quotient W-types using plump ordinals.
 -- This builds the quotient in stages indexed by ordinals, ensuring that
@@ -16,11 +16,11 @@ module QIT.QW.Stage
   ⦃ sq* : SetQuotients ⦄
   {ℓS ℓP ℓE ℓV}
   (sig : Sig ℓS ℓP ℓE ℓV)
-  (ZA : Plump.Algebra (sig .Sig.S) (sig .Sig.P))
+  (ZA : PlumpAlgebra (sig .Sig.S) (sig .Sig.P))
   where
+
 open Sig sig
 open FunExt funExt*
-
 
 open import QIT.Relation.Subset
 open import QIT.Relation.Binary
@@ -45,11 +45,8 @@ open import QIT.Functor.Properties
 import QIT.Setoid.Indexed as Ix
 open import QIT.Setoid.Hom 
 
-open SetoidQuotient
-
-module Z = AlgProperties ZA
-
-open Z
+open SQ
+open PlumpAlgebra ZA
 
 -- Diagram is a functor from a preorder category to setoids
 Diagram≈ : ∀ ℓD ℓD' → Set (ℓA ⊔ lsuc ℓD ⊔ lsuc ℓD')

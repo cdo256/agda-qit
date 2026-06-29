@@ -8,7 +8,7 @@ open import QIT.Container.Base
 -- This definition was copied from Fiore et al. 2022, and their earlier work (Pitts et al. 2021).
 -- Start with an shape and position. This represents the 'shape' of
 -- the underlying W-type being constructed.
-module QIT.Plump.W.Base
+module QIT.Plump.W
   ⦃ pathElim* : PathElim ⦄
   {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP)
   where
@@ -45,7 +45,7 @@ Pᶻ ⊥ₛ = Lift _ ⊥ˢ
 Pᶻ ∨ₛ = Lift _ (⊤ˢ ⊎ ⊤ˢ)
 Pᶻ (ιₛ s) = P s
 
-open import QIT.Plump.Algebra Sᶻ Pᶻ
+open import QIT.Plump.Algebra S P
 
 -- Plump ordinals Z are W-trees over the extended signature (Sᶻ, Pᶻ).
 -- Elements of Z are used as size bounds.
@@ -75,12 +75,6 @@ _∨ᶻ_ α β = sup (∨ₛ , f)
   f : Pᶻ ∨ₛ → W Sᶻ Pᶻ
   f (lift (inj₁ _)) = α
   f (lift (inj₂ _)) = β
-
--- Canonical inclusion from base trees T into plump ordinals Z:
--- map each original node shape s to the embedded shape ιˢ s.
--- This lets us compare/bound base terms t : T by ordinals α : Z.
-ιᶻ : T → Z
-ιᶻ (sup (s , f)) = sup (ιₛ s , λ α → ιᶻ (f α))
 
 -- Define a well-founded order (≤, <) on Z.
 --
@@ -143,23 +137,11 @@ mutual
 << : ∀{α β γ} → β < γ → α < β → α < γ
 << (<sup i β≤fi) β<γ = <sup i (<→≤ (≤< β≤fi β<γ))
 
--- Helper: for any x and any inhabited P s, x is strictly below the
--- one-node tree with shape ιˢ s and all children equal to x.
--- This is used when we need "at least one branch exists" to witness <.
-<supᶻ : ∀ {s} x → ∥ P s ∥ → x < sup (ιₛ s , λ _ → x)
-<supᶻ x ∣ α ∣ = <sup α (≤refl x)
-
 -- α is strictly below sucᶻ α because sucᶻ α = sup(∨ˢ, _↦α), and we
 -- witness < using the left child.
 <sucᶻ : ∀ α → α < sucᶻ α
 <sucᶻ = λ α → <sup (lift (inj₁ tt)) (≤refl α)
 
--- Lift the order to the base W-type T via the embedding ιᶻ.
-_<ᵀ_ : (W S P) → Z → Prop (ℓS ⊔ ℓP)
-t <ᵀ α = ιᶻ t < α
-
-_≤ᵀ_ : (W S P) → Z → Prop (ℓS ⊔ ℓP)
-t ≤ᵀ α = ιᶻ t ≤ α
 
 -- Each child is ≤ the supremum. This is often used to weaken bounds.
 child≤ : ∀ s f i → f i ≤ sup (s , f)
@@ -281,16 +263,13 @@ isQuasiExtensionalZ .∧e₂ (∧i α⊆β , β⊆α) = ∧i ⊆→≤ α⊆β ,
   λ { (lift (inj₁ tt)) → α<γ
     ; (lift (inj₂ tt)) → β<γ }
 
-sup≤sup : ∀ {s f g} (r : ∀ i → f i ≤ g i) → sup (s , f) ≤ sup (s , g)
-sup≤sup r = sup≤ (λ i → <sup i (r i))
+supᶻ : Σ S (λ s → P s → Z) → Z 
+supᶻ (s , f) = sup (ιₛ s , f)
 
-≡→≤ : ∀ {α β} → α ≡ β → α ≤ β
-≡→≤ {α} {α} ≡.refl = ≤refl α
-
-Zᴬ : Algebra (ℓS ⊔ ℓP)
+Zᴬ : PlumpAlgebra _ _ _
 Zᴬ = record
   { Z = Z
-  ; sup = sup
+  ; sup = supᶻ
   ; _<_ = _<_
   ; _≤_ = _≤_
   ; sup≤ = sup≤
@@ -301,7 +280,12 @@ Zᴬ = record
   ; << = <<
   ; <→≤ = <→≤
   ; ≤refl = ≤refl
-  ; iswf< = iswf<
+  ; _∨ᶻ_ = _∨ᶻ_
+  ; ∨ᶻ-l< = ∨ᶻ-l<
+  ; ∨ᶻ-r< = ∨ᶻ-r<
+  ; ∨ᶻ-flip = ∨ᶻ-flip
+  ; ⊥ᶻ = ⊥ᶻ
+  ; ⊥ᶻ≤ = sup≤ λ ()
   }
 
 open import QIT.Plump.Size
