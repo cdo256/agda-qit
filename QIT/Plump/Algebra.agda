@@ -6,7 +6,8 @@ open import QIT.Relation.Subset
 
 module QIT.Plump.Algebra
   ⦃ pathElim* : PathElim ⦄       
-  {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) where
+  {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP)
+  where
 
 record Algebra ℓA : Set (lsuc ℓA ⊔ lsuc ℓS ⊔ lsuc ℓP) where
   field
@@ -31,7 +32,8 @@ record Algebra ℓA : Set (lsuc ℓA ⊔ lsuc ℓS ⊔ lsuc ℓP) where
 
     ≤refl : ∀ α → α ≤ α
 
-    iswf< : WellFounded _<_
+    -- iswf< : WellFounded _<_
+
 
 record Displayed ℓA (Zᴬ : Algebra ℓA) 
   : Set (ℓS ⊔ ℓP ⊔ lsuc ℓA) where

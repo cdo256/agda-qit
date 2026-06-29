@@ -1,6 +1,6 @@
 open import QIT.Prelude
 
-module QIT.Plump ⦃ a!c* : A!C ⦄ where
+module QIT.Plump where
 
 module Algebra where
   open import QIT.Plump.Algebra public

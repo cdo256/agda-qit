@@ -30,15 +30,12 @@ open Sig sig
 open A!C a!c*
 open FunExt funExt*
 
-import QIT.Plump.Algebra as Plump
-import QIT.Plump.W.Base as PlumpW
+open import QIT.Plump.W.Base S P using (ιₛ; Sᶻ; Pᶻ)
+import QIT.Plump.Algebra Sᶻ Pᶻ as Plump
 import QIT.QW.Stage sig as StageBase
 import QIT.QW.StageColimit sig as StageColimitBase
 
-module ZW = PlumpW S P
-module ZAlg = Plump ZW.Sᶻ ZW.Pᶻ
-
-module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
+module WithZ {ℓA} (ZA : Plump.Algebra ℓA) where
 
   private
     ℓD = ℓA ⊔ ℓS ⊔ ℓP
@@ -52,7 +49,6 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
   module Stage = StageBase.WithZ ZA
   module StageColimit = StageColimitBase.WithZ ZA
 
-  open ZW using (ιₛ)
   open import QIT.QW.Algebra sig
   open StageColimit public
   open import QIT.QW.Colimit ≤p ℓD ℓD' hiding (_≈ˡ_)
