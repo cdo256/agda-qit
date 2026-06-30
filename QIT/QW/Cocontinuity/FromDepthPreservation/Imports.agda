@@ -99,7 +99,7 @@ module DepthPreserving where
       where
       alg =
         mkAlg (Lift ℓV (W S P))
-              λ (s , f) → lift (W.sup (s , (λ i → lower (f i))))
+              (λ (s , f) → lift (W.sup (s , (λ i → lower (f i)))))
 
     u :   Z.sup (a , λ i → Z.ιᶻ (assign' (f i)))
       Z.≤ Z.sup (b , λ i → Z.ιᶻ (assign' (g i)))
