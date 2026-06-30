@@ -44,67 +44,38 @@ import QIT.Logic
 import QIT.Set.Base
 import QIT.Set.Bijection
 
--- Relations
--- import QIT.Relation.Base
--- import QIT.Relation.Binary
--- import QIT.Relation.IndexedBinary
--- import QIT.Relation.Subset
--- import QIT.Relation.Plump
--- import QIT.Relation.Nullary
--- import QIT.Relation.Finite
--- import QIT.Relation.WellFounded
--- import QIT.Relation.BarInduction
--- import QIT.Relation.SetQuotient
--- import QIT.Relation.Ordinal
--- import QIT.Relation.WISC
--- import QIT.Relation
+-- Category
+import QIT.Category.Base
+import QIT.Category.Strict
+import QIT.Category.SetoidEnriched
+import QIT.Category.Morphism
+import QIT.Category.Equivalence
+import QIT.Category.Slice
+import QIT.Category.Initial
+import QIT.Category.Terminal
 
--- import QIT.Nat
--- import QIT.Fin.Base
--- import QIT.Fin.Properties
+-- Category of Setoids
+import QIT.Setoid.Base
+import QIT.Setoid.Indexed
+import QIT.Setoid.Hom
+import QIT.Setoid.Iso
+import QIT.Setoid.Sigma
+import QIT.Setoid.Algebra.Base
+import QIT.Setoid.Algebra.Lift
+import QIT.Setoid.Quotient
+import QIT.Setoid
 
--- import QIT.Function.Base
--- import QIT.Identity
--- import QIT.Prop.Base
--- import QIT.Logic
--- import QIT.Prop.Data
--- import QIT.Prop.Properties
--- import QIT.Prop
--- import QIT.Set.Base
--- import QIT.Set.Bijection
+-- Specific Categories
+import QIT.Category.Discrete
+import QIT.Category.Preorder
+import QIT.Category.Set
+import QIT.Category.Setoid
+import QIT.Category.FamilyOfSetoids
 
--- -- Category
--- import QIT.Category.Base
--- import QIT.Category.Strict
--- import QIT.Category.SetoidEnriched
--- import QIT.Category.Morphism
--- import QIT.Category.Equivalence
--- import QIT.Category.Slice
--- import QIT.Category.Initial
--- import QIT.Category.Terminal
-
--- -- Category of Setoids
--- import QIT.Setoid.Base
--- import QIT.Setoid.Indexed
--- import QIT.Setoid.Hom
--- import QIT.Setoid.Iso
--- import QIT.Setoid.Sigma
--- import QIT.Setoid.Algebra.Base
--- import QIT.Setoid.Algebra.Lift
--- import QIT.Setoid.Quotient
--- import QIT.Setoid
-
--- -- Specific Categories
--- import QIT.Category.Discrete
--- import QIT.Category.Preorder
--- import QIT.Category.Set
--- import QIT.Category.Setoid
--- import QIT.Category.FamilyOfSetoids
-
--- -- Functor
--- import QIT.Functor.Base
--- import QIT.Functor.Properties
--- import QIT.Functor.NatTrans
+-- Functor
+import QIT.Functor.Base
+import QIT.Functor.Properties
+import QIT.Functor.NatTrans
 
 -- QW type definition
 import QIT.QW.W
@@ -118,13 +89,16 @@ import QIT.QW.Locality
 import QIT.QW.Cocontinuity
 import QIT.QW
 
+-- Plump ordinals
+import QIT.Plump.Algebra
+import QIT.Plump.W
+import QIT.Plump.Properties
+import QIT.Plump
+
 -- -- Extended Type Theories
 -- import QIT.IIT.Cont1
 -- -- import QIT.IIT.Codes -- incomplete
 -- -- import QIT.QIIT -- very incomplete
-
--- -- Plump ordinals
--- import QIT.Plump
 
 -- -- -- Examples
 -- import QIT.Examples.Mobile.Base

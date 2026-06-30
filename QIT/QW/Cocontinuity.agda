@@ -15,44 +15,36 @@ open import QIT.Category.Set
 open import QIT.Set.Bijection
 open import QIT.QW.Signature
 open import QIT.Relation.SetQuotient
+open import QIT.Plump.Algebra
 
 module QIT.QW.Cocontinuity 
   ⦃ pathElim* : PathElim ⦄
   ⦃ a!c* : A!C ⦄
   ⦃ funExt* : FunExt ⦄ 
   ⦃ propExt* : PropExt ⦄ 
-  ⦃ sq : SetQuotients ⦄
+  ⦃ sq* : SetQuotients ⦄
   {ℓS ℓP ℓE ℓV}
   (sig : Sig ℓS ℓP ℓE ℓV)
+  {ℓZ ℓ< ℓ≤ : Level}
+  (Zᴬ : PlumpAlgebra (sig .Sig.S) (sig .Sig.P) ℓZ ℓ< ℓ≤)
   where
 
 open Sig sig
-
 open A!C a!c*
 open FunExt funExt*
 
-open import QIT.Plump.W.Base S P using (ιₛ; Sᶻ; Pᶻ)
-import QIT.Plump.Algebra Sᶻ Pᶻ as Plump
-import QIT.QW.Stage sig as StageBase
-import QIT.QW.StageColimit sig as StageColimitBase
+open import QIT.QW.StageColimit sig Zᴬ
 
-module WithZ {ℓA} (ZA : Plump.Algebra ℓA) where
+import QIT.Plump.Properties
 
-  private
-    ℓD = ℓA ⊔ ℓS ⊔ ℓP
-    ℓD' = ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV
-
+module _ where
   open import QIT.Container.Base
   open import QIT.Container.StrictFunctor S P (ℓD ⊔ ℓD')
   open import QIT.Category.Morphism (SetCat (ℓD ⊔ ℓD'))
   open import QIT.Setoid.Quotient
 
-  module Stage = StageBase.WithZ ZA
-  module StageColimit = StageColimitBase.WithZ ZA
-
   open import QIT.QW.Algebra sig
-  open StageColimit public
-  open import QIT.QW.Colimit ≤p ℓD ℓD' hiding (_≈ˡ_)
+  -- open import QIT.QW.Colimit ≤p ℓD ℓD' hiding (_≈ˡ_)
 
   private
     ℓc = ℓA ⊔ ℓS ⊔ ℓP

@@ -1,4 +1,4 @@
-open import QIT.Prelude
+open import QIT.Prelude hiding (ℓD)
 open import QIT.Prop
 open import QIT.QW.Signature
 open import QIT.Relation.SetQuotient
@@ -16,7 +16,7 @@ module QIT.QW.Stage
   ⦃ sq* : SetQuotients ⦄
   {ℓS ℓP ℓE ℓV}
   (sig : Sig ℓS ℓP ℓE ℓV)
-  (ZA : PlumpAlgebra (sig .Sig.S) (sig .Sig.P))
+  {ℓZ ℓ< ℓ≤} (ZA : PlumpAlgebra (sig .Sig.S) (sig .Sig.P) ℓZ ℓ< ℓ≤)
   where
 
 open Sig sig
@@ -46,13 +46,15 @@ import QIT.Setoid.Indexed as Ix
 open import QIT.Setoid.Hom 
 
 open SQ
-open PlumpAlgebra ZA
+import QIT.Plump.Properties
+module Z = QIT.Plump.Properties ZA
+open Z
 
 -- Diagram is a functor from a preorder category to setoids
-Diagram≈ : ∀ ℓD ℓD' → Set (ℓA ⊔ lsuc ℓD ⊔ lsuc ℓD')
+Diagram≈ : ∀ ℓD ℓD' → Set (ℓZ ⊔ ℓ≤ ⊔ lsuc ℓD ⊔ lsuc ℓD')
 Diagram≈ ℓD ℓD' = Functor (PreorderCat Z ≤p) (SetoidCat ℓD ℓD')
 
-Diagram/≈ : ∀ ℓD ℓD' → Set (ℓA ⊔ lsuc ℓD ⊔ lsuc ℓD')
+Diagram/≈ : ∀ ℓD ℓD' → Set (ℓZ ⊔ ℓ≤ ⊔ lsuc ℓD ⊔ lsuc ℓD')
 Diagram/≈ ℓD ℓD' = Functor (PreorderCat Z ≤p) (SetCat (ℓD ⊔ ℓD'))
 
 _^_ : ∀ {ℓD ℓD'} → Diagram/≈ ℓD ℓD' → Set ℓD → Diagram/≈ ℓD ℓD'
@@ -69,12 +71,12 @@ open Box
 
 -- Stage α: elements of the underlying W-type bounded by ordinal α.
 -- This gives us size-bounded approximations to the final quotient.
-D₀ : (α : Z) → Set (ℓA ⊔ ℓS ⊔ ℓP)
+D₀ : (α : Z) → Set (ℓ≤ ⊔ ℓS ⊔ ℓP)
 D₀ α = ΣP T (_≤ᵀ α)
 
 -- Constructor for stage elements: build a tree with given shape and children.
 -- The ordinal bound is computed from the children's bounds using plump structure.
-psup : ∀ a μ (f : ∀ i → D₀ (μ i)) → D₀ (Z.sup (ιₛ a , μ))
+psup : ∀ a μ (f : ∀ i → D₀ (μ i)) → D₀ (Z.sup (a , μ))
 psup a μ f = W.sup (a , λ i → ⟨ f i ⟩ᴾ) , sup≤ (λ i → <sup i (f i .snd))
 
 -- Weakening: if α ≤ β then stage α embeds into stage β.
@@ -86,11 +88,7 @@ pweaken α≤β (t , t≤α) = t , ≤≤ α≤β t≤α
 -- Variables have minimal complexity ⊥ᶻ, constructors have complexity based on arguments.
 ιᵉ : {V : Set ℓV} → Expr V → Z
 ιᵉ (varᴱ v) = ⊥ᶻ
-ιᵉ (supᴱ s f) = Z.sup (ιₛ s , λ i → ιᵉ (f i))
-
--- Expression-ordinal comparison: when an expression fits within a stage.
-_≤ᴱ_ : {V : Set ℓV} → Expr V → Z → Prop ℓA
-t ≤ᴱ α = ιᵉ t ≤ α
+ιᵉ (supᴱ s f) = Z.sup (s , λ i → ιᵉ (f i))
 
 -- Interpretation of equation sides as W-type elements.
 -- These functions evaluate expressions in the underlying W-type T.
@@ -113,11 +111,11 @@ rhs' e ϕ = lower (assign T-alg* ϕ (Ξ e .rhs))
 -- This is built inductively using congruence, equation satisfaction,
 -- equivalence relation properties, and weakening.
 infixl 3 _⊢_≈ᵇ_
-data _⊢_≈ᵇ_ : (α : Z) → D₀ α → D₀ α → Prop (ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV) where
+data _⊢_≈ᵇ_ : (α : Z) → D₀ α → D₀ α → Prop (ℓZ ⊔ ℓ< ⊔ ℓ≤ ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV) where
   -- Congruence: constructor applications respect equivalence
   ≈pcong : ∀ a μ (f g : ∀ i → D₀ (μ i))
         → (r : ∀ i → μ i ⊢ f i ≈ᵇ g i)
-        → Z.sup (ιₛ a , μ) ⊢ psup a μ f ≈ᵇ psup a μ g
+        → Z.sup (a , μ) ⊢ psup a μ f ≈ᵇ psup a μ g
 
   -- Equation satisfaction: enforce the equations from the signature
   ≈psat : ∀ {α} (e : E) (ϕ : Assignment T-alg* (Ξ e))
@@ -163,9 +161,12 @@ module _ {ℓW}
   ≈ᵇ-elim (≈pweaken α≤β p) =
     mweaken α≤β p (≈ᵇ-elim p)
 
+ℓD = ℓS ⊔ ℓP ⊔ ℓ≤
+ℓD' = ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV ⊔ ℓZ ⊔ ℓ< ⊔ ℓ≤
+
 -- Each stage forms a setoid with the stage-indexed equivalence.
 -- This gives us a sequence of quotient approximations.
-D̃ : (α : Z) → Setoid (ℓA ⊔ ℓS ⊔ ℓP) (ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV)
+D̃ : (α : Z) → Setoid ℓD ℓD'
 D̃ α = record
   { Carrier = D₀ α
   ; _≈_ = α ⊢_≈ᵇ_
@@ -174,13 +175,13 @@ D̃ α = record
     ; sym = ≈psym
     ; trans = ≈ptrans } }
 
-D̃/≈ : Z → Set (ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV)
+D̃/≈ : Z → Set (ℓD ⊔ ℓD')
 D̃/≈ α = D̃ α /≈
 
 -- The complete diagram: stages connected by weakening morphisms.
 -- This forms a cocone over the plump ordinal preorder, and the colimit
 -- will give us the final quotient inductive type.
-D≈ : Diagram≈ (ℓA ⊔ ℓS ⊔ ℓP) (ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV)
+D≈ : Diagram≈ ℓD ℓD'
 D≈ = record
   { ob = D̃
   ; hom = hom
@@ -196,8 +197,8 @@ D≈ = record
 
 module D/≈ where
   module ≤p = Category (PreorderCat Z ≤p)
-  module SetoidCat = Category (SetoidCat (ℓA ⊔ ℓS ⊔ ℓP) (ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV))
-  module SetCat = Category (SetCat (ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV))
+  module SetoidCat = Category (SetoidCat ℓD ℓD')
+  module SetCat = Category (SetCat (ℓD ⊔ ℓD'))
   open ≡.≡-Reasoning
 
   sameStage : ∀ {α} {t : T} (p q : t ≤ᵀ α) → D̃ α [ (t , p) ≈ (t , q) ]
@@ -244,7 +245,7 @@ module D/≈ where
         ≡⟨ ≡.cong (hom (box g)) (≡.sym (hom-beta (box f) s)) ⟩
       hom (box g) (hom (box f) (D̃ α ⊢[ s ])) ∎
 
-  D : Diagram/≈ (ℓA ⊔ ℓS ⊔ ℓP) (ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ lsuc ℓV)
+  D : Diagram/≈ ℓD ℓD'
   D .Functor.ob = D̃/≈
   D .Functor.hom = hom
   D .Functor.id = id
