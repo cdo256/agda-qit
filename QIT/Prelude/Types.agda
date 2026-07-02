@@ -57,6 +57,12 @@ module ⊎ where
         → (x : A ⊎ B) → C x
   [ f , g ] (inj₁ x) = f x
   [ f , g ] (inj₂ x) = g x
+  [_,_]ᵖ : {A : Set ℓA} {B : Set ℓB} {C : A ⊎ B → Prop ℓC}
+        → ((a : A) → C (inj₁ a))
+        → ((b : B) → C (inj₂ b))
+        → (x : A ⊎ B) → C x
+  [ f , g ]ᵖ (inj₁ x) = f x
+  [ f , g ]ᵖ (inj₂ x) = g x
 
 open ⊎ using (_⊎_; inj₁; inj₂) public
 
