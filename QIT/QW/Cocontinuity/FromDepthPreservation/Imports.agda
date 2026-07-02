@@ -62,70 +62,16 @@ module DepthPreserving where
   Z₀→Z (W.sup (∨ₛ , f)) = Z₀→Z (f (lift (inj₁ tt))) Z.∨ᶻ Z₀→Z (f (lift (inj₂ tt)))
   Z₀→Z (W.sup (ιₛ s , f)) = Z.sup (s , λ i → Z₀→Z (f i))
 
-  module Occ = OccurrenceAtDepth
-
-  occurs-at-0-var : ∀ {V : Set ℓV} (v : V) {f} → OccursAtDepth v (varᴱ v {f = f}) 0
-  occurs-at-0-var v {f} = ∣ record
-    { p = here (varᴱ v {f = f})
-    ; len = ≡.refl
-    ; lookup = ≡.refl
-    } ∣
-
-  ¬occurs-at-0-sup : ∀ {V : Set ℓV} (v : V) (s : S) {f}
-    → ¬ OccursAtDepth v (supᴱ s f) 0
-  ¬occurs-at-0-sup v s {f} ∣ w ∣ with path-len≡0→here (Occ.p w) (Occ.len w)
-  ... | ≡.refl = inj₁≢inj₂ (≡.sym (Occ.lookup w))
-
-  var-at-0-injective : ∀ {V : Set ℓV} {x y : V} {f}
-    → OccursAtDepth x (varᴱ y {f = f}) 0
-    → x ≡ y
-  var-at-0-injective ∣ w ∣ with path-len≡0→here (Occ.p w) (Occ.len w)
-  ... | ≡.refl with Occ.lookup w
-  ... | ≡.refl = ≡.refl
-
   dp : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ιᶻ (ŝ .fst) ≡ ιᶻ (t̂ .fst)
   dp α ŝ t̂ (≈pcong a μ f g r) =
     ≡.cong (λ ○ → Z.sup (a , ○))
           (funExt λ i → dp (μ i) (f i) (g i) (r i))
-  dp α (s , s≤α) (t , t≤α) (≈psat e ϕ _ _)
-    with Equation.lhs (Ξ e) in lhs≡ | Equation.rhs (Ξ e) in rhs≡
-  ... | supᴱ a f | supᴱ b g =
-    antisym u {!!}
+  dp α (s , s≤α) (t , t≤α) (≈psat e ϕ _ _) = antisym {!!} {!!}
     where
-    open import QIT.Algebra.Base
-    assign' : (e : Expr S P ℓV (Ξ e .V)) → W S P
-    assign' e =
-      lower (assign S P ℓV alg ϕ e)
-      where
-      alg =
-        mkAlg (Lift ℓV (W S P))
-              (λ (s , f) → lift (W.sup (s , (λ i → lower (f i)))))
-
-    u :   Z.sup (a , λ i → Z.ιᶻ (assign' (f i)))
-      Z.≤ Z.sup (b , λ i → Z.ιᶻ (assign' (g i)))
-    u = {!!}
-  ... | supᴱ a f | varᴱ y =
-    ⊥e (¬occurs-at-0-sup y a
-      (≡.substp (λ e' → OccursAtDepth y e' 0) lhs≡
-        (dp-syntax e .var y 0 .∧e₂
-          (≡.substp (λ e' → OccursAtDepth y e' 0) (≡.sym rhs≡) (occurs-at-0-var y)))))
-  ... | varᴱ x | supᴱ b g =
-    ⊥e (¬occurs-at-0-sup x b
-      (≡.substp (λ e' → OccursAtDepth x e' 0) rhs≡
-        (dp-syntax e .var x 0 .∧e₁
-          (≡.substp (λ e' → OccursAtDepth x e' 0) (≡.sym lhs≡) (occurs-at-0-var x)))))
-  ... | varᴱ x | varᴱ y =
-    ≡.cong (λ z → ιᶻ (lower (ϕ z)))
-      (var-at-0-injective
-        (≡.substp (λ e' → OccursAtDepth x e' 0) rhs≡
-          (dp-syntax e .var x 0 .∧e₁
-            (≡.substp (λ e' → OccursAtDepth x e' 0) (≡.sym lhs≡) (occurs-at-0-var x)))))
-  -- let u : ∀ (α : Z₀) → Eq.lhs ≤ᴱ α ⇔ Eq.rhs ≤ᴱ α
-  --     u = dp e .eq
-  --     v : (x : Eq.V) (n : ℕ) → OccursAtDepth x Eq.lhs n ⇔ OccursAtDepth x Eq.rhs n
-  --     v = dp e .var
-  -- in antisym {!!} {!!}
-
+    p : ιᶻ (lhs' e ϕ) Z.≤ ιᶻ (rhs' e ϕ)
+    p = {!!}
+    -- q : ιᶻ (lhs' e ϕ) Z.≤≥ ιᶻ (rhs' e ϕ)
+    -- q = {!!}
   dp α ŝ t̂ ≈prefl = ≡.refl
   dp α ŝ t̂ (≈psym p) = ≡.sym (dp _ _ _ p)
   dp α ŝ t̂ (≈ptrans p q) = ≡.trans (dp _ _ _ p) (dp _ _ _ q)

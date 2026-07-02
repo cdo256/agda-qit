@@ -47,8 +47,8 @@ module _ where
   -- open import QIT.QW.Colimit ≤p ℓD ℓD' hiding (_≈ˡ_)
 
   private
-    ℓc = ℓA ⊔ ℓS ⊔ ℓP
-    ℓc' = ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV
+    ℓc = {!ℓA ⊔ ℓS ⊔ ℓP!}
+    ℓc' = {!ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV!}
 
   Cocontinuous : (F : Functor (SetCat (ℓc ⊔ ℓc')) (SetCat (ℓc ⊔ ℓc'))) (D : Diagram/≈ ℓc ℓc')
                 → Prop ℓc'
