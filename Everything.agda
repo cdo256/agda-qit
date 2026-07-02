@@ -81,6 +81,8 @@ import QIT.Functor.NatTrans
 import QIT.QW.W
 import QIT.QW.Equation
 import QIT.QW.Signature
+import QIT.QW.Plump
+import QIT.QW.Subclasses
 import QIT.QW.Algebra
 import QIT.QW.Stage
 import QIT.QW.StageColimit
