@@ -1,5 +1,9 @@
 module Everything where
 
+-- Changes:
+--  - QIT.Prelude.Universe: Export universe variables.
+--  - QIT.Prelude.Logic: Rename intro and elim rules.
+
 -- Base
 import QIT.Prelude.Universe
 import QIT.Prelude.Truncation
@@ -73,19 +77,6 @@ import QIT.Functor.Base
 import QIT.Functor.Properties
 import QIT.Functor.NatTrans
 
--- Algebra
-import QIT.Algebra.Base
-import QIT.Algebra.Properties
-import QIT.Algebra.Lift
-import QIT.Algebra
-
--- Containers
-import QIT.Container.Base
-import QIT.Container.Functor
-import QIT.Container.StrictFunctor
-import QIT.Container.Indexed
-import QIT.Container.Properties
-
 -- QW type definition
 import QIT.QW.W
 import QIT.QW.Equation
@@ -108,11 +99,6 @@ import QIT.Plump
 -- import QIT.IIT.Cont1
 -- -- import QIT.IIT.Codes -- incomplete
 -- -- import QIT.QIIT -- very incomplete
-
--- -- Kaposi-Kovacs-Altenkirch Syntax
--- import QIT.KKA2019.Syntax
--- -- import QIT.KK2020.Level
--- -- -- import QIT.KK2020.Syntax -- incomplete
 
 -- -- -- Examples
 -- import QIT.Examples.Mobile.Base
