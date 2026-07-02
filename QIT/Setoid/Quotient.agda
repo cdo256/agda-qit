@@ -27,6 +27,9 @@ module SQ {ℓA ℓR} (Ã : Setoid ℓA ℓR) where
     [_] : A → Ã /≈
     [_] = Q.[_]
 
+    []-beta : ∀ x → [ x ] ≡ Q.[ x ]
+    []-beta x = ≡.refl
+
     ≈[_] : ∀ {x y} → x ≈ y → [ x ] ≡ [ y ]
     ≈[_] p = Q.quot-rel _ _ p
 
