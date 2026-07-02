@@ -22,8 +22,8 @@ module ≡syntax {ℓ} {A : Set ℓ} where
 
 infixr 5 _∘_
 _∘_ : ∀ {ℓA ℓB ℓC}
-    → {A : Set ℓA} {B : Set ℓB} {C : Set ℓC}
-    → (B → C) → (A → B) → (A → C)
+    → {A : Set ℓA} {B : A → Set ℓB} {C : A → Set ℓC}
+    → (∀ {a} → B a → C a) → ((a : A) → B a) → ((a : A) → C a)
 f ∘ g = λ x → f (g x)
 
 id : ∀ {ℓA} {A : Set ℓA} → A → A
