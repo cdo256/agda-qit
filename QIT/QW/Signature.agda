@@ -11,7 +11,7 @@ open import QIT.QW.Equation
 module QIT.QW.Signature
   ⦃ a!c* : A!C ⦄ 
   ⦃ pathElim* : PathElim ⦄
-  ⦃ fe* : FunExt ⦄
+  ⦃ funExt* : FunExt ⦄
   where
 
 -- A QW signature consists of:

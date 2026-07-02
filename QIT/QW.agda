@@ -29,7 +29,7 @@ open import QIT.Prelude
 -- This provides a systematic method for implementing QITs in type theory
 -- without requiring them as primitives in the type system.
 
-module QIT.QW ⦃ a!c* : A!C ⦄ where
+module QIT.QW where
 
 module QW where
   open import QIT.QW.Equation public
