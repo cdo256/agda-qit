@@ -66,6 +66,15 @@ module _ where
         ; trans = S.trans } }
     where module S = Unindexed.Setoid S
 
+  FiberSetoid : ∀ {ℓI ℓA ℓR} (S : Setoid ℓI ℓA ℓR) → S .Setoid.I → Unindexed.Setoid ℓA ℓR
+  FiberSetoid S i = record
+    { Carrier = A i
+    ; _≈_ = R i i
+    ; isEquivalence = record
+      { refl = refl ; sym = sym ; trans = trans } }
+    where
+    open Setoid S
+
   -- Convert an indexed setoid (at level ℓ0) to a regular setoid.
   -- Takes the dependent sum Σ I A as the carrier, and defines equality
   -- on pairs (i, x) and (j, y) using the indexed relation R i j x y.
