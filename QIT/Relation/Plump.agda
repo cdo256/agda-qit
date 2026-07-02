@@ -8,4 +8,4 @@ module QIT.Relation.Plump
   {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP)
   where
 
-open import QIT.Plump.W.Base S P public
+open import QIT.Plump.W S P public

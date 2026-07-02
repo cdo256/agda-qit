@@ -86,9 +86,6 @@ import QIT.Container.StrictFunctor
 import QIT.Container.Indexed
 import QIT.Container.Properties
 
--- Plump ordinals
-import QIT.Plump
-
 -- QW type definition
 import QIT.QW.W
 import QIT.QW.Equation
@@ -100,6 +97,12 @@ import QIT.QW.Colimit
 import QIT.QW.Locality
 import QIT.QW.Cocontinuity
 import QIT.QW
+
+-- Plump ordinals
+import QIT.Plump.Algebra
+import QIT.Plump.W
+import QIT.Plump.Properties
+import QIT.Plump
 
 -- -- Extended Type Theories
 -- import QIT.IIT.Cont1
