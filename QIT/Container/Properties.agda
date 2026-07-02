@@ -30,6 +30,24 @@ module _ {ℓS ℓP} {S : Set ℓS} {P : S → Set ℓP} where
   pathLength (here _) = 0
   pathLength (there _ _ _ p) = suc (pathLength p)
 
+  path-len≡0→here : ∀ {x} → (p : Path x) → pathLength p ≡ 0 → p ≡ here x
+  path-len≡0→here (here x) ≡.refl = ≡.refl
+
+  path-len≠0→there
+    : ∀ {x} → (p : Path x)
+    → (pathLength p ≢ 0)
+    → ∃ λ (s : S)
+    → ∃ λ (f : P s → W S P)
+    → ∃ λ (i : P s)
+    → ∃ λ (y : W S P)
+    → ∃ λ (q : Path (f i))
+    → (x ≡ sup (s , f))
+    ∧ᵖ λ r → ≡.subst Path r p ≡ there s f i q
+  path-len≠0→there (here _) 0≠0 = ⊥e (0≠0 ≡.refl)
+  path-len≠0→there (there s f i p) _ =
+    ∃i s , ∃i f , ∃i i , ∃i f i , ∃i p , ∧i ≡.refl , subst-refl _
+
+
   pathLookup : ∀ {x} → Path x → W S P
   pathLookup (here x) = x
   pathLookup (there _ _ _ p) = pathLookup p
