@@ -211,7 +211,7 @@ We demonstrate the theory with a concrete example: the mobile QIT.
 The mobile signature captures a simple idea: tree structures where the
 ordering of branches doesn't matter. Given any set I (finite or infinite),
 we get trees with I-branching nodes, but we quotient by reindexing under
-all bijections I ↔ I. The result is mobiles: tree-like structures
+all bijections I ≅ I. The result is mobiles: tree-like structures
 that can be freely rotated:
 
 ```agda

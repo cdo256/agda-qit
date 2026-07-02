@@ -20,9 +20,9 @@ inhab⇔>0 {zero} .∧e₂ ()
 inhab⇔>0 {suc n} .∧e₁ _ = s≤s z≤n
 inhab⇔>0 {suc n} .∧e₂ _ = ∣ zero ∣
 
-↔to⇔ : ∀ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} → A ↔ B → ∥ A ∥ ⇔ ∥ B ∥
-↔to⇔ {A = A} {B} p .∧e₁ ∣ x ∣ = ∣ p .↔.to x ∣
-↔to⇔ {A = A} {B} p .∧e₂ ∣ y ∣ = ∣ p .↔.from y ∣
+≅to⇔ : ∀ {ℓA ℓB} {A : Set ℓA} {B : Set ℓB} → A ≅ˢ B → ∥ A ∥ ⇔ ∥ B ∥
+≅to⇔ {A = A} {B} p .∧e₁ ∣ x ∣ = ∣ p .≅ˢ.to x ∣
+≅to⇔ {A = A} {B} p .∧e₂ ∣ y ∣ = ∣ p .≅ˢ.from y ∣
 
 ¬Fin0 : ¬ ∥ Fin 0 ∥
 ¬Fin0 ∣ () ∣
@@ -30,24 +30,24 @@ inhab⇔>0 {suc n} .∧e₂ _ = ∣ zero ∣
 fzero≠fsuc : ∀ {n} (a : Fin n) → zero ≢ suc a
 fzero≠fsuc a ()
 
-Fin↔-suc : ∀ {m n} → Fin (suc m) ↔ Fin (suc n) → Fin m ↔ Fin n
-Fin↔-suc {m} {n} p = q
+Fin≅-suc : ∀ {m n} → Fin (suc m) ≅ˢ Fin (suc n) → Fin m ≅ˢ Fin n
+Fin≅-suc {m} {n} p = q
   where
-  f' : ∀ {m n} → (p : Fin (suc m) ↔ Fin (suc n)) → (a : Fin m) → Singleton (p .↔.to (suc a)) → Singleton (p .↔.to zero) → Fin n
+  f' : ∀ {m n} → (p : Fin (suc m) ≅ˢ Fin (suc n)) → (a : Fin m) → Singleton (p .≅ˢ.to (suc a)) → Singleton (p .≅ˢ.to zero) → Fin n
   f' p a (zero , q) (zero , r) =
     ⊥e' (fzero≠fsuc a (≡.trans (≡.sym (p.rinv zero))
                            (≡.trans (≡.cong p.from (≡.trans (≡.sym r) q))
                             (p.rinv (suc a)))))
-    where module p = _↔_ p
+    where module p = _≅ˢ_ p
   f' p a (zero , _) (suc c , _) = c
   f' p a (suc b , _) _ = b
 
-  f : ∀ {m n} → (p : Fin (suc m) ↔ Fin (suc n)) → (a : Fin m) → Fin n
-  f p a = f' p a (inspect (p .↔.to (suc a))) (inspect (p .↔.to zero))
-    where module p = _↔_ p
+  f : ∀ {m n} → (p : Fin (suc m) ≅ˢ Fin (suc n)) → (a : Fin m) → Fin n
+  f p a = f' p a (inspect (p .≅ˢ.to (suc a))) (inspect (p .≅ˢ.to zero))
+    where module p = _≅ˢ_ p
 
-  module p = _↔_ p
-  q : Fin m ↔ Fin n
+  module p = _≅ˢ_ p
+  q : Fin m ≅ˢ Fin n
   q = record
     { to = to
     ; from = from
@@ -57,7 +57,7 @@ Fin↔-suc {m} {n} p = q
     to : Fin m → Fin n
     to = f p
     from : Fin n → Fin m
-    from = f (↔.flip p)
+    from = f (≅ˢ.sym p)
     linv : (a : Fin n) → to (from a) ≡ a
     linv a with inspect (p.from (suc a)) | inspect (p.from zero)
     ... | zero , q | zero , r = ⊥e (fzero≠fsuc a eq)
@@ -105,13 +105,13 @@ Fin↔-suc {m} {n} p = q
       from-suc = ≡.trans (≡.cong p.from q) (p.rinv (suc a))
     ...   | suc c , s | w = Fin-suc-injective (≡.trans s (≡.trans (≡.cong p.from q) (p.rinv (suc a))))
 
-Fin↔-injective : ∀ {m n} → Fin m ↔ Fin n → m ≡ n
+Fin↔-injective : ∀ {m n} → Fin m ≅ˢ Fin n → m ≡ n
 Fin↔-injective {zero} {zero} p = ≡.refl
 Fin↔-injective {zero} {suc n} p = ⊥e (¬Fin0 ∣ from zero ∣)
-  where open _↔_ p
+  where open _≅ˢ_ p
 Fin↔-injective {suc m} {zero} p = ⊥e (¬Fin0 ∣ to zero ∣)
-  where open _↔_ p
-Fin↔-injective {suc m} {suc n} p = ≡.cong suc (Fin↔-injective (Fin↔-suc p))
+  where open _≅ˢ_ p
+Fin↔-injective {suc m} {suc n} p = ≡.cong suc (Fin↔-injective (Fin≅-suc p))
 
 open import QIT.Set.Bijection
 Fin-inj→≤ : ∀ {m n} → (f : Fin m → Fin n) → IsInjection f → m ≤ n

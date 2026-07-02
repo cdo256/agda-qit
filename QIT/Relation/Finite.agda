@@ -18,13 +18,13 @@ open import QIT.Nat
 
 module _ {ℓA} where
   isFiniteᵖ : (A : Set ℓA) → Prop _
-  isFiniteᵖ A = ∃ λ n → ∥ Fin n ↔ A ∥
+  isFiniteᵖ A = ∃ λ n → ∥ Fin n ≅ˢ A ∥
 
   isFinite' : (A : Set ℓA) → Set _
-  isFinite' A = ΣP ℕ λ n → ∥ Fin n ↔ A ∥
+  isFinite' A = ΣP ℕ λ n → ∥ Fin n ≅ˢ A ∥
 
   isFinite : (A : Set ℓA) → Set _
-  isFinite A = Σ ℕ λ n → Fin n ↔ A
+  isFinite A = Σ ℕ λ n → Fin n ≅ˢ A
 
   FinSet : Set (lsuc ℓA)
   FinSet = Σ (Set ℓA) isFinite
@@ -35,7 +35,7 @@ module _ {ℓA} where
       λ{(no ¬p) → no (λ q → ¬p (≡.cong from q) )
       ; (yes p) → yes (≡.trans (≡.sym (linv x)) (≡.trans (≡.cong to p) (linv y))) }  
     where
-    open _↔_ f
+    open _≅ˢ_ f
     i = from x
     j = from y
 
@@ -44,17 +44,17 @@ module _ {ℓA} where
     A!C.a!c a!c _ isContrΣSz
     where
     Sz : (n : ℕ) → Prop ℓA
-    Sz n = ∥ Fin n ↔ A ∥
+    Sz n = ∥ Fin n ≅ˢ A ∥
     isPropΣSz : isProp (ΣP ℕ Sz)
     isPropΣSz (m , ∣ p ∣) (n , ∣ q ∣) = ΣP≡ _ _ m≡n
       where
-      open ↔
-      [m]↔[n] : Fin m ↔ Fin n
-      [m]↔[n] = flip q ∘ p
+      open ≅ˢ
+      [m]↔[n] : Fin m ≅ˢ Fin n
+      [m]↔[n] = sym q ∘ p
       m≡n : m ≡ n
       m≡n = cantor-schröder-bernstein
         ([m]↔[n] .to) ([m]↔[n] .from)
-        (↔to-Injection [m]↔[n])
-        (↔to-Injection (flip [m]↔[n]))
+        (≅-to-Injection [m]↔[n])
+        (≅-to-Injection (sym [m]↔[n]))
     isContrΣSz : isContr (ΣP ℕ Sz)
     isContrΣSz = mkIsContr _ (∃e (λ n p → ∣ (n , p) ∣) isFiniteA) isPropΣSz

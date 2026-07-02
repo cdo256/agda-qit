@@ -27,7 +27,7 @@ mkIsContr A ∣ x ∣ isPropA = ∃i x , isPropA x
 
 module _ where
   a!c-Prop : ∀ {ℓX} (X : Set ℓX)
-            → isProp X → (Box ∥ X ∥) ↔ X
+            → isProp X → (Box ∥ X ∥) ≅ˢ X
   a!c-Prop X isPropX = record
     { to = λ (box x) → a!c X (mkIsContr X x isPropX)
     ; from = λ z → box ∣ z ∣
@@ -36,5 +36,5 @@ module _ where
 
   Prop≅hProp-sect
     : ∀ {ℓA} → (A : hProp ℓA)
-    → Prop→hProp (hProp→Prop A) .fst ↔ A .fst
+    → Prop→hProp (hProp→Prop A) .fst ≅ˢ A .fst
   Prop≅hProp-sect (A , isPropA) = a!c-Prop A isPropA

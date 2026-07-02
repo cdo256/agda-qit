@@ -61,9 +61,9 @@ leaf≡leaf f g =
 -- Given a function α : I → T and a bijection π : I ↔ I,
 -- produce the function that applies π before α.
 -- This is how bijections act on the children of nodes.
-_∘ᵗ_ : ∀ (α : I → T) (π : I ↔ I)
+_∘ᵗ_ : ∀ (α : I → T) (π : I ≅ˢ I)
      → I → T
-(f ∘ᵗ π) = λ i → f (π .↔.to i)
+(f ∘ᵗ π) = λ i → f (π .≅ˢ.to i)
 
 -- The QIT signature for mobiles: trees quotiented by permutation invariance.
 -- This signature captures the tree structure plus equations saying that
