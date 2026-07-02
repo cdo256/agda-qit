@@ -9,7 +9,8 @@ module QIT.QW.Equation
   ⦃ a!c* : A!C ⦄ 
   ⦃ pathElim* : PathElim ⦄
   ⦃ funExt* : FunExt ⦄
-  {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) (ℓV : Level)
+  {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP)
+  (ℓV : Level)
   where
 
 open FunExt funExt*
@@ -25,24 +26,9 @@ module Fᴱ = Functor F
 
 open import QIT.Algebra.Base F as Alg
 
--- Expressions over variables V: terms built from V and constructor signature (S,P).
--- These are W-types over the extended signature (V ⊎ S, Pʰ) where:
--- - Variables V have no arguments (arity ⊥*)
--- - Constructors S keep their original arities P
--- Extended shapes: variables or constructors
-Sʰ : (V : Set ℓV) → Set (ℓS ⊔ ℓV)
-Sʰ V = V ⊎ S
-
--- Extended positions: variables are nullary, constructors keep original arity
-Pʰ : (V : Set ℓV) → Sʰ V → Set ℓP
-Pʰ V = ⊎.[ (λ _ → ⊥ˢ*) , P ]
-
-Expr : (V : Set ℓV) → Set (ℓS ⊔ ℓP ⊔ ℓV)
-Expr V = W (Sʰ V) (Pʰ V)
--- Expr V = FreeAlgebra S P V
-
-pattern varᴱ v {f} = sup (inj₁ v , f)
-pattern supᴱ s f = sup (inj₂ s , f)
+data Expr (V : Set ℓV) : Set (ℓS ⊔ ℓP ⊔ ℓV) where
+  varᴱ : V → Expr V
+  supᴱ : (s : S) (f : P s → Expr V) → Expr V
 
 ιᴱ : {V : Set ℓV} → W S P → Expr V
 ιᴱ (sup (s , f)) = supᴱ s λ i → ιᴱ (f i)
@@ -83,7 +69,8 @@ module _ (Xα : Algebra) where
   -- Variables are replaced by their assignments, constructors are interpreted
   -- using the algebra's structure map.
   assign : {V : Set ℓV} (ϕ : V → X) (e : Expr V) → X
-  assign ϕ = recW ⊎.[ (λ v _ → ϕ v) , (λ s f → α (s , f)) ]
+  assign ϕ (varᴱ v) = ϕ v
+  assign ϕ (supᴱ s f) = α (s , λ i → assign ϕ (f i))
 
   -- Variable assignment for an equation: maps variables to algebra elements
   Assignment : Equation → Set (ℓS ⊔ ℓP ⊔ ℓV)
@@ -111,15 +98,15 @@ module _ {V : Set ℓV} {Xα : Algebra}
 
   assign-unique
     : (ρ : V → X)
-    → (vsat : ∀ v f → hom (varᴱ v {f}) ≡ ρ v)
+    → (vsat : ∀ v → hom (varᴱ v) ≡ ρ v)
     → (e : Expr V)
     → hom e ≡ assign Xα ρ e
-  assign-unique ρ vsat (varᴱ v {f}) = begin
-    hom (varᴱ v {f})
-      ≡⟨ vsat v f ⟩
+  assign-unique ρ vsat (varᴱ v) = begin
+    hom (varᴱ v)
+      ≡⟨ vsat v ⟩
     ρ v
       ≡⟨ refl ⟩
-    assign Xα ρ (varᴱ v {f}) ∎
+    assign Xα ρ (varᴱ v) ∎
     where
     open ≡.≡-Reasoning
   assign-unique ρ vsat (supᴱ s f) = begin
