@@ -200,97 +200,102 @@ dweaken/ {α} {β} p = rec (S̃ α) (λ s → S̃ β ⊢[ dweaken₀ p s ]) (S̃
 dweaken-beta : ∀ {α β} → (p : α ≤ β) → (s : S₀ α) → dweaken/ p (S̃ α ⊢[ s ]) ≡ (S̃ β ⊢[ dweaken₀ p s ])
 dweaken-beta {α} {β} p s = rec-beta (S̃ α) (λ s → S̃ β ⊢[ dweaken₀ p s ]) (S̃ β ⊢≈[_]) s
 
-module ≤p = Preorder ≤p
+open import QIT.Category.Base
+module ≤p = Category (PreorderCat Z ≤p)
+open import QIT.Category.Equivalence
+open import QIT.Category.Set
+module SetCat = Category (SetCat {!!})
+
 
 id : ∀ {α} → dweaken (≤p.id {α}) ≡h SetCat.id
 id {α} {t̃} = q t̃
   where
-  module Qα = SetoidQuotient (D̃ α)
-  q : ∀ t̃ → hom {α} ≤p.id t̃ ≡ SetCat.id {D̃ α /≈} t̃
-  q = Qα.elimp (λ t̃ → hom ≤p.id t̃ ≡ SetCat.id t̃)
-                (hom-beta ≤p.id)
-comp : ∀ {α β γ} (f : Box (α ≤ β)) (g : Box (β ≤ γ))
-    → hom (g ≤p.∘ f) ≡h (hom g SetCat.∘ hom f)
-comp {α} {β} {γ} (box f) (box g) {t̃} = Qα.elimp _ r t̃
-  where
-  module Qα = SetoidQuotient (D̃ α)
-  r : (s : S₀ α)
-    → hom (box g ≤p.∘ box f) (D̃ α ⊢[ s ])
-    ≡ (hom (box g) SetCat.∘ hom (box f)) (D̃ α ⊢[ s ])
-  r s = 
-    hom (box g ≤p.∘ box f) (D̃ α ⊢[ s ])
-      ≡⟨ hom-beta (box (≤≤ g f)) s ⟩
-    D̃ γ ⊢[ dweaken₀ (≤≤ g f) s ]
-      ≡⟨ ≡.sym (hom-beta (box g) (dweaken₀ f s)) ⟩
-    hom (box g) (D̃ β ⊢[ dweaken₀ f s ])
-      ≡⟨ ≡.cong (hom (box g)) (≡.sym (hom-beta (box f) s)) ⟩
-    hom (box g) (hom (box f) (D̃ α ⊢[ s ])) ∎
+  module Qα = SQ (S̃ α)
+  q : ∀ t̃ → dweaken/ {α} ≤p.id t̃ ≡ SetCat.id {S̃ α /≈} t̃
+  q = Qα.elimp (λ t̃ → dweaken/ ≤p.id t̃ ≡ SetCat.id t̃)
+                (dweaken-beta ≤p.id)
+-- comp : ∀ {α β γ} (f : Box (α ≤ β)) (g : Box (β ≤ γ))
+--     → hom (g ≤p.∘ f) ≡h (hom g SetCat.∘ hom f)
+-- comp {α} {β} {γ} (box f) (box g) {t̃} = Qα.elimp _ r t̃
+--   where
+--   module Qα = SetoidQuotient (D̃ α)
+--   r : (s : S₀ α)
+--     → hom (box g ≤p.∘ box f) (D̃ α ⊢[ s ])
+--     ≡ (hom (box g) SetCat.∘ hom (box f)) (D̃ α ⊢[ s ])
+--   r s = 
+--     hom (box g ≤p.∘ box f) (D̃ α ⊢[ s ])
+--       ≡⟨ hom-beta (box (≤≤ g f)) s ⟩
+--     D̃ γ ⊢[ dweaken₀ (≤≤ g f) s ]
+--       ≡⟨ ≡.sym (hom-beta (box g) (dweaken₀ f s)) ⟩
+--     hom (box g) (D̃ β ⊢[ dweaken₀ f s ])
+--       ≡⟨ ≡.cong (hom (box g)) (≡.sym (hom-beta (box f) s)) ⟩
+--     hom (box g) (hom (box f) (D̃ α ⊢[ s ])) ∎
 
-open import QIT.Function.Base
-open import QIT.Set.Bijection
+-- open import QIT.Function.Base
+-- open import QIT.Set.Bijection
 
-isInjHom : ∀ {α β} (p : α ≤ β)
-        → ∀ {x y} → hom (box p) (D̃ α ⊢[ x ]) ≡ hom (box p) (D̃ α ⊢[ y ])
-        → _≡_ {A = D̃ α /≈} (D̃ α ⊢[ x ]) (D̃ α ⊢[ y ])
-isInjHom {α} {β} α≤β {x} {y} q =
-  Qα.≈[ Qβ.effectiveness _ _ q' ]
-  where
-  module Qα = SetoidQuotient (D̃ α)
-  module Qβ = SetoidQuotient (D̃ β)
+-- isInjHom : ∀ {α β} (p : α ≤ β)
+--         → ∀ {x y} → hom (box p) (D̃ α ⊢[ x ]) ≡ hom (box p) (D̃ α ⊢[ y ])
+--         → _≡_ {A = D̃ α /≈} (D̃ α ⊢[ x ]) (D̃ α ⊢[ y ])
+-- isInjHom {α} {β} α≤β {x} {y} q =
+--   Qα.≈[ Qβ.effectiveness _ _ q' ]
+--   where
+--   module Qα = SetoidQuotient (D̃ α)
+--   module Qβ = SetoidQuotient (D̃ β)
 
-  q' : Qβ.[ dweaken₀ α≤β x ] ≡ Qβ.[ dweaken₀ α≤β y ]
-  q' =
-    D̃ β ⊢[ dweaken₀ α≤β x ]
-      ≡⟨ ≡.sym (hom-beta (box α≤β) x) ⟩
-    hom (box α≤β) (D̃ α ⊢[ x ])
-      ≡⟨ q ⟩
-    hom (box α≤β) (D̃ α ⊢[ y ])
-      ≡⟨ hom-beta (box α≤β) y ⟩
-    D̃ β ⊢[ dweaken₀ α≤β y ] ∎
+--   q' : Qβ.[ dweaken₀ α≤β x ] ≡ Qβ.[ dweaken₀ α≤β y ]
+--   q' =
+--     D̃ β ⊢[ dweaken₀ α≤β x ]
+--       ≡⟨ ≡.sym (hom-beta (box α≤β) x) ⟩
+--     hom (box α≤β) (D̃ α ⊢[ x ])
+--       ≡⟨ q ⟩
+--     hom (box α≤β) (D̃ α ⊢[ y ])
+--       ≡⟨ hom-beta (box α≤β) y ⟩
+--     D̃ β ⊢[ dweaken₀ α≤β y ] ∎
 
-D/ : Diagram {!!} {!!}
-D/ = record
-  { ob = S̃/
-  ; hom = λ {x} {y} p → {!dweaken-cong!}
-  ; id = {!!}
-  ; comp = {!!}
-  ; resp = {!!} }
+-- D/ : Diagram {!!} {!!}
+-- D/ = record
+--   { ob = S̃/
+--   ; hom = λ {x} {y} p → {!dweaken-cong!}
+--   ; id = {!!}
+--   ; comp = {!!}
+--   ; resp = {!!} }
 
--- D̃/≈ : Z → Set (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV ⊔ ℓA)
--- D̃/≈ α = D̃ α /≈
+-- -- D̃/≈ : Z → Set (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV ⊔ ℓA)
+-- -- D̃/≈ α = D̃ α /≈
 
--- -- Morphisms are weakening maps preserving equivalence
--- hom : ∀ {α β} → Box (α ≤ β) → ≈.Hom (D̃ α) (D̃ β)
--- hom {α} {β} (box α≤β) = record
---   { to = dweaken₀ α≤β
---   ; cong = λ z → z }
+-- -- -- Morphisms are weakening maps preserving equivalence
+-- -- hom : ∀ {α β} → Box (α ≤ β) → ≈.Hom (D̃ α) (D̃ β)
+-- -- hom {α} {β} (box α≤β) = record
+-- --   { to = dweaken₀ α≤β
+-- --   ; cong = λ z → z }
 
--- -- TODO: These are now trivial.
--- subst-S₀-fst : ∀ {γ δ} (p : γ ≡ δ) (û : S₀ γ) → D-fst (subst S₀ p û) ≡ D-fst û
--- subst-S₀-fst ≡.refl û = ≡.refl
+-- -- -- TODO: These are now trivial.
+-- -- subst-S₀-fst : ∀ {γ δ} (p : γ ≡ δ) (û : S₀ γ) → D-fst (subst S₀ p û) ≡ D-fst û
+-- -- subst-S₀-fst ≡.refl û = ≡.refl
 
--- -- The complete diagram: stages connected by weakening morphisms.
--- -- This forms a cocone over the plump ordinal preorder, and the colimit
--- -- will give us the final quotient inductive type.
--- D≈ : Diagram≈ (ℓA ⊔ ℓS ⊔ ℓP) (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV)
--- D≈ = record
---   { ob = D̃
---   ; hom = hom
---   ; id = ≈trefl
---   ; comp = λ _ _ → ≈trefl
---   ; resp = λ _ → ≈trefl }
-
-
--- -- D : Diagram/≈ (ℓA ⊔ ℓS ⊔ ℓP) (ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV)
--- -- D = record
--- --   { ob = λ α → D̃ α /≈
+-- -- -- The complete diagram: stages connected by weakening morphisms.
+-- -- -- This forms a cocone over the plump ordinal preorder, and the colimit
+-- -- -- will give us the final quotient inductive type.
+-- -- D≈ : Diagram≈ (ℓA ⊔ ℓS ⊔ ℓP) (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV)
+-- -- D≈ = record
+-- --   { ob = D̃
 -- --   ; hom = hom
--- --   ; id = id
--- --   ; comp = comp
--- --   ; resp = λ _ → ≡.refl }
--- --   module D/≈ where
--- --   module ≤p = Category (PreorderCat Z ≤p)
--- --   module SetoidCat = Category (SetoidCat (ℓA ⊔ ℓS ⊔ ℓP) (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV))
--- --   module SetCat = Category (SetCat (ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV))
--- --   open ≡.≡-Reasoning
+-- --   ; id = ≈trefl
+-- --   ; comp = λ _ _ → ≈trefl
+-- --   ; resp = λ _ → ≈trefl }
+
+
+-- -- -- D : Diagram/≈ (ℓA ⊔ ℓS ⊔ ℓP) (ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV)
+-- -- -- D = record
+-- -- --   { ob = λ α → D̃ α /≈
+-- -- --   ; hom = hom
+-- -- --   ; id = id
+-- -- --   ; comp = comp
+-- -- --   ; resp = λ _ → ≡.refl }
+-- -- --   module D/≈ where
+-- -- --   module ≤p = Category (PreorderCat Z ≤p)
+-- -- --   module SetoidCat = Category (SetoidCat (ℓA ⊔ ℓS ⊔ ℓP) (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV))
+-- -- --   module SetCat = Category (SetCat (ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV))
+-- -- --   open ≡.≡-Reasoning
 
