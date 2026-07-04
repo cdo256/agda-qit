@@ -3,6 +3,7 @@ open import QIT.Logic
 open import QIT.QW.Signature
 open import QIT.Plump.Algebra
 import QIT.Plump.Properties
+open import QIT.Prop
 
 module QIT.QW.Plump
   ⦃ pathElim* : PathElim ⦄
@@ -11,6 +12,8 @@ module QIT.QW.Plump
   {ℓS ℓP ℓE ℓV}
   (sig : Sig ℓS ℓP ℓE ℓV)
   where
+
+open FunExt funExt*
 
 record ExtensionalPlumpOrdinals ℓA
   : Set (lsuc ℓS ⊔ lsuc ℓP ⊔ lsuc ℓA)
@@ -26,6 +29,7 @@ record ExtensionalPlumpOrdinals ℓA
 
   open IsExtensional isExtensionalZᴬ public
   import QIT.Plump.W S P as Z₀
+  module Z₀Prop = QIT.Plump.Properties Z₀.Zᴬ
   import QIT.Container.Base as W
   [_]ᶻ : Z₀.Z → Z
   [ W.sup (Z₀.⊥ₛ , f) ]ᶻ = ⊥ᶻ
@@ -34,6 +38,10 @@ record ExtensionalPlumpOrdinals ℓA
     ∨ᶻ [ f (inj₂ tt*) ]ᶻ
   [ W.sup (Z₀.ιₛ s , f) ]ᶻ =
     sup (s , λ i → [ f i ]ᶻ)
+  ιᶻ-factors : ∀ x → [ Z₀Prop.ιᶻ x ]ᶻ ≡ ιᶻ x
+  ιᶻ-factors (W.sup (s , f)) =
+    ≡.cong (λ ○ → sup (s , ○))
+           (funExt λ i → ιᶻ-factors (f i))
   ≤[_]ᶻ : ∀ {α β : Z₀.Z}
         → α Z₀.≤ β → [ α ]ᶻ ≤ [ β ]ᶻ
   <[_]ᶻ : ∀ {α β : Z₀.Z}
@@ -50,3 +58,17 @@ record ExtensionalPlumpOrdinals ℓA
     ∨ᶻ≤ <[ ξ<β (inj₁ tt*) ]ᶻ <[ ξ<β (inj₂ tt*) ]ᶻ
   ≤[_]ᶻ {W.sup (Z₀.ιₛ s , ξ)} {β} (Z₀.sup≤ ξ<β) =
     sup≤ (λ i → <[ ξ<β i ]ᶻ)
+
+  ιᶻ≤ιᶻ : ∀ x y
+    → Z₀Prop.ιᶻ x Z₀.≤ Z₀Prop.ιᶻ y 
+    → ιᶻ x ≤ ιᶻ y
+  ιᶻ≤ιᶻ x y p =
+    ≡.substp₂ _≤_
+      (ιᶻ-factors x)
+      (ιᶻ-factors y)
+      ≤[ p ]ᶻ
+
+  ιᶻ≤≥ιᶻ : ∀ x y
+    → Z₀Prop.ιᶻ x Z₀.≤≥ Z₀Prop.ιᶻ y 
+    → ιᶻ x ≤ ιᶻ y ∧ ιᶻ y ≤ ιᶻ x
+  ιᶻ≤≥ιᶻ x y (∧i p , q) = ∧i ιᶻ≤ιᶻ x y p , ιᶻ≤ιᶻ y x q
