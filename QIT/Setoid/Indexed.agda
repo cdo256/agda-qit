@@ -52,6 +52,7 @@ module _ {ℓI ℓA ℓR} (S : Setoid ℓI ℓA ℓR) where
 
 module _ where
   import QIT.Setoid.Base as Unindexed
+  import QIT.Setoid.Quotient as UQ
 
   -- Convert a regular setoid to an indexed setoid with trivial indexing.
   -- Uses the unit type ⊤ as the index set, so there's only one index.
@@ -78,7 +79,7 @@ module _ where
   -- Convert an indexed setoid (at level ℓ0) to a regular setoid.
   -- Takes the dependent sum Σ I A as the carrier, and defines equality
   -- on pairs (i, x) and (j, y) using the indexed relation R i j x y.
-  IndexedSetoid→UnindexedSetoid : ∀ {ℓA ℓR} → Setoid ℓ0 ℓA ℓR → Unindexed.Setoid ℓA ℓR
+  IndexedSetoid→UnindexedSetoid : ∀ {ℓI ℓA ℓR} → Setoid ℓI ℓA ℓR → Unindexed.Setoid (ℓI ⊔ ℓA) ℓR
   IndexedSetoid→UnindexedSetoid S = record
     { Carrier = Σ S.I S.A
     ; _≈_ = λ (i , x) (j , y) → S.R i j x y
@@ -87,3 +88,5 @@ module _ where
       ; sym = S.sym
       ; trans = S.trans } }
     where module S = Setoid S
+
+
