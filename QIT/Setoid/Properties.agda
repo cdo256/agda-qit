@@ -5,7 +5,7 @@ open import QIT.Relation.Binary
 open import QIT.Setoid.Base
 import QIT.Setoid.Indexed as Ix
 
-module QIT.Setoid.Properties ⦃ a!c* : A!C ⦄ where
+module QIT.Setoid.Properties ⦃ pathElim* : PathElim ⦄ where
 
 module _ {ℓS ℓS'} (S : Setoid ℓS ℓS') where
   private
@@ -28,4 +28,9 @@ module _ {ℓI ℓS ℓS'} (S : Ix.Setoid ℓI ℓS ℓS') where
 
     transport≈ : ∀ {a b} (p : a ≡ b) {x y : A a}
       → S Ix.[ x ≈ y ] → S Ix.[ subst A p x ≈ subst A p y ]
-    transport≈ ≡.refl p = p
+    transport≈ ≡.refl p =
+      ≡.substp₂
+        (S Ix.[_≈_])
+        (≡.sym (subst-refl _))
+        (≡.sym (subst-refl _))
+        p
