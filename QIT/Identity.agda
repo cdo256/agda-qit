@@ -64,6 +64,11 @@ subst-refl : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB}
           → subst B refl b ≡ b
 subst-refl {B = B} b = J-refl (λ x _ → B x) b
 
+subst-irrel : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB}
+          → {x y : A} (p q : x ≡ y) (b : B x)
+          → subst B p b ≡ subst B q b
+subst-irrel {B = B} refl refl b = refl
+
 subst-const : ∀ {ℓA ℓB} {A : Set ℓA} (B : Set ℓB)
             → ∀ {x y : A} (z : B) (p : x ≡ y)
             → subst (λ _ → B) p z ≡ z

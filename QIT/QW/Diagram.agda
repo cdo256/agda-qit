@@ -122,9 +122,6 @@ hom≈ {α} {β} (box α≤β) = record
   { to = dweaken₀ α≤β
   ; cong = λ z → z }
 
-subst-S₀-fst : ∀ {γ δ} (p : γ ≡ δ) (û : S₀ γ) → ⟨ subst S₀ p û ⟩ᴾ ≡ ⟨ û ⟩ᴾ
-subst-S₀-fst {γ} ≡.refl û = ≡.cong ⟨_⟩ᴾ (subst-refl {B = S₀} û)
-
 -- Container functor
 open import QIT.Container.Base
 open import QIT.Container.StrictFunctor S P (ℓD ⊔ ℓD')

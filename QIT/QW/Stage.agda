@@ -32,6 +32,7 @@ open import QIT.Algebra.Lift S P ℓV
 open import QIT.QW.Equation S P ℓV
 open import QIT.QW.W S P
 open import QIT.Setoid
+import QIT.Setoid.Indexed as Ix
 
 open ≈.SQ
 
@@ -97,6 +98,15 @@ data _≈ᵗ_ : T → T → Prop (ℓS ⊔ ℓP ⊔ ℓV ⊔ ℓE) where
   ≈tsym : ∀ {s t} → s ≈ᵗ t → t ≈ᵗ s
   ≈ttrans : ∀ {s t u} → s ≈ᵗ t → t ≈ᵗ u → s ≈ᵗ u
 
+T̃ : Setoid (ℓS ⊔ ℓP) (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV)
+T̃ = record
+  { Carrier = T
+  ; _≈_ = _≈ᵗ_
+  ; isEquivalence = record
+    { refl = ≈trefl
+    ; sym = ≈tsym
+    ; trans = ≈ttrans } }
+
 _≈ˢ_ : {α β : Z} → S₀ α → S₀ β → Prop (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV)
 (s , _) ≈ˢ (t , _) = s ≈ᵗ t
 
@@ -133,6 +143,21 @@ S̃ α = record
     ; sym = ≈tsym
     ; trans = ≈ttrans } }
 
+S̃ᶜ : Ix.Setoid ℓZ (ℓS ⊔ ℓP ⊔ ℓ≤) (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV)
+S̃ᶜ = record
+  { I = Z
+  ; A = S₀
+  ; R = λ _ _ ŝ t̂ → ŝ ≈ˢ t̂
+  ; isEquivalence = record
+    { refl = ≈trefl
+    ; sym = ≈tsym
+    ; trans = ≈ttrans } }
+
+open import QIT.Setoid.IndexedQuotient
+
+S̃ᶜ/ : Set (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV ⊔ ℓZ ⊔ ℓ≤)
+S̃ᶜ/ = S̃ᶜ /≈ᴵ
+
 S̃/ : Z → Set (ℓ≤ ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV)
 S̃/ α = S̃ α /≈
 
@@ -151,3 +176,19 @@ dweaken/ {α} {β} p = rec (S̃ α) (λ s → S̃ β ⊢[ dweaken₀ p s ]) (S̃
 
 dweaken-beta : ∀ {α β} → (p : α ≤ β) → (s : S₀ α) → dweaken/ p (S̃ α ⊢[ s ]) ≡ (S̃ β ⊢[ dweaken₀ p s ])
 dweaken-beta {α} {β} p s = rec-beta (S̃ α) (λ s → S̃ β ⊢[ dweaken₀ p s ]) (S̃ β ⊢≈[_]) s
+
+subst-S₀-fst : ∀ {γ δ} (p : γ ≡ δ) (û : S₀ γ) → ⟨ subst S₀ p û ⟩ᴾ ≡ ⟨ û ⟩ᴾ
+subst-S₀-fst {γ} ≡.refl û = ≡.cong ⟨_⟩ᴾ (subst-refl {B = S₀} û)
+
+subst-quot-S
+  : ∀ {α β} → (p : α ≡ β) (x : S₀ α)
+  → S̃ β ⊢[ subst S₀ p x ]
+  ≡ subst S̃/ p (S̃ α ⊢[ x ])
+subst-quot-S {α} {α} ≡.refl x =
+  S̃ α ⊢[ subst S₀ ≡.refl x ]
+    ≡⟨ ≡.cong (S̃ α ⊢[_]) (subst-refl x) ⟩
+  S̃ α ⊢[ x ]
+    ≡⟨ ≡.sym (subst-refl (S̃ α ⊢[ x ])) ⟩
+  subst S̃/ ≡.refl (S̃ α ⊢[ x ]) ∎
+  where
+  open ≡.≡-Reasoning

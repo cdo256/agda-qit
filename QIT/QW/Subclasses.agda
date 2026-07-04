@@ -45,7 +45,7 @@ module _ where
     : Prop (ℓE ⊔ ℓS ⊔ ℓP ⊔ ℓV) where
     open Equation
     field
-      dp : (e : E) (ρ : Ξ e .V  → T)
+      dpe : (e : E) (ρ : Ξ e .V  → T)
          →  ιᶻ (assignT ρ (Ξ e .lhs))
          ≤≥ ιᶻ (assignT ρ (Ξ e .rhs))
 
