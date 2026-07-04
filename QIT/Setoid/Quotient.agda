@@ -1,7 +1,7 @@
 open import QIT.Prelude
 open import QIT.Identity as ≡ hiding (refl; sym; trans; cong)
 open import QIT.Logic
-open import QIT.Setoid.Base renaming (_[_≈_] to _⟦_≈_⟧)
+open import QIT.Setoid.Base
 open import QIT.Relation.Binary using (IsEquivalence)
 open import QIT.Relation.SetQuotient
 
@@ -201,12 +201,35 @@ module SQ {ℓA ℓR} (Ã : Setoid ℓA ℓR) where
           p a' [ b ] ∎
           where open ≡.≡-Reasoning
 
-  map : ∀ {ℓB ℓS} (B̃ : Setoid ℓB ℓS) (f₀ : ⟨ Ã ⟩ → ⟨ B̃ ⟩) (f-cong : ∀ {x y : ⟨ Ã ⟩} → x ≈ y → B̃ ⟦ f₀ x ≈ f₀ y ⟧) → Ã /≈ → B̃ /≈
-  map B̃ f₀ f-cong = rec (λ x → Q.[ f₀ x ]) λ {x} {y} p → Q.quot-rel (f₀ x) (f₀ y) (f-cong p)
-    where
-    module B = Setoid B̃
 
 open SQ using () renaming ([_] to _⊢[_]; ≈[_] to _⊢≈[_]) public
+
+map : ∀ {ℓA ℓR ℓB ℓS}
+    → (Ã : Setoid ℓA ℓR)
+    → (B̃ : Setoid ℓB ℓS)
+    → (f₀ : ⟨ Ã ⟩ → ⟨ B̃ ⟩)
+    → (f-cong : ∀ {x y : ⟨ Ã ⟩} → Ã [ x ≈ y ] → B̃ [ f₀ x ≈ f₀ y ])
+    → Ã /≈ → B̃ /≈
+map Ã B̃ f₀ f-cong =
+  SQ.rec Ã (λ x → B̃ ⊢[ f₀ x ])
+           (λ p → B̃ ⊢≈[ f-cong p ])
+  where
+  module B = Setoid B̃
+
+map-beta
+  : ∀ {ℓA ℓR ℓB ℓS}
+  → (Ã : Setoid ℓA ℓR)
+  → (B̃ : Setoid ℓB ℓS)
+  → (f₀ : ⟨ Ã ⟩ → ⟨ B̃ ⟩)
+  → (f-cong : ∀ {x y : ⟨ Ã ⟩} → Ã [ x ≈ y ] → B̃ [ f₀ x ≈ f₀ y ])
+  → (a : ⟨ Ã ⟩)
+  → map Ã B̃ f₀ f-cong (Ã ⊢[ a ]) ≡ B̃ ⊢[ f₀ a ]
+map-beta Ã B̃ f₀ f-cong a =
+      SQ.rec-beta Ã (λ x → B̃ ⊢[ f₀ x ])
+                    (λ p → B̃ ⊢≈[ f-cong p ]) a
+  where
+  module B = Setoid B̃
+
 
 record QuotRelWitness {ℓA ℓA≈ ℓB ℓB≈ ℓR} (A : Setoid ℓA ℓA≈) (B : Setoid ℓB ℓB≈)
         (R : ⟨ A ⟩ → ⟨ B ⟩ → Prop ℓR)
