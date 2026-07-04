@@ -79,5 +79,5 @@ module QIT.Colimit.Base
     ; isEquivalence = equiv
     }
 
-  Colim/≈ : Set (ℓI ⊔ ℓD ⊔ ℓD' ⊔ ℓ≤)
-  Colim/≈ = Colim /≈
+  Colim/ : Set (ℓI ⊔ ℓD ⊔ ℓD' ⊔ ℓ≤)
+  Colim/ = Colim /≈

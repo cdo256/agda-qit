@@ -21,5 +21,5 @@ record Equivalence {ℓCo ℓCh ℓCe ℓDo ℓDh ℓDe}
   field
     F : Functor C D
     G : Functor D C
-    η : NatIso Id (G ∘ F)
-    ε : NatIso (F ∘ G) Id
+    η : NatIso Id (G ∘ꟳ F)
+    ε : NatIso (F ∘ꟳ G) Id

@@ -20,13 +20,13 @@ Id {C = C} = record
 -- Functor composition with diagrams: F ∘ P applies functor F to diagram P.
 -- If P : I → Setoid and F : Setoid → Setoid, then F ∘ P : I → Setoid.
 -- This lets us transform entire diagrams by applying functors pointwise.
-_∘_ : ∀ {ℓAo ℓAh ℓAe ℓBo ℓBh ℓBe ℓCo ℓCh ℓCe}
+_∘ꟳ_ : ∀ {ℓAo ℓAh ℓAe ℓBo ℓBh ℓBe ℓCo ℓCh ℓCe}
      → {A : Category ℓAo ℓAh ℓAe}
      → {B : Category ℓBo ℓBh ℓBe}
      → {C : Category ℓCo ℓCh ℓCe}
      → (G : Functor B C) (F : Functor A B)
      → Functor A C
-_∘_ {A = A} {B} {C} G F = record
+_∘ꟳ_ {A = A} {B} {C} G F = record
   { ob = λ x → G.ob (F.ob x)
   ; hom = λ f → G.hom (F.hom f)
   ; id = id
@@ -63,4 +63,4 @@ restrict-domain : ∀ {ℓAo ℓAh ℓAe ℓBo ℓBh ℓBe ℓCo ℓCh ℓCe}
      → {B : Category ℓBo ℓBh ℓBe}
      → {C : Category ℓCo ℓCh ℓCe}
      → Functor A B → Functor B C → Functor A C
-restrict-domain i F = F ∘ i
+restrict-domain i F = F ∘ꟳ i
