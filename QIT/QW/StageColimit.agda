@@ -38,7 +38,7 @@ open import QIT.Container.StrictFunctor S P (ℓD ⊔ ℓD')
 open import QIT.Setoid.Quotient using (_/≈)
 
 -- Colimits and cocontinuity
-open import QIT.QW.Colimit Z.≤p ℓD ℓD' hiding (_≈ˡ_)
+open import QIT.Colimit Z.≤p ℓD ℓD' hiding (_≈ˡ_)
 
 -- Module aliases for cleaner notation
 module F = Functor F

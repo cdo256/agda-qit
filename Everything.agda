@@ -76,6 +76,7 @@ import QIT.Category.FamilyOfSetoids
 import QIT.Functor.Base
 import QIT.Functor.Properties
 import QIT.Functor.NatTrans
+import QIT.Colimit
 
 -- QW type definition
 import QIT.QW.W
@@ -86,7 +87,6 @@ import QIT.QW.Subclasses
 import QIT.QW.Algebra
 import QIT.QW.Stage
 import QIT.QW.StageColimit
-import QIT.QW.Colimit
 import QIT.QW.Locality
 import QIT.QW.Cocontinuity
 import QIT.QW

@@ -193,7 +193,7 @@ colimit: the categorical construction that glues together all the finite
 stages into the final infinite object:
 
 ```agda
-open import QIT.QW.Colimit
+open import QIT.Colimit
 ```
 
 We need to prove that our QIT constructors have the right universal

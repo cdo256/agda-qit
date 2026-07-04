@@ -9,7 +9,7 @@ open import QIT.Category.Preorder
 open import QIT.Category.Set
 open import QIT.Relation.SetQuotient
 
-module QIT.QW.Colimit
+module QIT.Colimit
   ⦃ pathElim* : PathElim ⦄
   ⦃ a!c* : A!C ⦄
   ⦃ fe* : FunExt ⦄
@@ -22,4 +22,4 @@ module QIT.QW.Colimit
   (P : Functor (PreorderCat I ≤p) (SetCat (ℓD ⊔ ℓD')))
   where
 
-open import QIT.QW.Colimit.Properties ≤p ℓD ℓD' P public
+open import QIT.Colimit.Properties ≤p ℓD ℓD' P public

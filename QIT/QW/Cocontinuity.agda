@@ -55,7 +55,7 @@ module WithZ {ℓA} (ZA : ZAlg.Algebra ℓA) where
   open ZW using (ιₛ)
   open import QIT.QW.Algebra sig
   open StageColimit public
-  open import QIT.QW.Colimit ≤p ℓD ℓD' hiding (_≈ˡ_)
+  open import QIT.Colimit ≤p ℓD ℓD' hiding (_≈ˡ_)
 
   private
     ℓc = ℓA ⊔ ℓS ⊔ ℓP

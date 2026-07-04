@@ -11,7 +11,7 @@ open import QIT.Category.Preorder
 open import QIT.Category.Set
 open import QIT.Relation.SetQuotient
 
-module QIT.QW.Colimit.Properties
+module QIT.Colimit.Properties
   ⦃ pathElim* : PathElim ⦄
   ⦃ a!c* : A!C ⦄
   ⦃ funExt* : FunExt ⦄
@@ -34,7 +34,7 @@ private
   _≤_ : BinaryRel I ℓ≤
   _≤_ = ≤p .proj₁
 
-open import QIT.QW.Colimit.Base ≤p ℓD ℓD' P public
+open import QIT.Colimit.Base ≤p ℓD ℓD' P public
 
 open Functor P using () renaming (ob to P̂)
 module ≤p = QIT.Category.Preorder I ≤p
@@ -43,7 +43,7 @@ RestrictDiagram : (α : I) → Functor (≤p.PreorderCat↓ α) (SetCat (ℓD �
 RestrictDiagram α = restrict-domain (≤p.include≤ α) P
 
 module Bounded (α : I) where
-  open import QIT.QW.Colimit.Base (≤p.Restrict≤ α) ℓD ℓD' (RestrictDiagram α) public
+  open import QIT.Colimit.Base (≤p.Restrict≤ α) ℓD ℓD' (RestrictDiagram α) public
     using ()
     renaming
       ( Colim₀ to Colim≤₀
@@ -51,7 +51,7 @@ module Bounded (α : I) where
       ; recˡ to recˡ≤
       ; ≈lrefl to ≈lrefl≤
       ; Colim to Colim≤~
-      ; Colim/≈ to Colim≤
+      ; Colim/ to Colim≤
       ; ≈lstage to ≈l≤stage
       ; ≈lstep to ≈l≤step
       ; ≈lsym to ≈l≤sym

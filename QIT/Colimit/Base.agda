@@ -9,7 +9,7 @@ open import QIT.Category.Preorder
 open import QIT.Category.Set
 open import QIT.Relation.SetQuotient
 
-module QIT.QW.Colimit.Base
+module QIT.Colimit.Base
   ⦃ pathElim* : PathElim ⦄
   ⦃ a!c* : A!C ⦄
   ⦃ fe* : FunExt ⦄
