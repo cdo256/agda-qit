@@ -12,19 +12,12 @@ module QIT.QW.Subclasses
 
 open Sig sig
 
-open import QIT.Plump.Algebra S P
 open import QIT.Container.StrictFunctor S P (ℓS ⊔ ℓP ⊔ ℓV)
 open import QIT.Algebra.Base F
 open import QIT.Algebra.Lift S P
 
-open import QIT.Nat
-open import QIT.Relation.Subset
-open import QIT.Container.Base
-open import QIT.Container.Properties
-open import QIT.Setoid
 open import QIT.QW.W S P
 open import QIT.QW.Equation S P ℓV
-open import QIT.Functor.Base
 open import QIT.Plump.W S P using (Zᴬ; _≤≥_)
 open import QIT.Plump.Properties Zᴬ as Z
 
