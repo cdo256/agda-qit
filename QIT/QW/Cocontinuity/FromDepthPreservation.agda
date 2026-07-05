@@ -68,11 +68,6 @@ dpᵗ s t (≈ttrans p q) = ≡.trans (dpᵗ s _ p) (dpᵗ _ t q)
 dp : ∀ {α β} (ŝ : S₀ α) (t̂ : S₀ β) → ŝ ≈ˢ t̂ → ιᶻ (ŝ .fst) ≡ ιᶻ (t̂ .fst)
 dp (s , _) (t , _) p = dpᵗ s t p
 
-Σ-proj₂ : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB}
-  {x y : Σ A B} (e : x ≡ y)
-  → subst B (≡.cong proj₁ e) (x .proj₂) ≡ y .proj₂
-Σ-proj₂ ≡.refl = subst-refl _
-
 module Rank where
   rank₀ : ∀ {α} → S₀ α → Z
   rank₀ (t , _) = ιᶻ t
