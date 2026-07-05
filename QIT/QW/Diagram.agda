@@ -17,7 +17,7 @@ module QIT.QW.Diagram
   ⦃ sq* : SetQuotients ⦄
   {ℓS ℓP ℓE ℓV}
   (sig : Sig ℓS ℓP ℓE ℓV)
-  {ℓZ ℓ< ℓ≤} (Zᴬ : PlumpAlgebra (sig .Sig.S) (sig .Sig.P) ℓZ ℓ< ℓ≤)
+  (Zᴬ : PlumpAlgebra (sig .Sig.S) (sig .Sig.P))
   where
 open Sig sig
 open FunExt funExt*
@@ -40,7 +40,7 @@ open SQ
 open import QIT.Functor.Diagram ≤p
 
 private
-  ℓD = ℓ≤ ⊔ ℓS ⊔ ℓP
+  ℓD = ℓS ⊔ ℓP
   ℓD' = ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV
 
 open Box

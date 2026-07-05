@@ -9,8 +9,8 @@ open import QIT.Plump.Algebra
 
 module QIT.Plump.Properties
   ⦃ pathElim* : PathElim ⦄
-  {ℓS ℓP ℓZ ℓ< ℓ≤} {S : Set ℓS} {P : S → Set ℓP}
-  (Zᴬ : PlumpAlgebra S P ℓZ ℓ< ℓ≤)
+  {ℓS ℓP} {S : Set ℓS} {P : S → Set ℓP}
+  (Zᴬ : PlumpAlgebra S P)
   where
 
 open PlumpAlgebra Zᴬ public
@@ -95,6 +95,6 @@ inc↓ p γ = γ .fst , ≤≤ p (γ .snd)
 open import QIT.Category.Preorder Z ≤p
 open import QIT.Category.Equivalence
 
-record IsRegular (κ : Z) : Prop (ℓZ ⊔ ℓ< ⊔ ℓ≤) where
+record IsRegular (κ : Z) : Prop (ℓS ⊔ ℓP) where
   field
     regular : ∀ α → α < κ → Equivalence (PreorderCat↓ α) (PreorderCat↓ κ) → ⊥

@@ -17,8 +17,9 @@ module QIT.QW.Stage
   ⦃ sq* : SetQuotients ⦄
   {ℓS ℓP ℓE ℓV}
   (sig : Sig ℓS ℓP ℓE ℓV)
-  {ℓZ ℓ< ℓ≤} (Zᴬ : PlumpAlgebra (sig .Sig.S) (sig .Sig.P) ℓZ ℓ< ℓ≤)
+  (Zᴬ : PlumpAlgebra (sig .Sig.S) (sig .Sig.P))
   where
+
 open Sig sig
 open FunExt funExt*
 
@@ -38,7 +39,7 @@ open ≈.SQ
 
 -- Stage α: elements of the underlying W-type bounded by ordinal α.
 -- This gives us size-bounded approximations to the final quotient.
-S₀ : (α : Z) → Set (ℓ≤ ⊔ ℓS ⊔ ℓP)
+S₀ : (α : Z) → Set (ℓS ⊔ ℓP)
 S₀ α = ΣP T (_≤ᵀ α)
 
 -- Constructor for stage elements: build a tree with given shape and children.
@@ -59,7 +60,7 @@ dweaken₀ α≤β (t , t≤α) = t , ≤≤ α≤β t≤α
 ιᵉ (supᴱ s f) = Z.sup (s , λ i → ιᵉ (f i))
 
 -- Expression-ordinal comparison: when an expression fits within a stage.
-_≤ᴱ_ : {V : Set ℓV} → Expr V → Z → Prop ℓ≤
+_≤ᴱ_ : {V : Set ℓV} → Expr V → Z → Prop (ℓS ⊔ ℓP)
 t ≤ᴱ α = ιᵉ t ≤ α
 
 -- Interpretation of equation sides as W-type elements.
@@ -134,7 +135,7 @@ _ ⊢ ŝ ≈ᵇ t̂ = ŝ ≈ˢ t̂
 ≈strans : ∀ {α ŝ t̂ û} → α ⊢ ŝ ≈ᵇ t̂ → α ⊢ t̂ ≈ᵇ û → α ⊢ ŝ ≈ᵇ û
 ≈strans = ≈ttrans
 
-S̃ : Z → Setoid (ℓS ⊔ ℓP ⊔ ℓ≤) (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV)
+S̃ : Z → Setoid (ℓS ⊔ ℓP) (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV)
 S̃ α = record
   { Carrier = S₀ α
   ; _≈_ = λ ŝ t̂ → ŝ ≈ˢ t̂
@@ -143,7 +144,7 @@ S̃ α = record
     ; sym = ≈tsym
     ; trans = ≈ttrans } }
 
-S̃ᶜ : Ix.Setoid ℓZ (ℓS ⊔ ℓP ⊔ ℓ≤) (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV)
+S̃ᶜ : Ix.Setoid (ℓS ⊔ ℓP) (ℓS ⊔ ℓP) (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV)
 S̃ᶜ = record
   { I = Z
   ; A = S₀
@@ -155,10 +156,10 @@ S̃ᶜ = record
 
 open import QIT.Setoid.IndexedQuotient
 
-S̃ᶜ/ : Set (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV ⊔ ℓZ ⊔ ℓ≤)
+S̃ᶜ/ : Set (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV)
 S̃ᶜ/ = S̃ᶜ /≈ᴵ
 
-S̃/ : Z → Set (ℓ≤ ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV)
+S̃/ : Z → Set (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV)
 S̃/ α = S̃ α /≈
 
 -- Weakening: equivalences persist across stage inclusions

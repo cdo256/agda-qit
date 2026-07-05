@@ -6,11 +6,11 @@ open import QIT.Relation.Subset
 
 module QIT.Plump.Algebra
   ⦃ pathElim* : PathElim ⦄       
-  {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP) ℓZ ℓ< ℓ≤
   where
 
 record PlumpAlgebra
-  : Set (lsuc ℓZ ⊔ lsuc ℓ< ⊔ lsuc ℓ≤ ⊔ lsuc ℓS ⊔ lsuc ℓP) where
+  {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP)
+  : Set (lsuc ℓS ⊔ lsuc ℓP) where
 
   infix 4 _≤_ _<_
   infixl 10 _∨ᶻ_
@@ -19,10 +19,10 @@ record PlumpAlgebra
     T = W.W S P
 
   field
-    Z : Set ℓZ
+    Z : Set (ℓS ⊔ ℓP)
     sup : Σ S (λ s → P s → Z) → Z
-    _<_ : Z → Z → Prop ℓ<
-    _≤_ : Z → Z → Prop ℓ≤
+    _<_ : Z → Z → Prop (ℓS ⊔ ℓP)
+    _≤_ : Z → Z → Prop (ℓS ⊔ ℓP)
 
     sup≤ : {s : S} {f : P s → Z} {α : Z}
           → (∀ i → f i < α)
@@ -51,6 +51,6 @@ record PlumpAlgebra
 
     -- iswf< : WellFounded _<_
 
-  record IsExtensional : Prop (ℓZ ⊔ ℓ≤) where
+  record IsExtensional : Prop (ℓS ⊔ ℓP) where
     field
       antisym : ∀ {α β} → α ≤ β → β ≤ α → α ≡ β

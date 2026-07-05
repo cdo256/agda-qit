@@ -15,12 +15,12 @@ module QIT.QW.Plump
 
 open FunExt funExt*
 
-record ExtensionalPlumpOrdinals ℓA
-  : Set (lsuc ℓS ⊔ lsuc ℓP ⊔ lsuc ℓA)
+record ExtensionalPlumpOrdinals
+  : Set (lsuc ℓS ⊔ lsuc ℓP)
   where
   open Sig sig
   field
-    Zᴬ : PlumpAlgebra S P ℓA ℓA ℓA
+    Zᴬ : PlumpAlgebra S P
 
   open QIT.Plump.Properties Zᴬ
 

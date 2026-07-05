@@ -26,14 +26,13 @@ module QIT.QW.Cocontinuity.FromDepthPreservation
   ⦃ sq* : SetQuotients ⦄
   {ℓS ℓP ℓE ℓV}
   (sig : Sig ℓS ℓP ℓE ℓV)
-  (ℓA : Level)
   ⦃ depthPreserving* : DepthPreservingSig sig ⦄
-  ⦃ extensionalPlumpOrdinals* : ExtensionalPlumpOrdinals sig ℓA ⦄
+  ⦃ extensionalPlumpOrdinals* : ExtensionalPlumpOrdinals sig ⦄
   where
 
 private
-  ℓD = ℓA ⊔ ℓS ⊔ ℓP
-  ℓD' = ℓA ⊔ ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV
+  ℓD = ℓS ⊔ ℓP
+  ℓD' = ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV
 
 open Sig sig
 open FunExt funExt*

@@ -45,7 +45,7 @@ Pᶻ ⊥ₛ = Lift ℓP ⊥ˢ
 Pᶻ ∨ₛ = Lift ℓP ⊤ˢ ⊎ Lift ℓP ⊤ˢ
 Pᶻ (ιₛ s) = P s
 
-open import QIT.Plump.Algebra S P
+open import QIT.Plump.Algebra
 
 -- Plump ordinals Z are W-trees over the extended signature (Sᶻ, Pᶻ).
 -- Elements of Z are used as size bounds.
@@ -266,7 +266,7 @@ isQuasiExtensionalZ .∧e₂ (∧i α⊆β , β⊆α) = ∧i ⊆→≤ α⊆β ,
 supᶻ : Σ S (λ s → P s → Z) → Z 
 supᶻ (s , f) = sup (ιₛ s , f)
 
-Zᴬ : PlumpAlgebra _ _ _
+Zᴬ : PlumpAlgebra S P
 Zᴬ = record
   { Z = Z
   ; sup = supᶻ
