@@ -68,6 +68,11 @@ dpᵗ s t (≈ttrans p q) = ≡.trans (dpᵗ s _ p) (dpᵗ _ t q)
 dp : ∀ {α β} (ŝ : S₀ α) (t̂ : S₀ β) → ŝ ≈ˢ t̂ → ιᶻ (ŝ .fst) ≡ ιᶻ (t̂ .fst)
 dp (s , _) (t , _) p = dpᵗ s t p
 
+Σ-proj₂ : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB}
+  {x y : Σ A B} (e : x ≡ y)
+  → subst B (≡.cong proj₁ e) (x .proj₂) ≡ y .proj₂
+Σ-proj₂ ≡.refl = subst-refl _
+
 module Rank where
   rank₀ : ∀ {α} → S₀ α → Z
   rank₀ (t , _) = ιᶻ t
@@ -341,6 +346,45 @@ module LiftElement where
       where
       open ≡.≡-Reasoning
 
+  weaken-irrel : ∀ {α β} (p q : α ≤ β) (ŝ : S̃/ α) → dweaken/ p ŝ ≡ dweaken/ q ŝ
+  weaken-irrel {α} {β} p q = SQ.elimp (S̃ α) B u
+    where
+    B : S̃/ α → Prop _
+    B ŝ = dweaken/ p ŝ ≡ dweaken/ q ŝ
+
+    u : ∀ a → B (S̃ α ⊢[ a ])
+    u a =
+      dweaken/ p (S̃ α ⊢[ a ])
+        ≡⟨ dweaken-beta p a ⟩
+      S̃ β ⊢[ dweaken₀ p a ]
+        ≡⟨ S̃ β ⊢≈[ ≈trefl ] ⟩
+      S̃ β ⊢[ dweaken₀ q a ]
+        ≡⟨ ≡.sym (dweaken-beta q a) ⟩
+      dweaken/ q (S̃ α ⊢[ a ]) ∎
+      where
+      open ≡.≡-Reasoning
+
+  dweaken-cast : ∀ {α β γ} (r : α ≡ β)
+    → (p : α ≤ γ) (q : β ≤ γ) (ŝ : S̃/ α)
+    → dweaken/ p ŝ ≡ dweaken/ q (subst S̃/ r ŝ)
+  dweaken-cast ≡.refl p q ŝ =
+    ≡.trans (weaken-irrel p q ŝ)
+            (≡.cong (dweaken/ q) (≡.sym (subst-refl ŝ)))
+
+  weakenLiftC : ∀ {α β} (p : α ≤ β) (ŝ : S̃/ α)
+    → dweaken/ (≤≤ p (rank≤ ŝ)) (subst S̃/ (rankC-beta (α , ŝ)) (liftC₀ (α , ŝ)))
+    ≡ dweaken/ p ŝ
+  weakenLiftC {α} {β} p ŝ =
+    dweaken/ (≤≤ p (rank≤ ŝ)) (subst S̃/ (rankC-beta (α , ŝ)) (liftC₀ (α , ŝ)))
+      ≡⟨ ≡.cong (dweaken/ (≤≤ p (rank≤ ŝ))) (subst-inv S̃/ (≡.sym (rankC-beta (α , ŝ)))) ⟩
+    dweaken/ (≤≤ p (rank≤ ŝ)) (lift≈ ŝ)
+      ≡⟨ comp (box (rank≤ ŝ)) (box p) {x = lift≈ ŝ} ⟩
+    dweaken/ p (dweaken/ (rank≤ ŝ) (lift≈ ŝ))
+      ≡⟨ ≡.cong (dweaken/ p) (weakenLift ŝ) ⟩
+    dweaken/ p ŝ ∎
+    where
+    open ≡.≡-Reasoning
+
   isSectLiftC₀
     : ∀ (x : Colim₀ D̃/)
     → Colim D̃/ ⊢[ liftC (Colim D̃/ ⊢[ x ]) ]
@@ -384,6 +428,9 @@ module Cocontinuity where
   ϕ : Colim/ (F ∘ꟳ D̃/) → F.ob (Colim/ D̃/)
   ϕ = SQ.rec (Colim (F ∘ꟳ D̃/)) ϕ₀ ϕ-cong
 
+  ϕ-beta : (x : Colim₀ (F ∘ꟳ D̃/)) → ϕ (Colim (F ∘ꟳ D̃/) ⊢[ x ]) ≡ ϕ₀ x
+  ϕ-beta = SQ.rec-beta (Colim (F ∘ꟳ D̃/)) ϕ₀ ϕ-cong
+
   ψ : F.ob (Colim/ D̃/) → Colim/ (F ∘ꟳ D̃/)
   ψ (s , f̂) = Colim _ ⊢[ α , s , x̂ ]
     where
@@ -395,3 +442,95 @@ module Cocontinuity where
     α = Z.sup (s , μ)
     x̂ : P s → S̃/ α
     x̂ i = dweaken/ (child≤ s μ i) (ĝ i)
+
+  ϕψ : ∀ x → ϕ (ψ x) ≡ x
+  ϕψ x@(s , f̂) =
+    ϕ (Colim (F ∘ꟳ D̃/) ⊢[ α , s , x̂ ])
+      ≡⟨ ϕ-beta (α , s , x̂) ⟩
+    s , (λ i → Colim D̃/ ⊢[ α , x̂ i ])
+      ≡⟨ ≡.cong (s ,_) (funExt (λ i → Colim D̃/ ⊢≈[ p i ])) ⟩
+    s , (λ i → Colim D̃/ ⊢[ liftC (f̂ i) ])
+      ≡⟨ ≡.cong (s ,_) (funExt (λ i → isSectLiftC (f̂ i))) ⟩
+    s , f̂ ∎
+    where
+    μ : P s → Z
+    μ i = liftC (f̂ i) .proj₁
+    ĝ : ∀ i → S̃/ (μ i)
+    ĝ i = liftC (f̂ i) .proj₂
+    α : Z
+    α = Z.sup (s , μ)
+    x̂ : P s → S̃/ α
+    x̂ i = dweaken/ (child≤ s μ i) (ĝ i)
+    p : ∀ i → Colim D̃/ [ (α , x̂ i) ≈ liftC (f̂ i) ]
+    p i = ≈lsym (≈lstep (child≤ s μ i) (ĝ i))
+    open ≡.≡-Reasoning
+
+  ψϕ : ∀ x → ψ (ϕ x) ≡ x
+  ψϕ x = SQ.elimp (Colim (F ∘ꟳ D̃/)) (λ x → ψ (ϕ x) ≡ x) p x
+    where
+    module ColimFD = SQ (Colim (F ∘ꟳ D̃/))
+    module ColimD = SQ (Colim D̃/)
+    open ≡.≡-Reasoning
+    p : ∀ (x : Colim₀ (F ∘ꟳ D̃/)) → ψ (ϕ ColimFD.[ x ]) ≡ ColimFD.[ x ]
+    p (α , s , f̂) =
+      ψ (ϕ ColimFD.[ α , s , f̂ ])
+        ≡⟨ ≡.cong ψ (ϕ-beta (α , s , f̂)) ⟩
+      ψ (s , λ i → Colim D̃/ ⊢[ α , f̂ i ])
+        ≡⟨ ColimFD.≈[ q ] ⟩
+      ColimFD.[ α , s , f̂ ] ∎
+      where
+      μ : P s → Z
+      μ i = liftC (ColimD.[ α , f̂ i ]) .proj₁
+
+      β : Z
+      β = Z.sup (s , μ)
+
+      ĝ : ∀ i → S̃/ (μ i)
+      ĝ i = liftC (ColimD.[ α , f̂ i ]) .proj₂
+
+      x̂ : P s → S̃/ β
+      x̂ i = dweaken/ (child≤ s μ i) (ĝ i)
+
+      γ : Z
+      γ = α ∨ᶻ β
+
+      h : ∀ i → dweaken/ (Z.<→≤ (Z.∨ᶻ-r< {α} {β})) (x̂ i) ≡ dweaken/ (Z.<→≤ (Z.∨ᶻ-l< {α} {β})) (f̂ i)
+      h i =
+        ≡.trans
+          (≡.sym (comp (box (child≤ s μ i)) (box (Z.<→≤ (Z.∨ᶻ-r< {α} {β}))) {x = ĝ i}))
+          (≡.trans
+            (dweaken-cast r₁ p₁ q₁ (ĝ i))
+            (≡.trans
+              (≡.cong
+                (dweaken/ q₁)
+                (Σ-proj₂ (liftC-beta (α , f̂ i))))
+              (≡.trans
+                (dweaken-cast r₂ q₁ q₂ (liftC₀ (α , f̂ i)))
+                (≡.trans
+                  (weaken-irrel q₂ p₂ (subst S̃/ (rankC-beta (α , f̂ i)) (liftC₀ (α , f̂ i))))
+                  (weakenLiftC (Z.<→≤ (Z.∨ᶻ-l< {α} {β})) (f̂ i))))))
+        where
+        r₁ : μ i ≡ rankC (ColimD.[ α , f̂ i ])
+        r₁ = ≡.cong proj₁ (liftC-beta (α , f̂ i))
+
+        p₁ : μ i ≤ γ
+        p₁ = ≤≤ (Z.<→≤ (Z.∨ᶻ-r< {α} {β})) (child≤ s μ i)
+
+        q₁ : rankC (ColimD.[ α , f̂ i ]) ≤ γ
+        q₁ = ≡.substp (_≤ γ) r₁ p₁
+
+        r₂ : rankC (ColimD.[ α , f̂ i ]) ≡ rank (f̂ i)
+        r₂ = rankC-beta (α , f̂ i)
+
+        q₂ : rank (f̂ i) ≤ γ
+        q₂ = ≡.substp (_≤ γ) r₂ q₁
+
+        p₂ : rank (f̂ i) ≤ γ
+        p₂ = ≤≤ (Z.<→≤ (Z.∨ᶻ-l< {α} {β})) (rank≤ (f̂ i))
+
+      q : Colim (F ∘ꟳ D̃/) [ (β , s , x̂) ≈ (α , s , f̂) ]
+      q = ≈ltrans
+            (≈lstep (Z.<→≤ (Z.∨ᶻ-r< {α} {β})) (s , x̂))
+            (≈ltrans
+              (≈lstage γ (≡.cong (s ,_) (funExt h)))
+              (≈lsym (≈lstep (Z.<→≤ (Z.∨ᶻ-l< {α} {β})) (s , f̂))))

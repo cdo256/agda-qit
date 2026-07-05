@@ -31,7 +31,7 @@ open import QIT.Category.Setoid
 open import QIT.Category.Set
 open import QIT.Functor.Base
 open import QIT.Functor.Quotient
-open import QIT.Functor.Properties renaming (_∘_ to _∘ꟳ_)
+open import QIT.Functor.Properties
 open import QIT.Setoid.Hom 
 
 open SQ
