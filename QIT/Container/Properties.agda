@@ -45,7 +45,7 @@ module _ {ℓS ℓP} {S : Set ℓS} {P : S → Set ℓP} where
     ∧ᵖ λ r → ≡.subst Path r p ≡ there s f i q
   path-len≠0→there (here _) 0≠0 = ⊥e (0≠0 ≡.refl)
   path-len≠0→there (there s f i p) _ =
-    ∃i s , ∃i f , ∃i i , ∃i f i , ∃i p , ∧i ≡.refl , subst-refl _
+    ∃i s , ∃i f , ∃i i , ∃i f i , ∃i p , ∧i ≡.refl , ≡.refl
 
 
   pathLookup : ∀ {x} → Path x → W S P
@@ -71,7 +71,7 @@ module _ {ℓS ℓP} {S : Set ℓS} {P : S → Set ℓP} where
                → (p : sup (s , f) ≡ sup (s' , f'))
                → (i : P s)
                → f i ≡ f' (subst P (≡.cong getShape p) i)
-  sup-child-eq {f = f} ≡.refl i = ≡.cong f (≡.sym (≡.subst-refl i))
+  sup-child-eq ≡.refl i = ≡.refl
 
 module _ where
   open import QIT.Relation.Finite

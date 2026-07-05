@@ -185,7 +185,12 @@ module LiftElement where
     subst S̃/ (≡.trans (≡.sym (rank-beta ŝ))
                        (≡.cong rank (S̃ α ⊢≈[ r ])))
               (lift/ ŝ)
-      ≡⟨ subst-irrel _ _ (lift/ ŝ) ⟩
+      ≡⟨ subst-irrel
+           (≡.trans (≡.sym (rank-beta ŝ))
+                    (≡.cong rank (S̃ α ⊢≈[ r ])))
+           (≡.trans (rank-cong ŝ t̂ r)
+                    (≡.sym (rank-beta t̂)))
+           (lift/ ŝ) ⟩
     subst S̃/ (≡.trans (rank-cong ŝ t̂ r)
                        (≡.sym (rank-beta t̂)))
               (lift/ ŝ)
@@ -222,7 +227,11 @@ module LiftElement where
       subst S̃/ q (subst S̃/ (≡.sym (rank-beta a)) (lift/ a))
         ≡⟨ ≡.subst-subst S̃/ (≡.sym (rank-beta a)) q (lift/ a) ⟩
       subst S̃/ (≡.trans (≡.sym (rank-beta a)) q) (lift/ a)
-        ≡⟨ subst-irrel _ _ (lift/ a) ⟩
+        ≡⟨ subst-irrel
+             (≡.trans (≡.sym (rank-beta a)) q)
+             (≡.trans (≡.sym (rank-beta (dweaken₀ p a)))
+                      (≡.cong rank (≡.sym (dweaken-beta p a))))
+             (lift/ a) ⟩
       subst S̃/
         (≡.trans (≡.sym (rank-beta (dweaken₀ p a)))
                   (≡.cong rank (≡.sym (dweaken-beta p a))))
@@ -244,7 +253,7 @@ module LiftElement where
 
       dcong-lift≈ : ∀ {s̃ t̃ : S̃/ β} (e : s̃ ≡ t̃)
         → subst S̃/ (≡.cong rank e) (lift≈ s̃) ≡ lift≈ t̃
-      dcong-lift≈ ≡.refl = subst-refl _
+      dcong-lift≈ ≡.refl = ≡.refl
 
   liftC₀ : (x : D*₀) → S̃/ (rankC (D* ⊢[ x ]))
   liftC₀ x@(α , ŝ) = ≡.subst S̃/ p (lift≈ ŝ)
@@ -255,8 +264,12 @@ module LiftElement where
   liftC-cong : ∀ {x y} → (p : D* [ x ≈ y ])
              → subst S̃/ (rankC-dp p) (liftC₀ x) ≡ liftC₀ y
   liftC-cong {(α , s̃)} {(α , t̃)} (≈lstage α e) =
-    subst S̃/ (rankC-dp (≈lstage α e)) (liftC₀ (α , s̃))
-      ≡⟨ subst-irrel _ _ (liftC₀ (α , s̃)) ⟩
+    subst S̃/ (rankC-dp (≈lstage α e))
+          (liftC₀ (α , s̃))
+      ≡⟨ subst-irrel
+           (rankC-dp (≈lstage α e))
+           (≡.cong (λ z → rankC (D* ⊢[ z ])) (≡.cong (α ,_) e))
+           (liftC₀ (α , s̃)) ⟩
     subst S̃/ (≡.cong (λ z → rankC (D* ⊢[ z ])) (≡.cong (α ,_) e))
           (liftC₀ (α , s̃))
       ≡⟨ dcong-liftC₀ (≡.cong (α ,_) e) ⟩
@@ -267,7 +280,7 @@ module LiftElement where
     dcong-liftC₀ : ∀ {x y} (e : x ≡ y)
       → subst S̃/ (≡.cong (λ z → rankC (D* ⊢[ z ])) e) (liftC₀ x)
       ≡ liftC₀ y
-    dcong-liftC₀ ≡.refl = subst-refl _
+    dcong-liftC₀ ≡.refl = ≡.refl
   liftC-cong {(α , s̃)} {(β , t̃)} (≈lstep p s̃) =
     subst S̃/ (rankC-dp (≈lstep p s̃)) (liftC₀ (α , s̃))
       ≡⟨ ≡.subst-subst S̃/ (≡.sym (rankC-beta (α , s̃)))
@@ -275,7 +288,12 @@ module LiftElement where
     subst S̃/ (≡.trans (≡.sym (rankC-beta (α , s̃)))
                        (rankC-dp (≈lstep p s̃)))
           (lift≈ s̃)
-      ≡⟨ subst-irrel _ _ (lift≈ s̃) ⟩
+      ≡⟨ subst-irrel
+           (≡.trans (≡.sym (rankC-beta (α , s̃)))
+                    (rankC-dp (≈lstep p s̃)))
+           (≡.trans (rankC-cong (≈lstep p s̃))
+                    (≡.sym (rankC-beta (β , D̃/.hom (box p) s̃))))
+           (lift≈ s̃) ⟩
     subst S̃/ (≡.trans (rankC-cong (≈lstep p s̃))
                        (≡.sym (rankC-beta (β , D̃/.hom (box p) s̃))))
           (lift≈ s̃)
@@ -291,7 +309,7 @@ module LiftElement where
     open ≡.≡-Reasoning
   liftC-cong {x} {y} (≈lsym p) =
     subst S̃/ (rankC-dp (≈lsym p)) (liftC₀ x)
-      ≡⟨ subst-irrel _ _ (liftC₀ x) ⟩
+      ≡⟨ subst-irrel (rankC-dp (≈lsym p)) (≡.sym (rankC-dp p)) (liftC₀ x) ⟩
     subst S̃/ (≡.sym (rankC-dp p)) (liftC₀ x)
       ≡⟨ ≡.dsym S̃/ (rankC-dp p) (liftC-cong p) ⟩
     liftC₀ y ∎
@@ -299,7 +317,10 @@ module LiftElement where
     open ≡.≡-Reasoning
   liftC-cong {x} {z} (≈ltrans {t = y} p q) =
     subst S̃/ (rankC-dp (≈ltrans p q)) (liftC₀ x)
-      ≡⟨ subst-irrel _ _ (liftC₀ x) ⟩
+      ≡⟨ subst-irrel
+           (rankC-dp (≈ltrans p q))
+           (≡.trans (rankC-dp p) (rankC-dp q))
+           (liftC₀ x) ⟩
     subst S̃/ (≡.trans (rankC-dp p) (rankC-dp q)) (liftC₀ x)
       ≡⟨ ≡.sym (≡.subst-subst S̃/ (rankC-dp p) (rankC-dp q) (liftC₀ x)) ⟩
     subst S̃/ (rankC-dp q) (subst S̃/ (rankC-dp p) (liftC₀ x))
@@ -368,9 +389,7 @@ module LiftElement where
   dweaken-cast : ∀ {α β γ} (r : α ≡ β)
     → (p : α ≤ γ) (q : β ≤ γ) (ŝ : S̃/ α)
     → dweaken/ p ŝ ≡ dweaken/ q (subst S̃/ r ŝ)
-  dweaken-cast ≡.refl p q ŝ =
-    ≡.trans (weaken-irrel p q ŝ)
-            (≡.cong (dweaken/ q) (≡.sym (subst-refl ŝ)))
+  dweaken-cast ≡.refl p q ŝ = weaken-irrel p q ŝ
 
   weakenLiftC : ∀ {α β} (p : α ≤ β) (ŝ : S̃/ α)
     → dweaken/ (≤≤ p (rank≤ ŝ)) (subst S̃/ (rankC-beta (α , ŝ)) (liftC₀ (α , ŝ)))

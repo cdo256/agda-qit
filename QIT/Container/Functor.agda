@@ -31,8 +31,7 @@ module F-Ob (A : Setoid ℓA ℓA') where
   mk≈ꟳ' : ∀ {s : S} {f g : P s → ⟨ A ⟩}
     → ((i : P s) → f i ≈ g i)
     → (s , f) ≈ꟳ (s , g)
-  mk≈ꟳ' {s} {f} {g} f≈g = mk≈ꟳ ≡.refl λ i →
-    trans (f≈g i) (≡→≈ A (≡.cong g (≡.sym (≡.subst-refl i))))
+  mk≈ꟳ' f≈g = mk≈ꟳ ≡.refl f≈g
 
   -- Prove equivalence relation laws for ≈ꟳ
   ≈frefl : Reflexive _≈ꟳ_
@@ -40,14 +39,11 @@ module F-Ob (A : Setoid ℓA ℓA') where
 
   ≈fsym : Symmetric _≈ꟳ_
   ≈fsym {s , f} {s , g} (mk≈ꟳ ≡.refl f≈g) =
-    mk≈ꟳ' λ i → sym (trans (f≈g i) (≡→≈ A (≡.cong g (≡.subst-refl i))))
+    mk≈ꟳ' λ i → sym (f≈g i)
 
   ≈ftrans : Transitive _≈ꟳ_
   ≈ftrans {s , f} {s , g} {s , h} (mk≈ꟳ ≡.refl f≈g) (mk≈ꟳ ≡.refl g≈h) =
-    mk≈ꟳ' λ i →
-      trans
-        (trans (f≈g i) (≡→≈ A (≡.cong g (≡.subst-refl i))))
-        (trans (g≈h i) (≡→≈ A (≡.cong h (≡.subst-refl i))))
+    mk≈ꟳ' λ i → trans (f≈g i) (g≈h i)
 
   -- The setoid F A with container elements and pointwise equivalence
   ob : Setoid (ℓS ⊔ ℓP ⊔ ℓA) (ℓS ⊔ ℓP ⊔ ℓA')

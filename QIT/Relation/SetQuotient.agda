@@ -113,6 +113,4 @@ module _
     quot-drel
       : {x y : A} (u : B x) (v : B y) (p : x ≡ y)
       → R (subst B p u) v → ≡.subst (λ ○ → B ○ / R) p [ u ] ≡ [ v ]
-    quot-drel u v ≡.refl ruv =
-      ≡.trans (≡.subst-refl [ u ])
-        (quot-rel u v (≡.substp (λ z → R z v) (≡.subst-refl u) ruv))
+    quot-drel u v ≡.refl ruv = quot-rel u v ruv

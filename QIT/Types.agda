@@ -18,4 +18,4 @@ inj₁≢inj₂ ()
 Σ-proj₂ : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB}
   {x y : Σ A B} (e : x ≡ y)
   → subst B (≡.cong proj₁ e) (x .proj₂) ≡ y .proj₂
-Σ-proj₂ ≡.refl = subst-refl _
+Σ-proj₂ ≡.refl = ≡.refl

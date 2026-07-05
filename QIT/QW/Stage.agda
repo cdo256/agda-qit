@@ -180,17 +180,10 @@ dweaken-beta : ∀ {α β} → (p : α ≤ β) → (s : S₀ α) → dweaken/ p 
 dweaken-beta {α} {β} p s = rec-beta (S̃ α) (λ s → S̃ β ⊢[ dweaken₀ p s ]) (S̃ β ⊢≈[_]) s
 
 subst-S₀-fst : ∀ {γ δ} (p : γ ≡ δ) (û : S₀ γ) → ⟨ subst S₀ p û ⟩ᴾ ≡ ⟨ û ⟩ᴾ
-subst-S₀-fst {γ} ≡.refl û = ≡.cong ⟨_⟩ᴾ (subst-refl {B = S₀} û)
+subst-S₀-fst {γ} ≡.refl û = ≡.refl
 
 subst-quot-S
   : ∀ {α β} → (p : α ≡ β) (x : S₀ α)
   → S̃ β ⊢[ subst S₀ p x ]
   ≡ subst S̃/ p (S̃ α ⊢[ x ])
-subst-quot-S {α} {α} ≡.refl x =
-  S̃ α ⊢[ subst S₀ ≡.refl x ]
-    ≡⟨ ≡.cong (S̃ α ⊢[_]) (subst-refl x) ⟩
-  S̃ α ⊢[ x ]
-    ≡⟨ ≡.sym (subst-refl (S̃ α ⊢[ x ])) ⟩
-  subst S̃/ ≡.refl (S̃ α ⊢[ x ]) ∎
-  where
-  open ≡.≡-Reasoning
+subst-quot-S ≡.refl x = ≡.refl

@@ -50,8 +50,6 @@ module Rec (Yβ : Algebra) where
       ≡⟨ ≡.sym f.comm ⟩
     β (s , λ i → f.hom (g i)) 
       ≡⟨ ≡.cong β (≡.cong (λ ○ → s , ○) (funExt λ (i : P s) → unique f {g i})) ⟩
-    β (s , λ i → rec (g i))
-      ≡⟨ ≡.refl ⟩
     rec (sup (s , g)) ∎
     where
     open ≡.≡-Reasoning

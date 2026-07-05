@@ -28,9 +28,4 @@ module _ {ℓI ℓS ℓS'} (S : Ix.Setoid ℓI ℓS ℓS') where
 
     transport≈ : ∀ {a b} (p : a ≡ b) {x y : A a}
       → S Ix.[ x ≈ y ] → S Ix.[ subst A p x ≈ subst A p y ]
-    transport≈ ≡.refl p =
-      ≡.substp₂
-        (S Ix.[_≈_])
-        (≡.sym (subst-refl _))
-        (≡.sym (subst-refl _))
-        p
+    transport≈ ≡.refl p = p

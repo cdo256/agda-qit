@@ -169,10 +169,8 @@ module SQ {ℓA ℓR} (Ã : Setoid ℓA ℓR) where
       where
       eq-right : ∀ a {x y} (r : x ≈ y)
                → ≡.subst (X [ a ]) ≈[ r ] (f a x) ≡ f a y
-      eq-right a {x} {y} r =
-        ≡.trans
-          (≡.sym (≡.subst-refl (≡.subst (X [ a ]) ≈[ r ] (f a x))))
-          (eq {x = a} {y = a} {z = x} {w = y} (Setoid.refl Ã) r)
+      eq-right a r =
+        eq (Setoid.refl Ã) r
 
       p : (a : A) (b/ : Ã /≈) → X [ a ] b/
       p a = elim (X [ a ]) (f a) (eq-right a)
@@ -191,10 +189,6 @@ module SQ {ℓA ℓR} (Ã : Setoid ℓA ℓR) where
                       (elim-beta (X [ a ]) (f a) (eq-right a) b) ⟩
           ≡.subst (λ a/ → X a/ [ b ]) ≈[ a≈a' ]
                   (f a b)
-            ≡⟨ ≡.cong (≡.subst (λ a/ → X a/ [ b ]) ≈[ a≈a' ])
-                      (≡.sym (≡.subst-refl (f a b))) ⟩
-          ≡.subst (λ a/ → X a/ [ b ]) ≈[ a≈a' ]
-                  (≡.subst (X [ a ]) ≈[ Setoid.refl Ã ] (f a b))
             ≡⟨ eq {x = a} {y = a'} {z = b} {w = b} a≈a' (Setoid.refl Ã) ⟩
           f a' b
             ≡⟨ ≡.sym (elim-beta (X [ a' ]) (f a') (eq-right a') b) ⟩
