@@ -18,16 +18,16 @@ open import QIT.Algebra.Lift S P
 
 open import QIT.QW.W S P
 open import QIT.QW.Equation S P ℓV
-open import QIT.Plump.W S P using (Zᴬ; _≤≥_)
+open import QIT.Plump.W S P
 open import QIT.Plump.Properties Zᴬ as Z
 
 module _ where
   expr→Z : {V : Set ℓV} → Expr V → Z
   expr→Z (varᴱ _) = ⊥ᶻ
-  expr→Z (supᴱ s f) = Z.sup (s , λ i → expr→Z (f i))
+  expr→Z (supᴱ s f) = supᶻ (s , λ i → expr→Z (f i))
 
   _≤ᴱ_ : {V : Set ℓV} → Expr V → Z → Prop (ℓS ⊔ ℓP)
-  e ≤ᴱ α = expr→Z e Z.≤ α
+  e ≤ᴱ α = expr→Z e ≤ α
 
   T-alg* : Algebra
   T-alg* = LiftAlgebra ℓV T-alg

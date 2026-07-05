@@ -19,9 +19,11 @@ module QIT.QW.Diagram
   (sig : Sig ℓS ℓP ℓE ℓV)
   (Zᴬ : PlumpAlgebra (sig .Sig.S) (sig .Sig.P))
   where
+  
 open Sig sig
 open FunExt funExt*
 
+open PlumpAlgebra Zᴬ
 open import QIT.Plump.Properties Zᴬ as Z
 
 open import QIT.Setoid
@@ -101,12 +103,9 @@ isInjHom : ∀ {α β} (p : α ≤ β)
         → ∀ {x y} → hom/ (box p) (S̃ α ⊢[ x ]) ≡ hom/ (box p) (S̃ α ⊢[ y ])
         → _≡_ {A = S̃ α /≈} (S̃ α ⊢[ x ]) (S̃ α ⊢[ y ])
 isInjHom {α} {β} α≤β {x} {y} q =
-  Qα.≈[ Qβ.effectiveness _ _ q' ]
+  S̃ α ⊢≈[ SQ.effectiveness (S̃ β) _ _ q' ]
   where
-  module Qα = SQ (S̃ α)
-  module Qβ = SQ (S̃ β)
-
-  q' : Qβ.[ dweaken₀ α≤β x ] ≡ Qβ.[ dweaken₀ α≤β y ]
+  q' : S̃ β ⊢[ dweaken₀ α≤β x ] ≡ S̃ β ⊢[ dweaken₀ α≤β y ]
   q' =
     S̃ β ⊢[ dweaken₀ α≤β x ]
       ≡⟨ ≡.sym (dweaken-beta α≤β x) ⟩
@@ -136,11 +135,24 @@ D̃/ : Functor (PreorderCat Z ≤p)
              (SetCat (ℓD ⊔ ℓD'))
 D̃/ = D̃ /≈ᴰ
 
+FD̃/ : Functor (PreorderCat Z ≤p)
+              (SetCat (ℓS ⊔ ℓP ⊔ ℓD ⊔ ℓD'))
+FD̃/ = F ∘ꟳ D̃/
+
 -- Module aliases for cleaner notation
-module F = Functor F
-module D̃ = Functor D̃
-module D̃/ = Functor (D̃ /≈ᴰ)
-module F∘D = Functor (F ∘ꟳ D̃/)
+D* : Setoid (ℓD ⊔ ℓD') (ℓD ⊔ ℓD')
+D* = Colim D̃/
+D*₀ : Set (ℓD ⊔ ℓD')
+D*₀ = Colim₀ D̃/
+D*/ : Set (ℓD ⊔ ℓD')
+D*/ = Colim/ D̃/
+
+FD* : Setoid (ℓD ⊔ ℓD') (ℓD ⊔ ℓD')
+FD* = Colim FD̃/
+FD*₀ : Set (ℓD ⊔ ℓD')
+FD*₀ = Colim₀ FD̃/
+FD*/ : Set (ℓD ⊔ ℓD')
+FD*/ = Colim/ FD̃/
 
 -- The underlying W-type of trees before quotienting.
 T = W S P

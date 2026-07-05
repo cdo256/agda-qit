@@ -51,6 +51,61 @@ record PlumpAlgebra
 
     -- iswf< : WellFounded _<_
 
-  record IsExtensional : Prop (ℓS ⊔ ℓP) where
-    field
-      antisym : ∀ {α β} → α ≤ β → β ≤ α → α ≡ β
+record ExtensionalPlumpAlgebra
+  {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP)
+  : Set (lsuc ℓS ⊔ lsuc ℓP) where
+  field
+    Zᴬ : PlumpAlgebra S P
+
+  open PlumpAlgebra Zᴬ public
+
+  field
+    antisym : ∀ {α β} → α ≤ β → β ≤ α → α ≡ β
+
+  -- [_]ᶻ : Z₀.Z → Z
+  -- [ W.sup (Z₀.⊥ₛ , f) ]ᶻ = ⊥ᶻ
+  -- [ W.sup (Z₀.∨ₛ , f) ]ᶻ =
+  --      [ f (inj₁ tt*) ]ᶻ
+  --   ∨ᶻ [ f (inj₂ tt*) ]ᶻ
+  -- [ W.sup (Z₀.ιₛ s , f) ]ᶻ =
+  --   sup (s , λ i → [ f i ]ᶻ)
+  -- ιᶻ-factors : ∀ x → [ Z₀Prop.ιᶻ x ]ᶻ ≡ ιᶻ x
+  -- ιᶻ-factors (W.sup (s , f)) =
+  --   ≡.cong (λ ○ → sup (s , ○))
+  --          (funExt λ i → ιᶻ-factors (f i))
+  -- ≤[_]ᶻ : ∀ {α β : Z₀.Z}
+  --       → α Z₀.≤ β → [ α ]ᶻ ≤ [ β ]ᶻ
+  -- <[_]ᶻ : ∀ {α β : Z₀.Z}
+  --       → α Z₀.< β → [ α ]ᶻ < [ β ]ᶻ
+  -- <[_]ᶻ {α} {W.sup (Z₀.⊥ₛ , ξ)} (Z₀.<sup () α≤ξi)
+  -- <[_]ᶻ {α} {W.sup (Z₀.∨ₛ , ξ)} (Z₀.<sup (inj₁ tt*) α≤ξ₁) =
+  --   <≤ ∨ᶻ-l< ≤[ α≤ξ₁ ]ᶻ
+  -- <[_]ᶻ {α} {W.sup (Z₀.∨ₛ , ξ)} (Z₀.<sup (inj₂ tt*) α≤ξ₂) =
+  --   <≤ ∨ᶻ-r< ≤[ α≤ξ₂ ]ᶻ
+  -- <[_]ᶻ {α} {W.sup (Z₀.ιₛ s , ξ)} (Z₀.<sup i α≤ξi) =
+  --   <sup i ≤[ α≤ξi ]ᶻ
+  -- ≤[_]ᶻ {W.sup (Z₀.⊥ₛ , ξ)} {β} _ = ⊥ᶻ≤
+  -- ≤[_]ᶻ {W.sup (Z₀.∨ₛ , ξ)} {β} (Z₀.sup≤ ξ<β) =
+  --   ∨ᶻ≤ <[ ξ<β (inj₁ tt*) ]ᶻ <[ ξ<β (inj₂ tt*) ]ᶻ
+  -- ≤[_]ᶻ {W.sup (Z₀.ιₛ s , ξ)} {β} (Z₀.sup≤ ξ<β) =
+  --   sup≤ (λ i → <[ ξ<β i ]ᶻ)
+
+  -- ιᶻ≤ιᶻ : ∀ x y
+  --   → Z₀Prop.ιᶻ x Z₀.≤ Z₀Prop.ιᶻ y 
+  --   → ιᶻ x ≤ ιᶻ y
+  -- ιᶻ≤ιᶻ x y p =
+  --   ≡.substp₂ _≤_
+  --     (ιᶻ-factors x)
+  --     (ιᶻ-factors y)
+  --     ≤[ p ]ᶻ
+
+  -- ιᶻ≤≥ιᶻ : ∀ x y
+  --   → Z₀Prop.ιᶻ x Z₀.≤≥ Z₀Prop.ιᶻ y 
+  --   → ιᶻ x ≤ ιᶻ y ∧ ιᶻ y ≤ ιᶻ x
+  -- ιᶻ≤≥ιᶻ x y (∧i p , q) = ∧i ιᶻ≤ιᶻ x y p , ιᶻ≤ιᶻ y x q
+
+record ExtensionalPlumpOrdinals : Setω where
+  field
+    Zᴬe : ∀ {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP)
+        → ExtensionalPlumpAlgebra S P
+  

@@ -23,7 +23,8 @@ module QIT.QW.Stage
 open Sig sig
 open FunExt funExt*
 
-open import QIT.Plump.Properties Zᴬ as Z
+open import QIT.Plump.Properties Zᴬ 
+open PlumpAlgebra Zᴬ renaming (sup to supᶻ)
 
 import QIT.Setoid.Indexed as Ix
 open import QIT.Container.Base
@@ -45,7 +46,7 @@ S₀ α = ΣP T (_≤ᵀ α)
 -- Constructor for stage elements: build a tree with given shape and children.
 -- The ordinal bound is computed from the children's bounds using plump structure.
 ssup₀ : ∀ a μ (f : ∀ i → S₀ (μ i))
-      → S₀ (Z.sup (a , μ))
+      → S₀ (supᶻ (a , μ))
 ssup₀ a μ f = W.sup (a , λ i → ⟨ f i ⟩ᴾ) , sup≤ (λ i → <sup i (f i .snd))
 
 -- Weakening: if α ≤ β then stage α embeds into stage β.
@@ -57,7 +58,7 @@ dweaken₀ α≤β (t , t≤α) = t , ≤≤ α≤β t≤α
 -- Variables have minimal complexity ⊥ᶻ, constructors have complexity based on arguments.
 ιᵉ : {V : Set ℓV} → Expr V → Z
 ιᵉ (varᴱ v) = ⊥ᶻ
-ιᵉ (supᴱ s f) = Z.sup (s , λ i → ιᵉ (f i))
+ιᵉ (supᴱ s f) = supᶻ (s , λ i → ιᵉ (f i))
 
 -- Expression-ordinal comparison: when an expression fits within a stage.
 _≤ᴱ_ : {V : Set ℓV} → Expr V → Z → Prop (ℓS ⊔ ℓP)
@@ -119,7 +120,7 @@ _ ⊢ ŝ ≈ᵇ t̂ = ŝ ≈ˢ t̂
 
 ≈scong : ∀ a μ (f g : ∀ i → S₀ (μ i))
       → (r : ∀ i → μ i ⊢ f i ≈ᵇ g i)
-      → Z.sup (a , μ) ⊢ ssup₀ a μ f ≈ᵇ ssup₀ a μ g
+      → supᶻ (a , μ) ⊢ ssup₀ a μ f ≈ᵇ ssup₀ a μ g
 ≈scong a _ f g r = ≈tcong a (λ i → ⟨ f i ⟩ᴾ) (λ i → ⟨ g i ⟩ᴾ) r
 
 -- Equation satisfaction: enforce the equations from the signature

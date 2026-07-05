@@ -13,7 +13,7 @@ module QIT.Plump.Properties
   (Zᴬ : PlumpAlgebra S P)
   where
 
-open PlumpAlgebra Zᴬ public
+open PlumpAlgebra Zᴬ
 
 private T = W.W S P
 
@@ -97,4 +97,4 @@ open import QIT.Category.Equivalence
 
 record IsRegular (κ : Z) : Prop (ℓS ⊔ ℓP) where
   field
-    regular : ∀ α → α < κ → Equivalence (PreorderCat↓ α) (PreorderCat↓ κ) → ⊥
+    regular : ∀ α → α < κ → (↓ α) ≅ˢ (↓ κ) → ⊥
