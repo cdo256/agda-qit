@@ -80,11 +80,23 @@ module Rank where
   rank-cong : ∀ {α β} (ŝ  : S₀ α) (t̂ : S₀ β) → ŝ ≈ˢ t̂ → rank₀ ŝ ≡ rank₀ t̂
   rank-cong ŝ t̂ p = dp ŝ t̂ p
 
-  rank : ∀ {α} → S̃/ α → Z
-  rank {α} = SQ.rec (S̃ α) rank₀ λ {ŝ t̂} → rank-cong ŝ t̂
+  abstract
+    rank : ∀ {α} → S̃/ α → Z
+    rank {α} = SQ.rec (S̃ α) rank₀ λ {ŝ t̂} → rank-cong ŝ t̂
 
-  rank-beta : ∀ {α} (t̂ : S₀ α) → rank (S̃ α ⊢[ t̂ ]) ≡ rank₀ t̂
-  rank-beta {α} t̂ = SQ.rec-beta (S̃ α) rank₀ (λ {ŝ t̂} → rank-cong ŝ t̂) t̂
+    rank-beta : ∀ {α} (t̂ : S₀ α) → rank (S̃ α ⊢[ t̂ ]) ≡ rank₀ t̂
+    rank-beta {α} t̂ = SQ.rec-beta (S̃ α) rank₀ (λ {ŝ t̂} → rank-cong ŝ t̂) t̂
+
+  -- abstract
+  --   rank[] : ∀ {α} → S₀ α → Z
+  --   rank[] {α} t̂ =
+  --     SQ.rec (S̃ α) rank₀ (λ {ŝ t̂} → rank-cong ŝ t̂) (S̃ α ⊢[ t̂ ])
+
+  --   rank[]-beta : ∀ {α} (t̂ : S₀ α) → rank[] t̂ ≡ rank₀ t̂
+  --   rank[]-beta {α} t̂ =
+  --     SQ.rec-beta (S̃ α) rank₀ (λ {ŝ t̂} → rank-cong ŝ t̂) t̂
+
+  -- {-# REWRITE rank[]-beta #-}
 
   rank₀≤ : ∀ {α} → (ŝ : S₀ α) → rank₀ ŝ ≤ α
   rank₀≤ {α} (s , s≤α) = s≤α
@@ -93,17 +105,19 @@ module Rank where
   rank≤ {α} = SQ.elimp (S̃ α) (λ ŝ → rank ŝ ≤ α) p
     where
     p : ∀ ŝ → rank (S̃ α ⊢[ ŝ ]) ≤ α
-    p ŝ = ≡.substp (_≤ α) (≡.sym (rank-beta ŝ)) (rank₀≤ ŝ)
+    p ŝ rewrite rank-beta ŝ =
+      rank₀≤ ŝ
 
   rankC₀ : D*₀ → Z
   rankC₀ (_ , t̂) = rank t̂
 
   rank-step₀ : ∀ {α β} (p : α ≤ β) (t̂ : S₀ α)
             → rank (S̃ α ⊢[ t̂ ]) ≡ rank (D̃/.hom (box p) (S̃ α ⊢[ t̂ ]))
-  rank-step₀ p t̂ =
-    ≡.trans (rank-beta t̂)
-      (≡.trans (≡.sym (rank-beta (dweaken₀ p t̂)))
-        (≡.cong rank (≡.sym (dweaken-beta p t̂))))
+  rank-step₀ p t̂ rewrite
+      rank-beta t̂
+    | ≡.sym (rank-beta (dweaken₀ p t̂))
+    | dweaken-beta p t̂ =
+      ≡.refl
 
   rank-step : ∀ {α β} (p : α ≤ β) (t̂ : S̃/ α)
             → rank t̂ ≡ rank (D̃/.hom (box p) t̂)
@@ -121,22 +135,19 @@ module Rank where
   rankC-cong (≈ltrans p q) =
     ≡.trans (rankC-cong p) (rankC-cong q)
 
-  rankC : D*/ → Z
-  rankC = SQ.rec D* rankC₀ rankC-cong
+  abstract
+    rankC : D*/ → Z
+    rankC = SQ.rec D* rankC₀ rankC-cong
 
-  rankC-beta : (x : D*₀) → rankC (D* ⊢[ x ]) ≡ rankC₀ x
-  rankC-beta = SQ.rec-beta (D*) rankC₀ rankC-cong
+    rankC-beta : (x : D*₀) → rankC (D* ⊢[ x ]) ≡ rankC₀ x
+    rankC-beta = SQ.rec-beta (D*) rankC₀ rankC-cong
 
   rankC-dp : ∀ {x y} → D* [ x ≈ y ]
            → rankC (D* ⊢[ x ]) ≡ rankC (D* ⊢[ y ])
-  rankC-dp {x} {y} p =
-    rankC (D* ⊢[ x ])
-      ≡⟨ rankC-beta x ⟩
-    rankC₀ x
-      ≡⟨ rankC-cong p ⟩
-    rankC₀ y
-      ≡⟨ ≡.sym (rankC-beta y) ⟩
-    rankC (D* ⊢[ y ]) ∎
+  rankC-dp {x} {y} p
+    rewrite rankC-beta x
+          | rankC-beta y =
+    rankC-cong p
     where
     open ≡.≡-Reasoning
 
@@ -210,6 +221,15 @@ module LiftElement where
   lift≈-beta : ∀ {α} (ŝ : S₀ α) → lift≈ (S̃ α ⊢[ ŝ ]) ≡ lift≈₀ ŝ
   lift≈-beta {α} ŝ =
     SQ.elim-beta (S̃ α) (λ t̂ → S̃/ (rank t̂)) lift≈₀ lift≈-cong ŝ
+
+  abstract
+    lift≈[] : ∀ {α} (ŝ : S₀ α) → S̃/ (rank (S̃ α ⊢[ ŝ ]))
+    lift≈[] {α} ŝ = lift≈ (S̃ α ⊢[ ŝ ])
+
+    lift≈[]-beta : ∀ {α} (ŝ : S₀ α) → lift≈[] ŝ ≡ lift≈₀ ŝ
+    lift≈[]-beta ŝ = lift≈-beta ŝ
+  {-# NOT_PROJECTION_LIKE lift≈[] #-}
+  {-# REWRITE lift≈[]-beta #-}
 
   lift≈-step : ∀ {α β} (p : α ≤ β) (s̃ : S̃/ α)
     → (q : rank s̃ ≡ rank (D̃/.hom (box p) s̃))
@@ -337,11 +357,20 @@ module LiftElement where
       (λ x → rankC (D* ⊢[ x ]) , liftC₀ x)
       (λ p → ≡.Σ≡ (rankC-dp p) (liftC-cong p))
 
-  liftC-beta : (x : D*₀) → liftC (_ ⊢[ x ]) ≡ (rankC (D* ⊢[ x ]) , liftC₀ x)
+  liftC-beta : (x : D*₀) → liftC (D* ⊢[ x ]) ≡ (rankC (D* ⊢[ x ]) , liftC₀ x)
   liftC-beta =
     SQ.rec-beta (D*)
       (λ x → rankC (D* ⊢[ x ]) , liftC₀ x)
       (λ p → ≡.Σ≡ (rankC-dp p) (liftC-cong p))
+
+  abstract
+    liftC[] : D*₀ → D*₀
+    liftC[] x = liftC (D* ⊢[ x ])
+
+    liftC[]-beta : (x : D*₀) → liftC[] x ≡ (rankC (D* ⊢[ x ]) , liftC₀ x)
+    liftC[]-beta x = liftC-beta x
+  {-# NOT_PROJECTION_LIKE liftC[] #-}
+  {-# REWRITE liftC[]-beta #-}
 
   weakenLift : ∀ {α} (ŝ : S̃/ α) → dweaken/ (rank≤ ŝ) (lift≈ ŝ) ≡ ŝ
   weakenLift {α} = SQ.elimp (S̃ α) B u
@@ -419,7 +448,7 @@ module LiftElement where
     p =
       liftC (D* ⊢[ x ])
         ≈⟨ ≡→≈ (D*) (liftC-beta x) ⟩
-      rankC (_ ⊢[ x ]) , liftC₀ x
+      rankC (D* ⊢[ x ]) , liftC₀ x
         ≈⟨ ≡→≈ (D*) (Σ≡ (rankC-beta x) ≡.refl) ⟩
       rankC₀ x , subst S̃/ (rankC-beta x) (liftC₀ x)
         ≈⟨ ≈lstep (rank≤ ŝ) (subst S̃/ (rankC-beta x) (liftC₀ x)) ⟩
@@ -450,6 +479,15 @@ module Cocontinuity where
 
   ϕ-beta : (x : FD*₀) → ϕ (Colim (FD̃/) ⊢[ x ]) ≡ ϕ₀ x
   ϕ-beta = SQ.rec-beta (Colim (FD̃/)) ϕ₀ ϕ-cong
+
+  abstract
+    ϕ[] : FD*₀ → F.ob D*/
+    ϕ[] x = ϕ (Colim (FD̃/) ⊢[ x ])
+
+    ϕ[]-beta : (x : FD*₀) → ϕ[] x ≡ ϕ₀ x
+    ϕ[]-beta x = ϕ-beta x
+  {-# NOT_PROJECTION_LIKE ϕ[] #-}
+  {-# REWRITE ϕ[]-beta #-}
 
   ψ : F.ob D*/ → FD*/
   ψ (s , f̂) = FD* ⊢[ α , s , x̂ ]

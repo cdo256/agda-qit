@@ -38,9 +38,9 @@ hom {X} {Y} p =
   where
   module p = ≈.Hom p
 id : ∀ {X} → hom (SetoidCat.id {X}) ≡h SetCat.id {X /≈}
-id {X} {x} = SQ.elimp X (λ z → hom SetoidCat.id z ≡ z) p x
+id {X} {x} = SQ.elimp X (λ z → hom (SetoidCat.id {X}) z ≡ z) p x
   where
-  p : (a : ⟨ X ⟩) → hom SetoidCat.id (X ⊢[ a ]) ≡ X ⊢[ a ]
+  p : (a : ⟨ X ⟩) → hom (SetoidCat.id {X}) (X ⊢[ a ]) ≡ X ⊢[ a ]
   p a = map-beta X X (λ x → x) (λ p → p) a
 comp : ∀ {X Y Z} (f : ≈.Hom X Y) (g : ≈.Hom Y Z)
       → hom (g SetoidCat.∘ f) ≡h hom g SetCat.∘ hom f
@@ -83,6 +83,6 @@ QuotientFunctor : Functor (SetoidCat ℓS ℓ≈) (SetCat (ℓS ⊔ ℓ≈))
 QuotientFunctor = record
   { ob = _/≈
   ; hom = hom
-  ; id = id
+  ; id = λ {X} → id {X}
   ; comp = comp
   ; resp = λ {X Y f g} → resp {X} {Y} {f} {g} }

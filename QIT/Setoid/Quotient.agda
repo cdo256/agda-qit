@@ -22,7 +22,6 @@ Ã /≈ = A / _≈_
   open Setoid Ã renaming (Carrier to A)
 
 module SQ {ℓA ℓR} (Ã : Setoid ℓA ℓR) where
-  abstract
     open Setoid Ã renaming (Carrier to A)
     [_] : A → Ã /≈
     [_] = Q.[_]
@@ -194,7 +193,6 @@ module SQ {ℓA ℓR} (Ã : Setoid ℓA ℓR) where
             ≡⟨ ≡.sym (elim-beta (X [ a' ]) (f a') (eq-right a') b) ⟩
           p a' [ b ] ∎
           where open ≡.≡-Reasoning
-
 
 open SQ using () renaming ([_] to _⊢[_]; ≈[_] to _⊢≈[_]) public
 
