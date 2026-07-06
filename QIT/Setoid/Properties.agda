@@ -3,7 +3,7 @@ open import QIT.Prop
 open import QIT.Relation.Base
 open import QIT.Relation.Binary
 open import QIT.Setoid.Base
-import QIT.Setoid.Indexed as Ix
+-- import QIT.Setoid.Indexed as Ix
 
 module QIT.Setoid.Properties ⦃ pathElim* : PathElim ⦄ where
 
@@ -23,9 +23,9 @@ module _ {ℓS ℓS'} (S : Setoid ℓS ℓS') where
         → S [ x ≈ z ] → S [ y ≈ z ]
   castˡ ≡.refl p = p
 
-module _ {ℓI ℓS ℓS'} (S : Ix.Setoid ℓI ℓS ℓS') where
-    open Ix.Setoid S
+-- module _ {ℓI ℓS ℓS'} (S : Ix.Setoid ℓI ℓS ℓS') where
+--     open Ix.Setoid S
 
-    transport≈ : ∀ {a b} (p : a ≡ b) {x y : A a}
-      → S Ix.[ x ≈ y ] → S Ix.[ subst A p x ≈ subst A p y ]
-    transport≈ ≡.refl p = p
+--     transport≈ : ∀ {a b} (p : a ≡ b) {x y : A a}
+--       → S Ix.[ x ≈ y ] → S Ix.[ subst A p x ≈ subst A p y ]
+--     transport≈ ≡.refl p = p

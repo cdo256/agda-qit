@@ -264,6 +264,17 @@ subst-Π : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : Set ℓB} (C : A → B → S
         ≡ subst (λ a → C a z) p (g z)
 subst-Π {A = A} {B} C {x} refl g z = refl
 
+-- dfunExt
+--   : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : A → Set ℓB}
+--   → (C : ∀ a → B a → Set ℓC)
+--   → {x y : A} (p : x ≡ y)
+--   → {f : ∀ b → C x b} {g : ∀ b → C y b}
+--   → (∀ a → (q : a ≡ x) → (b : B a)
+--          → subst (λ a → C a {! b!}) p {!f b!}
+--                ≡ {!g (subst B p b)!})
+--   → subst (λ a → ∀ b → C a b) p f ≡ g
+-- dfunExt C refl h = {!!}
+
 subst-cong
   : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : Set ℓB} (C : B → Set ℓC)
   → (f : A → B)

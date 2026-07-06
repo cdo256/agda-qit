@@ -16,17 +16,55 @@ open import QIT.Category.Preorder
 open import QIT.Category.Set
 open import QIT.Functor.Base
 
-WISC : ∀ {ℓ} → (A : Set ℓ) (C : Set ℓ) (W : C → Set ℓ) → Prop _
-WISC {ℓ} A C W =
-  ∀ (E : Set ℓ)
+IsWISC : ∀ {ℓ}
+       → (A : Set ℓ)
+       → (C : Set ℓ)
+       → (W : C → Set ℓ)
+       → (ℓ' : Level)
+       → Prop (ℓ ⊔ lsuc ℓ')
+IsWISC A C W ℓ' =
+  ∀ (E : Set ℓ')
   → (q : E → A)
   → Surjective q
   → ∃ λ (c : C)
   → ∃ λ (f : W c → E)
   → Surjective (q ∘ f)
+
+WISC : ∀ ℓ ℓ' → Prop (lsuc ℓ ⊔ lsuc ℓ')
+WISC ℓ ℓ' = (A : Set ℓ)
+     → ∃ λ (C : Set ℓ)
+     → ∃ λ (W : C → Set ℓ)
+     → IsWISC A C W ℓ'
+
+IWISC : ∀ ℓ ℓ' → Prop (lsuc ℓ ⊔ lsuc ℓ')
+IWISC ℓ ℓ' = (A : Set ℓ) (F : A → Set ℓ)
+      → ∃ λ (C : Set ℓ)
+      → ∃ λ (W : C → Set ℓ)
+      → ∀ c → IsWISC (F c) C W ℓ'
+
+WISC→IWISC : ∀ ℓ ℓ' → WISC ℓ ℓ' → IWISC ℓ ℓ'
+WISC→IWISC ℓ ℓ' wisc A B with wisc A
+... | ∃i C , ∃i D , w = matchp (w {!E!}) {!!}
+  where
+  E : Set _
+  E = Σ A λ x
+    → Σ Set λ F₀
+    → ΣP (F₀ → Set) λ F
+    → IsWISC (B x) F₀ F
+  -- where
+  -- f : (a : A)
+  --   → (E : Set ℓ)
+  --   → (q : E → F a)
+  --   → Surjective q
+  --   → ∃ λ (_ : C)
+  --   → ∃ λ f → (y : F a)
+  --   → ∃ (λ x → q (f x) ≡ y)
+  -- f a E q surj-q with w E {!!} {!!}
+  -- ... | u = {!!}
+
   
 WeakAC : ∀ {ℓ} → (A : Set ℓ) (C : Set ℓ) (W : C → Set ℓ)
-       → WISC A C W
+       → IsWISC A C W ?
        → (B : A → Set ℓ)
        → (P : ∀ x → B x → Prop ℓ)
        → (∀ x → ∃ (P x))
@@ -56,32 +94,26 @@ WeakAC A C W w B P e = wac
     v : (z : W c) → P ((p' ∘ f) z) (q' (f z))
     v z = f z .snd
 
-IWISC : ∀ ℓ → Prop (lsuc ℓ)
-IWISC ℓ = (A : Set ℓ) (F : A → Set ℓ)
-      → ∃ λ (C : Set ℓ)
-      → ∃ λ (W : C → Set ℓ)
-      → ∀ c → WISC (F c) C W
-
-module _ {ℓ} (iwisc : IWISC ℓ) where
-  WeakAC'
-    : ∀ (A : Set ℓ)
-    → ∃ λ (C : Set ℓ)
-    → ∃ λ (W : C → Set ℓ)
-    → (B : A → Set ℓ)
-    → (P : ∀ x → B x → Prop ℓ)
-    → (∀ x → ∃ (P x))
-    → ∃ λ (c : C)
-    → ∃ λ (p : W c → A)
-    → ∃ λ (q : ∀ z → B (p z))
-    → Surjective p
-    ∧ (∀ z → P (p z) (q z))
-  WeakAC' A with iwisc ⊤ˢ* (λ _ → A)
-  ... | ∃i C , ∃i W , w = ∃i C , ∃i W , u 
-    where
-    u : (B : A → Set ℓ) (P : (x : A) → B x → Prop ℓ) (ex : (x : A) → ∃ (P x))
-      → ∃ (λ (c : C)
-      → ∃ (λ (p : W c → A)
-      → ∃ (λ (q : (z : W c) → B (p z))
-      → ((y : A) → ∃ (λ x → p x ≡ y))
-      ∧ ((z : W c) → P (p z) (q z)))))
-    u B P ex = WeakAC A C W (w tt*) B P ex
+-- module _ {ℓ} (iwisc : IWISC ℓ) where
+--   WeakAC'
+--     : ∀ (A : Set ℓ)
+--     → ∃ λ (C : Set ℓ)
+--     → ∃ λ (W : C → Set ℓ)
+--     → (B : A → Set ℓ)
+--     → (P : ∀ x → B x → Prop ℓ)
+--     → (∀ x → ∃ (P x))
+--     → ∃ λ (c : C)
+--     → ∃ λ (p : W c → A)
+--     → ∃ λ (q : ∀ z → B (p z))
+--     → Surjective p
+--     ∧ (∀ z → P (p z) (q z))
+--   WeakAC' A with iwisc ⊤ˢ* (λ _ → A)
+--   ... | ∃i C , ∃i W , w = ∃i C , ∃i W , u 
+--     where
+--     u : (B : A → Set ℓ) (P : (x : A) → B x → Prop ℓ) (ex : (x : A) → ∃ (P x))
+--       → ∃ (λ (c : C)
+--       → ∃ (λ (p : W c → A)
+--       → ∃ (λ (q : (z : W c) → B (p z))
+--       → ((y : A) → ∃ (λ x → p x ≡ y))
+--       ∧ ((z : W c) → P (p z) (q z)))))
+--     u B P ex = WeakAC A C W (w tt*) B P ex

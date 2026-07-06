@@ -10,9 +10,8 @@ import QIT.Relation.IndexedBinary as IndexedBinary
 -- over an index set. This is crucial for the QIT development where we need to
 -- relate elements living at different stages or levels of a construction.
 
-record Setoid ℓI ℓA ℓR : Set (lsuc (ℓI ⊔ ℓA ⊔ ℓR)) where
+record Setoid {ℓI} ℓA ℓR (I : Set ℓI) : Set (lsuc (ℓI ⊔ ℓA ⊔ ℓR)) where
   field
-    I             : Set ℓI
     A             : I → Set ℓA
     R             : IndexedBinaryRel A ℓR
     isEquivalence : IndexedBinary.IsEquivalence A R
@@ -24,10 +23,10 @@ record Setoid ℓI ℓA ℓR : Set (lsuc (ℓI ⊔ ℓA ⊔ ℓR)) where
   _≈_ {i} {j} x y = R i j x y
 
 
-module _ {ℓI ℓA ℓR} (S : Setoid ℓI ℓA ℓR) where
+module _ {ℓI ℓA ℓR} {I : Set ℓI} (S : Setoid ℓA ℓR I) where
   open Setoid S
 
-  ⟨_⟩ : (S .Setoid.I → Set ℓA)
+  ⟨_⟩ : I → Set ℓA
   ⟨_⟩ = A
 
   _[_≈_] : ∀ {i j} → A i → A j → Prop _
@@ -56,10 +55,9 @@ module _ where
 
   -- Convert a regular setoid to an indexed setoid with trivial indexing.
   -- Uses the unit type ⊤ as the index set, so there's only one index.
-  UnindexedSetoid→IndexedSetoid : ∀ {ℓA ℓR} → Unindexed.Setoid ℓA ℓR → Setoid ℓ0 ℓA ℓR
+  UnindexedSetoid→IndexedSetoid : ∀ {ℓA ℓR} → Unindexed.Setoid ℓA ℓR → Setoid ℓA ℓR ⊤ˢ
   UnindexedSetoid→IndexedSetoid S = record
-      { I = ⊤ˢ
-      ; A = λ _ → S.Carrier
+      { A = λ _ → S.Carrier
       ; R = λ _ _ x y → x S.≈ y
       ; isEquivalence = record
         { refl = S.refl
@@ -67,7 +65,7 @@ module _ where
         ; trans = S.trans } }
     where module S = Unindexed.Setoid S
 
-  FiberSetoid : ∀ {ℓI ℓA ℓR} (S : Setoid ℓI ℓA ℓR) → S .Setoid.I → Unindexed.Setoid ℓA ℓR
+  FiberSetoid : ∀ {ℓI ℓA ℓR} {I : Set ℓI} (S : Setoid ℓA ℓR I) → I → Unindexed.Setoid ℓA ℓR
   FiberSetoid S i = record
     { Carrier = A i
     ; _≈_ = R i i
@@ -79,9 +77,9 @@ module _ where
   -- Convert an indexed setoid (at level ℓ0) to a regular setoid.
   -- Takes the dependent sum Σ I A as the carrier, and defines equality
   -- on pairs (i, x) and (j, y) using the indexed relation R i j x y.
-  IndexedSetoid→UnindexedSetoid : ∀ {ℓI ℓA ℓR} → Setoid ℓI ℓA ℓR → Unindexed.Setoid (ℓI ⊔ ℓA) ℓR
-  IndexedSetoid→UnindexedSetoid S = record
-    { Carrier = Σ S.I S.A
+  IndexedSetoid→UnindexedSetoid : ∀ {ℓI ℓA ℓR} {I : Set ℓI} → Setoid ℓA ℓR I → Unindexed.Setoid (ℓI ⊔ ℓA) ℓR
+  IndexedSetoid→UnindexedSetoid {I = I} S = record
+    { Carrier = Σ I S.A
     ; _≈_ = λ (i , x) (j , y) → S.R i j x y
     ; isEquivalence = record
       { refl = S.refl

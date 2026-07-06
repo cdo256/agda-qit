@@ -50,3 +50,6 @@ module ≅ˢ where
     module q = _≅ˢ_ q
 
 open ≅ˢ using (_≅ˢ_) public
+
+matchp : {A : Prop ℓA} {B : A → Prop ℓB} → (a : A) → (f : ∀ a → B a) → B a
+matchp x f = f x
