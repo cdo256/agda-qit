@@ -17,7 +17,6 @@ open import QIT.Relation.Nullary
 open import QIT.Relation.SetQuotient
 open import QIT.Relation.Subset
 open import QIT.Set.Bijection
-open import QIT.Set.Base
 open import QIT.Setoid.Quotient
 
 module QIT.QW.Cocontinuity.FromDepthPreservation
@@ -183,58 +182,38 @@ module LiftElement where
   lift≈₀ : ∀ {α} → (ŝ : S₀ α) → S̃/ (rank ([ S̃ α ] ŝ))
   lift≈₀ ŝ = subst S̃/ (≡.sym (rank-beta ŝ)) (lift/ ŝ)
 
-  -- lift≈-cong' : ∀ {α} {ŝ t̂ : S₀ α} (r : (S̃ α ⊢[ ŝ ]) ≡ (S̃ α ⊢[ t̂ ]))
-  --   → ≡.subst (λ t̂ → S̃/ (rank t̂)) r (lift≈₀ ŝ)
-  --   ≡ lift≈₀ t̂
-  -- lift≈-cong' {α} {ŝ} {t̂} r =
-  --   subst (λ t̂ → S̃/ (rank t̂)) r 
-  --         (subst S̃/ (≡.sym (rank-beta ŝ)) (lift/ ŝ))
-  --     ≡⟨ ≡.subst-cong S̃/ rank r (subst S̃/ _ (lift/ ŝ)) ⟩
-  --   subst S̃/ (≡.cong rank r)
-  --         (subst S̃/ (≡.sym (rank-beta ŝ)) (lift/ ŝ))
-  --     ≡⟨ ≡.subst-subst S̃/ (≡.sym (rank-beta ŝ))
-  --                      (≡.cong rank r) (lift/ ŝ) ⟩
-  --   subst S̃/ (≡.trans (≡.sym (rank-beta ŝ))
-  --                      (≡.cong rank r))
-  --             (lift/ ŝ)
-  --     ≡⟨ {!!} ⟩
-  --   subst S̃/ (≡.sym (rank-beta t̂)) (lift/ t̂) ∎
-  --   where
-  --   open ≡.≡-Reasoning
-
-  -- lift≈-cong : ∀ {α} {ŝ t̂ : S₀ α} (r : ŝ ≈ˢ t̂)
-  --   → ≡.subst (λ t̂ → S̃/ (rank t̂)) (S̃ α ⊢≈[ r ]) (lift≈₀ ŝ)
-  --   ≡ lift≈₀ t̂
-  -- lift≈-cong {α} {ŝ} {t̂} r =
-  --   subst (λ t̂ → S̃/ (rank t̂)) (S̃ α ⊢≈[ r ])
-  --         (subst S̃/ (≡.sym (rank-beta ŝ)) (lift/ ŝ))
-  --     ≡⟨ ≡.subst-cong S̃/ rank (S̃ α ⊢≈[ r ]) (subst S̃/ _ (lift/ ŝ)) ⟩
-  --   subst S̃/ (≡.cong rank (S̃ α ⊢≈[ r ]))
-  --         (subst S̃/ (≡.sym (rank-beta ŝ)) (lift/ ŝ))
-  --     ≡⟨ ≡.subst-subst S̃/ (≡.sym (rank-beta ŝ))
-  --                      (≡.cong rank (S̃ α ⊢≈[ r ])) (lift/ ŝ) ⟩
-  --   subst S̃/ (≡.trans (≡.sym (rank-beta ŝ))
-  --                      (≡.cong rank (S̃ α ⊢≈[ r ])))
-  --             (lift/ ŝ)
-  --     ≡⟨ ≡.sym (≡.subst-subst S̃/ (rank-cong ŝ t̂ r)
-  --                      (≡.sym (rank-beta t̂)) (lift/ ŝ)) ⟩
-  --   subst S̃/ (≡.sym (rank-beta t̂))
-  --         (subst S̃/ (rank-cong ŝ t̂ r) (lift/ ŝ))
-  --     ≡⟨ ≡.cong (subst S̃/ (≡.sym (rank-beta t̂)))
-  --              (lift-cong {ŝ = ŝ} {t̂ = t̂} r) ⟩
-  --   subst S̃/ (≡.sym (rank-beta t̂)) (lift/ t̂) ∎
-  --   where
-  --   open ≡.≡-Reasoning
-  
-  lift≈-cong : ∀ {α} {ŝ t̂ : S₀ α} (p : ŝ ≈ˢ t̂)
-    → ≡.subst (λ t̂ → S̃/ (rank t̂)) (S̃ α ⊢≈[ p ]) (lift≈₀ ŝ)
+  lift≈-cong : ∀ {α} {ŝ t̂ : S₀ α} (r : ŝ ≈ˢ t̂)
+    → ≡.subst (λ t̂ → S̃/ (rank t̂)) (S̃ α ⊢≈[ r ]) (lift≈₀ ŝ)
     ≡ lift≈₀ t̂
-  lift≈-cong {α} {ŝ} {t̂} (≈tcong a f g p) = {!!}
-  lift≈-cong {α} {ŝ} {t̂} (≈tsat e ϕ) = {!!}
-  lift≈-cong {α} {ŝ} {t̂} ≈trefl = ≡.refl
-  lift≈-cong {α} {ŝ} {t̂} (≈tsym p) = ≡.dsym (λ t̂ → S̃/ (rank t̂)) (S̃ α ⊢≈[ p ]) (lift≈-cong p)
-  lift≈-cong {α} {ŝ} {t̂} (≈ttrans p q) =
-    {!≡.dtrans (λ t̂ → S̃/ (rank t̂)) (S̃ α ⊢≈[ p ]) (S̃ α ⊢≈[ q ]) (lift≈-cong p) (lift≈-cong q)!} 
+  lift≈-cong {α} {ŝ} {t̂} r =
+    subst (λ t̂ → S̃/ (rank t̂)) (S̃ α ⊢≈[ r ])
+          (subst S̃/ (≡.sym (rank-beta ŝ)) (lift/ ŝ))
+      ≡⟨ ≡.subst-cong S̃/ rank (S̃ α ⊢≈[ r ]) (subst S̃/ _ (lift/ ŝ)) ⟩
+    subst S̃/ (≡.cong rank (S̃ α ⊢≈[ r ]))
+          (subst S̃/ (≡.sym (rank-beta ŝ)) (lift/ ŝ))
+      ≡⟨ ≡.subst-subst S̃/ (≡.sym (rank-beta ŝ))
+                       (≡.cong rank (S̃ α ⊢≈[ r ])) (lift/ ŝ) ⟩
+    subst S̃/ (≡.trans (≡.sym (rank-beta ŝ))
+                       (≡.cong rank (S̃ α ⊢≈[ r ])))
+              (lift/ ŝ)
+      ≡⟨ subst-irrel
+           (≡.trans (≡.sym (rank-beta ŝ))
+                    (≡.cong rank (S̃ α ⊢≈[ r ])))
+           (≡.trans (rank-cong ŝ t̂ r)
+                    (≡.sym (rank-beta t̂)))
+           (lift/ ŝ) ⟩
+    subst S̃/ (≡.trans (rank-cong ŝ t̂ r)
+                       (≡.sym (rank-beta t̂)))
+              (lift/ ŝ)
+      ≡⟨ ≡.sym (≡.subst-subst S̃/ (rank-cong ŝ t̂ r)
+                       (≡.sym (rank-beta t̂)) (lift/ ŝ)) ⟩
+    subst S̃/ (≡.sym (rank-beta t̂))
+          (subst S̃/ (rank-cong ŝ t̂ r) (lift/ ŝ))
+      ≡⟨ ≡.cong (subst S̃/ (≡.sym (rank-beta t̂)))
+               (lift-cong {ŝ = ŝ} {t̂ = t̂} r) ⟩
+    subst S̃/ (≡.sym (rank-beta t̂)) (lift/ t̂) ∎
+    where
+    open ≡.≡-Reasoning
 
   lift≈ : ∀ {α} → (t̂ : S̃/ α) → S̃/ (rank t̂)
   lift≈ {α} = SQ.elim (S̃ α) (λ t̂ → S̃/ (rank t̂)) lift≈₀ lift≈-cong
@@ -268,6 +247,15 @@ module LiftElement where
       subst S̃/ q (subst S̃/ (≡.sym (rank-beta a)) (lift/ a))
         ≡⟨ ≡.subst-subst S̃/ (≡.sym (rank-beta a)) q (lift/ a) ⟩
       subst S̃/ (≡.trans (≡.sym (rank-beta a)) q) (lift/ a)
+        ≡⟨ subst-irrel
+             (≡.trans (≡.sym (rank-beta a)) q)
+             (≡.trans (≡.sym (rank-beta (dweaken₀ p a)))
+                      (≡.cong rank (≡.sym (dweaken-beta p a))))
+             (lift/ a) ⟩
+      subst S̃/
+        (≡.trans (≡.sym (rank-beta (dweaken₀ p a)))
+                  (≡.cong rank (≡.sym (dweaken-beta p a))))
+        (lift/ a)
         ≡⟨ ≡.sym (≡.subst-subst S̃/
                      (≡.sym (rank-beta (dweaken₀ p a)))
                      (≡.cong rank (≡.sym (dweaken-beta p a)))
@@ -296,7 +284,16 @@ module LiftElement where
   liftC-cong : ∀ {x y} → (p : D* [ x ≈ y ])
              → subst S̃/ (rankC-dp p) (liftC₀ x) ≡ liftC₀ y
   liftC-cong {(α , s̃)} {(α , t̃)} (≈lstage α e) =
-    dcong-liftC₀ (≡.cong (α ,_) e)
+    subst S̃/ (rankC-dp (≈lstage α e))
+          (liftC₀ (α , s̃))
+      ≡⟨ subst-irrel
+           (rankC-dp (≈lstage α e))
+           (≡.cong (λ z → rankC (D* ⊢[ z ])) (≡.cong (α ,_) e))
+           (liftC₀ (α , s̃)) ⟩
+    subst S̃/ (≡.cong (λ z → rankC (D* ⊢[ z ])) (≡.cong (α ,_) e))
+          (liftC₀ (α , s̃))
+      ≡⟨ dcong-liftC₀ (≡.cong (α ,_) e) ⟩
+    liftC₀ (α , t̃) ∎
     where
     open ≡.≡-Reasoning
 
@@ -311,6 +308,15 @@ module LiftElement where
     subst S̃/ (≡.trans (≡.sym (rankC-beta (α , s̃)))
                        (rankC-dp (≈lstep p s̃)))
           (lift≈ s̃)
+      ≡⟨ subst-irrel
+           (≡.trans (≡.sym (rankC-beta (α , s̃)))
+                    (rankC-dp (≈lstep p s̃)))
+           (≡.trans (rankC-cong (≈lstep p s̃))
+                    (≡.sym (rankC-beta (β , D̃/.hom (box p) s̃))))
+           (lift≈ s̃) ⟩
+    subst S̃/ (≡.trans (rankC-cong (≈lstep p s̃))
+                       (≡.sym (rankC-beta (β , D̃/.hom (box p) s̃))))
+          (lift≈ s̃)
       ≡⟨ ≡.sym (≡.subst-subst S̃/ (rankC-cong (≈lstep p s̃))
                            (≡.sym (rankC-beta (β , D̃/.hom (box p) s̃)))
                            (lift≈ s̃)) ⟩
@@ -323,12 +329,19 @@ module LiftElement where
     open ≡.≡-Reasoning
   liftC-cong {x} {y} (≈lsym p) =
     subst S̃/ (rankC-dp (≈lsym p)) (liftC₀ x)
+      ≡⟨ subst-irrel (rankC-dp (≈lsym p)) (≡.sym (rankC-dp p)) (liftC₀ x) ⟩
+    subst S̃/ (≡.sym (rankC-dp p)) (liftC₀ x)
       ≡⟨ ≡.dsym S̃/ (rankC-dp p) (liftC-cong p) ⟩
     liftC₀ y ∎
     where
     open ≡.≡-Reasoning
   liftC-cong {x} {z} (≈ltrans {t = y} p q) =
     subst S̃/ (rankC-dp (≈ltrans p q)) (liftC₀ x)
+      ≡⟨ subst-irrel
+           (rankC-dp (≈ltrans p q))
+           (≡.trans (rankC-dp p) (rankC-dp q))
+           (liftC₀ x) ⟩
+    subst S̃/ (≡.trans (rankC-dp p) (rankC-dp q)) (liftC₀ x)
       ≡⟨ ≡.sym (≡.subst-subst S̃/ (rankC-dp p) (rankC-dp q) (liftC₀ x)) ⟩
     subst S̃/ (rankC-dp q) (subst S̃/ (rankC-dp p) (liftC₀ x))
       ≡⟨ ≡.cong (subst S̃/ (rankC-dp q)) (liftC-cong p) ⟩
@@ -384,10 +397,28 @@ module LiftElement where
       where
       open ≡.≡-Reasoning
 
+  weaken-irrel : ∀ {α β} (p q : α ≤ β) (ŝ : S̃/ α) → dweaken/ p ŝ ≡ dweaken/ q ŝ
+  weaken-irrel {α} {β} p q = SQ.elimp (S̃ α) B u
+    where
+    B : S̃/ α → Prop _
+    B ŝ = dweaken/ p ŝ ≡ dweaken/ q ŝ
+
+    u : ∀ a → B (S̃ α ⊢[ a ])
+    u a =
+      dweaken/ p (S̃ α ⊢[ a ])
+        ≡⟨ dweaken-beta p a ⟩
+      S̃ β ⊢[ dweaken₀ p a ]
+        ≡⟨ S̃ β ⊢≈[ ≈trefl ] ⟩
+      S̃ β ⊢[ dweaken₀ q a ]
+        ≡⟨ ≡.sym (dweaken-beta q a) ⟩
+      dweaken/ q (S̃ α ⊢[ a ]) ∎
+      where
+      open ≡.≡-Reasoning
+
   dweaken-cast : ∀ {α β γ} (r : α ≡ β)
     → (p : α ≤ γ) (q : β ≤ γ) (ŝ : S̃/ α)
     → dweaken/ p ŝ ≡ dweaken/ q (subst S̃/ r ŝ)
-  dweaken-cast ≡.refl p q ŝ = ≡.refl
+  dweaken-cast ≡.refl p q ŝ = weaken-irrel p q ŝ
 
   weakenLiftC : ∀ {α β} (p : α ≤ β) (ŝ : S̃/ α)
     → dweaken/ (≤≤ p (rank≤ ŝ)) (subst S̃/ (rankC-beta (α , ŝ)) (liftC₀ (α , ŝ)))
@@ -532,7 +563,9 @@ module Cocontinuity where
                 (Σ-proj₂ (liftC-beta (α , f̂ i))))
               (≡.trans
                 (dweaken-cast r₂ q₁ q₂ (liftC₀ (α , f̂ i)))
-                (weakenLiftC (Z.<→≤ (Z.∨ᶻ-l< {α} {β})) (f̂ i)))))
+                (≡.trans
+                  (weaken-irrel q₂ p₂ (subst S̃/ (rankC-beta (α , f̂ i)) (liftC₀ (α , f̂ i))))
+                  (weakenLiftC (Z.<→≤ (Z.∨ᶻ-l< {α} {β})) (f̂ i))))))
         where
         r₁ : μ i ≡ rankC (D* ⊢[ α , f̂ i ])
         r₁ = ≡.cong proj₁ (liftC-beta (α , f̂ i))
