@@ -53,3 +53,9 @@ open ≅ˢ using (_≅ˢ_) public
 
 matchp : {A : Prop ℓA} {B : A → Prop ℓB} → (a : A) → (f : ∀ a → B a) → B a
 matchp x f = f x
+
+_∘_ : ∀ {A : Set ℓA} {B : A → Set ℓB} {C : A → Set ℓC}
+    → (g : ∀ {a} → (b : B a) → C a)
+    → (f : (a : A) → B a)
+    → ∀ a → C a
+(g ∘ f) a = g (f a)

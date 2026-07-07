@@ -1,8 +1,9 @@
 open import QIT.Prelude
 
-module QIT.Examples.ConTy.WeaklyTagged ⦃ a!c* : A!C ⦄ where
+module QIT.Examples.ConTy.WeaklyTagged
+  ⦃ pathElim* : PathElim ⦄
+  where
 
-open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Relation.Subset
 open import QIT.Relation.Base
@@ -33,41 +34,17 @@ record Algebra : Set₁ where
       → [ γ ] ≡ ĉ
       → [ a ] ≡ t̂ γ
       → [ ▷ γ a ] ≡ ĉ
-    k▷-a : (γ : CT) (a : CT)
-      → [ γ ] ≡ ĉ
-      → [ ▷ γ a ] ≡ ĉ
-      → [ a ] ≡ t̂ γ
     u : (γ : CT) → CT
     ku : (γ : CT)
       → [ γ ] ≡ ĉ
       → [ u γ ] ≡ t̂ γ 
     π : (γ : CT) (a : CT) (b : CT) → CT
-    kπ-a : (γ : CT) (a : CT) (b : CT) 
-      → [ γ ] ≡ ĉ
-      → [ b ] ≡ t̂ (▷ γ a)
-      → [ π γ a b ] ≡ t̂ γ 
-      → [ a ] ≡ t̂ γ
-    kπ-b : (γ : CT) (a : CT) (b : CT) 
-      → [ γ ] ≡ ĉ
-      → [ a ] ≡ t̂ γ
-      → [ π γ a b ] ≡ t̂ γ 
-      → [ b ] ≡ t̂ (▷ γ a)
     kπ : (γ : CT) (a : CT) (b : CT) 
       → [ γ ] ≡ ĉ
       → [ a ] ≡ t̂ γ
       → [ b ] ≡ t̂ (▷ γ a)
       → [ π γ a b ] ≡ t̂ γ 
     σ : (γ : CT) (a : CT) (b : CT) → CT
-    kσ-a : (γ : CT) (a : CT) (b : CT) 
-      → [ γ ] ≡ ĉ
-      → [ b ] ≡ t̂ (▷ γ a)
-      → [ σ γ a b ] ≡ t̂ γ 
-      → [ a ] ≡ t̂ γ
-    kσ-b : (γ : CT) (a : CT) (b : CT) 
-      → [ γ ] ≡ ĉ
-      → [ a ] ≡ t̂ γ
-      → [ σ γ a b ] ≡ t̂ γ 
-      → [ b ] ≡ t̂ (▷ γ a)
     kσ : (γ : CT) (a : CT) (b : CT) 
       → [ γ ] ≡ ĉ
       → [ a ] ≡ t̂ γ
@@ -208,6 +185,3 @@ Cat = record
 
 open import QIT.Category.Morphism Cat public
 open import QIT.Category.Initial Cat public
-
--- Q : Algebra
--- isInitialQ : isInitial Q

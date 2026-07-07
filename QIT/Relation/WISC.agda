@@ -10,11 +10,10 @@ open import QIT.Relation.Base
 open import QIT.Relation.Binary
 open import QIT.Relation.Ordinal
 open import QIT.Prop
-open import QIT.Function.Base
+open import QIT.Function.Base hiding (_∘_)
 open import QIT.Set.Base
 open import QIT.Category.Preorder
 open import QIT.Category.Set
-open import QIT.Functor.Base
 
 IsWISC : ∀ {ℓ}
        → (A : Set ℓ)
@@ -42,25 +41,25 @@ IWISC ℓ ℓ' = (A : Set ℓ) (F : A → Set ℓ)
       → ∃ λ (W : C → Set ℓ)
       → ∀ c → IsWISC (F c) C W ℓ'
 
-WISC→IWISC : ∀ ℓ ℓ' → WISC ℓ ℓ' → IWISC ℓ ℓ'
-WISC→IWISC ℓ ℓ' wisc A B with wisc A
-... | ∃i C , ∃i D , w = matchp (w {!E!}) {!!}
-  where
-  E : Set _
-  E = Σ A λ x
-    → Σ Set λ F₀
-    → ΣP (F₀ → Set) λ F
-    → IsWISC (B x) F₀ F
-  -- where
-  -- f : (a : A)
-  --   → (E : Set ℓ)
-  --   → (q : E → F a)
-  --   → Surjective q
-  --   → ∃ λ (_ : C)
-  --   → ∃ λ f → (y : F a)
-  --   → ∃ (λ x → q (f x) ≡ y)
-  -- f a E q surj-q with w E {!!} {!!}
-  -- ... | u = {!!}
+-- WISC→IWISC : ∀ ℓ ℓ' → WISC ℓ ℓ' → IWISC ℓ ℓ'
+-- WISC→IWISC ℓ ℓ' wisc A B with wisc A
+-- ... | ∃i C , ∃i D , w = matchp (w {!E!}) {!!}
+--   where
+--   E : Set _
+--   E = Σ A λ x
+--     → Σ Set λ F₀
+--     → ΣP (F₀ → Set) λ F
+--     → IsWISC (B x) F₀ F
+--   -- where
+--   -- f : (a : A)
+--   --   → (E : Set ℓ)
+--   --   → (q : E → F a)
+--   --   → Surjective q
+--   --   → ∃ λ (_ : C)
+--   --   → ∃ λ f → (y : F a)
+--   --   → ∃ (λ x → q (f x) ≡ y)
+--   -- f a E q surj-q with w E {!!} {!!}
+--   -- ... | u = {!!}
 
   
 WeakAC : ∀ {ℓ} → (A : Set ℓ) (C : Set ℓ) (W : C → Set ℓ)

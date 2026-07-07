@@ -1,6 +1,9 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 open import QIT.Prelude
 
-module QIT.Examples.ConTy.Direct ⦃ a!c* : A!C ⦄ where
+module QIT.Examples.ConTy.Direct
+  ⦃ pathElim* : PathElim ⦄
+  where
 
 open import QIT.Prelude
 open import QIT.Prop
@@ -16,10 +19,10 @@ record Algebra : Set₁ where
     ∙   : Con
     _▷_ : ∀ γ → Ty γ → Con
     u   : (γ : Con) → Ty γ
-    π   : ∀ {γ} → (a : Ty γ) → (b : Ty (γ ▷ a)) → Ty γ
-    σ   : ∀ {γ} → (a : Ty γ) → (b : Ty (γ ▷ a)) → Ty γ
-    σ▷  : ∀ {γ a b} → γ ▷ a ▷ b ≡ γ ▷ σ a b
-    σπ  : ∀ {γ a b c} → π {γ} a (π b c) ≡ π (σ a b) (subst Ty σ▷ c)
+    π   : ∀ γ → (a : Ty γ) → (b : Ty (γ ▷ a)) → Ty γ
+    σ   : ∀ γ → (a : Ty γ) → (b : Ty (γ ▷ a)) → Ty γ
+    σ▷  : ∀ γ a b → γ ▷ a ▷ b ≡ γ ▷ σ γ a b
+    σπ  : ∀ γ a b c → π γ a (π (γ ▷ a) b c) ≡ π γ (σ γ a b) (subst Ty (σ▷ γ a b) c)
 
 open Algebra public
 
@@ -31,12 +34,12 @@ record Hom (A B : Algebra) : Set₁ where
     conᴿ : A.Con → B.Con
     tyᴿ  : ∀ γ → A.Ty γ → B.Ty (conᴿ γ)
     ∙ᴿ   : conᴿ A.∙ ≡ B.∙
-    ▷ᴿ   : ∀ {γ} a → conᴿ (γ A.▷ a) ≡ conᴿ γ B.▷ tyᴿ γ a
-    uᴿ   : ∀ {γ} → tyᴿ γ (A.u γ) ≡ B.u (conᴿ γ)
-    πᴿ   : ∀ {γ} a b → tyᴿ γ (A.π a b)
-                      ≡ B.π (tyᴿ γ a) (subst B.Ty (▷ᴿ a) (tyᴿ (γ A.▷ a) b))
-    σᴿ   : ∀ {γ} a b → tyᴿ γ (A.σ a b)
-                      ≡ B.σ (tyᴿ γ a) (subst B.Ty (▷ᴿ a) (tyᴿ (γ A.▷ a) b))
+    ▷ᴿ   : ∀ γ a → conᴿ (γ A.▷ a) ≡ conᴿ γ B.▷ tyᴿ γ a
+    uᴿ   : ∀ γ → tyᴿ γ (A.u γ) ≡ B.u (conᴿ γ)
+    πᴿ   : ∀ γ a b → tyᴿ γ (A.π γ a b)
+                      ≡ B.π (conᴿ γ) (tyᴿ γ a) (subst B.Ty (▷ᴿ γ a) (tyᴿ (γ A.▷ a) b))
+    σᴿ   : ∀ γ a b → tyᴿ γ (A.σ γ a b)
+                      ≡ B.σ (conᴿ γ) (tyᴿ γ a) (subst B.Ty (▷ᴿ γ a) (tyᴿ (γ A.▷ a) b))
 
 open Hom public
 
@@ -52,10 +55,10 @@ id = record
   { conᴿ = λ γ → γ
   ; tyᴿ  = λ _ a → a
   ; ∙ᴿ   = ≡.refl
-  ; ▷ᴿ   = λ _ → ≡.refl
-  ; uᴿ   = ≡.refl
-  ; πᴿ   = λ _ _ → ≡.refl
-  ; σᴿ   = λ _ _ → ≡.refl
+  ; ▷ᴿ   = λ _ _ → ≡.refl
+  ; uᴿ   = λ _ → ≡.refl
+  ; πᴿ   = λ _ _ _ → ≡.refl
+  ; σᴿ   = λ _ _ _ → ≡.refl
   }
 
 _∘_ : ∀ {A B C} → Hom B C → Hom A B → Hom A C
@@ -139,7 +142,7 @@ open _≈_ public
 
 isEquiv≈ : ∀ {A B : Algebra} → IsEquivalence (_≈_ {A} {B})
 isEquiv≈ {A} {B} = record
-  { refl  = mk≈ (λ _ → ≡.refl) (λ _ _ → ≡.refl)
+  { refl  = mk≈ (λ _ → ≡.refl) (λ _ _ → ≡.refl)-- 
   ; sym   = λ (mk≈ c t) → mk≈ (λ γ   → ≡.sym (c γ))
                                (λ γ a → ≡.dsym (Ty B) (c γ) (t γ a))
   ; trans = λ (mk≈ cp tp) (mk≈ cq tq) →
