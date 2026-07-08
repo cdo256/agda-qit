@@ -41,29 +41,44 @@ IWISC ℓ ℓ' = (A : Set ℓ) (F : A → Set ℓ)
       → ∃ λ (W : C → Set ℓ)
       → ∀ c → IsWISC (F c) C W ℓ'
 
--- WISC→IWISC : ∀ ℓ ℓ' → WISC ℓ ℓ' → IWISC ℓ ℓ'
--- WISC→IWISC ℓ ℓ' wisc A B with wisc A
--- ... | ∃i C , ∃i D , w = matchp (w {!E!}) {!!}
---   where
---   E : Set _
---   E = Σ A λ x
---     → Σ Set λ F₀
---     → ΣP (F₀ → Set) λ F
---     → IsWISC (B x) F₀ F
---   -- where
---   -- f : (a : A)
---   --   → (E : Set ℓ)
---   --   → (q : E → F a)
---   --   → Surjective q
---   --   → ∃ λ (_ : C)
---   --   → ∃ λ f → (y : F a)
---   --   → ∃ (λ x → q (f x) ≡ y)
---   -- f a E q surj-q with w E {!!} {!!}
---   -- ... | u = {!!}
+WISC→IWISC : (∀ ℓ ℓ' → WISC ℓ ℓ') → (∀ ℓ ℓ' → IWISC ℓ ℓ')
+WISC→IWISC wisc ℓ ℓ' A B with wisc ℓ (lsuc ℓ' ⊔ lsuc ℓ) A
+... | ∃i C , ∃i D , wCD = matchp (wCD E p surj-p) (λ where
+  (∃i c , ∃i f , surj-p∘f) →
+    let C' : Set ℓ
+        C' = {!!}
+        D' : C' → Set ℓ
+        D' = {!!}
+        w' : ∀ c' → IsWISC (D' c') C' D' ℓ'
+        w' = {!!}
+    in ∃i C' , ∃i D' , w')
+  where
+  E : Set _
+  E = Σ A λ x
+    → Σ (Set ℓ) λ F₀
+    → ΣP (F₀ → Set ℓ) λ F₁
+    → IsWISC (B x) F₀ F₁ ℓ'
+  p : E → A
+  p (x , F₀ , F₁ , wF) = x
+  surj-p : Surjective p
+  surj-p x with wisc ℓ ℓ' (B x)
+  ... | ∃i F₀ , ∃i F₁ , wF =
+    ∃i (x , F₀ , F₁ , wF) , ≡.refl
+    
+  -- where
+  -- f : (a : A)
+  --   → (E : Set ℓ)
+  --   → (q : E → F a)
+  --   → Surjective q
+  --   → ∃ λ (_ : C)
+  --   → ∃ λ f → (y : F a)
+  --   → ∃ (λ x → q (f x) ≡ y)
+  -- f a E q surj-q with w E {!!} {!!}
+  -- ... | u = {!!}
 
   
 WeakAC : ∀ {ℓ} → (A : Set ℓ) (C : Set ℓ) (W : C → Set ℓ)
-       → IsWISC A C W ?
+       → IsWISC A C W {!!}
        → (B : A → Set ℓ)
        → (P : ∀ x → B x → Prop ℓ)
        → (∀ x → ∃ (P x))
