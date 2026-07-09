@@ -66,10 +66,10 @@ _∘_ {A} {B} {C} g f = record
   { conᴿ = λ γ   → g.conᴿ (f.conᴿ γ)
   ; tyᴿ  = λ γ a → g.tyᴿ (f.conᴿ γ) (f.tyᴿ γ a)
   ; ∙ᴿ   = ≡.trans (≡.cong g.conᴿ f.∙ᴿ) g.∙ᴿ
-  ; ▷ᴿ   = λ a   → ≡.trans (≡.cong g.conᴿ (f.▷ᴿ a)) (g.▷ᴿ (f.tyᴿ _ a))
-  ; uᴿ   = ≡.trans (≡.cong (g.tyᴿ _) f.uᴿ) g.uᴿ
-  ; πᴿ   = λ {γ} a b → ≡.trans (≡.cong (g.tyᴿ _) (f.πᴿ a b)) (w a b)
-  ; σᴿ   = λ {γ} a b → ≡.trans (≡.cong (g.tyᴿ _) (f.σᴿ a b)) (v a b)
+  ; ▷ᴿ   = λ γ a → ≡.trans (≡.cong g.conᴿ (f.▷ᴿ γ a)) (g.▷ᴿ (f.conᴿ γ) (f.tyᴿ γ a))
+  ; uᴿ   = λ γ → ≡.trans (≡.cong (g.tyᴿ _) (f.uᴿ γ)) (g.uᴿ (f.conᴿ γ))
+  ; πᴿ   = λ γ a b → ≡.trans (≡.cong (g.tyᴿ _) (f.πᴿ γ a b)) (w γ a b)
+  ; σᴿ   = λ γ a b → ≡.trans (≡.cong (g.tyᴿ _) (f.σᴿ γ a b)) (v γ a b)
   }
   where
   module A = Algebra A
@@ -77,59 +77,59 @@ _∘_ {A} {B} {C} g f = record
   module C = Algebra C
   module f = Hom f
   module g = Hom g
-  w : ∀ {γ} a b
-    → g.tyᴿ _ (B.π (f.tyᴿ γ a) (subst B.Ty (f.▷ᴿ a) (f.tyᴿ _ b)))
-    ≡ C.π (g.tyᴿ _ (f.tyᴿ γ a))
-          (subst C.Ty (≡.trans (≡.cong g.conᴿ (f.▷ᴿ a)) (g.▷ᴿ (f.tyᴿ _ a)))
+  w : ∀ γ a b
+    → g.tyᴿ _ (B.π (f.conᴿ γ) (f.tyᴿ γ a) (subst B.Ty (f.▷ᴿ γ a) (f.tyᴿ _ b)))
+    ≡ C.π (g.conᴿ (f.conᴿ γ)) (g.tyᴿ _ (f.tyᴿ γ a))
+          (subst C.Ty (≡.trans (≡.cong g.conᴿ (f.▷ᴿ γ a)) (g.▷ᴿ (f.conᴿ γ) (f.tyᴿ γ a)))
                       (g.tyᴿ _ (f.tyᴿ _ b)))
-  w a b =
-    g.tyᴿ _ (B.π (f.tyᴿ _ a) (subst B.Ty (f.▷ᴿ a) (f.tyᴿ _ b)))
-      ≡⟨ g.πᴿ (f.tyᴿ _ a) (subst B.Ty (f.▷ᴿ a) (f.tyᴿ _ b)) ⟩
-    C.π (g.tyᴿ _ (f.tyᴿ _ a))
-        (subst C.Ty (g.▷ᴿ (f.tyᴿ _ a)) (g.tyᴿ _ (subst B.Ty (f.▷ᴿ a) (f.tyᴿ _ b))))
-      ≡⟨ ≡.cong (C.π _) q ⟩
-    C.π (g.tyᴿ _ (f.tyᴿ _ a))
-        (subst C.Ty (≡.trans (≡.cong g.conᴿ (f.▷ᴿ a)) (g.▷ᴿ (f.tyᴿ _ a)))
+  w γ a b =
+    g.tyᴿ _ (B.π (f.conᴿ γ) (f.tyᴿ γ a) (subst B.Ty (f.▷ᴿ γ a) (f.tyᴿ _ b)))
+      ≡⟨ g.πᴿ (f.conᴿ γ) (f.tyᴿ γ a) (subst B.Ty (f.▷ᴿ γ a) (f.tyᴿ _ b)) ⟩
+    C.π (g.conᴿ (f.conᴿ γ)) (g.tyᴿ _ (f.tyᴿ γ a))
+        (subst C.Ty (g.▷ᴿ (f.conᴿ γ) (f.tyᴿ γ a)) (g.tyᴿ _ (subst B.Ty (f.▷ᴿ γ a) (f.tyᴿ _ b))))
+      ≡⟨ ≡.cong (C.π (g.conᴿ (f.conᴿ γ)) (g.tyᴿ _ (f.tyᴿ γ a))) q ⟩
+    C.π (g.conᴿ (f.conᴿ γ)) (g.tyᴿ _ (f.tyᴿ γ a))
+        (subst C.Ty (≡.trans (≡.cong g.conᴿ (f.▷ᴿ γ a)) (g.▷ᴿ (f.conᴿ γ) (f.tyᴿ γ a)))
                     (g.tyᴿ _ (f.tyᴿ _ b))) ∎
     where
     open ≡.≡-Reasoning
-    q : subst C.Ty (g.▷ᴿ (f.tyᴿ _ a)) (g.tyᴿ _ (subst B.Ty (f.▷ᴿ a) (f.tyᴿ _ b)))
-      ≡ subst C.Ty (≡.trans (≡.cong g.conᴿ (f.▷ᴿ a)) (g.▷ᴿ (f.tyᴿ _ a)))
+    q : subst C.Ty (g.▷ᴿ (f.conᴿ γ) (f.tyᴿ γ a)) (g.tyᴿ _ (subst B.Ty (f.▷ᴿ γ a) (f.tyᴿ _ b)))
+      ≡ subst C.Ty (≡.trans (≡.cong g.conᴿ (f.▷ᴿ γ a)) (g.▷ᴿ (f.conᴿ γ) (f.tyᴿ γ a)))
                    (g.tyᴿ _ (f.tyᴿ _ b))
     q =
-      subst C.Ty (g.▷ᴿ (f.tyᴿ _ a)) (g.tyᴿ _ (subst B.Ty (f.▷ᴿ a) (f.tyᴿ _ b)))
-        ≡⟨ ≡.cong (subst C.Ty (g.▷ᴿ _)) (tyᴿ-subst g (f.▷ᴿ a) (f.tyᴿ _ b)) ⟩
-      subst C.Ty (g.▷ᴿ (f.tyᴿ _ a))
-                 (subst C.Ty (≡.cong g.conᴿ (f.▷ᴿ a)) (g.tyᴿ _ (f.tyᴿ _ b)))
-        ≡⟨ ≡.subst-subst C.Ty (≡.cong g.conᴿ (f.▷ᴿ a)) (g.▷ᴿ (f.tyᴿ _ a)) _ ⟩
-      subst C.Ty (≡.trans (≡.cong g.conᴿ (f.▷ᴿ a)) (g.▷ᴿ (f.tyᴿ _ a)))
+      subst C.Ty (g.▷ᴿ (f.conᴿ γ) (f.tyᴿ γ a)) (g.tyᴿ _ (subst B.Ty (f.▷ᴿ γ a) (f.tyᴿ _ b)))
+        ≡⟨ ≡.cong (subst C.Ty (g.▷ᴿ (f.conᴿ γ) (f.tyᴿ γ a))) (tyᴿ-subst g (f.▷ᴿ γ a) (f.tyᴿ _ b)) ⟩
+      subst C.Ty (g.▷ᴿ (f.conᴿ γ) (f.tyᴿ γ a))
+                 (subst C.Ty (≡.cong g.conᴿ (f.▷ᴿ γ a)) (g.tyᴿ _ (f.tyᴿ _ b)))
+        ≡⟨ ≡.subst-subst C.Ty (≡.cong g.conᴿ (f.▷ᴿ γ a)) (g.▷ᴿ (f.conᴿ γ) (f.tyᴿ γ a)) _ ⟩
+      subst C.Ty (≡.trans (≡.cong g.conᴿ (f.▷ᴿ γ a)) (g.▷ᴿ (f.conᴿ γ) (f.tyᴿ γ a)))
                  (g.tyᴿ _ (f.tyᴿ _ b)) ∎
-  v : ∀ {γ} a b
-    → g.tyᴿ _ (B.σ (f.tyᴿ γ a) (subst B.Ty (f.▷ᴿ a) (f.tyᴿ _ b)))
-    ≡ C.σ (g.tyᴿ _ (f.tyᴿ γ a))
-          (subst C.Ty (≡.trans (≡.cong g.conᴿ (f.▷ᴿ a)) (g.▷ᴿ (f.tyᴿ _ a)))
+  v : ∀ γ a b
+    → g.tyᴿ _ (B.σ (f.conᴿ γ) (f.tyᴿ γ a) (subst B.Ty (f.▷ᴿ γ a) (f.tyᴿ _ b)))
+    ≡ C.σ (g.conᴿ (f.conᴿ γ)) (g.tyᴿ _ (f.tyᴿ γ a))
+          (subst C.Ty (≡.trans (≡.cong g.conᴿ (f.▷ᴿ γ a)) (g.▷ᴿ (f.conᴿ γ) (f.tyᴿ γ a)))
                       (g.tyᴿ _ (f.tyᴿ _ b)))
-  v a b =
-    g.tyᴿ _ (B.σ (f.tyᴿ _ a) (subst B.Ty (f.▷ᴿ a) (f.tyᴿ _ b)))
-      ≡⟨ g.σᴿ (f.tyᴿ _ a) (subst B.Ty (f.▷ᴿ a) (f.tyᴿ _ b)) ⟩
-    C.σ (g.tyᴿ _ (f.tyᴿ _ a))
-        (subst C.Ty (g.▷ᴿ (f.tyᴿ _ a)) (g.tyᴿ _ (subst B.Ty (f.▷ᴿ a) (f.tyᴿ _ b))))
-      ≡⟨ ≡.cong (C.σ _) q ⟩
-    C.σ (g.tyᴿ _ (f.tyᴿ _ a))
-        (subst C.Ty (≡.trans (≡.cong g.conᴿ (f.▷ᴿ a)) (g.▷ᴿ (f.tyᴿ _ a)))
+  v γ a b =
+    g.tyᴿ _ (B.σ (f.conᴿ γ) (f.tyᴿ γ a) (subst B.Ty (f.▷ᴿ γ a) (f.tyᴿ _ b)))
+      ≡⟨ g.σᴿ (f.conᴿ γ) (f.tyᴿ γ a) (subst B.Ty (f.▷ᴿ γ a) (f.tyᴿ _ b)) ⟩
+    C.σ (g.conᴿ (f.conᴿ γ)) (g.tyᴿ _ (f.tyᴿ γ a))
+        (subst C.Ty (g.▷ᴿ (f.conᴿ γ) (f.tyᴿ γ a)) (g.tyᴿ _ (subst B.Ty (f.▷ᴿ γ a) (f.tyᴿ _ b))))
+      ≡⟨ ≡.cong (C.σ (g.conᴿ (f.conᴿ γ)) (g.tyᴿ _ (f.tyᴿ γ a))) q ⟩
+    C.σ (g.conᴿ (f.conᴿ γ)) (g.tyᴿ _ (f.tyᴿ γ a))
+        (subst C.Ty (≡.trans (≡.cong g.conᴿ (f.▷ᴿ γ a)) (g.▷ᴿ (f.conᴿ γ) (f.tyᴿ γ a)))
                     (g.tyᴿ _ (f.tyᴿ _ b))) ∎
     where
     open ≡.≡-Reasoning
-    q : subst C.Ty (g.▷ᴿ (f.tyᴿ _ a)) (g.tyᴿ _ (subst B.Ty (f.▷ᴿ a) (f.tyᴿ _ b)))
-      ≡ subst C.Ty (≡.trans (≡.cong g.conᴿ (f.▷ᴿ a)) (g.▷ᴿ (f.tyᴿ _ a)))
+    q : subst C.Ty (g.▷ᴿ (f.conᴿ γ) (f.tyᴿ γ a)) (g.tyᴿ _ (subst B.Ty (f.▷ᴿ γ a) (f.tyᴿ _ b)))
+      ≡ subst C.Ty (≡.trans (≡.cong g.conᴿ (f.▷ᴿ γ a)) (g.▷ᴿ (f.conᴿ γ) (f.tyᴿ γ a)))
                    (g.tyᴿ _ (f.tyᴿ _ b))
     q =
-      subst C.Ty (g.▷ᴿ (f.tyᴿ _ a)) (g.tyᴿ _ (subst B.Ty (f.▷ᴿ a) (f.tyᴿ _ b)))
-        ≡⟨ ≡.cong (subst C.Ty (g.▷ᴿ _)) (tyᴿ-subst g (f.▷ᴿ a) (f.tyᴿ _ b)) ⟩
-      subst C.Ty (g.▷ᴿ (f.tyᴿ _ a))
-                 (subst C.Ty (≡.cong g.conᴿ (f.▷ᴿ a)) (g.tyᴿ _ (f.tyᴿ _ b)))
-        ≡⟨ ≡.subst-subst C.Ty (≡.cong g.conᴿ (f.▷ᴿ a)) (g.▷ᴿ (f.tyᴿ _ a)) _ ⟩
-      subst C.Ty (≡.trans (≡.cong g.conᴿ (f.▷ᴿ a)) (g.▷ᴿ (f.tyᴿ _ a)))
+      subst C.Ty (g.▷ᴿ (f.conᴿ γ) (f.tyᴿ γ a)) (g.tyᴿ _ (subst B.Ty (f.▷ᴿ γ a) (f.tyᴿ _ b)))
+        ≡⟨ ≡.cong (subst C.Ty (g.▷ᴿ (f.conᴿ γ) (f.tyᴿ γ a))) (tyᴿ-subst g (f.▷ᴿ γ a) (f.tyᴿ _ b)) ⟩
+      subst C.Ty (g.▷ᴿ (f.conᴿ γ) (f.tyᴿ γ a))
+                 (subst C.Ty (≡.cong g.conᴿ (f.▷ᴿ γ a)) (g.tyᴿ _ (f.tyᴿ _ b)))
+        ≡⟨ ≡.subst-subst C.Ty (≡.cong g.conᴿ (f.▷ᴿ γ a)) (g.▷ᴿ (f.conᴿ γ) (f.tyᴿ γ a)) _ ⟩
+      subst C.Ty (≡.trans (≡.cong g.conᴿ (f.▷ᴿ γ a)) (g.▷ᴿ (f.conᴿ γ) (f.tyᴿ γ a)))
                  (g.tyᴿ _ (f.tyᴿ _ b)) ∎
 
 record _≈_ {A B : Algebra} (f g : Hom A B) : Prop ℓ0 where
@@ -142,7 +142,7 @@ open _≈_ public
 
 isEquiv≈ : ∀ {A B : Algebra} → IsEquivalence (_≈_ {A} {B})
 isEquiv≈ {A} {B} = record
-  { refl  = mk≈ (λ _ → ≡.refl) (λ _ _ → ≡.refl)-- 
+  { refl  = mk≈ (λ _ → ≡.refl) (λ _ _ → ≡.refl)
   ; sym   = λ (mk≈ c t) → mk≈ (λ γ   → ≡.sym (c γ))
                                (λ γ a → ≡.dsym (Ty B) (c γ) (t γ a))
   ; trans = λ (mk≈ cp tp) (mk≈ cq tq) →

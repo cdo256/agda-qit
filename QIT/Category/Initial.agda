@@ -17,8 +17,10 @@ open Category C
 isWeaklyInitial : (x : Obj) → Prop (ℓCo ⊔ ℓCh)
 isWeaklyInitial x = ∀ (y : Obj) → ∥ x ⇒ y ∥
 
-isInitial : (x : Obj) → Prop (ℓCo ⊔ ℓCh)
-isInitial x = ∀ y → isProp (x ⇒ y)
+record isInitial (x : Obj) : Set (ℓCo ⊔ ℓCh ⊔ ℓCe) where
+  field
+    hom : ∀ y → x ⇒ y
+    unique : ∀ y → (f : x ⇒ y) → hom y ≡ f
 
-Initial : Set (ℓCo ⊔ ℓCh)
-Initial = ΣP Obj isInitial
+Initial : Set (ℓCo ⊔ ℓCh ⊔ ℓCe)
+Initial = Σ Obj isInitial
