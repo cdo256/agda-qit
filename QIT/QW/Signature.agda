@@ -33,6 +33,9 @@ record Sig ℓS ℓP ℓE ℓV : Set (lsuc ℓE ⊔ lsuc ℓV ⊔ lsuc ℓS ⊔ 
 
   open Equation public
 
+W→Sig : (S : Set ℓS) (P : S → Set ℓP) → Sig ℓS ℓP ℓ0 ℓ0
+W→Sig S P = record { S = S ; P = P ; E = ⊥ˢ ; Ξ = λ () }
+
 record SigQ ℓS ℓP ℓE ℓV ℓB : Set (lsuc ℓE ⊔ lsuc ℓV ⊔ lsuc ℓS ⊔ lsuc ℓP ⊔ lsuc ℓB) where
   field
     -- Container signature: shapes (constructors) and positions (arguments)
