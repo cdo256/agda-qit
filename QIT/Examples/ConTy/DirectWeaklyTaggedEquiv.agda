@@ -9,7 +9,6 @@ import QIT.Examples.ConTy.WeaklyTagged as W
 
 open import QIT.Prelude
 open import QIT.Prop
-open import QIT.List
 open import QIT.Types
 open import QIT.Maybe
 open import QIT.Category.Morphism
@@ -151,14 +150,15 @@ D→W da = wa
     ; σπ = σπ
     }
 
-⟦_⟧ : ∀ {X : Set} → List (X × X) → Prop
-⟦ [] ⟧ = ⊤
-⟦ (x , y) ∷ hs ⟧ = x ≡ y ∧ ⟦ hs ⟧
 
 
 D→W' : D.Algebra → W.Algebra
 D→W' da = {!wa!}
   where
+  open import QIT.List
+  ⟦_⟧ : ∀ {X : Set} → List (X × X) → Prop
+  ⟦ [] ⟧ = ⊤
+  ⟦ (x , y) ∷ hs ⟧ = x ≡ y ∧ ⟦ hs ⟧
   open ≡
   module DA = D.Algebra da
   data CT : Set where
@@ -193,6 +193,18 @@ D→W' da = {!wa!}
   [_]h : CTh → CTh
   [ hs ⊢ x ]h = hs ⊢ λ h* → [ x h* ]
 
+  getCon : (x : CTh) → CTh
+  getCon (hs ⊢ x) = hs ⊢ y
+    where
+    y : ⟦ hs ⟧ → CT
+    y h* with [ x h* ]
+    ... | con γ = #
+    ... | ty γ a = con γ
+    ... | k̂ = #
+    ... | ĉ = #
+    ... | t̂ u = #
+    ... | # = #
+
   con-inj : ∀ {γ δ} → con γ ≡ con δ → γ ≡ δ
   con-inj refl = refl
 
@@ -217,17 +229,20 @@ D→W' da = {!wa!}
 --   tʰ-γ : (γ a : CTh) → [ a ]h ≡ tʰ γ → [ γ ]h ≡ cʰ
 --   tʰ-γ (γ-hs ⊢ γ) (a-hs ⊢ a) ka = let u = t̂-γ γ a in {!!}
 
---   ∙ : CT
---   ∙ = con DA.∙
---   ∙ʰ : CTh
---   ∙ʰ = ι ∙
+  ∙ : CT
+  ∙ = con DA.∙
+  ∙ʰ : CTh
+  ∙ʰ = ι ∙
 
---   ▷ : CT → CT → CT
---   ▷ (con γ) (ty γ' a) = con (γ' DA.▷ a)
---   {-# CATCHALL #-}
---   ▷ _ _ = #
---   ▷ʰ : CTh → CTh → CTh
---   ▷ʰ (γ-hs ⊢ con γ) (a-hs ⊢ ty γ' a) = ((con γ , con γ') ∷ γ-hs ++ a-hs) ⊢ {!γ DA.▷ a!}
+  ▷ : CT → CT → CT
+  ▷ (con γ) (ty γ' a) = con (γ' DA.▷ a)
+  {-# CATCHALL #-}
+  ▷ _ _ = #
+  ▷ʰ : CTh → CTh → CTh
+  -- ▷ʰ (γ-hs ⊢ γ) (a-hs ⊢ a) =
+  --   ((getCon a , γ) ∷ γ-hs ++ a-hs) ⊢ {!γ DA.▷ a!}
+  -- ▷ʰ (γ-hs ⊢ con γ) (a-hs ⊢ ty γ' a) = ((con γ , con γ') ∷ γ-hs ++ a-hs) ⊢ {!γ DA.▷ a!}
+--   ▷ʰ (γ-hs ⊢ γ) (a-hs ⊢ a) = ((con γ , con γ') ∷ γ-hs ++ a-hs) ⊢ {!γ DA.▷ a!}
 --   {-# CATCHALL #-}
 --   ▷ʰ _ _ = {!!}
 --   k▷ : (γ a : CT) → [ γ ] ≡ ĉ → [ a ] ≡ t̂ γ → [ ▷ γ a ] ≡ ĉ
@@ -426,6 +441,7 @@ D→W'' da = {!wa!}
     ĉ : CT
     t̂ : CT → CT
     # : CT
+    _≟_⊢_ : (x y : CT) → (x ≡ y → CT) → CT
   [_] : CT → CT
   [ con a ] = ĉ
   [ ty γ a ] = t̂ (con γ)
@@ -433,6 +449,7 @@ D→W'' da = {!wa!}
   [ ĉ ] = k̂
   [ t̂ γ ] = k̂
   [ # ] = #
+  [ x ≟ y ⊢ z ] = {!!}
 
   con-inj : ∀ {γ δ} → con γ ≡ con δ → γ ≡ δ
   con-inj refl = refl
@@ -515,27 +532,233 @@ D→W'' da = {!wa!}
   σπ : {!!}
 
 
-  wa : W.Algebra
-  wa = record
-    { CT = CT
-    ; [_] = [_]
-    ; k̂ = k̂
-    ; kk̂ = refl
-    ; ĉ = ĉ
-    ; kĉ = refl
-    ; t̂ = t̂
-    ; kt̂ = λ _ _ → refl
-    ; t̂-γ = t̂-γ
-    ; ∙ = con DA.∙
-    ; k∙ = refl
-    ; ▷ = ▷
-    ; k▷ = k▷
-    ; u = u 
-    ; ku = ku
-    ; π = π
-    ; kπ = kπ
-    ; σ = σ
-    ; kσ = kσ
-    ; σ▷ = σ▷
-    ; σπ = σπ
-    }
+  -- wa : W.Algebra
+  -- wa = record
+  --   { CT = CT
+  --   ; [_] = [_]
+  --   ; k̂ = k̂
+  --   ; kk̂ = refl
+  --   ; ĉ = ĉ
+  --   ; kĉ = refl
+  --   ; t̂ = t̂
+  --   ; kt̂ = λ _ _ → refl
+  --   ; t̂-γ = t̂-γ
+  --   ; ∙ = con DA.∙
+  --   ; k∙ = refl
+  --   ; ▷ = ▷
+  --   ; k▷ = k▷
+  --   ; u = u 
+  --   ; ku = ku
+  --   ; π = π
+  --   ; kπ = kπ
+  --   ; σ = σ
+  --   ; kσ = kσ
+  --   ; σ▷ = σ▷
+  --   ; σπ = σπ
+  --   }
+
+D→W''' : D.Algebra → W.Algebra
+D→W''' da = {!wa!}
+  where
+  open ≡
+  module DA = D.Algebra da
+  data CT : Set where
+    con : DA.Con → CT
+    ty : (γ : DA.Con) → DA.Ty γ → CT
+    k̂ : CT
+    ĉ : CT
+    t̂ : CT → CT
+    # : CT
+
+  data Hyp : Set
+  ⟦_⟧ : Hyp → Set
+  data Hyp where
+    [] : Hyp
+    _∷⁻_≟_ : (hs : Hyp) → (x₁ : ⟦ hs ⟧ → CT) → (x₂ : ⟦ hs ⟧ → CT) → Hyp
+  ⟦ [] ⟧ = ⊤ˢ
+  ⟦ hs ∷⁻ x₁ ≟ x₂ ⟧ = Σ ⟦ hs ⟧ λ h* → Box (x₁ h* ≡ x₂ h*)
+
+
+  _++_ : Hyp → Hyp → Hyp
+  wk : (hs gs : Hyp) → ⟦ hs ++ gs ⟧ → ⟦ gs ⟧
+  hs ++ [] = hs
+  hs ++ (gs ∷⁻ x₁ ≟ x₂) =
+    (hs ++ gs) ∷⁻ (λ h* → x₁ (wk hs gs h*))
+               ≟  (λ h* → x₂ (wk hs gs h*))
+  ++-idl : ∀ hs → [] ++ hs ≡ hs
+  ++-idl [] = refl
+  ++-idl (hs ∷⁻ x₁ ≟ x₂) =
+    ≡.dcong₂ {B = λ hs → (⟦ hs ⟧ → CT) × (⟦ hs ⟧ → CT)}
+      (λ hs (x , y) → hs ∷⁻ x ≟ y) (++-idl hs) p 
+    where
+    p : J (λ hs _ → (⟦ hs ⟧ → CT) × (⟦ hs ⟧ → CT)) (++-idl hs)
+         ((λ h* → x₁ (wk [] hs h*)) , (λ h* → x₂ (wk [] hs h*)))
+         ≡ (x₁ , x₂)
+    p = ×≡ {!funExt!} {!!}
+
+  wk [] gs h* = ≡.subst ⟦_⟧ (++-idl gs) h*
+  wk (hs ∷⁻ x₁ ≟ x₂) gs h* = {!!}
+  record CTh : Set where
+    constructor _⊢_
+    pattern
+    field
+      hyp : Hyp
+      val : ⟦ hyp ⟧ → CT
+
+  tʰ : CTh → CTh
+  tʰ (hs ⊢ x) = hs ⊢ λ h* → t̂ (x h*)
+
+  ι : CT → CTh
+  ι x = [] ⊢ λ _ → x
+
+  [_] : CT → CT
+  [ con a ] = ĉ
+  [ ty γ a ] = t̂ (con γ)
+  [ k̂ ] = k̂
+  [ ĉ ] = k̂
+  [ t̂ γ ] = k̂
+  [ # ] = #
+
+  [_]h : CTh → CTh
+  [ hs ⊢ x ]h = hs ⊢ λ h* → [ x h* ]
+
+  getCon : (x : CTh) → CTh
+  getCon (hs ⊢ x) = hs ⊢ y
+    where
+    y : ⟦ hs ⟧ → CT
+    y h* with [ x h* ]
+    ... | con γ = #
+    ... | ty γ a = con γ
+    ... | k̂ = #
+    ... | ĉ = #
+    ... | t̂ u = #
+    ... | # = #
+
+  con-inj : ∀ {γ δ} → con γ ≡ con δ → γ ≡ δ
+  con-inj refl = refl
+
+  ty-inj₁ : ∀ {γ δ} {a : DA.Ty γ} {b : DA.Ty δ} → ty γ a ≡ ty δ b → γ ≡ δ
+  ty-inj₁ refl = refl
+
+  ty-inj₂ : ∀ {γ δ} {a : DA.Ty γ} {b : DA.Ty δ}
+    → (p : ty γ a ≡ ty δ b) → subst DA.Ty (ty-inj₁ p) a ≡ b
+  ty-inj₂ refl = refl
+
+  t̂-inj : ∀ {γ δ} → t̂ γ ≡ t̂ δ → γ ≡ δ
+  t̂-inj refl = refl
+
+  t̂-γ : (γ a : CT) → [ a ] ≡ t̂ γ → [ γ ] ≡ ĉ
+  t̂-γ (con _) _ _ = refl
+  t̂-γ (ty _ _) (ty _ _) ()
+  t̂-γ k̂ (ty _ _) ()
+  t̂-γ ĉ (ty _ _) ()
+  t̂-γ (t̂ _) (ty _ _) ()
+  t̂-γ # (ty _ _) ()
+
+--   tʰ-γ : (γ a : CTh) → [ a ]h ≡ tʰ γ → [ γ ]h ≡ cʰ
+--   tʰ-γ (γ-hs ⊢ γ) (a-hs ⊢ a) ka = let u = t̂-γ γ a in {!!}
+
+  ∙ : CT
+  ∙ = con DA.∙
+  ∙ʰ : CTh
+  ∙ʰ = ι ∙
+
+--   ▷ : CT → CT → CT
+--   ▷ (con γ) (ty γ' a) = con (γ' DA.▷ a)
+--   {-# CATCHALL #-}
+--   ▷ _ _ = #
+--   ▷ʰ : CTh → CTh → CTh
+--   ▷ʰ (γ-hs ⊢ γ) (a-hs ⊢ a) =
+--     ((getCon a ≟ γ ∷⁻ γ-hs) ++ a-hs) ⊢ {!γ DA.▷ a!}
+--   -- ▷ʰ (γ-hs ⊢ con γ) (a-hs ⊢ ty γ' a) = ((con γ , con γ') ∷ γ-hs ++ a-hs) ⊢ {!γ DA.▷ a!}
+-- --   ▷ʰ (γ-hs ⊢ γ) (a-hs ⊢ a) = ((con γ , con γ') ∷ γ-hs ++ a-hs) ⊢ {!γ DA.▷ a!}
+-- --   {-# CATCHALL #-}
+-- --   ▷ʰ _ _ = {!!}
+-- --   k▷ : (γ a : CT) → [ γ ] ≡ ĉ → [ a ] ≡ t̂ γ → [ ▷ γ a ] ≡ ĉ
+-- --   k▷ (con γ) (ty γ' a) refl refl = refl
+
+-- --   u : CT → CT
+-- --   u (con γ) = ty γ (DA.u γ)
+-- --   {-# CATCHALL #-}
+-- --   u _ = #
+-- --   ku : (γ : CT) → [ γ ] ≡ ĉ → [ u γ ] ≡ t̂ γ
+-- --   ku (con γ) refl = refl
+
+-- --   π : CT → CT → CT → CT
+-- --   π (con γ) (ty γ' a) (ty δ b) = ty γ {!!}
+-- --   -- ty γ (DA.π a' b')
+-- --   --   where
+-- --   --   a' : DA.Ty γ
+-- --   --   a' = {!!}
+-- --   --   b' : DA.Ty (γ DA.▷ a')
+-- --   --   b' = {!!}
+-- --   -- {-# CATCHALL #-}
+-- --   -- π _ _ _ = #
+
+-- --   gt : CT → Maybe DA.Con
+-- --   gt (con γ) = nothing
+-- --   gt (ty γ a) = just γ
+-- --   gt k̂ = nothing
+-- --   gt ĉ = nothing
+-- --   gt (t̂ γ) = nothing
+-- --   gt # = nothing
+
+-- --   ĉ→Con : (γ : CT) → [ γ ] ≡ ĉ → DA.Con
+-- --   ĉ→Con (con γ) _ = γ
+
+-- --   v : (γ a : CT)
+-- --     → (p : [ γ ] ≡ ĉ) → [ a ] ≡ t̂ γ
+-- --     → [ ▷ γ a ] ≡ ĉ
+-- --     → gt a ≡ just (ĉ→Con γ p)
+-- --   v (con γ) (ty γ' a) refl q refl = cong just (con-inj (t̂-inj q))
+
+-- --   kπ : (γ a b : CT)
+-- --      → [ γ ] ≡ ĉ
+-- --      → [ a ] ≡ t̂ γ
+-- --      → [ b ] ≡ t̂ (▷ γ a)
+-- --      → [ π γ a b ] ≡ t̂ γ
+-- --   kπ (con γ) (ty γ' a) (ty δ b) refl refl refl = refl
+-- --   σ : CT → CT → CT → CT
+-- --   σ (con γ) (ty γ' a) (ty δ b) = ty γ' {!!}
+-- --   {-# CATCHALL #-}
+-- --   σ _ _ _ = #
+-- --   kσ : (γ a b : CT)
+-- --      → [ γ ] ≡ ĉ
+-- --      → [ a ] ≡ t̂ γ
+-- --      → [ b ] ≡ t̂ (▷ γ a)
+-- --      → [ σ γ a b ] ≡ t̂ γ
+-- --   kσ (con γ) (ty γ' a) (ty δ b) refl refl refl = refl
+-- --   σ▷ : (γ a b : CT)
+-- --      → [ γ ] ≡ ĉ
+-- --      → [ a ] ≡ t̂ γ
+-- --      → [ b ] ≡ t̂ (▷ γ a)
+-- --      → ▷ (▷ γ a) b ≡ ▷ γ (σ γ a b)
+-- --   σ▷ (con γ) (ty γ' a) (ty δ b) refl refl refl =
+-- --     {!cong (λ b → con (γ DA.▷ a DA.▷ b)) {!!}!}
+-- --   σπ : {!!}
+
+
+-- --   wa : W.Algebra
+-- --   wa = record
+-- --     { CT = CTh
+-- --     ; [_] = [_]h
+-- --     ; k̂ = kʰ
+-- --     ; kk̂ = refl
+-- --     ; ĉ = cʰ
+-- --     ; kĉ = refl
+-- --     ; t̂ = tʰ
+-- --     ; kt̂ = λ _ _ → {!!}
+-- --     ; t̂-γ = {!t̂-γ!}
+-- --     ; ∙ = {!con DA.∙!}
+-- --     ; k∙ = refl
+-- --     -- ; ▷ = ▷
+-- --     -- ; k▷ = k▷
+-- --     -- ; u = u 
+-- --     -- ; ku = ku
+-- --     -- ; π = π
+-- --     -- ; kπ = kπ
+-- --     -- ; σ = σ
+-- --     -- ; kσ = kσ
+-- --     -- ; σ▷ = σ▷
+-- --     -- ; σπ = σπ
+-- --     }
