@@ -1,6 +1,8 @@
 open import QIT.Prelude
 
-module QIT.Maybe ⦃ a!c* : A!C ⦄ where
+module QIT.Maybe
+  ⦃ pathElim* : PathElim ⦄
+  where
 
 data Maybe {ℓA} (A : Set ℓA) : Set ℓA where 
   nothing : Maybe A
