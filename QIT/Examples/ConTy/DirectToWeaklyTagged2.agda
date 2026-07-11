@@ -22,8 +22,8 @@ open import QIT.Category.Initial
 open import QIT.Relation.Subset
 open import QIT.Function.Base
 
-D→W : D.Algebra → W.Algebra
-D→W da = {!wa!}
+D→W : D.Algebra → W.Algebra ℓ1
+D→W da = wa
   where
   open ≡
   module DA = D.Algebra da
@@ -155,6 +155,14 @@ D→W da = {!wa!}
     → [ π₀ γ a b kγ ka kb ]₀ ≡ t̂ γ
   kπ₀ γ a b kγ ka kb = cong t̂ (con-Con₀ γ kγ)
 
+  Ty₀-π₀ : (γ a b : Atom)
+    → (kγ : [ γ ]₀ ≡ ĉ)
+    → (ka : [ a ]₀ ≡ t̂ γ)
+    → (kb : [ b ]₀ ≡ t̂ (▷₀ γ a kγ ka))
+    → Ty₀ γ (π₀ γ a b kγ ka kb) kγ (kπ₀ γ a b kγ ka kb)
+    ≡ DA.π (Con₀ γ kγ) (Ty₀ γ a kγ ka) (Ty₀ (▷₀ γ a kγ ka) b (k▷₀ γ a kγ ka) kb)
+  Ty₀-π₀ (con γ) (ty .γ a) (ty .(γ DA.▷ a) b) refl refl refl = refl
+
   σ₀ : (γ a b : Atom)
     → (kγ : [ γ ]₀ ≡ ĉ)
     → (ka : [ a ]₀ ≡ t̂ γ)
@@ -173,22 +181,35 @@ D→W da = {!wa!}
     → [ σ₀ γ a b kγ ka kb ]₀ ≡ t̂ γ
   kσ₀ γ a b kγ ka kb = cong t̂ (con-Con₀ γ kγ)
 
-  pull : {X : Set ℓX} → (x y : Lifting ℓP X) → x ≡ y
-    → (qy : y .proj₁)
-    → Σ (Box (x .proj₁)) λ qx → Box (x .proj₂ (unbox qx) ≡ y .proj₂ qy)
-  pull x y p qy = J
-    (λ y _ → (qy : y .proj₁) → Σ (Box (x .proj₁)) λ qx → Box (x .proj₂ (unbox qx) ≡ y .proj₂ qy))
-    p
-    (λ qx → box qx , box refl)
-    qy
+  Ty₀-σ₀ : (γ a b : Atom)
+    → (kγ : [ γ ]₀ ≡ ĉ)
+    → (ka : [ a ]₀ ≡ t̂ γ)
+    → (kb : [ b ]₀ ≡ t̂ (▷₀ γ a kγ ka))
+    → Ty₀ γ (σ₀ γ a b kγ ka kb) kγ (kσ₀ γ a b kγ ka kb)
+    ≡ DA.σ (Con₀ γ kγ) (Ty₀ γ a kγ ka) (Ty₀ (▷₀ γ a kγ ka) b (k▷₀ γ a kγ ka) kb)
+  Ty₀-σ₀ (con γ) (ty .γ a) (ty .(γ DA.▷ a) b) refl refl refl = refl
 
-  pull' : {X : Set ℓX} → (x y : Lifting ℓP X) → x ≡ y
-    → (qy : y .proj₁)
-    → x .proj₁ ∧ᵖ λ qx → x .proj₂ qx ≡ y .proj₂ qy
-  pull' x y refl qy = ∧i qy , u
-    where
-    u : proj₂ x qy ≡ proj₂ y qy
-    u = refl
+  σ▷₀ : (γ a b : Atom)
+    → (kγ : [ γ ]₀ ≡ ĉ)
+    → (ka : [ a ]₀ ≡ t̂ γ)
+    → (kb : [ b ]₀ ≡ t̂ (▷₀ γ a kγ ka))
+    → ▷₀ (▷₀ γ a kγ ka) b (k▷₀ γ a kγ ka) kb
+    ≡ ▷₀ γ (σ₀ γ a b kγ ka kb) kγ (kσ₀ γ a b kγ ka kb)
+  σ▷₀ (con γ) (ty .γ a) (ty .(γ DA.▷ a) b) refl refl refl =
+    cong con (DA.σ▷ γ a b)
+
+  σπ₀ : (γ a b d : Atom)
+    → (kγ : [ γ ]₀ ≡ ĉ)
+    → (ka : [ a ]₀ ≡ t̂ γ)
+    → (kb : [ b ]₀ ≡ t̂ (▷₀ γ a kγ ka))
+    → (kd : [ d ]₀ ≡ t̂ (▷₀ (▷₀ γ a kγ ka) b (k▷₀ γ a kγ ka) kb))
+    → π₀ γ a (π₀ (▷₀ γ a kγ ka) b d (k▷₀ γ a kγ ka) kb kd)
+         kγ ka (kπ₀ (▷₀ γ a kγ ka) b d (k▷₀ γ a kγ ka) kb kd)
+      ≡ π₀ γ (σ₀ γ a b kγ ka kb) d
+         kγ (kσ₀ γ a b kγ ka kb)
+         (trans kd (cong t̂ (σ▷₀ γ a b kγ ka kb)))
+  σπ₀ (con γ) (ty .γ a) (ty .(γ DA.▷ a) b) (ty .((γ DA.▷ a) DA.▷ b) d) refl refl refl refl =
+    cong (ty γ) (DA.σπ γ a b d)
 
   pull₁ : {X : Set ℓX} → {x y : Lifting ℓP X} → x ≡ y
         → (qy : y .proj₁) → x .proj₁
@@ -304,12 +325,12 @@ D→W da = {!wa!}
   ku γʰ kγ = mkCT≡ p q pt
     where
     p : proj₁ [ u γʰ ] → proj₁ (tʰ γʰ)
-    p h* = ∧i tt* , h* .∧e₂ .∧e₁
+    p _ = ∧i tt* , conData₁ γʰ kγ
     q : proj₁ (tʰ γʰ) → proj₁ [ u γʰ ]
     q _ = ∧i tt* , ∧i conData₁ γʰ kγ , ∧i conData₂ γʰ kγ , tt*
     pt : ∀ p q → [ u γʰ ] .proj₂ p ≡ tʰ γʰ .proj₂ q
-    pt p q =
-      trans (ku₀ (γʰ .proj₂ (p .∧e₂ .∧e₁)) (p .∧e₂ .∧e₂ .∧e₁))
+    pt _ _ =
+      trans (ku₀ (γʰ .proj₂ (conData₁ γʰ kγ)) (conData₂ γʰ kγ))
             (cong t̂ (congp (γʰ .proj₂)))
 
   kπ : (γʰ aʰ bʰ : CT)
@@ -321,7 +342,7 @@ D→W da = {!wa!}
     where
     kδ = k▷ γʰ aʰ kγ ka
     p : proj₁ [ π γʰ aʰ bʰ ] → proj₁ (tʰ γʰ)
-    p h* = ∧i tt* , h* .∧e₂ .∧e₁
+    p _ = ∧i tt* , conData₁ γʰ kγ
     q : proj₁ (tʰ γʰ) → proj₁ [ π γʰ aʰ bʰ ]
     q _ = ∧i tt* ,
           ∧i conData₁ γʰ kγ ,
@@ -332,13 +353,13 @@ D→W da = {!wa!}
           ∧i extData₂ γʰ aʰ bʰ kγ ka kδ kb ,
           tt*
     pt : ∀ p q → [ π γʰ aʰ bʰ ] .proj₂ p ≡ tʰ γʰ .proj₂ q
-    pt p q =
-      trans (kπ₀ (γʰ .proj₂ (p .∧e₂ .∧e₁))
-                  (aʰ .proj₂ (p .∧e₂ .∧e₂ .∧e₁))
-                  (bʰ .proj₂ (p .∧e₂ .∧e₂ .∧e₂ .∧e₁))
-                  (p .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁)
-                  (p .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁)
-                  (p .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁))
+    pt _ _ =
+      trans (kπ₀ (γʰ .proj₂ (conData₁ γʰ kγ))
+                  (aʰ .proj₂ (tyData₁ γʰ aʰ kγ ka))
+                  (bʰ .proj₂ (extData₁ γʰ aʰ bʰ kγ ka kδ kb))
+                  (conData₂ γʰ kγ)
+                  (tyData₂ γʰ aʰ kγ ka)
+                  (extData₂ γʰ aʰ bʰ kγ ka kδ kb))
             (cong t̂ (congp (γʰ .proj₂)))
 
   kσ : (γʰ aʰ bʰ : CT)
@@ -350,7 +371,7 @@ D→W da = {!wa!}
     where
     kδ = k▷ γʰ aʰ kγ ka
     p : proj₁ [ σ γʰ aʰ bʰ ] → proj₁ (tʰ γʰ)
-    p h* = ∧i tt* , h* .∧e₂ .∧e₁
+    p _ = ∧i tt* , conData₁ γʰ kγ
     q : proj₁ (tʰ γʰ) → proj₁ [ σ γʰ aʰ bʰ ]
     q _ = ∧i tt* ,
           ∧i conData₁ γʰ kγ ,
@@ -361,13 +382,103 @@ D→W da = {!wa!}
           ∧i extData₂ γʰ aʰ bʰ kγ ka kδ kb ,
           tt*
     pt : ∀ p q → [ σ γʰ aʰ bʰ ] .proj₂ p ≡ tʰ γʰ .proj₂ q
-    pt p q =
-      trans (kσ₀ (γʰ .proj₂ (p .∧e₂ .∧e₁))
-                  (aʰ .proj₂ (p .∧e₂ .∧e₂ .∧e₁))
-                  (bʰ .proj₂ (p .∧e₂ .∧e₂ .∧e₂ .∧e₁))
-                  (p .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁)
-                  (p .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁)
-                  (p .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁))
+    pt _ _ =
+      trans (kσ₀ (γʰ .proj₂ (conData₁ γʰ kγ))
+                  (aʰ .proj₂ (tyData₁ γʰ aʰ kγ ka))
+                  (bʰ .proj₂ (extData₁ γʰ aʰ bʰ kγ ka kδ kb))
+                  (conData₂ γʰ kγ)
+                  (tyData₂ γʰ aʰ kγ ka)
+                  (extData₂ γʰ aʰ bʰ kγ ka kδ kb))
             (cong t̂ (congp (γʰ .proj₂)))
+
+  σ▷ : (γʰ aʰ bʰ : CT)
+    → [ γʰ ] ≡ cʰ
+    → [ aʰ ] ≡ tʰ γʰ
+    → [ bʰ ] ≡ tʰ (▷ γʰ aʰ)
+    → ▷ (▷ γʰ aʰ) bʰ ≡ ▷ γʰ (σ γʰ aʰ bʰ)
+  σ▷ γʰ aʰ bʰ kγ ka kb = mkCT≡ p q pt
+    where
+    kδ = k▷ γʰ aʰ kγ ka
+    p : proj₁ (▷ (▷ γʰ aʰ) bʰ) → proj₁ (▷ γʰ (σ γʰ aʰ bʰ))
+    p _ = ∧i conData₁ γʰ kγ ,
+          ∧i tyData₁ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb) ,
+          ∧i conData₂ γʰ kγ ,
+          ∧i tyData₂ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb) ,
+          tt*
+    q : proj₁ (▷ γʰ (σ γʰ aʰ bʰ)) → proj₁ (▷ (▷ γʰ aʰ) bʰ)
+    q _ = ∧i conData₁ (▷ γʰ aʰ) kδ ,
+          ∧i tyData₁ (▷ γʰ aʰ) bʰ kδ kb ,
+          ∧i conData₂ (▷ γʰ aʰ) kδ ,
+          ∧i tyData₂ (▷ γʰ aʰ) bʰ kδ kb ,
+          tt*
+    pt : ∀ p q → ▷ (▷ γʰ aʰ) bʰ .proj₂ p ≡ ▷ γʰ (σ γʰ aʰ bʰ) .proj₂ q
+    pt _ _ =
+      σ▷₀ (γʰ .proj₂ (conData₁ γʰ kγ))
+          (aʰ .proj₂ (tyData₁ γʰ aʰ kγ ka))
+          (bʰ .proj₂ (extData₁ γʰ aʰ bʰ kγ ka kδ kb))
+          (conData₂ γʰ kγ)
+          (tyData₂ γʰ aʰ kγ ka)
+          (extData₂ γʰ aʰ bʰ kγ ka kδ kb)
+
+  σπ : (γʰ aʰ bʰ dʰ : CT)
+    → [ γʰ ] ≡ cʰ
+    → [ aʰ ] ≡ tʰ γʰ
+    → [ bʰ ] ≡ tʰ (▷ γʰ aʰ)
+    → [ dʰ ] ≡ tʰ (▷ (▷ γʰ aʰ) bʰ)
+    → π γʰ aʰ (π (▷ γʰ aʰ) bʰ dʰ) ≡ π γʰ (σ γʰ aʰ bʰ) dʰ
+  σπ γʰ aʰ bʰ dʰ kγ ka kb kc = mkCT≡ p q pt
+    where
+    kδ = k▷ γʰ aʰ kγ ka
+    kε = k▷ (▷ γʰ aʰ) bʰ kδ kb
+    p : proj₁ (π γʰ aʰ (π (▷ γʰ aʰ) bʰ dʰ)) → proj₁ (π γʰ (σ γʰ aʰ bʰ) dʰ)
+    p _ = ∧i conData₁ γʰ kγ ,
+          ∧i tyData₁ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb) ,
+          ∧i tyData₁ (▷ γʰ (σ γʰ aʰ bʰ)) dʰ (k▷ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb)) (substp (λ x → [ dʰ ] ≡ tʰ x) (σ▷ γʰ aʰ bʰ kγ ka kb) kc) ,
+          ∧i conData₂ γʰ kγ ,
+          ∧i tyData₂ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb) ,
+          ∧i tyData₂ (▷ γʰ (σ γʰ aʰ bʰ)) dʰ (k▷ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb)) (substp (λ x → [ dʰ ] ≡ tʰ x) (σ▷ γʰ aʰ bʰ kγ ka kb) kc) ,
+          tt*
+    q : proj₁ (π γʰ (σ γʰ aʰ bʰ) dʰ) → proj₁ (π γʰ aʰ (π (▷ γʰ aʰ) bʰ dʰ))
+    q _ = ∧i conData₁ γʰ kγ ,
+          ∧i tyData₁ γʰ aʰ kγ ka ,
+          ∧i tyData₁ (▷ γʰ aʰ) (π (▷ γʰ aʰ) bʰ dʰ) kδ (kπ (▷ γʰ aʰ) bʰ dʰ kδ kb kc) ,
+          ∧i conData₂ γʰ kγ ,
+          ∧i tyData₂ γʰ aʰ kγ ka ,
+          ∧i tyData₂ (▷ γʰ aʰ) (π (▷ γʰ aʰ) bʰ dʰ) kδ (kπ (▷ γʰ aʰ) bʰ dʰ kδ kb kc) ,
+          tt*
+    pt : ∀ p q → π γʰ aʰ (π (▷ γʰ aʰ) bʰ dʰ) .proj₂ p ≡ π γʰ (σ γʰ aʰ bʰ) dʰ .proj₂ q
+    pt _ _ =
+      σπ₀ (γʰ .proj₂ (conData₁ γʰ kγ))
+          (aʰ .proj₂ (tyData₁ γʰ aʰ kγ ka))
+          (bʰ .proj₂ (extData₁ γʰ aʰ bʰ kγ ka kδ kb))
+          (dʰ .proj₂ (extData₁ (▷ γʰ aʰ) bʰ dʰ kδ kb kε kc))
+          (conData₂ γʰ kγ)
+          (tyData₂ γʰ aʰ kγ ka)
+          (extData₂ γʰ aʰ bʰ kγ ka kδ kb)
+          (extData₂ (▷ γʰ aʰ) bʰ dʰ kδ kb kε kc)
+
+  wa : W.Algebra ℓ1
+  wa = record
+    { CT = CT
+    ; [_] = [_]
+    ; k̂ = kʰ
+    ; kk̂ = kk̂
+    ; ĉ = cʰ
+    ; kĉ = kĉ
+    ; t̂ = tʰ
+    ; kt̂ = kt̂
+    ; ∙ = ∙
+    ; k∙ = k∙
+    ; ▷ = ▷
+    ; k▷ = k▷
+    ; u = u
+    ; ku = ku
+    ; π = π
+    ; kπ = kπ
+    ; σ = σ
+    ; kσ = kσ
+    ; σ▷ = σ▷
+    ; σπ = σπ
+    }
 
     
