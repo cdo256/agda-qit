@@ -69,12 +69,10 @@ import QIT.Category.Terminal
 
 -- Category of Setoids
 import QIT.Setoid.Base
-import QIT.Setoid.Indexed
 import QIT.Setoid.Hom
 import QIT.Setoid.Iso
 import QIT.Setoid.Sigma
 import QIT.Setoid.Properties
-import QIT.Setoid.IndexedQuotient
 import QIT.Setoid.Algebra.Base
 import QIT.Setoid.Algebra.Lift
 import QIT.Setoid.Quotient
