@@ -172,23 +172,8 @@ D→W da = {!wa!}
 
   pull : {X : Set ℓX} → (x y : Lifting ℓP X) → x ≡ y
     → (qy : y .proj₁)
-    → Σ (Box (x .proj₁)) λ qx → Box (x .proj₂ (unbox qx) ≡ y .proj₂ qy)
-  pull x y p qy = J
-    (λ y _ → (qy : y .proj₁) → Σ (Box (x .proj₁)) λ qx → Box (x .proj₂ (unbox qx) ≡ y .proj₂ qy))
-    p
-    (λ qx → box qx , box refl)
-    qy
-
-  ctxData : (γʰ : CT) → [ γʰ ] ≡ cʰ
-    → Σ (Box (γʰ .proj₁)) λ pγ → Box ([ γʰ .proj₂ (unbox pγ) ]₀ ≡ ĉ)
-  ctxData γʰ kγ with pull ([ γʰ ]) cʰ kγ tt*
-  ... | hγ , eqγ = box (unbox hγ .∧e₂) , box (unbox eqγ)
-
-  tyData : (γʰ aʰ : CT) → (kγ : [ γʰ ] ≡ cʰ) → [ aʰ ] ≡ tʰ γʰ
-    → Σ (Box (aʰ .proj₁)) λ pa → Box ([ aʰ .proj₂ (unbox pa) ]₀ ≡ t̂ (γʰ .proj₂ (unbox (ctxData γʰ kγ .proj₁))))
-  tyData γʰ aʰ kγ ka with ctxData γʰ kγ
-  ... | pγ , kγ₀ with pull ([ aʰ ]) (tʰ γʰ) ka (∧i tt* , unbox pγ)
-  ... | ha , eqa = box (unbox ha .∧e₂) , box (unbox eqa)
+    → x .proj₁ ∧ᵖ λ qx → x .proj₂ qx ≡ y .proj₂ qy
+  pull x y refl qy = ∧i qy , refl
 
   ∙₀ : Atom
   ∙₀ = con DA.∙
@@ -233,14 +218,14 @@ D→W da = {!wa!}
     assume ([ b ]₀ ≡ t̂ (▷₀ γ a kγ ka)) λ kb →
     return (σ₀ γ a b kγ ka kb)
 
-  extData : (γʰ aʰ bʰ : CT)
-    → (kγ : [ γʰ ] ≡ cʰ)
-    → (ka : [ aʰ ] ≡ tʰ γʰ)
-    → [ bʰ ] ≡ tʰ (▷ γʰ aʰ)
-    → Σ (Box (bʰ .proj₁)) λ pb → Box ([ bʰ .proj₂ (unbox pb) ]₀ ≡ t̂ (▷₀ (γʰ .proj₂ (unbox (ctxData γʰ kγ .proj₁))) (aʰ .proj₂ (unbox (tyData γʰ aʰ kγ ka .proj₁))) (unbox (ctxData γʰ kγ .proj₂)) (unbox (tyData γʰ aʰ kγ ka .proj₂))))
-  extData γʰ aʰ bʰ kγ ka kb with ctxData γʰ kγ | tyData γʰ aʰ kγ ka
-  ... | pγ , kγ₀ | pa , ka₀ with pull ([ bʰ ]) (tʰ (▷ γʰ aʰ)) kb (∧i tt* , (∧i (unbox pγ) , (∧i (unbox pa) , (∧i (unbox kγ₀) , (∧i (unbox ka₀) , tt*)))))
-  ... | hb , eqb = box (unbox hb .∧e₂) , box (unbox eqb)
+  -- extData : (γʰ aʰ bʰ : CT)
+  --   → (kγ : [ γʰ ] ≡ cʰ)
+  --   → (ka : [ aʰ ] ≡ tʰ γʰ)
+  --   → [ bʰ ] ≡ tʰ (▷ γʰ aʰ)
+  --   → (bʰ .proj₁) ∧ᵖ λ pb → [ bʰ .proj₂ pb ]₀ ≡ t̂ (▷₀ (γʰ .proj₂ {!!}) (aʰ .proj₂ (unbox {!tyData γʰ aʰ kγ ka .proj₁!})) ({!ctxData γʰ kγ .proj₂!}) {!tyData γʰ aʰ kγ ka .proj₂!})
+  -- extData γʰ aʰ bʰ kγ ka kb with ctxData γʰ kγ | tyData γʰ aʰ kγ ka
+  -- ... | pγ , kγ₀ | pa , ka₀ with pull ([ bʰ ]) (tʰ (▷ γʰ aʰ)) kb (∧i tt* , (∧i (unbox pγ) , (∧i (unbox pa) , (∧i (unbox kγ₀) , (∧i (unbox ka₀) , tt*)))))
+  -- ... | hb , eqb = box (unbox hb .∧e₂) , box (unbox eqb)
 
   kk̂ : [ kʰ ] ≡ kʰ
   kk̂ = mkCT≡ (λ _ → tt*) (λ _ → ∧i tt* , tt*) λ _ _ → refl
@@ -249,91 +234,91 @@ D→W da = {!wa!}
   kĉ = mkCT≡ (λ _ → tt*) (λ _ → ∧i tt* , tt*) λ _ _ → refl
 
   kt̂ : (γʰ : CT) → [ γʰ ] ≡ cʰ → [ tʰ γʰ ] ≡ kʰ
-  kt̂ γʰ p = {!!}
+  kt̂ γʰ kγ = 
   -- kt̂ : (γʰ : CT) → [ γʰ ] ≡ cʰ → [ tʰ γʰ ] ≡ kʰ
   -- kt̂ γʰ kγ with ctxData γʰ kγ
   -- ... | pγ , kγ₀ =
   --   ≈→≡ (∧i (∧i (λ _ → tt*) , (λ _ → ∧i tt* , (∧i tt* , unbox pγ)))
   --         , (λ _ _ → refl))
 
-  k∙ : [ ∙ ] ≡ cʰ
-  k∙ = ≈→≡ (∧i (∧i (λ _ → tt*) , (λ _ → ∧i tt* , tt*)) , (λ _ _ → refl))
+  -- k∙ : [ ∙ ] ≡ cʰ
+  -- k∙ = ≈→≡ (∧i (∧i (λ _ → tt*) , (λ _ → ∧i tt* , tt*)) , (λ _ _ → refl))
 
-  k▷ : (γʰ aʰ : CT) → [ γʰ ] ≡ cʰ → [ aʰ ] ≡ tʰ γʰ → [ ▷ γʰ aʰ ] ≡ cʰ
-  k▷ γʰ aʰ kγ ka with ctxData γʰ kγ | tyData γʰ aʰ kγ ka
-  ... | pγ , kγ₀ | pa , ka₀ =
-    ≈→≡ (∧i pq , pt)
-    where
-    pq = ∧i (λ _ → tt*) , (λ _ → ∧i tt* , (∧i (unbox pγ) , (∧i (unbox pa) , (∧i (unbox kγ₀) , (∧i (unbox ka₀) , tt*)))))
-    pt : ∀ p q → [ ▷ γʰ aʰ ] .proj₂ p ≡ cʰ .proj₂ q
-    pt _ _ = refl
+  -- k▷ : (γʰ aʰ : CT) → [ γʰ ] ≡ cʰ → [ aʰ ] ≡ tʰ γʰ → [ ▷ γʰ aʰ ] ≡ cʰ
+  -- k▷ γʰ aʰ kγ ka with ctxData γʰ kγ | tyData γʰ aʰ kγ ka
+  -- ... | pγ , kγ₀ | pa , ka₀ =
+  --   ≈→≡ (∧i pq , pt)
+  --   where
+  --   pq = ∧i (λ _ → tt*) , (λ _ → ∧i tt* , (∧i (unbox pγ) , (∧i (unbox pa) , (∧i (unbox kγ₀) , (∧i (unbox ka₀) , tt*)))))
+  --   pt : ∀ p q → [ ▷ γʰ aʰ ] .proj₂ p ≡ cʰ .proj₂ q
+  --   pt _ _ = refl
 
-  ku : (γʰ : CT) → [ γʰ ] ≡ cʰ → [ u γʰ ] ≡ tʰ γʰ
-  ku γʰ kγ =
-    ≈→≡ (∧i pq , pt)
-    where
-    pq = ∧i (λ p → ∧i tt* , (p .∧e₂ .∧e₁))
-            , (λ q → let pγ = ctxData γʰ kγ .proj₁
-                     in ∧i tt* , (∧i (unbox pγ) , (∧i (unbox (ctxData γʰ kγ .proj₂)) , tt*)))
-    pt : ∀ p q → [ u γʰ ] .proj₂ p ≡ tʰ γʰ .proj₂ q
-    pt p q =
-      trans (ku₀ (γʰ .proj₂ (p .∧e₂ .∧e₁)) (p .∧e₂ .∧e₂ .∧e₁))
-            (cong t̂ (congp (γʰ .proj₂)))
+  -- ku : (γʰ : CT) → [ γʰ ] ≡ cʰ → [ u γʰ ] ≡ tʰ γʰ
+  -- ku γʰ kγ =
+  --   ≈→≡ (∧i pq , pt)
+  --   where
+  --   pq = ∧i (λ p → ∧i tt* , (p .∧e₂ .∧e₁))
+  --           , (λ q → let pγ = ctxData γʰ kγ .proj₁
+  --                    in ∧i tt* , (∧i (unbox pγ) , (∧i (unbox (ctxData γʰ kγ .proj₂)) , tt*)))
+  --   pt : ∀ p q → [ u γʰ ] .proj₂ p ≡ tʰ γʰ .proj₂ q
+  --   pt p q =
+  --     trans (ku₀ (γʰ .proj₂ (p .∧e₂ .∧e₁)) (p .∧e₂ .∧e₂ .∧e₁))
+  --           (cong t̂ (congp (γʰ .proj₂)))
 
-  kπ : (γʰ aʰ bʰ : CT)
-    → [ γʰ ] ≡ cʰ
-    → [ aʰ ] ≡ tʰ γʰ
-    → [ bʰ ] ≡ tʰ (▷ γʰ aʰ)
-    → [ π γʰ aʰ bʰ ] ≡ tʰ γʰ
-  kπ γʰ aʰ bʰ kγ ka kb with ctxData γʰ kγ | tyData γʰ aʰ kγ ka | extData γʰ aʰ bʰ kγ ka kb
-  ... | pγ , kγ₀ | pa , ka₀ | pb , kb₀ =
-    ≈→≡ (∧i pq , pt)
-    where
-    pq : [ π γʰ aʰ bʰ ] .proj₁ ⇔ (tʰ γʰ) .proj₁
-    pq .∧e₁ p = ∧i tt* , (p .∧e₂ .∧e₁)
-    pq .∧e₂ q = let wkb = ∧i (unbox kb₀) , tt*
-                    wka = ∧i (unbox ka₀) , wkb
-                    wkγ = ∧i (unbox kγ₀) , wka
-                    wb = ∧i (unbox pb) , wkγ
-                    wa = ∧i (unbox pa) , wb
-                    wγ = ∧i (unbox pγ) , wa
-                in ∧i tt* , wγ
-    pt : ∀ p q → [ π γʰ aʰ bʰ ] .proj₂ p ≡ tʰ γʰ .proj₂ q
-    pt p q =
-      trans (kπ₀ (γʰ .proj₂ (p .∧e₂ .∧e₁))
-                  (aʰ .proj₂ (p .∧e₂ .∧e₂ .∧e₁))
-                  (bʰ .proj₂ (p .∧e₂ .∧e₂ .∧e₂ .∧e₁))
-                  (p .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁)
-                  (p .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁)
-                  (p .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁))
-            (cong t̂ (congp (γʰ .proj₂)))
+  -- kπ : (γʰ aʰ bʰ : CT)
+  --   → [ γʰ ] ≡ cʰ
+  --   → [ aʰ ] ≡ tʰ γʰ
+  --   → [ bʰ ] ≡ tʰ (▷ γʰ aʰ)
+  --   → [ π γʰ aʰ bʰ ] ≡ tʰ γʰ
+  -- kπ γʰ aʰ bʰ kγ ka kb with ctxData γʰ kγ | tyData γʰ aʰ kγ ka | extData γʰ aʰ bʰ kγ ka kb
+  -- ... | pγ , kγ₀ | pa , ka₀ | pb , kb₀ =
+  --   ≈→≡ (∧i pq , pt)
+  --   where
+  --   pq : [ π γʰ aʰ bʰ ] .proj₁ ⇔ (tʰ γʰ) .proj₁
+  --   pq .∧e₁ p = ∧i tt* , (p .∧e₂ .∧e₁)
+  --   pq .∧e₂ q = let wkb = ∧i (unbox kb₀) , tt*
+  --                   wka = ∧i (unbox ka₀) , wkb
+  --                   wkγ = ∧i (unbox kγ₀) , wka
+  --                   wb = ∧i (unbox pb) , wkγ
+  --                   wa = ∧i (unbox pa) , wb
+  --                   wγ = ∧i (unbox pγ) , wa
+  --               in ∧i tt* , wγ
+  --   pt : ∀ p q → [ π γʰ aʰ bʰ ] .proj₂ p ≡ tʰ γʰ .proj₂ q
+  --   pt p q =
+  --     trans (kπ₀ (γʰ .proj₂ (p .∧e₂ .∧e₁))
+  --                 (aʰ .proj₂ (p .∧e₂ .∧e₂ .∧e₁))
+  --                 (bʰ .proj₂ (p .∧e₂ .∧e₂ .∧e₂ .∧e₁))
+  --                 (p .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁)
+  --                 (p .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁)
+  --                 (p .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁))
+  --           (cong t̂ (congp (γʰ .proj₂)))
 
-  kσ : (γʰ aʰ bʰ : CT)
-    → [ γʰ ] ≡ cʰ
-    → [ aʰ ] ≡ tʰ γʰ
-    → [ bʰ ] ≡ tʰ (▷ γʰ aʰ)
-    → [ σ γʰ aʰ bʰ ] ≡ tʰ γʰ
-  kσ γʰ aʰ bʰ kγ ka kb with ctxData γʰ kγ | tyData γʰ aʰ kγ ka | extData γʰ aʰ bʰ kγ ka kb
-  ... | pγ , kγ₀ | pa , ka₀ | pb , kb₀ =
-    ≈→≡ (∧i pq , pt)
-    where
-    pq : [ σ γʰ aʰ bʰ ] .proj₁ ⇔ (tʰ γʰ) .proj₁
-    pq .∧e₁ p = ∧i tt* , (p .∧e₂ .∧e₁)
-    pq .∧e₂ q = let wkb = ∧i (unbox kb₀) , tt*
-                    wka = ∧i (unbox ka₀) , wkb
-                    wkγ = ∧i (unbox kγ₀) , wka
-                    wb = ∧i (unbox pb) , wkγ
-                    wa = ∧i (unbox pa) , wb
-                    wγ = ∧i (unbox pγ) , wa
-                in ∧i tt* , wγ
-    pt : ∀ p q → [ σ γʰ aʰ bʰ ] .proj₂ p ≡ tʰ γʰ .proj₂ q
-    pt p q =
-      trans (kσ₀ (γʰ .proj₂ (p .∧e₂ .∧e₁))
-                  (aʰ .proj₂ (p .∧e₂ .∧e₂ .∧e₁))
-                  (bʰ .proj₂ (p .∧e₂ .∧e₂ .∧e₂ .∧e₁))
-                  (p .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁)
-                  (p .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁)
-                  (p .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁))
-            (cong t̂ (congp (γʰ .proj₂)))
+  -- kσ : (γʰ aʰ bʰ : CT)
+  --   → [ γʰ ] ≡ cʰ
+  --   → [ aʰ ] ≡ tʰ γʰ
+  --   → [ bʰ ] ≡ tʰ (▷ γʰ aʰ)
+  --   → [ σ γʰ aʰ bʰ ] ≡ tʰ γʰ
+  -- kσ γʰ aʰ bʰ kγ ka kb with ctxData γʰ kγ | tyData γʰ aʰ kγ ka | extData γʰ aʰ bʰ kγ ka kb
+  -- ... | pγ , kγ₀ | pa , ka₀ | pb , kb₀ =
+  --   ≈→≡ (∧i pq , pt)
+  --   where
+  --   pq : [ σ γʰ aʰ bʰ ] .proj₁ ⇔ (tʰ γʰ) .proj₁
+  --   pq .∧e₁ p = ∧i tt* , (p .∧e₂ .∧e₁)
+  --   pq .∧e₂ q = let wkb = ∧i (unbox kb₀) , tt*
+  --                   wka = ∧i (unbox ka₀) , wkb
+  --                   wkγ = ∧i (unbox kγ₀) , wka
+  --                   wb = ∧i (unbox pb) , wkγ
+  --                   wa = ∧i (unbox pa) , wb
+  --                   wγ = ∧i (unbox pγ) , wa
+  --               in ∧i tt* , wγ
+  --   pt : ∀ p q → [ σ γʰ aʰ bʰ ] .proj₂ p ≡ tʰ γʰ .proj₂ q
+  --   pt p q =
+  --     trans (kσ₀ (γʰ .proj₂ (p .∧e₂ .∧e₁))
+  --                 (aʰ .proj₂ (p .∧e₂ .∧e₂ .∧e₁))
+  --                 (bʰ .proj₂ (p .∧e₂ .∧e₂ .∧e₂ .∧e₁))
+  --                 (p .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁)
+  --                 (p .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁)
+  --                 (p .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁))
+  --           (cong t̂ (congp (γʰ .proj₂)))
 
     
