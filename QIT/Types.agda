@@ -19,3 +19,7 @@ inj₁≢inj₂ ()
   {x y : Σ A B} (e : x ≡ y)
   → subst B (≡.cong proj₁ e) (x .proj₂) ≡ y .proj₂
 Σ-proj₂ ≡.refl = ≡.refl
+
+×≡ : {A : Set ℓA} {B : Set ℓB} {a₁ a₂ : A} {b₁ b₂ : B}
+   → a₁ ≡ a₂ → b₁ ≡ b₂ → _≡_ {A = A × B} (a₁ , b₁) (a₂ , b₂)
+×≡ ≡.refl ≡.refl = ≡.refl
