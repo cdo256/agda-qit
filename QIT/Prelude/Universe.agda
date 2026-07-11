@@ -2,6 +2,9 @@ module QIT.Prelude.Universe where
 
 open import Agda.Primitive renaming (lzero to ℓ0) public
 
+ℓ1 = lsuc ℓ0
+ℓ2 = lsuc ℓ1
+
 variable
   ℓA ℓB ℓC ℓD ℓE ℓF ℓI ℓP ℓQ ℓR ℓS ℓX ℓY ℓZ : Level
 
