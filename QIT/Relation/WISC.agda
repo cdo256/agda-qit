@@ -10,11 +10,11 @@ open import QIT.Relation.Base
 open import QIT.Relation.Binary
 open import QIT.Relation.Ordinal
 open import QIT.Prop
-open import QIT.Function.Base
+open import QIT.Function.Base hiding (_∘_)
 open import QIT.Set.Base
 open import QIT.Category.Preorder
 open import QIT.Category.Set
-open import QIT.Functor.Base
+open import QIT.Functor.Base 
 
 WISC : ∀ {ℓ} → (A : Set ℓ) (C : Set ℓ) (W : C → Set ℓ) → Prop _
 WISC {ℓ} A C W =

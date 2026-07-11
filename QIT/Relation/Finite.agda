@@ -50,7 +50,7 @@ module _ {ℓA} where
       where
       open ≅ˢ
       [m]↔[n] : Fin m ≅ˢ Fin n
-      [m]↔[n] = sym q ∘ p
+      [m]↔[n] = sym q ≅ˢ.∘ p
       m≡n : m ≡ n
       m≡n = cantor-schröder-bernstein
         ([m]↔[n] .to) ([m]↔[n] .from)
