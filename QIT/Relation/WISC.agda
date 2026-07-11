@@ -16,17 +16,34 @@ open import QIT.Category.Preorder
 open import QIT.Category.Set
 open import QIT.Functor.Base 
 
-WISC : ∀ {ℓ} → (A : Set ℓ) (C : Set ℓ) (W : C → Set ℓ) → Prop _
-WISC {ℓ} A C W =
-  ∀ (E : Set ℓ)
+IsWISC : ∀ {ℓ}
+       → (A : Set ℓ)
+       → (C : Set ℓ)
+       → (W : C → Set ℓ)
+       → (ℓ' : Level)
+       → Prop (ℓ ⊔ lsuc ℓ')
+IsWISC A C W ℓ' =
+  ∀ (E : Set ℓ')
   → (q : E → A)
   → Surjective q
   → ∃ λ (c : C)
   → ∃ λ (f : W c → E)
   → Surjective (q ∘ f)
-  
+
+WISC : ∀ ℓ ℓ' → Prop (lsuc ℓ ⊔ lsuc ℓ')
+WISC ℓ ℓ' = (A : Set ℓ)
+     → ∃ λ (C : Set ℓ)
+     → ∃ λ (W : C → Set ℓ)
+     → IsWISC A C W ℓ'
+
+IWISC : ∀ ℓ ℓ' → Prop (lsuc ℓ ⊔ lsuc ℓ')
+IWISC ℓ ℓ' = (A : Set ℓ) (F : A → Set ℓ)
+      → ∃ λ (C : Set ℓ)
+      → ∃ λ (W : C → Set ℓ)
+      → ∀ c → IsWISC (F c) C W ℓ'
+
 WeakAC : ∀ {ℓ} → (A : Set ℓ) (C : Set ℓ) (W : C → Set ℓ)
-       → WISC A C W
+       → IsWISC A C W ℓ
        → (B : A → Set ℓ)
        → (P : ∀ x → B x → Prop ℓ)
        → (∀ x → ∃ (P x))
@@ -56,13 +73,7 @@ WeakAC A C W w B P e = wac
     v : (z : W c) → P ((p' ∘ f) z) (q' (f z))
     v z = f z .snd
 
-IWISC : ∀ ℓ → Prop (lsuc ℓ)
-IWISC ℓ = (A : Set ℓ) (F : A → Set ℓ)
-      → ∃ λ (C : Set ℓ)
-      → ∃ λ (W : C → Set ℓ)
-      → ∀ c → WISC (F c) C W
-
-module _ {ℓ} (iwisc : IWISC ℓ) where
+module _ {ℓ} (iwisc : IWISC ℓ ℓ) where
   WeakAC'
     : ∀ (A : Set ℓ)
     → ∃ λ (C : Set ℓ)
