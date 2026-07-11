@@ -54,8 +54,36 @@ open ≅ˢ using (_≅ˢ_) public
 matchp : {A : Prop ℓA} {B : A → Prop ℓB} → (a : A) → (f : ∀ a → B a) → B a
 matchp x f = f x
 
+infixr 5 _∘_
 _∘_ : ∀ {A : Set ℓA} {B : A → Set ℓB} {C : A → Set ℓC}
     → (g : ∀ {a} → (b : B a) → C a)
     → (f : (a : A) → B a)
     → ∀ a → C a
 (g ∘ f) a = g (f a)
+
+infixr 5 _∘ᵖ_
+_∘ᵖ_ : ∀ {A : Prop ℓA} {B : A → Prop ℓB} {C : A → Set ℓC}
+    → (g : ∀ {a} → (b : B a) → C a)
+    → (f : (a : A) → B a)
+    → ∀ a → C a
+(g ∘ᵖ f) a = g (f a)
+
+infixr 5 _∘ˢᵖ_
+_∘ˢᵖ_ : ∀ {A : Set ℓA} {B : A → Prop ℓB} {C : A → Set ℓC}
+    → (g : ∀ {a} → (b : B a) → C a)
+    → (f : (a : A) → B a)
+    → ∀ a → C a
+(g ∘ˢᵖ f) a = g (f a)
+
+infixr 5 _∘ᵖˢ_
+_∘ᵖˢ_ : ∀ {A : Prop ℓA} {B : A → Set ℓB} {C : A → Set ℓC}
+    → (g : ∀ {a} → (b : B a) → C a)
+    → (f : (a : A) → B a)
+    → ∀ a → C a
+(g ∘ᵖˢ f) a = g (f a)
+
+const : ∀ {A : Set ℓA} {B : Set ℓB} → A → B → A
+const a _ = a
+
+Π : (A : Set ℓA) (B : A → Set ℓB) → Set (ℓA ⊔ ℓB)
+Π A B = (a : A) → B a

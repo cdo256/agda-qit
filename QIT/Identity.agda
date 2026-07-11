@@ -275,6 +275,7 @@ subst-Π {A = A} {B} C {x} refl g z = refl
 --   → subst (λ a → ∀ b → C a b) p f ≡ g
 -- dfunExt C refl h = {!!}
 
+
 subst-cong
   : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : Set ℓB} (C : B → Set ℓC)
   → (f : A → B)

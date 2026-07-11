@@ -21,6 +21,10 @@ record FunExt : Propω where
            → {f g : ∀ a → B a} → (∀ x → f x ≡ g x)
            → f ≡ g
 
+    funExtp : ∀ {ℓA ℓB} {A : Prop ℓA} {B : A → Set ℓB}
+           → {f g : ∀ a → B a} → (∀ x → f x ≡ g x)
+           → f ≡ g
+
 -- P∧Q→P≡Q : ∀ {ℓP} {P Q : Prop ℓP} → P ∧ Q → P ≡ Q
 -- P∧Q→P≡Q (p , q) = propExt ((λ _ → q) , (λ _ → p))
 
