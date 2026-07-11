@@ -98,6 +98,43 @@ module _
     module _ {ℓB} where
       open SetQuotientElimStr (sqe (sq A R) ℓB) using ( quot-elim ; quot-elim-beta ; quot-rec
                                     ; quot-rec-beta ; quot-recp ; quot-elimp) public
+
+      abstract
+        quot-elim[]
+          : (B : SetQuotientStr.Q (sq A R) → Set ℓB)
+          → (f : ∀ a → B [ a ])
+          → (eq : (x y : A) → (r : R x y) → subst B (quot-rel x y r) (f x) ≡ f y)
+          → (x : A)
+          → B [ x ]
+        quot-elim[] B f eq x = quot-elim B f eq [ x ]
+
+        quot-elim[]-beta
+          : (B : SetQuotientStr.Q (sq A R) → Set ℓB)
+          → (f : ∀ a → B [ a ])
+          → (eq : (x y : A) → (r : R x y) → subst B (quot-rel x y r) (f x) ≡ f y)
+          → (x : A)
+          → quot-elim[] B f eq x ≡ f x
+        quot-elim[]-beta B f eq x = quot-elim-beta B f eq x
+      {-# NOT_PROJECTION_LIKE quot-elim[] #-}
+      {-# REWRITE quot-elim[]-beta #-}
+
+      abstract
+        quot-rec[] : {B : Set ℓB}
+          → (f : A → B)
+          → (eq : (x y : A) → R x y → f x ≡ f y)
+          → (x : A)
+          → B
+        quot-rec[] f eq x = quot-rec f eq [ x ]
+
+        quot-rec[]-beta : {B : Set ℓB}
+          → (f : A → B)
+          → (eq : (x y : A) → R x y → f x ≡ f y)
+          → (x : A)
+          → quot-rec[] f eq x ≡ f x
+        quot-rec[]-beta f eq x = quot-rec-beta f eq x
+      {-# NOT_PROJECTION_LIKE quot-rec[] #-}
+      {-# REWRITE quot-rec[]-beta #-}
+
       {-# DISPLAY SetQuotientElimStr.quot-elim _ B f eq q = quot-elim B f eq q #-}
       {-# DISPLAY SetQuotientElimStr.quot-elim-beta _ B f eq x = quot-elim-beta B f eq x #-}
       {-# DISPLAY SetQuotientElimStr.quot-rec _ f eq q = quot-rec f eq q #-}
