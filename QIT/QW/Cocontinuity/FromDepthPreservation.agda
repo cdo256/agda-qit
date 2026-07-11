@@ -87,17 +87,6 @@ module Rank where
     rank-beta : ∀ {α} (t̂ : S₀ α) → rank (S̃ α ⊢[ t̂ ]) ≡ rank₀ t̂
     rank-beta {α} t̂ = SQ.rec-beta (S̃ α) rank₀ (λ {ŝ t̂} → rank-cong ŝ t̂) t̂
 
-  -- abstract
-  --   rank[] : ∀ {α} → S₀ α → Z
-  --   rank[] {α} t̂ =
-  --     SQ.rec (S̃ α) rank₀ (λ {ŝ t̂} → rank-cong ŝ t̂) (S̃ α ⊢[ t̂ ])
-
-  --   rank[]-beta : ∀ {α} (t̂ : S₀ α) → rank[] t̂ ≡ rank₀ t̂
-  --   rank[]-beta {α} t̂ =
-  --     SQ.rec-beta (S̃ α) rank₀ (λ {ŝ t̂} → rank-cong ŝ t̂) t̂
-
-  -- {-# REWRITE rank[]-beta #-}
-
   rank₀≤ : ∀ {α} → (ŝ : S₀ α) → rank₀ ŝ ≤ α
   rank₀≤ {α} (s , s≤α) = s≤α
 
@@ -221,15 +210,6 @@ module LiftElement where
   lift≈-beta : ∀ {α} (ŝ : S₀ α) → lift≈ (S̃ α ⊢[ ŝ ]) ≡ lift≈₀ ŝ
   lift≈-beta {α} ŝ =
     SQ.elim-beta (S̃ α) (λ t̂ → S̃/ (rank t̂)) lift≈₀ lift≈-cong ŝ
-
-  abstract
-    lift≈[] : ∀ {α} (ŝ : S₀ α) → S̃/ (rank (S̃ α ⊢[ ŝ ]))
-    lift≈[] {α} ŝ = lift≈ (S̃ α ⊢[ ŝ ])
-
-    lift≈[]-beta : ∀ {α} (ŝ : S₀ α) → lift≈[] ŝ ≡ lift≈₀ ŝ
-    lift≈[]-beta ŝ = lift≈-beta ŝ
-  {-# NOT_PROJECTION_LIKE lift≈[] #-}
-  {-# REWRITE lift≈[]-beta #-}
 
   lift≈-step : ∀ {α β} (p : α ≤ β) (s̃ : S̃/ α)
     → (q : rank s̃ ≡ rank (D̃/.hom (box p) s̃))
@@ -363,15 +343,6 @@ module LiftElement where
       (λ x → rankC (D* ⊢[ x ]) , liftC₀ x)
       (λ p → ≡.Σ≡ (rankC-dp p) (liftC-cong p))
 
-  abstract
-    liftC[] : D*₀ → D*₀
-    liftC[] x = liftC (D* ⊢[ x ])
-
-    liftC[]-beta : (x : D*₀) → liftC[] x ≡ (rankC (D* ⊢[ x ]) , liftC₀ x)
-    liftC[]-beta x = liftC-beta x
-  {-# NOT_PROJECTION_LIKE liftC[] #-}
-  {-# REWRITE liftC[]-beta #-}
-
   weakenLift : ∀ {α} (ŝ : S̃/ α) → dweaken/ (rank≤ ŝ) (lift≈ ŝ) ≡ ŝ
   weakenLift {α} = SQ.elimp (S̃ α) B u
     where
@@ -479,15 +450,6 @@ module Cocontinuity where
 
   ϕ-beta : (x : FD*₀) → ϕ (Colim (FD̃/) ⊢[ x ]) ≡ ϕ₀ x
   ϕ-beta = SQ.rec-beta (Colim (FD̃/)) ϕ₀ ϕ-cong
-
-  abstract
-    ϕ[] : FD*₀ → F.ob D*/
-    ϕ[] x = ϕ (Colim (FD̃/) ⊢[ x ])
-
-    ϕ[]-beta : (x : FD*₀) → ϕ[] x ≡ ϕ₀ x
-    ϕ[]-beta x = ϕ-beta x
-  {-# NOT_PROJECTION_LIKE ϕ[] #-}
-  {-# REWRITE ϕ[]-beta #-}
 
   ψ : F.ob D*/ → FD*/
   ψ (s , f̂) = FD* ⊢[ α , s , x̂ ]

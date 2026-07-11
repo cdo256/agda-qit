@@ -116,6 +116,8 @@ import QIT.QW.Diagram
 import QIT.QW.Locality
 import QIT.QW.Cocontinuity
 import QIT.QW.Cocontinuity.FromDepthPreservation
+import QIT.QW.Cocontinuity.FromDepthPreservation2
+import QIT.QW.Cocontinuity.ForW
 import QIT.QW
 
 -- Plump ordinals

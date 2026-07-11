@@ -268,6 +268,26 @@ subst-Π : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : Set ℓB} (C : A → B → S
         ≡ subst (λ a → C a z) p (g z)
 subst-Π {A = A} {B} C {x} refl g z = refl
 
+dfunExt
+  : ⦃ funExt* : FunExt ⦄
+  → ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : A → Set ℓB}
+  → (C : ∀ a → B a → Set ℓC)
+  → {x y : A} (p : x ≡ y)
+  → {f : ∀ b → C x b} {g : ∀ b → C y b}
+  → ((b : B x) → dsubst₂ C p refl (f b) ≡ g (subst B p b))
+  → subst (λ a → ∀ b → C a b) p f ≡ g
+dfunExt ⦃ funExt* ⦄ C refl h = FunExt.funExt funExt* h
+
+dfunExtp
+  : ⦃ funExt* : FunExt ⦄
+  → ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : A → Prop ℓB}
+  → {x y : A} (p : x ≡ y)
+  → {C : Set ℓC}
+  → {f : B x → C} {g : B y → C}
+  → ((b : B x) → f b ≡ g (substp B p b))
+  → subst (λ a → B a → C) p f ≡ g
+dfunExtp ⦃ funExt* ⦄ refl h = FunExt.funExtp funExt* h
+
 subst-cong
   : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : Set ℓB} (C : B → Set ℓC)
   → (f : A → B)

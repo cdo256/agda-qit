@@ -18,6 +18,7 @@ open import QIT.Relation.SetQuotient
 open import QIT.Relation.Subset
 open import QIT.Set.Bijection
 open import QIT.Set.Base
+open import QIT.Identity as Id using (dfunExtp)
 open import QIT.Setoid.Quotient
 
 module QIT.QW.Cocontinuity.FromDepthPreservation2
@@ -81,19 +82,18 @@ module Rank where
   rank₀-cong : ∀ {α β} (ŝ  : S₀ α) (t̂ : S₀ β) → ŝ ≈ˢ t̂ → rank₀ ŝ ≡ rank₀ t̂
   rank₀-cong ŝ t̂ p = dp ŝ t̂ p
 
-  abstract
-    rank : ∀ {α} → S̃/ α → Z
-    rank {α} = SQ.rec (S̃ α) rank₀ λ {ŝ t̂} → rank₀-cong ŝ t̂
+  rank : ∀ {α} → S̃/ α → Z
+  rank {α} = SQ.rec (S̃ α) rank₀ λ {ŝ t̂} → rank₀-cong ŝ t̂
 
-    rank-beta : ∀ {α} (t̂ : S₀ α) → rank (S̃ α ⊢[ t̂ ]) ≡ rank₀ t̂
-    rank-beta {α} t̂ = SQ.rec-beta (S̃ α) rank₀ (λ {ŝ t̂} → rank₀-cong ŝ t̂) t̂
+  rank-beta : ∀ {α} (t̂ : S₀ α) → rank (S̃ α ⊢[ t̂ ]) ≡ rank₀ t̂
+  rank-beta {α} t̂ = SQ.rec-beta (S̃ α) rank₀ (λ {ŝ t̂} → rank₀-cong ŝ t̂) t̂
 
   rank-cong : ∀ {α β} (ŝ  : S₀ α) (t̂ : S₀ β) → ŝ ≈ˢ t̂
             → rank (S̃ α ⊢[ ŝ ]) ≡ rank (S̃ β ⊢[ t̂ ])
-  rank-cong ŝ t̂ p
-    rewrite rank-beta ŝ
-          | rank-beta t̂ =
-    rank₀-cong ŝ t̂ p
+  rank-cong ŝ t̂ p =
+    substp₂ _≡_ (≡.sym (rank-beta ŝ))
+                (≡.sym (rank-beta t̂))
+                (dp ŝ t̂ p)
 
   rank₀≤ : ∀ {α} → (ŝ : S₀ α) → rank₀ ŝ ≤ α
   rank₀≤ {α} (s , s≤α) = s≤α
@@ -102,19 +102,17 @@ module Rank where
   rank≤ {α} = SQ.elimp (S̃ α) (λ ŝ → rank ŝ ≤ α) p
     where
     p : ∀ ŝ → rank (S̃ α ⊢[ ŝ ]) ≤ α
-    p ŝ rewrite rank-beta ŝ =
-      rank₀≤ ŝ
+    p ŝ = ≡.substp (_≤ α) (≡.sym (rank-beta ŝ)) (rank₀≤ ŝ)
 
   rankC₀ : D*₀ → Z
   rankC₀ (_ , t̂) = rank t̂
 
   rank-step₀ : ∀ {α β} (p : α ≤ β) (t̂ : S₀ α)
             → rank (S̃ α ⊢[ t̂ ]) ≡ rank (D̃/.hom (box p) (S̃ α ⊢[ t̂ ]))
-  rank-step₀ p t̂ rewrite
-      rank-beta t̂
-    | ≡.sym (rank-beta (dweaken₀ p t̂))
-    | dweaken-beta p t̂ =
-      ≡.refl
+  rank-step₀ p t̂ =
+    ≡.trans (rank-beta t̂)
+      (≡.trans (≡.sym (rank-beta (dweaken₀ p t̂)))
+        (≡.cong rank (≡.sym (dweaken-beta p t̂))))
 
   rank-step : ∀ {α β} (p : α ≤ β) (t̂ : S̃/ α)
             → rank t̂ ≡ rank (D̃/.hom (box p) t̂)
@@ -132,495 +130,356 @@ module Rank where
   rankC-cong (≈ltrans p q) =
     ≡.trans (rankC-cong p) (rankC-cong q)
 
-  abstract
-    rankC : D*/ → Z
-    rankC = SQ.rec D* rankC₀ rankC-cong
+  rankC : D*/ → Z
+  rankC = SQ.rec D* rankC₀ rankC-cong
 
-    rankC-beta : (x : D*₀) → rankC (D* ⊢[ x ]) ≡ rankC₀ x
-    rankC-beta = SQ.rec-beta (D*) rankC₀ rankC-cong
+  rankC-beta : (x : D*₀) → rankC (D* ⊢[ x ]) ≡ rankC₀ x
+  rankC-beta = SQ.rec-beta (D*) rankC₀ rankC-cong
 
   rankC-dp : ∀ {x y} → D* [ x ≈ y ]
            → rankC (D* ⊢[ x ]) ≡ rankC (D* ⊢[ y ])
-  rankC-dp {x} {y} p
-    rewrite rankC-beta x
-          | rankC-beta y =
-    rankC-cong p
-    where
-    open ≡.≡-Reasoning
+  rankC-dp {x} {y} p =
+    ≡.trans (rankC-beta x)
+      (≡.trans (rankC-cong p)
+        (≡.sym (rankC-beta y)))
 
 module LiftElement where
   open DepthPreserving
   -- open SQ
   open Rank
 
-  liftS : ∀ {α β} → (t̂ : S₀ α) → rank₀ t̂ ≤ β → S₀ β
-  liftS (t , _) p = t , p
+  liftS₀ : ∀ {α β} → (t̂ : S₀ α) → rank₀ t̂ ≤ β → S₀ β
+  liftS₀ (t , _) p = t , p
 
-  liftS/ : ∀ {α β} → (t̂ : S₀ α) → rank₀ t̂ ≤ β → S̃/ β
-  liftS/ {α} {β} t̂ p = S̃ β ⊢[ liftS t̂ p ]
+  liftS' : ∀ {α β} → (t̂ : S₀ α) → rank₀ t̂ ≤ β → S̃/ β
+  liftS' {α} {β} t̂ p = S̃ β ⊢[ liftS₀ t̂ p ]
 
-  lift₀ : ∀ {α β} → (t̂ : S₀ α)
-        → rank (S̃ α ⊢[ t̂ ]) ≤ β → S̃/ β
-  lift₀ {α} {β} t̂ p = liftS/ t̂ p'
+  liftS : ∀ {α β} → (t̂ : S₀ α) → rank (S̃ α ⊢[ t̂ ]) ≤ β → S̃/ β
+  liftS {α} {β} t̂ p = liftS' t̂ p'
     where
     p' : rank₀ t̂ Z.≤ β
     p' = ≡.substp (_≤ β) (rank-beta t̂) p
     
-
-  lift-cong
+  liftS-cong
     : ∀ {α β} → (ŝ t̂ : S₀ α)
+    → (s≤β : rank (S̃ α ⊢[ ŝ ]) ≤ β)
+    → (t≤β : rank (S̃ α ⊢[ t̂ ]) ≤ β)
     → (p : ŝ ≈ˢ t̂)
-    → ≡.subst (λ ○ → rank ○ ≤ β → S̃/ β)
-              (S̃ α ⊢≈[ p ]) (lift₀ ŝ) ≡ lift₀ t̂
-  lift-cong {α} {β} ŝ t̂ p = {!!}
+    → liftS ŝ s≤β ≡ liftS t̂ t≤β
+  liftS-cong {α} {β} ŝ t̂ s≤β t≤β p = S̃ β ⊢≈[ p ]
+
+  liftS/ : ∀ {α β} → (t̃ : S̃/ α) → rank t̃ ≤ β → S̃/ β
+  liftS/ {α} {β} =
+    SQ.elim (S̃ α) (λ t̃ → rank t̃ ≤ β → S̃/ β)
+            (λ t̂ ρ≤β → liftS t̂ ρ≤β)
+            (λ {ŝ t̂} p → dfunExtp {A = S̃/ α} {B = λ t̃ → rank t̃ ≤ β} (S̃ α ⊢≈[ p ])
+               (λ ρs≤β → S̃ β ⊢≈[ p ]))
+
+  liftS-beta : ∀ {α β} → (t̂ : S₀ α) → (ρt≤β : rank (S̃ α ⊢[ t̂ ]) ≤ β)
+             → liftS/ (S̃ α ⊢[ t̂ ]) ρt≤β ≡ liftS t̂ ρt≤β 
+  liftS-beta {α} {β} t̂ ρ≤β = funExtp⁻ (p t̂) ρ≤β
     where
-    dfunExt
-      : (∀ (q : rank (S̃ α ⊢[ ŝ ]) ≤ β)
-        → liftS/ ŝ (≡.substp (_≤ β) (rank-beta ŝ) q)
-          ≡ liftS/ t̂ (≡.substp (_≤ β) (rank-beta t̂)
-            (substp (λ ○ → rank ○ ≤ β) (S̃ α ⊢≈[ p ]) q)))
-      → ≡.subst
-          (λ ○ → rank ○ ≤ β → S̃/ β)
-          (S̃ α ⊢≈[ p ])
-        (λ (q : rank (S̃ α ⊢[ ŝ ]) ≤ β) → liftS/ ŝ (≡.substp (_≤ β) (rank-beta ŝ) q))
-      ≡ (λ (q : rank (S̃ α ⊢[ t̂ ]) ≤ β) → liftS/ t̂ (≡.substp (_≤ β) (rank-beta t̂) q))
-    dfunExt = ≡.dfunExt (λ ○ _ → S̃/ β) (S̃ α ⊢≈[ p ])
+    p : (t̂ : S₀ α) → liftS/ (S̃ α ⊢[ t̂ ]) ≡ liftS t̂
+    p = SQ.elim-beta (S̃ α) (λ t̃ → rank t̃ ≤ β → S̃/ β)
+            (λ t̂ ρ≤β → liftS t̂ ρ≤β)
+            λ {ŝ t̂} p → dfunExtp {A = S̃/ α} {B = λ t̃ → rank t̃ ≤ β} (S̃ α ⊢≈[ p ])
+               (λ ρs≤β → S̃ β ⊢≈[ p ])
 
---   lift₀ : ∀ {α β} → (t̂ : S₀ α) → rank₀ t̂ ≤ β → S̃ β
---   lift₀ t̂@(t , _) = t , Z.≡→≤ (≡.sym (rank-beta t̂))
+  liftC₀ : ∀ {β} → (x : D*₀) → rankC (D* ⊢[ x ]) ≤ β → S̃/ β
+  liftC₀ {β} x@(α , s̃) ρx≤β = liftS/ s̃ ρx≤β'
+    where
+    ρx≤β' : rank s̃ ≤ β
+    ρx≤β' = substp (_≤ β) (rankC-beta x) ρx≤β
 
---   lift/ : ∀ {α} → (t̂ : S̃/ α) → S̃/ (rank t̂)
---   lift/ {α} =
---     SQ.elim (S̃ α) (λ t̂ → S̃/ (rank t̂))
---             f₀ f-cong
---     where
---     f₀ : (t̂ : S₀ α) → S̃/ (rank (S̃ α ⊢[ t̂ ]))
---     f₀ t̂ = S̃ (rank (S̃ α ⊢[ t̂ ])) ⊢[ lift₀ t̂ ]
---     f-cong : ∀ {ŝ t̂ : S₀ α} → (p : ŝ ≈ˢ t̂)
---            → subst (S̃/ ∘ rank) (S̃ α ⊢≈[ p ]) (f₀ ŝ) ≡ f₀ t̂
---     f-cong (≈tcong a f g r) = {!!}
---     f-cong (≈tsat e ϕ) = {!!}
---     f-cong ≈trefl = ≡.drefl (S̃/ ∘ rank)
---     f-cong (≈tsym p) =
---       ≡.dsym (S̃/ ∘ rank) (S̃ α ⊢≈[ p ]) (f-cong p)
---     f-cong (≈ttrans {s} {t} {u} p q) = {!!}
---       where
---       t̂ = lift₀ 
--- --       ≡.dtrans (S̃/ ∘ rank) (S̃ α ⊢≈[ p ]) (S̃ α ⊢≈[ p ]) (f-cong p)
--- -- -- rank-cong ŝ t̂ p
+  liftC-cong : ∀ {β} {x y} → (p : D* [ x ≈ y ])
+             → (ρx≤β : rankC (D* ⊢[ x ]) ≤ β)
+             → (ρy≤β : rankC (D* ⊢[ y ]) ≤ β)
+             → liftC₀ x ρx≤β ≡ liftC₀ y ρy≤β
+  liftC-cong {β} (≈lstage i ≡.refl) ρx≤β ρy≤β = ≡.refl
+  liftC-cong {β} {x@(α , s̃)} {y@(α' , t̃)} (≈lstep p s̃) =
+    SQ.elimp (S̃ α)
+      (λ s̃ → (ρx≤β : rankC (D* ⊢[ (α , s̃) ]) ≤ β)
+           → (ρy≤β : rankC (D* ⊢[ (α' , dweaken/ p s̃) ]) ≤ β)
+           → liftC₀ (α , s̃) ρx≤β ≡ liftC₀ (α' , dweaken/ p s̃) ρy≤β)
+      q
+      s̃
+    where
+    q : (ŝ : S₀ α)
+      → (ρx≤β : rankC (D* ⊢[ (α , S̃ α ⊢[ ŝ ]) ]) ≤ β)
+      → (ρy≤β : rankC (D* ⊢[ (α' , dweaken/ p (S̃ α ⊢[ ŝ ])) ]) ≤ β)
+      → liftC₀ (α , S̃ α ⊢[ ŝ ]) ρx≤β
+      ≡ liftC₀ (α' , dweaken/ p (S̃ α ⊢[ ŝ ])) ρy≤β
+    q ŝ ρx≤β ρy≤β = 
+      liftC₀ (α , (S̃ α ⊢[ ŝ ])) ρx≤β
+        ≡⟨ ≡.refl ⟩
+      liftS/ (S̃ α ⊢[ ŝ ]) (substp (_≤ β) (rankC-beta (α , (S̃ α ⊢[ ŝ ]))) ρx≤β)
+        ≡⟨ liftS-beta ŝ ρs≤β ⟩
+      liftS ŝ ρs≤β
+        ≡⟨ ≡.refl ⟩
+      liftS (dweaken₀ p ŝ) ρt≤βr
+        ≡⟨ ≡.sym (liftS-beta (dweaken₀ p ŝ) ρt≤βr) ⟩
+      liftS/ (S̃ α' ⊢[ dweaken₀ p ŝ ]) ρt≤βr
+        ≡⟨ dcongsp liftS/ (≡.sym (dweaken-beta p ŝ)) ⟩
+      liftS/ (dweaken/ p (S̃ α ⊢[ ŝ ]))
+             (substp (_≤ β) (rankC-beta (α' , (dweaken/ p (S̃ α ⊢[ ŝ ])))) ρy≤β)
+        ≡⟨ ≡.refl ⟩
+      liftC₀ (α' , dweaken/ p (S̃ α ⊢[ ŝ ])) ρy≤β ∎
+      where
+      open ≡.≡-Reasoning
+      ρs≤β : rank (S̃ α ⊢[ ŝ ]) ≤ β
+      ρs≤β = substp (_≤ β) (rankC-beta (α , (S̃ α ⊢[ ŝ ]))) ρx≤β
 
--- -- --     S̃ (rank (S̃ α ⊢[ t̂ ])) ⊢[ lift₀ t̂ ]
+      ρt≤βq : rank (dweaken/ p (S̃ α ⊢[ ŝ ])) ≤ β
+      ρt≤βq = substp (_≤ β) (rankC-beta (α' , (dweaken/ p (S̃ α ⊢[ ŝ ])))) ρy≤β
 
--- -- -- --   lift-cong' : ∀ {α} {ŝ t̂ : S₀ α} (p : S̃ α [ ŝ ≈ t̂ ])
--- -- -- --     → subst S̃/ (≡.cong rank (S̃ α ⊢≈[ p ])) (lift/ ŝ)
--- -- -- --     ≡ lift/ t̂
--- -- -- --   lift-cong' {α} p = {!!}
+      ρt≤βr : rank (S̃ α' ⊢[ dweaken₀ p ŝ ]) ≤ β
+      ρt≤βr = substp (_≤ β) (≡.cong rank (dweaken-beta p ŝ)) ρt≤βq
 
--- -- -- --   lift-cong : ∀ {α} {ŝ t̂ : S₀ α} (p : S̃ α [ ŝ ≈ t̂ ])
--- -- -- --     → subst S̃/ (≡.cong rank (S̃ α ⊢≈[ p ])) (lift/ ŝ)
--- -- -- --     ≡ lift/ t̂
--- -- -- --   lift-cong {α} p = {!!}
+  liftC-cong {β} {x@(αs , s̃)} {y@(αt , t̃)} (≈lsym p) ρx≤β ρy≤β =
+    ≡.sym (liftC-cong p ρy≤β ρx≤β)
+  liftC-cong {β} {x@(αs , s̃)} {y@(αt , t̃)} (≈ltrans {t = z} p p₁) ρx≤β ρy≤β =
+    ≡.trans (liftC-cong p ρx≤β ρz≤β)
+            (liftC-cong p₁ ρz≤β ρy≤β)
+    where
+    ρz≤β : rankC (D* ⊢[ z ]) ≤ β
+    ρz≤β = substp (_≤ β) (rankC-dp p) ρx≤β
 
--- -- -- -- --   lift-cong : ∀ {α} {ŝ t̂ : S₀ α} (p : S̃ α [ ŝ ≈ t̂ ])
--- -- -- -- --     → subst S̃/ (≡.cong rank (S̃ α ⊢≈[ p ])) (lift/ ŝ)
--- -- -- -- --     ≡ lift/ t̂
--- -- -- -- --   lift-cong {α} {ŝ@(s , s≤α)} {t̂@(t , t≤α)} p =
--- -- -- -- --     subst S̃/ r {!lift/ ŝ!}
--- -- -- -- --       ≡⟨ ≡.cong (subst S̃/ r) (S̃ (ιᶻ s) ⊢≈[ q ]) ⟩
--- -- -- -- --     subst S̃/ r (S̃ (ιᶻ s) ⊢[ subst S₀ r⁻ (lift₀ t̂) ]) 
--- -- -- -- --       ≡⟨ ≡.cong (subst S̃/ r) (subst-quot-S r⁻ _) ⟩
--- -- -- -- --     subst S̃/ r (subst S̃/ r⁻ (lift/ t̂))
--- -- -- -- --       ≡⟨ subst-inv S̃/ r⁻ ⟩
--- -- -- -- --     lift/ t̂ ∎
--- -- -- -- --       where
--- -- -- -- --       open ≡.≡-Reasoning
--- -- -- -- --       r : ?
--- -- -- -- --       r⁻ : ?
--- -- -- -- --       r = dpᵗ s t p
--- -- -- -- --       r⁻ = ≡.sym r
--- -- -- -- --       q : ?
--- -- -- -- -- --       q : s ≈ᵗ ⟨ subst S₀ r⁻ (lift₀ t̂) ⟩ᴾ
--- -- -- -- -- --       q = ≈ttrans p (≡→≈ T̃ (≡.sym (subst-S₀-fst r⁻ (lift₀ t̂)) )) 
+  liftC₀-dcong : ∀ {β β'} (r : β ≡ β') (x : D*₀) (ρ : rankC (D* ⊢[ x ]) ≤ β)
+    → subst D̃/.ob r (liftC₀ x ρ)
+    ≡ liftC₀ x (substp (rankC (D* ⊢[ x ]) ≤_) r ρ)
+  liftC₀-dcong ≡.refl x ρ = ≡.refl
 
--- -- -- -- -- -- --   lift≈₀ : ∀ {α} → (ŝ : S₀ α) → S̃/ (rank₀ ŝ)
--- -- -- -- -- -- --   lift≈₀ ŝ = {!!}
+  liftC : D*/ → D*₀
+  liftC =
+    SQ.rec D*
+      (λ x → rankC (D* ⊢[ x ]) , liftC₀ x (Z.≤refl (rankC (D* ⊢[ x ]))))
+      (λ {x y} p → ≡.Σ≡ (rankC-dp p) (q (D* ⊢≈[ p ])))
+    where
+    q : ∀ {x y} → (p : (D* ⊢[ x ]) ≡ (D* ⊢[ y ]))
+      → subst D̃/.ob (≡.cong rankC p) (liftC₀ x (Z.≤refl (rankC (D* ⊢[ x ]))))
+      ≡ liftC₀ y (Z.≤refl (rankC (D* ⊢[ y ])))
+    q {x} {y} p =
+      subst D̃/.ob (≡.cong rankC p) (liftC₀ x (Z.≤refl (rankC (D* ⊢[ x ]))))
+        ≡⟨ subst-irrel {B = D̃/.ob}
+             (≡.cong rankC p)
+             (rankC-dp r)
+             (liftC₀ x (Z.≤refl (rankC (D* ⊢[ x ])))) ⟩
+      subst D̃/.ob (rankC-dp r) (liftC₀ x (Z.≤refl (rankC (D* ⊢[ x ]))))
+        ≡⟨ liftC₀-dcong (rankC-dp r) x (Z.≤refl (rankC (D* ⊢[ x ]))) ⟩
+      liftC₀ x ρx≤y
+        ≡⟨ liftC-cong r ρx≤y (Z.≤refl (rankC (D* ⊢[ y ]))) ⟩
+      liftC₀ y (Z.≤refl (rankC (D* ⊢[ y ]))) ∎
+      where
+      open ≡.≡-Reasoning
+      r : D* [ x ≈ y ]
+      r = SQ.effectiveness D* x y p
 
--- -- -- -- -- -- --   -- lift≈-cong' : ∀ {α} {ŝ t̂ : S₀ α} (r : (S̃ α ⊢[ ŝ ]) ≡ (S̃ α ⊢[ t̂ ]))
--- -- -- -- -- -- --   --   → ≡.subst (λ t̂ → S̃/ (rank t̂)) r (lift≈₀ ŝ)
--- -- -- -- -- -- --   --   ≡ lift≈₀ t̂
--- -- -- -- -- -- --   -- lift≈-cong' {α} {ŝ} {t̂} r =
--- -- -- -- -- -- --   --   subst (λ t̂ → S̃/ (rank t̂)) r 
--- -- -- -- -- -- --   --         (subst S̃/ (≡.sym (rank-beta ŝ)) (lift/ ŝ))
--- -- -- -- -- -- --   --     ≡⟨ ≡.subst-cong S̃/ rank r (subst S̃/ _ (lift/ ŝ)) ⟩
--- -- -- -- -- -- --   --   subst S̃/ (≡.cong rank r)
--- -- -- -- -- -- --   --         (subst S̃/ (≡.sym (rank-beta ŝ)) (lift/ ŝ))
--- -- -- -- -- -- --   --     ≡⟨ ≡.subst-subst S̃/ (≡.sym (rank-beta ŝ))
--- -- -- -- -- -- --   --                      (≡.cong rank r) (lift/ ŝ) ⟩
--- -- -- -- -- -- --   --   subst S̃/ (≡.trans (≡.sym (rank-beta ŝ))
--- -- -- -- -- -- --   --                      (≡.cong rank r))
--- -- -- -- -- -- --   --             (lift/ ŝ)
--- -- -- -- -- -- --   --     ≡⟨ {!!} ⟩
--- -- -- -- -- -- --   --   subst S̃/ (≡.sym (rank-beta t̂)) (lift/ t̂) ∎
--- -- -- -- -- -- --   --   where
--- -- -- -- -- -- --   --   open ≡.≡-Reasoning
+      ρx≤y : rankC (D* ⊢[ x ]) ≤ rankC (D* ⊢[ y ])
+      ρx≤y = substp (rankC (D* ⊢[ x ]) ≤_) (rankC-dp r)
+                (Z.≤refl (rankC (D* ⊢[ x ])))
 
--- -- -- -- -- -- --   -- lift≈-cong : ∀ {α} {ŝ t̂ : S₀ α} (r : ŝ ≈ˢ t̂)
--- -- -- -- -- -- --   --   → ≡.subst (λ t̂ → S̃/ (rank t̂)) (S̃ α ⊢≈[ r ]) (lift≈₀ ŝ)
--- -- -- -- -- -- --   --   ≡ lift≈₀ t̂
--- -- -- -- -- -- --   -- lift≈-cong {α} {ŝ} {t̂} r =
--- -- -- -- -- -- --   --   subst (λ t̂ → S̃/ (rank t̂)) (S̃ α ⊢≈[ r ])
--- -- -- -- -- -- --   --         (subst S̃/ (≡.sym (rank-beta ŝ)) (lift/ ŝ))
--- -- -- -- -- -- --   --     ≡⟨ ≡.subst-cong S̃/ rank (S̃ α ⊢≈[ r ]) (subst S̃/ _ (lift/ ŝ)) ⟩
--- -- -- -- -- -- --   --   subst S̃/ (≡.cong rank (S̃ α ⊢≈[ r ]))
--- -- -- -- -- -- --   --         (subst S̃/ (≡.sym (rank-beta ŝ)) (lift/ ŝ))
--- -- -- -- -- -- --   --     ≡⟨ ≡.subst-subst S̃/ (≡.sym (rank-beta ŝ))
--- -- -- -- -- -- --   --                      (≡.cong rank (S̃ α ⊢≈[ r ])) (lift/ ŝ) ⟩
--- -- -- -- -- -- --   --   subst S̃/ (≡.trans (≡.sym (rank-beta ŝ))
--- -- -- -- -- -- --   --                      (≡.cong rank (S̃ α ⊢≈[ r ])))
--- -- -- -- -- -- --   --             (lift/ ŝ)
--- -- -- -- -- -- --   --     ≡⟨ ≡.sym (≡.subst-subst S̃/ (rank-cong ŝ t̂ r)
--- -- -- -- -- -- --   --                      (≡.sym (rank-beta t̂)) (lift/ ŝ)) ⟩
--- -- -- -- -- -- --   --   subst S̃/ (≡.sym (rank-beta t̂))
--- -- -- -- -- -- --   --         (subst S̃/ (rank-cong ŝ t̂ r) (lift/ ŝ))
--- -- -- -- -- -- --   --     ≡⟨ ≡.cong (subst S̃/ (≡.sym (rank-beta t̂)))
--- -- -- -- -- -- --   --              (lift-cong {ŝ = ŝ} {t̂ = t̂} r) ⟩
--- -- -- -- -- -- --   --   subst S̃/ (≡.sym (rank-beta t̂)) (lift/ t̂) ∎
--- -- -- -- -- -- --   --   where
--- -- -- -- -- -- --   --   open ≡.≡-Reasoning
-  
--- -- -- -- -- -- --   -- lift≈-cong : ∀ {α} {ŝ t̂ : S₀ α} (p : ŝ ≈ˢ t̂)
--- -- -- -- -- -- --   --   → ≡.subst (S̃/ ∘ rank) (S̃ α ⊢≈[ p ]) (lift≈₀ ŝ)
--- -- -- -- -- -- --   --   ≡ lift≈₀ t̂
--- -- -- -- -- -- --   -- lift≈-cong {α} {ŝ} {t̂} (≈tcong a f g p) = {!!}
--- -- -- -- -- -- --   -- lift≈-cong {α} {ŝ} {t̂} (≈tsat e ϕ) = {!!}
--- -- -- -- -- -- --   -- lift≈-cong {α} {ŝ} {t̂} ≈trefl = ≡.refl
--- -- -- -- -- -- --   -- lift≈-cong {α} {ŝ} {t̂} (≈tsym p) = ≡.dsym (S̃/ ∘ rank) (S̃ α ⊢≈[ p ]) (lift≈-cong p)
--- -- -- -- -- -- --   -- lift≈-cong {α} {ŝ} {t̂} (≈ttrans {t = u} p q) =
--- -- -- -- -- -- --   --   ≡.dtrans (S̃/ ∘ rank) {a2 = u} (S̃ α ⊢≈[ p ]) (S̃ α ⊢≈[ q ]) (lift≈-cong p) (lift≈-cong q) 
+--   liftC-beta : (x : D*₀) → liftC (D* ⊢[ x ]) ≡ (rankC (D* ⊢[ x ]) , liftC₀ x)
+--   liftC-beta =
+--     SQ.rec-beta (D*)
+--       (λ x → rankC (D* ⊢[ x ]) , liftC₀ x)
+--       (λ p → ≡.Σ≡ (rankC-dp p) (liftC-cong p))
 
--- -- -- -- -- -- --   -- lift≈ : ∀ {α} → (t̂ : S̃/ α) → S̃/ (rank t̂)
--- -- -- -- -- -- --   -- lift≈ {α} = SQ.elim (S̃ α) (λ t̂ → S̃/ (rank t̂)) lift≈₀ lift≈-cong
+-- --   weakenLift : ∀ {α} (ŝ : S̃/ α) → dweaken/ (rank≤ ŝ) {!lift≈ ŝ!} ≡ ŝ
+-- --   weakenLift {α} = SQ.elimp (S̃ α) B u
+-- --     where
+-- --     B : S̃/ α → Prop _
+-- --     B ŝ = dweaken/ (rank≤ ŝ) {!lift≈ ŝ!} ≡ ŝ
 
--- -- -- -- -- -- --   -- lift≈-beta : ∀ {α} (ŝ : S₀ α) → lift≈ (S̃ α ⊢[ ŝ ]) ≡ lift≈₀ ŝ
--- -- -- -- -- -- --   -- lift≈-beta {α} ŝ =
--- -- -- -- -- -- --   --   SQ.elim-beta (S̃ α) (λ t̂ → S̃/ (rank t̂)) lift≈₀ lift≈-cong ŝ
+-- --     u : ∀ a → B (S̃ α ⊢[ a ])
+-- --     u a =
+-- --       dweaken/ (rank≤ (S̃ α ⊢[ a ])) {!lift≈ (S̃ α ⊢[ a ])!}
+-- --         ≡⟨ ≡.cong (dweaken/ (rank≤ (S̃ α ⊢[ a ]))) {!lift≈-beta a!} ⟩
+-- --       dweaken/ (rank≤ (S̃ α ⊢[ a ]))
+-- --         (subst S̃/ (≡.sym (rank-beta a)) {!lift/ a!})
+-- --         ≡⟨ ≡.cong (dweaken/ (rank≤ (S̃ α ⊢[ a ])))
+-- --                  (≡.sym (subst-quot-S (≡.sym (rank-beta a)) (lift₀ a))) ⟩
+-- --       dweaken/ (rank≤ (S̃ α ⊢[ a ]))
+-- --         (S̃ (rank (S̃ α ⊢[ a ])) ⊢[ subst S₀ (≡.sym (rank-beta a)) {!lift₀ a!} ])
+-- --         ≡⟨ dweaken-beta (rank≤ (S̃ α ⊢[ a ]))
+-- --                          (subst S₀ (≡.sym (rank-beta a)) (lift₀ a)) ⟩
+-- --       S̃ α ⊢[ dweaken₀ (rank≤ (S̃ α ⊢[ a ]))
+-- --                       (subst S₀ (≡.sym (rank-beta a)) {!lift₀ a!}) ]
+-- --         ≡⟨ S̃ α ⊢≈[ ≡→≈ T̃ (subst-S₀-fst (≡.sym (rank-beta a)) {!lift₀ a!}) ] ⟩
+-- --       S̃ α ⊢[ a ] ∎
+-- --       where
+-- --       open ≡.≡-Reasoning
 
--- -- -- -- -- -- --   -- abstract
--- -- -- -- -- -- --   --   lift≈[] : ∀ {α} (ŝ : S₀ α) → S̃/ (rank (S̃ α ⊢[ ŝ ]))
--- -- -- -- -- -- --   --   lift≈[] {α} ŝ = lift≈ (S̃ α ⊢[ ŝ ])
+-- --   dweaken-cast : ∀ {α β γ} (r : α ≡ β)
+-- --     → (p : α ≤ γ) (q : β ≤ γ) (ŝ : S̃/ α)
+-- --     → dweaken/ p ŝ ≡ dweaken/ q (subst S̃/ r ŝ)
+-- --   dweaken-cast ≡.refl p q ŝ = ≡.refl
 
--- -- -- -- -- -- --   --   lift≈[]-beta : ∀ {α} (ŝ : S₀ α) → lift≈[] ŝ ≡ lift≈₀ ŝ
--- -- -- -- -- -- --   --   lift≈[]-beta ŝ = lift≈-beta ŝ
--- -- -- -- -- -- --   -- {-# NOT_PROJECTION_LIKE lift≈[] #-}
--- -- -- -- -- -- --   -- {-# REWRITE lift≈[]-beta #-}
+-- --   weakenLiftC : ∀ {α β} (p : α ≤ β) (ŝ : S̃/ α)
+-- --     → dweaken/ (≤≤ p (rank≤ ŝ)) (subst S̃/ (rankC-beta (α , ŝ)) (liftC₀ (α , ŝ)))
+-- --     ≡ dweaken/ p ŝ
+-- --   weakenLiftC {α} {β} p ŝ =
+-- --     dweaken/ (≤≤ p (rank≤ ŝ)) (subst S̃/ (rankC-beta (α , ŝ)) (liftC₀ (α , ŝ)))
+-- --       ≡⟨ ≡.cong (dweaken/ (≤≤ p (rank≤ ŝ))) (subst-inv S̃/ (≡.sym (rankC-beta (α , ŝ)))) ⟩
+-- --     dweaken/ (≤≤ p (rank≤ ŝ)) {!lift≈ ŝ!}
+-- --       ≡⟨ comp (box (rank≤ ŝ)) (box p) {x = {!lift≈ ŝ!}} ⟩
+-- --     dweaken/ p (dweaken/ (rank≤ ŝ) {!lift≈ ŝ!})
+-- --       ≡⟨ ≡.cong (dweaken/ p) (weakenLift ŝ) ⟩
+-- --     dweaken/ p ŝ ∎
+-- --     where
+-- --     open ≡.≡-Reasoning
 
--- -- -- -- -- -- --   -- lift≈-step : ∀ {α β} (p : α ≤ β) (s̃ : S̃/ α)
--- -- -- -- -- -- --   --   → (q : rank s̃ ≡ rank (D̃/.hom (box p) s̃))
--- -- -- -- -- -- --   --   → subst S̃/ q (lift≈ s̃) ≡ lift≈ (D̃/.hom (box p) s̃)
--- -- -- -- -- -- --   -- lift≈-step {α} {β} p =
--- -- -- -- -- -- --   --   SQ.elimp (S̃ α) _ r
--- -- -- -- -- -- --   --   where
--- -- -- -- -- -- --   --   r : (a : S₀ α)
--- -- -- -- -- -- --   --     → (q : rank (S̃ α ⊢[ a ]) ≡ rank (D̃/.hom (box p) (S̃ α ⊢[ a ])))
--- -- -- -- -- -- --   --     → subst S̃/ q (lift≈ (S̃ α ⊢[ a ]))
--- -- -- -- -- -- --   --     ≡ lift≈ (D̃/.hom (box p) (S̃ α ⊢[ a ]))
--- -- -- -- -- -- --   --   r a q =
--- -- -- -- -- -- --   --     subst S̃/ q (lift≈ (S̃ α ⊢[ a ]))
--- -- -- -- -- -- --   --       ≡⟨ ≡.cong (subst S̃/ q) (lift≈-beta a) ⟩
--- -- -- -- -- -- --   --     subst S̃/ q (subst S̃/ (≡.sym (rank-beta a)) (lift/ a))
--- -- -- -- -- -- --   --       ≡⟨ ≡.subst-subst S̃/ (≡.sym (rank-beta a)) q (lift/ a) ⟩
--- -- -- -- -- -- --   --     subst S̃/ (≡.trans (≡.sym (rank-beta a)) q) (lift/ a)
--- -- -- -- -- -- --   --       ≡⟨ ≡.sym (≡.subst-subst S̃/
--- -- -- -- -- -- --   --                    (≡.sym (rank-beta (dweaken₀ p a)))
--- -- -- -- -- -- --   --                    (≡.cong rank (≡.sym (dweaken-beta p a)))
--- -- -- -- -- -- --   --                    (lift/ a)) ⟩
--- -- -- -- -- -- --   --     subst S̃/ (≡.cong rank (≡.sym (dweaken-beta p a)))
--- -- -- -- -- -- --   --       (subst S̃/ (≡.sym (rank-beta (dweaken₀ p a))) (lift/ a))
--- -- -- -- -- -- --   --       ≡⟨ ≡.cong (subst S̃/ (≡.cong rank (≡.sym (dweaken-beta p a))))
--- -- -- -- -- -- --   --                (≡.sym (lift≈-beta (dweaken₀ p a))) ⟩
--- -- -- -- -- -- --   --     subst S̃/ (≡.cong rank (≡.sym (dweaken-beta p a)))
--- -- -- -- -- -- --   --       (lift≈ (S̃ β ⊢[ dweaken₀ p a ]))
--- -- -- -- -- -- --   --       ≡⟨ dcong-lift≈ (≡.sym (dweaken-beta p a)) ⟩
--- -- -- -- -- -- --   --     lift≈ (D̃/.hom (box p) (S̃ α ⊢[ a ])) ∎
--- -- -- -- -- -- --   --     where
--- -- -- -- -- -- --   --     open ≡.≡-Reasoning
+-- --   isSectLiftC₀
+-- --     : ∀ (x : D*₀)
+-- --     → D* ⊢[ liftC (D* ⊢[ x ]) ]
+-- --     ≡ D* ⊢[ x ]
+-- --   isSectLiftC₀ x@(α , ŝ) = D* ⊢≈[ p ]
+-- --     where
+-- --     v : dweaken/ (rank≤ ŝ) (subst S̃/ (rankC-beta x) (liftC₀ x)) ≡ ŝ
+-- --     v = ≡.trans
+-- --           (≡.cong (dweaken/ (rank≤ ŝ)) (subst-inv S̃/ (≡.sym (rankC-beta x))))
+-- --           (weakenLift ŝ)
+-- --     p : D* [ liftC (D* ⊢[ x ]) ≈ x ]
+-- --     p =
+-- --       liftC (D* ⊢[ x ])
+-- --         ≈⟨ ≡→≈ (D*) (liftC-beta x) ⟩
+-- --       rankC (D* ⊢[ x ]) , liftC₀ x
+-- --         ≈⟨ ≡→≈ (D*) (Σ≡ (rankC-beta x) ≡.refl) ⟩
+-- --       rankC₀ x , subst S̃/ (rankC-beta x) (liftC₀ x)
+-- --         ≈⟨ ≈lstep (rank≤ ŝ) (subst S̃/ (rankC-beta x) (liftC₀ x)) ⟩
+-- --       α , dweaken/ (rank≤ ŝ) (subst S̃/ (rankC-beta x) (liftC₀ x))
+-- --         ≈⟨ ≈lstage α v ⟩
+-- --       α , ŝ ∎
+-- --       where
+-- --       open ≈.≈syntax {S = D*}
 
--- -- -- -- -- -- --   --     dcong-lift≈ : ∀ {s̃ t̃ : S̃/ β} (e : s̃ ≡ t̃)
--- -- -- -- -- -- --   --       → subst S̃/ (≡.cong rank e) (lift≈ s̃) ≡ lift≈ t̃
--- -- -- -- -- -- --   --     dcong-lift≈ ≡.refl = ≡.refl
+-- --   isSectLiftC : ∀ (x : D*/) → D* ⊢[ liftC x ] ≡ x
+-- --   isSectLiftC = SQ.elimp (D*) (λ z → D* ⊢[ liftC z ] ≡ z) isSectLiftC₀
 
--- -- -- -- -- -- --   liftC₀ : (x : D*₀) → S̃/ (rankC (D* ⊢[ x ]))
--- -- -- -- -- -- --   liftC₀ x@(α , ŝ) = ≡.subst S̃/ p {!!}
--- -- -- -- -- -- --     where
--- -- -- -- -- -- --     p : rank ŝ ≡ rankC (D* ⊢[ x ])
--- -- -- -- -- -- --     p = ≡.sym (rankC-beta x)
+-- -- module Cocontinuity where
+-- --   open Rank
+-- --   open LiftElement
 
--- -- -- -- -- -- --   liftC-cong : ∀ {x y} → (p : D* [ x ≈ y ])
--- -- -- -- -- -- --              → subst S̃/ (rankC-dp p) (liftC₀ x) ≡ liftC₀ y
--- -- -- -- -- -- --   liftC-cong {(α , s̃)} {(α , t̃)} (≈lstage α e) =
--- -- -- -- -- -- --     dcong-liftC₀ (≡.cong (α ,_) e)
--- -- -- -- -- -- --     where
--- -- -- -- -- -- --     open ≡.≡-Reasoning
+-- --   ϕ₀ : FD*₀ → F.ob D*/
+-- --   ϕ₀ (α , s , f) = s , λ i → D* ⊢[ α , f i ]
+-- --   ϕ-cong : ∀ {x y : FD*₀} → Colim (FD̃/) [ x ≈ y ] → ϕ₀ x ≡ ϕ₀ y
+-- --   ϕ-cong {α , a , f̂} {α , a , f̂} (≈lstage α ≡.refl) = ≡.refl
+-- --   ϕ-cong {α , a , f̂} {β , a , ĝ} (≈lstep p (a , f̂)) =
+-- --     ≡.cong (a ,_) (funExt (λ i → D* ⊢≈[ ≈lstep p (f̂ i) ]))
+-- --   ϕ-cong {α , a , f̂} {β , b , ĝ} (≈lsym p) = ≡.sym (ϕ-cong p)
+-- --   ϕ-cong {α , a , f̂} {β , b , ĝ} (≈ltrans p q) = ≡.trans (ϕ-cong p) (ϕ-cong q)
 
--- -- -- -- -- -- --     dcong-liftC₀ : ∀ {x y} (e : x ≡ y)
--- -- -- -- -- -- --       → subst S̃/ (≡.cong (λ z → rankC (D* ⊢[ z ])) e) (liftC₀ x)
--- -- -- -- -- -- --       ≡ liftC₀ y
--- -- -- -- -- -- --     dcong-liftC₀ ≡.refl = ≡.refl
--- -- -- -- -- -- --   liftC-cong {(α , s̃)} {(β , t̃)} (≈lstep p s̃) =
--- -- -- -- -- -- --     subst S̃/ (rankC-dp (≈lstep p s̃)) (liftC₀ (α , s̃))
--- -- -- -- -- -- --       ≡⟨ ≡.subst-subst S̃/ (≡.sym (rankC-beta (α , s̃)))
--- -- -- -- -- -- --                            (rankC-dp (≈lstep p s̃)) {!lift≈ s̃!} ⟩
--- -- -- -- -- -- --     subst S̃/ (≡.trans (≡.sym (rankC-beta (α , s̃)))
--- -- -- -- -- -- --                        (rankC-dp (≈lstep p s̃)))
--- -- -- -- -- -- --           {!lift≈ s̃!}
--- -- -- -- -- -- --       ≡⟨ ≡.sym (≡.subst-subst S̃/ (rankC-cong (≈lstep p s̃))
--- -- -- -- -- -- --                            (≡.sym (rankC-beta (β , D̃/.hom (box p) s̃)))
--- -- -- -- -- -- --                            {!lift≈ s̃!}) ⟩
--- -- -- -- -- -- --     subst S̃/ (≡.sym (rankC-beta (β , D̃/.hom (box p) s̃)))
--- -- -- -- -- -- --           (subst S̃/ (rankC-cong (≈lstep p s̃)) {!lift≈ s̃!})
--- -- -- -- -- -- --       ≡⟨ ≡.cong (subst S̃/ (≡.sym (rankC-beta (β , D̃/.hom (box p) s̃))))
--- -- -- -- -- -- --                {!lift≈-step p s̃ (rankC-cong (≈lstep p s̃))!} ⟩
--- -- -- -- -- -- --     liftC₀ (β , D̃/.hom (box p) s̃) ∎
--- -- -- -- -- -- --     where
--- -- -- -- -- -- --     open ≡.≡-Reasoning
--- -- -- -- -- -- --   liftC-cong {x} {y} (≈lsym p) =
--- -- -- -- -- -- --     subst S̃/ (rankC-dp (≈lsym p)) (liftC₀ x)
--- -- -- -- -- -- --       ≡⟨ ≡.dsym S̃/ (rankC-dp p) (liftC-cong p) ⟩
--- -- -- -- -- -- --     liftC₀ y ∎
--- -- -- -- -- -- --     where
--- -- -- -- -- -- --     open ≡.≡-Reasoning
--- -- -- -- -- -- --   liftC-cong {x} {z} (≈ltrans {t = y} p q) =
--- -- -- -- -- -- --     subst S̃/ (rankC-dp (≈ltrans p q)) (liftC₀ x)
--- -- -- -- -- -- --       ≡⟨ ≡.sym (≡.subst-subst S̃/ (rankC-dp p) (rankC-dp q) (liftC₀ x)) ⟩
--- -- -- -- -- -- --     subst S̃/ (rankC-dp q) (subst S̃/ (rankC-dp p) (liftC₀ x))
--- -- -- -- -- -- --       ≡⟨ ≡.cong (subst S̃/ (rankC-dp q)) (liftC-cong p) ⟩
--- -- -- -- -- -- --     subst S̃/ (rankC-dp q) (liftC₀ y)
--- -- -- -- -- -- --       ≡⟨ liftC-cong q ⟩
--- -- -- -- -- -- --     liftC₀ z ∎
--- -- -- -- -- -- --     where
--- -- -- -- -- -- --     open ≡.≡-Reasoning
+-- --   ϕ : Colim/ FD̃/ → F.ob D*/
+-- --   ϕ = SQ.rec FD* ϕ₀ ϕ-cong
 
--- -- -- -- -- -- --   liftC : D*/ → D*₀
--- -- -- -- -- -- --   liftC =
--- -- -- -- -- -- --     SQ.rec (D*)
--- -- -- -- -- -- --       (λ x → rankC (D* ⊢[ x ]) , liftC₀ x)
--- -- -- -- -- -- --       (λ p → ≡.Σ≡ (rankC-dp p) (liftC-cong p))
+-- --   ϕ-beta : (x : FD*₀) → ϕ (Colim (FD̃/) ⊢[ x ]) ≡ ϕ₀ x
+-- --   ϕ-beta = SQ.rec-beta (Colim (FD̃/)) ϕ₀ ϕ-cong
 
--- -- -- -- -- -- --   liftC-beta : (x : D*₀) → liftC (D* ⊢[ x ]) ≡ (rankC (D* ⊢[ x ]) , liftC₀ x)
--- -- -- -- -- -- --   liftC-beta =
--- -- -- -- -- -- --     SQ.rec-beta (D*)
--- -- -- -- -- -- --       (λ x → rankC (D* ⊢[ x ]) , liftC₀ x)
--- -- -- -- -- -- --       (λ p → ≡.Σ≡ (rankC-dp p) (liftC-cong p))
+-- --   abstract
+-- --     ϕ[] : FD*₀ → F.ob D*/
+-- --     ϕ[] x = ϕ (Colim (FD̃/) ⊢[ x ])
 
--- -- -- -- -- -- --   abstract
--- -- -- -- -- -- --     liftC[] : D*₀ → D*₀
--- -- -- -- -- -- --     liftC[] x = liftC (D* ⊢[ x ])
+-- --     ϕ[]-beta : (x : FD*₀) → ϕ[] x ≡ ϕ₀ x
+-- --     ϕ[]-beta x = ϕ-beta x
+-- --   {-# NOT_PROJECTION_LIKE ϕ[] #-}
+-- --   {-# REWRITE ϕ[]-beta #-}
 
--- -- -- -- -- -- --     liftC[]-beta : (x : D*₀) → liftC[] x ≡ (rankC (D* ⊢[ x ]) , liftC₀ x)
--- -- -- -- -- -- --     liftC[]-beta x = liftC-beta x
--- -- -- -- -- -- --   {-# NOT_PROJECTION_LIKE liftC[] #-}
--- -- -- -- -- -- --   {-# REWRITE liftC[]-beta #-}
+-- --   ψ : F.ob D*/ → FD*/
+-- --   ψ (s , f̂) = FD* ⊢[ α , s , x̂ ]
+-- --     where
+-- --     μ : P s → Z
+-- --     μ i = liftC (f̂ i) .proj₁
+-- --     ĝ : ∀ i → S̃/ (μ i)
+-- --     ĝ i = liftC (f̂ i) .proj₂
+-- --     α : Z
+-- --     α = Z.sup (s , μ)
+-- --     x̂ : P s → S̃/ α
+-- --     x̂ i = dweaken/ (child≤ s μ i) (ĝ i)
 
--- -- -- -- -- -- --   weakenLift : ∀ {α} (ŝ : S̃/ α) → dweaken/ (rank≤ ŝ) {!lift≈ ŝ!} ≡ ŝ
--- -- -- -- -- -- --   weakenLift {α} = SQ.elimp (S̃ α) B u
--- -- -- -- -- -- --     where
--- -- -- -- -- -- --     B : S̃/ α → Prop _
--- -- -- -- -- -- --     B ŝ = dweaken/ (rank≤ ŝ) {!lift≈ ŝ!} ≡ ŝ
+-- --   ϕψ : ∀ x → ϕ (ψ x) ≡ x
+-- --   ϕψ x@(s , f̂) =
+-- --     ϕ (FD* ⊢[ α , s , x̂ ])
+-- --       ≡⟨ ϕ-beta (α , s , x̂) ⟩
+-- --     s , (λ i → D* ⊢[ α , x̂ i ])
+-- --       ≡⟨ ≡.cong (s ,_) (funExt (λ i → D* ⊢≈[ p i ])) ⟩
+-- --     s , (λ i → D* ⊢[ liftC (f̂ i) ])
+-- --       ≡⟨ ≡.cong (s ,_) (funExt (λ i → isSectLiftC (f̂ i))) ⟩
+-- --     s , f̂ ∎
+-- --     where
+-- --     μ : P s → Z
+-- --     μ i = liftC (f̂ i) .proj₁
+-- --     ĝ : ∀ i → S̃/ (μ i)
+-- --     ĝ i = liftC (f̂ i) .proj₂
+-- --     α : Z
+-- --     α = Z.sup (s , μ)
+-- --     x̂ : P s → S̃/ α
+-- --     x̂ i = dweaken/ (child≤ s μ i) (ĝ i)
+-- --     p : ∀ i → D* [ (α , x̂ i) ≈ liftC (f̂ i) ]
+-- --     p i = ≈lsym (≈lstep (child≤ s μ i) (ĝ i))
+-- --     open ≡.≡-Reasoning
 
--- -- -- -- -- -- --     u : ∀ a → B (S̃ α ⊢[ a ])
--- -- -- -- -- -- --     u a =
--- -- -- -- -- -- --       dweaken/ (rank≤ (S̃ α ⊢[ a ])) {!lift≈ (S̃ α ⊢[ a ])!}
--- -- -- -- -- -- --         ≡⟨ ≡.cong (dweaken/ (rank≤ (S̃ α ⊢[ a ]))) {!lift≈-beta a!} ⟩
--- -- -- -- -- -- --       dweaken/ (rank≤ (S̃ α ⊢[ a ]))
--- -- -- -- -- -- --         (subst S̃/ (≡.sym (rank-beta a)) (lift/ a))
--- -- -- -- -- -- --         ≡⟨ ≡.cong (dweaken/ (rank≤ (S̃ α ⊢[ a ])))
--- -- -- -- -- -- --                  (≡.sym (subst-quot-S (≡.sym (rank-beta a)) (lift₀ a))) ⟩
--- -- -- -- -- -- --       dweaken/ (rank≤ (S̃ α ⊢[ a ]))
--- -- -- -- -- -- --         (S̃ (rank (S̃ α ⊢[ a ])) ⊢[ subst S₀ (≡.sym (rank-beta a)) (lift₀ a) ])
--- -- -- -- -- -- --         ≡⟨ dweaken-beta (rank≤ (S̃ α ⊢[ a ]))
--- -- -- -- -- -- --                          (subst S₀ (≡.sym (rank-beta a)) (lift₀ a)) ⟩
--- -- -- -- -- -- --       S̃ α ⊢[ dweaken₀ (rank≤ (S̃ α ⊢[ a ]))
--- -- -- -- -- -- --                       (subst S₀ (≡.sym (rank-beta a)) (lift₀ a)) ]
--- -- -- -- -- -- --         ≡⟨ S̃ α ⊢≈[ ≡→≈ T̃ (subst-S₀-fst (≡.sym (rank-beta a)) (lift₀ a)) ] ⟩
--- -- -- -- -- -- --       S̃ α ⊢[ a ] ∎
--- -- -- -- -- -- --       where
--- -- -- -- -- -- --       open ≡.≡-Reasoning
+-- --   ψϕ : ∀ x → ψ (ϕ x) ≡ x
+-- --   ψϕ x = SQ.elimp FD* (λ x → ψ (ϕ x) ≡ x) p x
+-- --     where
+-- --     open ≡.≡-Reasoning
+-- --     p : ∀ (x : FD*₀) → ψ (ϕ (FD* ⊢[ x ])) ≡ FD* ⊢[ x ]
+-- --     p (α , s , f̂) =
+-- --       ψ (ϕ (FD* ⊢[ α , s , f̂ ]))
+-- --         ≡⟨ ≡.cong ψ (ϕ-beta (α , s , f̂)) ⟩
+-- --       ψ (s , λ i → D* ⊢[ α , f̂ i ])
+-- --         ≡⟨ (FD* ⊢≈[ q ]) ⟩
+-- --       (FD* ⊢[ α , s , f̂ ]) ∎
+-- --       where
+-- --       μ : P s → Z
+-- --       μ i = liftC (D* ⊢[ α , f̂ i ]) .proj₁
 
--- -- -- -- -- -- --   dweaken-cast : ∀ {α β γ} (r : α ≡ β)
--- -- -- -- -- -- --     → (p : α ≤ γ) (q : β ≤ γ) (ŝ : S̃/ α)
--- -- -- -- -- -- --     → dweaken/ p ŝ ≡ dweaken/ q (subst S̃/ r ŝ)
--- -- -- -- -- -- --   dweaken-cast ≡.refl p q ŝ = ≡.refl
+-- --       β : Z
+-- --       β = Z.sup (s , μ)
 
--- -- -- -- -- -- --   weakenLiftC : ∀ {α β} (p : α ≤ β) (ŝ : S̃/ α)
--- -- -- -- -- -- --     → dweaken/ (≤≤ p (rank≤ ŝ)) (subst S̃/ (rankC-beta (α , ŝ)) (liftC₀ (α , ŝ)))
--- -- -- -- -- -- --     ≡ dweaken/ p ŝ
--- -- -- -- -- -- --   weakenLiftC {α} {β} p ŝ =
--- -- -- -- -- -- --     dweaken/ (≤≤ p (rank≤ ŝ)) (subst S̃/ (rankC-beta (α , ŝ)) (liftC₀ (α , ŝ)))
--- -- -- -- -- -- --       ≡⟨ ≡.cong (dweaken/ (≤≤ p (rank≤ ŝ))) (subst-inv S̃/ (≡.sym (rankC-beta (α , ŝ)))) ⟩
--- -- -- -- -- -- --     dweaken/ (≤≤ p (rank≤ ŝ)) {!lift≈ ŝ!}
--- -- -- -- -- -- --       ≡⟨ comp (box (rank≤ ŝ)) (box p) {x = {!lift≈ ŝ!}} ⟩
--- -- -- -- -- -- --     dweaken/ p (dweaken/ (rank≤ ŝ) {!lift≈ ŝ!})
--- -- -- -- -- -- --       ≡⟨ ≡.cong (dweaken/ p) (weakenLift ŝ) ⟩
--- -- -- -- -- -- --     dweaken/ p ŝ ∎
--- -- -- -- -- -- --     where
--- -- -- -- -- -- --     open ≡.≡-Reasoning
+-- --       ĝ : ∀ i → S̃/ (μ i)
+-- --       ĝ i = liftC (D* ⊢[ α , f̂ i ]) .proj₂
 
--- -- -- -- -- -- --   isSectLiftC₀
--- -- -- -- -- -- --     : ∀ (x : D*₀)
--- -- -- -- -- -- --     → D* ⊢[ liftC (D* ⊢[ x ]) ]
--- -- -- -- -- -- --     ≡ D* ⊢[ x ]
--- -- -- -- -- -- --   isSectLiftC₀ x@(α , ŝ) = D* ⊢≈[ p ]
--- -- -- -- -- -- --     where
--- -- -- -- -- -- --     v : dweaken/ (rank≤ ŝ) (subst S̃/ (rankC-beta x) (liftC₀ x)) ≡ ŝ
--- -- -- -- -- -- --     v = ≡.trans
--- -- -- -- -- -- --           (≡.cong (dweaken/ (rank≤ ŝ)) (subst-inv S̃/ (≡.sym (rankC-beta x))))
--- -- -- -- -- -- --           (weakenLift ŝ)
--- -- -- -- -- -- --     p : D* [ liftC (D* ⊢[ x ]) ≈ x ]
--- -- -- -- -- -- --     p =
--- -- -- -- -- -- --       liftC (D* ⊢[ x ])
--- -- -- -- -- -- --         ≈⟨ ≡→≈ (D*) (liftC-beta x) ⟩
--- -- -- -- -- -- --       rankC (D* ⊢[ x ]) , liftC₀ x
--- -- -- -- -- -- --         ≈⟨ ≡→≈ (D*) (Σ≡ (rankC-beta x) ≡.refl) ⟩
--- -- -- -- -- -- --       rankC₀ x , subst S̃/ (rankC-beta x) (liftC₀ x)
--- -- -- -- -- -- --         ≈⟨ ≈lstep (rank≤ ŝ) (subst S̃/ (rankC-beta x) (liftC₀ x)) ⟩
--- -- -- -- -- -- --       α , dweaken/ (rank≤ ŝ) (subst S̃/ (rankC-beta x) (liftC₀ x))
--- -- -- -- -- -- --         ≈⟨ ≈lstage α v ⟩
--- -- -- -- -- -- --       α , ŝ ∎
--- -- -- -- -- -- --       where
--- -- -- -- -- -- --       open ≈.≈syntax {S = D*}
+-- --       x̂ : P s → S̃/ β
+-- --       x̂ i = dweaken/ (child≤ s μ i) (ĝ i)
 
--- -- -- -- -- -- --   isSectLiftC : ∀ (x : D*/) → D* ⊢[ liftC x ] ≡ x
--- -- -- -- -- -- --   isSectLiftC = SQ.elimp (D*) (λ z → D* ⊢[ liftC z ] ≡ z) isSectLiftC₀
+-- --       γ : Z
+-- --       γ = α ∨ᶻ β
 
--- -- -- -- -- -- -- module Cocontinuity where
--- -- -- -- -- -- --   open Rank
--- -- -- -- -- -- --   open LiftElement
+-- --       h : ∀ i → dweaken/ (Z.<→≤ (Z.∨ᶻ-r< {α} {β})) (x̂ i)
+-- --               ≡ dweaken/ (Z.<→≤ (Z.∨ᶻ-l< {α} {β})) (f̂ i)
+-- --       h i =
+-- --         ≡.trans
+-- --           (≡.sym (comp (box (child≤ s μ i)) (box (Z.<→≤ (Z.∨ᶻ-r< {α} {β}))) {x = ĝ i}))
+-- --           (≡.trans
+-- --             (dweaken-cast r₁ p₁ q₁ (ĝ i))
+-- --             (≡.trans
+-- --               (≡.cong
+-- --                 (dweaken/ q₁)
+-- --                 (Σ-proj₂ (liftC-beta (α , f̂ i))))
+-- --               (≡.trans
+-- --                 (dweaken-cast r₂ q₁ q₂ (liftC₀ (α , f̂ i)))
+-- --                 (weakenLiftC (Z.<→≤ (Z.∨ᶻ-l< {α} {β})) (f̂ i)))))
+-- --         where
+-- --         r₁ : μ i ≡ rankC (D* ⊢[ α , f̂ i ])
+-- --         r₁ = ≡.cong proj₁ (liftC-beta (α , f̂ i))
 
--- -- -- -- -- -- --   ϕ₀ : FD*₀ → F.ob D*/
--- -- -- -- -- -- --   ϕ₀ (α , s , f) = s , λ i → D* ⊢[ α , f i ]
--- -- -- -- -- -- --   ϕ-cong : ∀ {x y : FD*₀} → Colim (FD̃/) [ x ≈ y ] → ϕ₀ x ≡ ϕ₀ y
--- -- -- -- -- -- --   ϕ-cong {α , a , f̂} {α , a , f̂} (≈lstage α ≡.refl) = ≡.refl
--- -- -- -- -- -- --   ϕ-cong {α , a , f̂} {β , a , ĝ} (≈lstep p (a , f̂)) =
--- -- -- -- -- -- --     ≡.cong (a ,_) (funExt (λ i → D* ⊢≈[ ≈lstep p (f̂ i) ]))
--- -- -- -- -- -- --   ϕ-cong {α , a , f̂} {β , b , ĝ} (≈lsym p) = ≡.sym (ϕ-cong p)
--- -- -- -- -- -- --   ϕ-cong {α , a , f̂} {β , b , ĝ} (≈ltrans p q) = ≡.trans (ϕ-cong p) (ϕ-cong q)
+-- --         p₁ : μ i ≤ γ
+-- --         p₁ = ≤≤ (Z.<→≤ (Z.∨ᶻ-r< {α} {β})) (child≤ s μ i)
 
--- -- -- -- -- -- --   ϕ : Colim/ FD̃/ → F.ob D*/
--- -- -- -- -- -- --   ϕ = SQ.rec FD* ϕ₀ ϕ-cong
+-- --         q₁ : rankC (D* ⊢[ α , f̂ i ]) ≤ γ
+-- --         q₁ = ≡.substp (_≤ γ) r₁ p₁
 
--- -- -- -- -- -- --   ϕ-beta : (x : FD*₀) → ϕ (Colim (FD̃/) ⊢[ x ]) ≡ ϕ₀ x
--- -- -- -- -- -- --   ϕ-beta = SQ.rec-beta (Colim (FD̃/)) ϕ₀ ϕ-cong
+-- --         r₂ : rankC (D* ⊢[ α , f̂ i ]) ≡ rank (f̂ i)
+-- --         r₂ = rankC-beta (α , f̂ i)
 
--- -- -- -- -- -- --   abstract
--- -- -- -- -- -- --     ϕ[] : FD*₀ → F.ob D*/
--- -- -- -- -- -- --     ϕ[] x = ϕ (Colim (FD̃/) ⊢[ x ])
+-- --         q₂ : rank (f̂ i) ≤ γ
+-- --         q₂ = ≡.substp (_≤ γ) r₂ q₁
 
--- -- -- -- -- -- --     ϕ[]-beta : (x : FD*₀) → ϕ[] x ≡ ϕ₀ x
--- -- -- -- -- -- --     ϕ[]-beta x = ϕ-beta x
--- -- -- -- -- -- --   {-# NOT_PROJECTION_LIKE ϕ[] #-}
--- -- -- -- -- -- --   {-# REWRITE ϕ[]-beta #-}
+-- --         p₂ : rank (f̂ i) ≤ γ
+-- --         p₂ = ≤≤ (Z.<→≤ (Z.∨ᶻ-l< {α} {β})) (rank≤ (f̂ i))
 
--- -- -- -- -- -- --   ψ : F.ob D*/ → FD*/
--- -- -- -- -- -- --   ψ (s , f̂) = FD* ⊢[ α , s , x̂ ]
--- -- -- -- -- -- --     where
--- -- -- -- -- -- --     μ : P s → Z
--- -- -- -- -- -- --     μ i = liftC (f̂ i) .proj₁
--- -- -- -- -- -- --     ĝ : ∀ i → S̃/ (μ i)
--- -- -- -- -- -- --     ĝ i = liftC (f̂ i) .proj₂
--- -- -- -- -- -- --     α : Z
--- -- -- -- -- -- --     α = Z.sup (s , μ)
--- -- -- -- -- -- --     x̂ : P s → S̃/ α
--- -- -- -- -- -- --     x̂ i = dweaken/ (child≤ s μ i) (ĝ i)
-
--- -- -- -- -- -- --   ϕψ : ∀ x → ϕ (ψ x) ≡ x
--- -- -- -- -- -- --   ϕψ x@(s , f̂) =
--- -- -- -- -- -- --     ϕ (FD* ⊢[ α , s , x̂ ])
--- -- -- -- -- -- --       ≡⟨ ϕ-beta (α , s , x̂) ⟩
--- -- -- -- -- -- --     s , (λ i → D* ⊢[ α , x̂ i ])
--- -- -- -- -- -- --       ≡⟨ ≡.cong (s ,_) (funExt (λ i → D* ⊢≈[ p i ])) ⟩
--- -- -- -- -- -- --     s , (λ i → D* ⊢[ liftC (f̂ i) ])
--- -- -- -- -- -- --       ≡⟨ ≡.cong (s ,_) (funExt (λ i → isSectLiftC (f̂ i))) ⟩
--- -- -- -- -- -- --     s , f̂ ∎
--- -- -- -- -- -- --     where
--- -- -- -- -- -- --     μ : P s → Z
--- -- -- -- -- -- --     μ i = liftC (f̂ i) .proj₁
--- -- -- -- -- -- --     ĝ : ∀ i → S̃/ (μ i)
--- -- -- -- -- -- --     ĝ i = liftC (f̂ i) .proj₂
--- -- -- -- -- -- --     α : Z
--- -- -- -- -- -- --     α = Z.sup (s , μ)
--- -- -- -- -- -- --     x̂ : P s → S̃/ α
--- -- -- -- -- -- --     x̂ i = dweaken/ (child≤ s μ i) (ĝ i)
--- -- -- -- -- -- --     p : ∀ i → D* [ (α , x̂ i) ≈ liftC (f̂ i) ]
--- -- -- -- -- -- --     p i = ≈lsym (≈lstep (child≤ s μ i) (ĝ i))
--- -- -- -- -- -- --     open ≡.≡-Reasoning
-
--- -- -- -- -- -- --   ψϕ : ∀ x → ψ (ϕ x) ≡ x
--- -- -- -- -- -- --   ψϕ x = SQ.elimp FD* (λ x → ψ (ϕ x) ≡ x) p x
--- -- -- -- -- -- --     where
--- -- -- -- -- -- --     open ≡.≡-Reasoning
--- -- -- -- -- -- --     p : ∀ (x : FD*₀) → ψ (ϕ (FD* ⊢[ x ])) ≡ FD* ⊢[ x ]
--- -- -- -- -- -- --     p (α , s , f̂) =
--- -- -- -- -- -- --       ψ (ϕ (FD* ⊢[ α , s , f̂ ]))
--- -- -- -- -- -- --         ≡⟨ ≡.cong ψ (ϕ-beta (α , s , f̂)) ⟩
--- -- -- -- -- -- --       ψ (s , λ i → D* ⊢[ α , f̂ i ])
--- -- -- -- -- -- --         ≡⟨ (FD* ⊢≈[ q ]) ⟩
--- -- -- -- -- -- --       (FD* ⊢[ α , s , f̂ ]) ∎
--- -- -- -- -- -- --       where
--- -- -- -- -- -- --       μ : P s → Z
--- -- -- -- -- -- --       μ i = liftC (D* ⊢[ α , f̂ i ]) .proj₁
-
--- -- -- -- -- -- --       β : Z
--- -- -- -- -- -- --       β = Z.sup (s , μ)
-
--- -- -- -- -- -- --       ĝ : ∀ i → S̃/ (μ i)
--- -- -- -- -- -- --       ĝ i = liftC (D* ⊢[ α , f̂ i ]) .proj₂
-
--- -- -- -- -- -- --       x̂ : P s → S̃/ β
--- -- -- -- -- -- --       x̂ i = dweaken/ (child≤ s μ i) (ĝ i)
-
--- -- -- -- -- -- --       γ : Z
--- -- -- -- -- -- --       γ = α ∨ᶻ β
-
--- -- -- -- -- -- --       h : ∀ i → dweaken/ (Z.<→≤ (Z.∨ᶻ-r< {α} {β})) (x̂ i)
--- -- -- -- -- -- --               ≡ dweaken/ (Z.<→≤ (Z.∨ᶻ-l< {α} {β})) (f̂ i)
--- -- -- -- -- -- --       h i =
--- -- -- -- -- -- --         ≡.trans
--- -- -- -- -- -- --           (≡.sym (comp (box (child≤ s μ i)) (box (Z.<→≤ (Z.∨ᶻ-r< {α} {β}))) {x = ĝ i}))
--- -- -- -- -- -- --           (≡.trans
--- -- -- -- -- -- --             (dweaken-cast r₁ p₁ q₁ (ĝ i))
--- -- -- -- -- -- --             (≡.trans
--- -- -- -- -- -- --               (≡.cong
--- -- -- -- -- -- --                 (dweaken/ q₁)
--- -- -- -- -- -- --                 (Σ-proj₂ (liftC-beta (α , f̂ i))))
--- -- -- -- -- -- --               (≡.trans
--- -- -- -- -- -- --                 (dweaken-cast r₂ q₁ q₂ (liftC₀ (α , f̂ i)))
--- -- -- -- -- -- --                 (weakenLiftC (Z.<→≤ (Z.∨ᶻ-l< {α} {β})) (f̂ i)))))
--- -- -- -- -- -- --         where
--- -- -- -- -- -- --         r₁ : μ i ≡ rankC (D* ⊢[ α , f̂ i ])
--- -- -- -- -- -- --         r₁ = ≡.cong proj₁ (liftC-beta (α , f̂ i))
-
--- -- -- -- -- -- --         p₁ : μ i ≤ γ
--- -- -- -- -- -- --         p₁ = ≤≤ (Z.<→≤ (Z.∨ᶻ-r< {α} {β})) (child≤ s μ i)
-
--- -- -- -- -- -- --         q₁ : rankC (D* ⊢[ α , f̂ i ]) ≤ γ
--- -- -- -- -- -- --         q₁ = ≡.substp (_≤ γ) r₁ p₁
-
--- -- -- -- -- -- --         r₂ : rankC (D* ⊢[ α , f̂ i ]) ≡ rank (f̂ i)
--- -- -- -- -- -- --         r₂ = rankC-beta (α , f̂ i)
-
--- -- -- -- -- -- --         q₂ : rank (f̂ i) ≤ γ
--- -- -- -- -- -- --         q₂ = ≡.substp (_≤ γ) r₂ q₁
-
--- -- -- -- -- -- --         p₂ : rank (f̂ i) ≤ γ
--- -- -- -- -- -- --         p₂ = ≤≤ (Z.<→≤ (Z.∨ᶻ-l< {α} {β})) (rank≤ (f̂ i))
-
--- -- -- -- -- -- --       q : FD* [ (β , s , x̂) ≈ (α , s , f̂) ]
--- -- -- -- -- -- --       q = ≈ltrans
--- -- -- -- -- -- --             (≈lstep (Z.<→≤ (Z.∨ᶻ-r< {α} {β})) (s , x̂))
--- -- -- -- -- -- --             (≈ltrans
--- -- -- -- -- -- --               (≈lstage γ (≡.cong (s ,_) (funExt h)))
--- -- -- -- -- -- --               (≈lsym (≈lstep (Z.<→≤ (Z.∨ᶻ-l< {α} {β})) (s , f̂))))
--- -- -- -- -- 
--- -- -- -- -- 
--- -- -- -- -- 
--- -- -- -- -- 
+-- --       q : FD* [ (β , s , x̂) ≈ (α , s , f̂) ]
+-- --       q = ≈ltrans
+-- --             (≈lstep (Z.<→≤ (Z.∨ᶻ-r< {α} {β})) (s , x̂))
+-- --             (≈ltrans
+-- --               (≈lstage γ (≡.cong (s ,_) (funExt h)))
+-- --               (≈lsym (≈lstep (Z.<→≤ (Z.∨ᶻ-l< {α} {β})) (s , f̂))))

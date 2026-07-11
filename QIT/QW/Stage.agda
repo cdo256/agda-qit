@@ -26,7 +26,6 @@ open FunExt funExt*
 open import QIT.Plump.Properties Zᴬ 
 open PlumpAlgebra Zᴬ renaming (sup to supᶻ)
 
-import QIT.Setoid.Indexed as Ix
 open import QIT.Container.Base
 open import QIT.Container.StrictFunctor S P (ℓS ⊔ ℓP ⊔ ℓV)
 open import QIT.Algebra F
@@ -34,7 +33,6 @@ open import QIT.Algebra.Lift S P ℓV
 open import QIT.QW.Equation S P ℓV
 open import QIT.QW.W S P
 open import QIT.Setoid
-import QIT.Setoid.Indexed as Ix
 
 open ≈.SQ
 
@@ -144,21 +142,6 @@ S̃ α = record
     { refl = ≈trefl
     ; sym = ≈tsym
     ; trans = ≈ttrans } }
-
-S̃ᶜ : Ix.Setoid (ℓS ⊔ ℓP) (ℓS ⊔ ℓP) (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV)
-S̃ᶜ = record
-  { I = Z
-  ; A = S₀
-  ; R = λ _ _ ŝ t̂ → ŝ ≈ˢ t̂
-  ; isEquivalence = record
-    { refl = ≈trefl
-    ; sym = ≈tsym
-    ; trans = ≈ttrans } }
-
-open import QIT.Setoid.IndexedQuotient
-
-S̃ᶜ/ : Set (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV)
-S̃ᶜ/ = S̃ᶜ /≈ᴵ
 
 S̃/ : Z → Set (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV)
 S̃/ α = S̃ α /≈
