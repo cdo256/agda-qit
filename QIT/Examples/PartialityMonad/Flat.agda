@@ -2,7 +2,8 @@ open import QIT.Prelude
 
 module QIT.Examples.PartialityMonad.Flat ⦃ a!c* : A!C ⦄ where
 
-open import QIT.Prelude renaming (⊤ to ⊤'; ⊥ to ⊥')
+open import QIT.Prelude
+open import QIT.Prelude.Logic renaming (⊤ to ⊤'; ⊥ to ⊥')
 open import QIT.Prop
 open import QIT.Relation.Subset
 import Data.Nat as ℕ

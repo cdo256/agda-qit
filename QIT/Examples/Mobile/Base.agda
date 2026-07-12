@@ -22,13 +22,19 @@ open import QIT.Prelude
 -- - Unordered tree structures (syntax trees, decision trees)
 -- - Combinatorial objects with inherent symmetries
 -- - Data structures where permutation equivalence is natural
-module QIT.Examples.Mobile.Base ⦃ a!c* : A!C ⦄ ⦃ fe* : FunExt ⦄ (I : Set) where
+module QIT.Examples.Mobile.Base
+  ⦃ pathElim* : PathElim ⦄
+  ⦃ a!c* : A!C ⦄ 
+  ⦃ funExt* : FunExt ⦄
+  (I : Set)
+  where
 
-open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Function.Base
 open import QIT.Container.Base
 open import QIT.QW
+
+open FunExt funExt*
 
 -- Container signature for I-branching trees before quotienting.
 -- We have two constructors: leaves (no children) and nodes (I children).
@@ -55,7 +61,7 @@ Fᵀ X = Σ Sᵀ λ s → Pᵀ s → X
 -- (impossible) children. This follows because ⊥* → T has a unique element.
 leaf≡leaf : ∀ (f g : ⊥ˢ* → T) → sup (l , f) ≡ sup (l , g)
 leaf≡leaf f g =
-  ≡.cong (λ ○ → sup (l , ○)) (≡.funExt λ ())
+  ≡.cong (λ ○ → sup (l , ○)) (funExt λ ())
 
 -- Bijection action on I-indexed functions.
 -- Given a function α : I → T and a bijection π : I ↔ I,
@@ -73,11 +79,11 @@ sig : QW.Sig ℓ0 ℓ0 ℓ0 ℓ0
 sig = record
   { S = Sᵀ
   ; P = Pᵀ
-  ; E = I ↔ I
+  ; E = I ≅ˢ I
   ; Ξ = λ π → record
     { V = I
-    ; lhs = QW.supᴱ n (λ i → QW.varᴱ i {λ()})
-    ; rhs = QW.supᴱ n (λ i → QW.varᴱ (π .↔.to i) {λ()}) } }
+    ; lhs = QW.supᴱ n (λ i → QW.varᴱ i)
+    ; rhs = QW.supᴱ n (λ i → QW.varᴱ (π .≅ˢ.to i)) } }
 
 -- The equations say: n(xᵢ)ᵢ∈I ≈ n(x_{π(i)})ᵢ∈I for any bijection π.
 -- This makes node construction invariant under permutation of children,

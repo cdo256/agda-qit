@@ -1,6 +1,6 @@
 open import QIT.Prelude
 
-module QIT.Examples.PartialityMonad ⦃ a!c* : A!C ⦄ where
+module QIT.Examples.PartialityMonad ⦃ a!c* : A!C ⦄ ⦃ pathElim* : PathElim ⦄ where
 
 open import QIT.Examples.PartialityMonad.Combined
 open import QIT.Examples.PartialityMonad.Direct

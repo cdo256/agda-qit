@@ -1,6 +1,6 @@
 open import QIT.Prelude
 
-module QIT.Examples.ConTy.Tagged ⦃ a!c* : A!C ⦄ where
+module QIT.Examples.ConTy.Tagged ⦃ a!c* : A!C ⦄ ⦃ pathElim* : PathElim ⦄ where
 
 open import QIT.Prelude
 open import QIT.Prop

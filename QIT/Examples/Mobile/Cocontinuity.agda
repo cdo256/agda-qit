@@ -1,76 +1,51 @@
 open import QIT.Prelude
 open import QIT.Prop
-open import QIT.Relation.Binary
-open import QIT.Relation.Nullary
-open import QIT.Relation.Subset
 open import QIT.Function.Base
-open import QIT.Functor.Base
-import QIT.Relation.SetQuotient as Quot
+open import QIT.Plump.Algebra
+open import QIT.QW.Signature
+open import QIT.Relation.SetQuotient
 
 module QIT.Examples.Mobile.Cocontinuity
+  ⦃ propExt : PropExt ⦄
+  ⦃ pathElim* : PathElim ⦄
+  ⦃ sq* : SetQuotients ⦄
+  ⦃ a!c : A!C ⦄
+  ⦃ fe* : FunExt ⦄
+  ⦃ epo* : ExtensionalPlumpOrdinals ⦄
   (I : Set)
-  (propExt : PropExt)
-  (sq : Quot.SetQuotients)
-  (sqe : Quot.SetQuotientsElim)
-  (a!c : A!C)
-  ⦃ fe* : FunExt ⦄ where
+  where
 
 open import QIT.Examples.Mobile.Base I
 
-import QIT.Plump.Algebra as Plump
-import QIT.Plump.W.Base as PlumpW
-import QIT.QW.Stage sig propExt sq sqe as Stage
-import QIT.QW.Cocontinuity sig propExt sq sqe a!c as QW
+open Sig sig
 
-module ZW = PlumpW Sᵀ Pᵀ
-module ZAlg = Plump ZW.Sᶻ ZW.Pᶻ
+open import QIT.Plump.W S P
+open import QIT.Plump.Properties Zᴬ as Z
+open import QIT.QW.Subclasses sig
 
-module WithZ
-  (ZA : ZAlg.Algebra ℓ0)
-  (extZA : ZAlg.IsExtensional ZA)
-  where
-
-  open import QIT.Container.StrictFunctor Sᵀ Pᵀ (lsuc ℓ0)
-
-  module SZ = Stage.WithZ ZA
-  module QC = QW.WithZ ZA
-
-  open SZ
-  open SZ.Z
-  open ZAlg.IsExtensional extZA using (antisym)
-
-  ≡→≤ : ∀ {α β} → α ≡ β → α ≤ β
-  ≡→≤ {α} {α} ≡.refl = ≤refl α
-
-  depth-preserving≤≥ : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → (ιᶻ (ŝ .fst) ≤ ιᶻ (t̂ .fst)) ∧ (ιᶻ (t̂ .fst) ≤ ιᶻ (ŝ .fst))
-  depth-preserving≤≥ α (s , s≤α) (t , t≤α) (≈pcong a μ f g r) =
-      sup≤ (λ i → <sup i (p i .fst))
-    , sup≤ (λ i → <sup i (p i .snd))
+instance
+  depthPreserving* : DepthPreservingSig
+  depthPreserving* = record { dpe = dpe }
     where
-    p : ∀ i → (ιᶻ (f i .fst) ≤ ιᶻ (g i .fst)) ∧ (ιᶻ (g i .fst) ≤ ιᶻ (f i .fst))
-    p i = depth-preserving≤≥ (μ i) (f i) (g i) (r i)
-  depth-preserving≤≥ α (s , _) (t , _) (≈psat π ϕ _ _) =
-      sup≤ (λ i → <sup (π⁻¹ i) (≡→≤ (≡.cong (λ o -> ιᶻ (lower (ϕ o))) (≡.sym (linv i)))))
-    , sup≤ (λ i → <sup (π̂ i) (≤refl (ιᶻ (lower (ϕ (π̂ i))))))
-    where
-    open _↔_ π renaming (to to π̂; from to π⁻¹)
-  depth-preserving≤≥ α (s , s≤α) (s , t≤α) ≈prefl = ≤refl (ιᶻ s) , ≤refl (ιᶻ s)
-  depth-preserving≤≥ α (s , s≤α) (t , t≤α) (≈psym p) =
-    let s≤t , t≤s = depth-preserving≤≥ α (t , t≤α) (s , s≤α) p
-    in t≤s , s≤t
-  depth-preserving≤≥ α (s , s≤α) (t , t≤α) (≈ptrans {t̂ = u , u≤α} p q) =
-    let s≤u , u≤s = depth-preserving≤≥ α (s , s≤α) (u , u≤α) p
-        u≤t , t≤u = depth-preserving≤≥ α (u , u≤α) (t , t≤α) q
-    in ≤≤ u≤t s≤u , ≤≤ u≤s t≤u
-  depth-preserving≤≥ α (s , s≤α) (t , t≤α) (≈pweaken {α = β} β≤α p) = depth-preserving≤≥ β _ _ p
+    dpe : ∀ π ρ → ιᶻ (assignT ρ (Ξ π .lhs)) ≤≥ ιᶻ (assignT ρ (Ξ π .rhs))
+    dpe π ρ = ∧i lhs≤rhs , rhs≤lhs
+      where
+      lhs≤rhs : ιᶻ (assignT ρ (Ξ π .lhs)) ≤ ιᶻ (assignT ρ (Ξ π .rhs))
+      lhs≤rhs = sup≤ witness
+        where
+        step : ∀ i → ιᶻ (ρ i) ≡ ιᶻ (ρ (π .≅ˢ.to (π .≅ˢ.from i)))
+        step i = ≡.sym (≡.cong (λ j → ιᶻ (ρ j)) (π .≅ˢ.linv i))
 
-  depth-preserving : ∀ α ŝ t̂ → α ⊢ ŝ ≈ᵇ t̂ → ιᶻ (ŝ .fst) ≡ ιᶻ (t̂ .fst)
-  depth-preserving α ŝ t̂ p = antisym s≤t t≤s
-    where
-    s≤t = depth-preserving≤≥ α ŝ t̂ p .fst
-    t≤s = depth-preserving≤≥ α ŝ t̂ p .snd
+        witness : ∀ i → ιᶻ (ρ i) < ιᶻ (assignT ρ (Ξ π .rhs))
+        witness i = <sup (π .≅ˢ.from i) (Z.≡→≤ (step i))
 
-  cocontinuousIso = QC.cocontinuous depth-preserving
+      rhs≤lhs : ιᶻ (assignT ρ (Ξ π .rhs)) ≤ ιᶻ (assignT ρ (Ξ π .lhs))
+      rhs≤lhs = sup≤ λ i → <sup (π .≅ˢ.to i) (≤refl (ιᶻ (ρ (π .≅ˢ.to i))))
 
-  cocontinuous : QC.Cocontinuous F D
-  cocontinuous = ∣ cocontinuousIso ∣
+open import QIT.QW.Cocontinuity.FromDepthPreservation sig
+
+ψ = Cocontinuity.ψ
+ϕ = Cocontinuity.ϕ
+ψϕ = Cocontinuity.ψϕ
+ϕψ = Cocontinuity.ϕψ
+cocontinuity = Cocontinuity.cocontinuity

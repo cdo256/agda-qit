@@ -382,4 +382,3 @@ WT→D wta = record
   --       (≡.trans (TA.σπ γ kγ a ka b kb c kc)
   --                (≡.dcongsp (TA.π γ kγ (TA.σ γ kγ a ka b kb) (TA.kσ γ kγ a ka b kb))
   --                           (≡.sym (≡.Jp (λ _ p → fst (subst Ty p (c , kc)) ≡ c) σ▷ ≡.refl))))
-

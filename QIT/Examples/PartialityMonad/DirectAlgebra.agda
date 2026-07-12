@@ -1,8 +1,9 @@
 open import QIT.Prelude
 
-module QIT.Examples.PartialityMonad.DirectAlgebra ⦃ a!c* : A!C ⦄ where
+module QIT.Examples.PartialityMonad.DirectAlgebra ⦃ a!c* : A!C ⦄ ⦃ pathElim* : PathElim ⦄ where
 
-open import QIT.Prelude renaming (⊤ to ⊤'; ⊥ to ⊥')
+open import QIT.Prelude
+open import QIT.Prelude.Logic renaming (⊤ to ⊤'; ⊥ to ⊥')
 open import QIT.Prop hiding (⊥)
 open import QIT.Relation.Subset
 open import QIT.Relation.Binary

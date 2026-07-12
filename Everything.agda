@@ -1,4 +1,6 @@
-module Everything where
+open import QIT.Prelude
+
+module Everything ⦃ a!c* : A!C ⦄ ⦃ fe* : FunExt ⦄ ⦃ pathElim* : PathElim ⦄ where
 
 -- Changes:
 --  - QIT.Prelude.Universe: Export universe variables.
@@ -126,65 +128,57 @@ import QIT.Plump.Size
 import QIT.Plump.Properties
 import QIT.Plump
 
--- Topology
--- import QIT.Topology.Base
--- import QIT.Topology.Subset
--- import QIT.Topology.Constructions
--- import QIT.Topology.Category
--- import QIT.Topology.BishopReals
--- import QIT.Topology.Examples
-
--- -- Extended Type Theories
--- import QIT.IIT.Base
--- import QIT.IIT.Cont1
+-- -- Theory of signatures
+import QIT.IIT.Base
+import QIT.IIT.Cont1
 -- -- import QIT.IIT.Codes -- incomplete
 -- -- import QIT.QIIT -- very incomplete
--- import QIT.KKA2019.Syntax
--- import QIT.KK2020.Level
+import QIT.KKA2019.Syntax
+import QIT.KK2020.Level
 -- import QIT.KK2020.Syntax
 
--- -- -- Examples
--- import QIT.Examples.Mobile.Base
--- -- import QIT.Examples.Mobile.Cocontinuity
--- -- import QIT.Examples.CauchyReals
--- import QIT.Examples.ConTy.Direct
+-- -- Examples
+import QIT.Examples.Mobile.Base
+import QIT.Examples.Mobile.Cocontinuity
+-- import QIT.Examples.CauchyReals
+import QIT.Examples.ConTy.Direct
 -- import QIT.Examples.ConTy.DirectWeaklyTaggedEquiv
 -- import QIT.Examples.ConTy.DisplayedReduction
--- import QIT.Examples.ConTy.Erased
+import QIT.Examples.ConTy.Erased
 -- import QIT.Examples.ConTy.ErasedElim
 -- import QIT.Examples.ConTy.ErasedRec
--- import QIT.Examples.ConTy.Iterated
--- import QIT.Examples.ConTy.MutualProjection
+import QIT.Examples.ConTy.Iterated
+import QIT.Examples.ConTy.MutualProjection
 -- import QIT.Examples.ConTy.QW
--- import QIT.Examples.ConTy.Tagged
+import QIT.Examples.ConTy.Tagged
 -- import QIT.Examples.ConTy.TaggedWeaklyTaggedEquiv
--- import QIT.Examples.ConTy.WeaklyTagged
+import QIT.Examples.ConTy.WeaklyTagged
 -- import QIT.Examples.ConTy
 -- import QIT.Examples.CyclicList
 -- import QIT.Examples.DoublyLinkedList
--- import QIT.Examples.HoleList
+import QIT.Examples.HoleList
 -- import QIT.Examples.Int
 -- import QIT.Examples.ListBag
--- import QIT.Examples.Nat
--- import QIT.Examples.PartialityMonad.Combined
--- import QIT.Examples.PartialityMonad.Direct
--- import QIT.Examples.PartialityMonad.DirectAlgebra
--- import QIT.Examples.PartialityMonad.Erased
--- import QIT.Examples.PartialityMonad.ErasedW
+import QIT.Examples.Nat
+import QIT.Examples.PartialityMonad.Combined
+import QIT.Examples.PartialityMonad.Direct
+import QIT.Examples.PartialityMonad.DirectAlgebra
+import QIT.Examples.PartialityMonad.Erased
+import QIT.Examples.PartialityMonad.ErasedW
 -- import QIT.Examples.PartialityMonad.Flat
--- import QIT.Examples.PartialityMonad.MutualAlgebra
+import QIT.Examples.PartialityMonad.MutualAlgebra
 -- import QIT.Examples.PartialityMonad.MutualDirectEquiv
--- import QIT.Examples.PartialityMonad
+import QIT.Examples.PartialityMonad
 -- import QIT.Examples.PartialityMonad.QW
--- import QIT.Examples.PartialityMonad.W1EquivDirect
--- import QIT.Examples.PartialityMonad.WellFormed
--- import QIT.Examples.PartialityMonad.WellFormedW
+import QIT.Examples.PartialityMonad.W1EquivDirect
+import QIT.Examples.PartialityMonad.WellFormed
+import QIT.Examples.PartialityMonad.WellFormedW
 -- import QIT.Examples.Plump.Properties
 -- import QIT.Examples.Queue
 -- -- import QIT.Examples.RotTree
--- -- import QIT.Examples.SGL
--- import QIT.Examples.T
+import QIT.Examples.SGL
+import QIT.Examples.T
 -- import QIT.Examples.Trunc
--- -- import QIT.Examples.WFTree
--- -- import QIT.Examples.Lambda
--- -- import QIT.Examples.Surreal
+-- import QIT.Examples.WFTree
+-- import QIT.Examples.Lambda
+-- import QIT.Examples.Surreal
