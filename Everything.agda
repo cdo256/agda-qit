@@ -125,14 +125,15 @@ import QIT.QW
 import QIT.Plump.Algebra
 import QIT.Plump.W
 import QIT.Plump.Size
+import QIT.Plump.Extensional
 import QIT.Plump.Properties
 import QIT.Plump
 
 -- -- Theory of signatures
 import QIT.IIT.Base
 import QIT.IIT.Cont1
--- -- import QIT.IIT.Codes -- incomplete
--- -- import QIT.QIIT -- very incomplete
+-- import QIT.IIT.Codes -- incomplete
+-- import QIT.QIIT -- very incomplete
 import QIT.KKA2019.Syntax
 import QIT.KK2020.Level
 -- import QIT.KK2020.Syntax
@@ -142,6 +143,9 @@ import QIT.Examples.Mobile.Base
 import QIT.Examples.Mobile.Cocontinuity
 -- import QIT.Examples.CauchyReals
 import QIT.Examples.ConTy.Direct
+import QIT.Examples.ConTy.DirectToWeaklyTaggedLarge
+import QIT.Examples.ConTy.WeaklyTaggedToDirect
+-- import QIT.Examples.ConTy.DirectToWeaklyTagged2
 -- import QIT.Examples.ConTy.DirectWeaklyTaggedEquiv
 -- import QIT.Examples.ConTy.DisplayedReduction
 import QIT.Examples.ConTy.Erased
@@ -175,7 +179,7 @@ import QIT.Examples.PartialityMonad.WellFormed
 import QIT.Examples.PartialityMonad.WellFormedW
 -- import QIT.Examples.Plump.Properties
 -- import QIT.Examples.Queue
--- -- import QIT.Examples.RotTree
+-- import QIT.Examples.RotTree
 import QIT.Examples.SGL
 import QIT.Examples.T
 -- import QIT.Examples.Trunc
