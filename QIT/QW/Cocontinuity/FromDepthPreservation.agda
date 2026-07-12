@@ -6,6 +6,7 @@ open import QIT.Category.Base hiding (_[_≈_]; _[_,_]; _[_∘_])
 open import QIT.Category.Preorder
 open import QIT.Category.Set
 open import QIT.Container.Base
+open import QIT.Function.Base
 open import QIT.Functor.Base
 open import QIT.Functor.Properties
 open import QIT.Plump.Algebra
@@ -553,3 +554,10 @@ module Cocontinuity where
             (≈ltrans
               (≈lstage γ (≡.cong (s ,_) (funExt h)))
               (≈lsym (≈lstep (Z.<→≤ (Z.∨ᶻ-l< {α} {β})) (s , f̂))))
+
+  cocontinuity : FD*/ ≅ˢ F.ob D*/ 
+  cocontinuity = record
+    { to = ϕ
+    ; from = ψ
+    ; rinv = ψϕ
+    ; linv = ϕψ }
