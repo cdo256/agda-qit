@@ -1,6 +1,6 @@
 open import QIT.Prelude
 
-module QIT.Examples.ConTy.DirectToWeaklyTagged2
+module QIT.Examples.ConTy.DirectToWeaklyTaggedLarge
   ⦃ pathElim* : PathElim ⦄
   ⦃ propExt* : PropExt ⦄
   ⦃ funExt* : FunExt ⦄
@@ -21,10 +21,12 @@ open import QIT.Category.Morphism
 open import QIT.Category.Initial
 open import QIT.Relation.Subset
 open import QIT.Function.Base
+open import QIT.Functor.Base
+open import QIT.Category.Base
 
-D→W : D.Algebra → W.Algebra ℓ1
-D→W da = wa
-  where
+G₀ : D.Algebra ℓ0 → W.Algebra ℓ1
+G₀ da = wa
+  module G₀ where
   open ≡
   module DA = D.Algebra da
   data Atom : Set where
@@ -310,7 +312,7 @@ D→W da = wa
 
   k▷ : (γʰ aʰ : CT) → [ γʰ ] ≡ cʰ → [ aʰ ] ≡ tʰ γʰ → [ ▷ γʰ aʰ ] ≡ cʰ
   k▷ γʰ aʰ kγ ka = mkCT≡ p q λ _ _ → refl
-    where
+    module k▷ where
     p : proj₁ (return [_]₀) ∧ᵖ (λ h* → proj₁ (▷ γʰ aʰ)) → ⊤*
     p _ = tt*
     q : LiftP ℓ0 ⊤ → proj₁ (return [_]₀) ∧ᵖ (λ h* → proj₁ (▷ γʰ aʰ))
@@ -323,7 +325,7 @@ D→W da = wa
 
   ku : (γʰ : CT) → [ γʰ ] ≡ cʰ → [ u γʰ ] ≡ tʰ γʰ
   ku γʰ kγ = mkCT≡ p q pt
-    where
+    module ku where
     p : proj₁ [ u γʰ ] → proj₁ (tʰ γʰ)
     p _ = ∧i tt* , conData₁ γʰ kγ
     q : proj₁ (tʰ γʰ) → proj₁ [ u γʰ ]
@@ -339,7 +341,7 @@ D→W da = wa
     → [ bʰ ] ≡ tʰ (▷ γʰ aʰ)
     → [ π γʰ aʰ bʰ ] ≡ tʰ γʰ
   kπ γʰ aʰ bʰ kγ ka kb = mkCT≡ p q pt
-    where
+    module kπ where
     kδ = k▷ γʰ aʰ kγ ka
     p : proj₁ [ π γʰ aʰ bʰ ] → proj₁ (tʰ γʰ)
     p _ = ∧i tt* , conData₁ γʰ kγ
@@ -368,7 +370,7 @@ D→W da = wa
     → [ bʰ ] ≡ tʰ (▷ γʰ aʰ)
     → [ σ γʰ aʰ bʰ ] ≡ tʰ γʰ
   kσ γʰ aʰ bʰ kγ ka kb = mkCT≡ p q pt
-    where
+    module kσ where
     kδ = k▷ γʰ aʰ kγ ka
     p : proj₁ [ σ γʰ aʰ bʰ ] → proj₁ (tʰ γʰ)
     p _ = ∧i tt* , conData₁ γʰ kγ
@@ -397,7 +399,7 @@ D→W da = wa
     → [ bʰ ] ≡ tʰ (▷ γʰ aʰ)
     → ▷ (▷ γʰ aʰ) bʰ ≡ ▷ γʰ (σ γʰ aʰ bʰ)
   σ▷ γʰ aʰ bʰ kγ ka kb = mkCT≡ p q pt
-    where
+    module σ▷ where
     kδ = k▷ γʰ aʰ kγ ka
     p : proj₁ (▷ (▷ γʰ aʰ) bʰ) → proj₁ (▷ γʰ (σ γʰ aʰ bʰ))
     p _ = ∧i conData₁ γʰ kγ ,
@@ -427,7 +429,7 @@ D→W da = wa
     → [ dʰ ] ≡ tʰ (▷ (▷ γʰ aʰ) bʰ)
     → π γʰ aʰ (π (▷ γʰ aʰ) bʰ dʰ) ≡ π γʰ (σ γʰ aʰ bʰ) dʰ
   σπ γʰ aʰ bʰ dʰ kγ ka kb kc = mkCT≡ p q pt
-    where
+    module σπ where
     kδ = k▷ γʰ aʰ kγ ka
     kε = k▷ (▷ γʰ aʰ) bʰ kδ kb
     p : proj₁ (π γʰ aʰ (π (▷ γʰ aʰ) bʰ dʰ)) → proj₁ (π γʰ (σ γʰ aʰ bʰ) dʰ)
@@ -481,4 +483,199 @@ D→W da = wa
     ; σπ = σπ
     }
 
-    
+G₁ : ∀ {α β : D.Algebra ℓ0} → D.Hom α β → W.Hom (G₀ α) (G₀ β)
+G₁ {α} {β} f = record
+  { θ = θ
+  ; [_] = [_]
+  ; k̂ = ≡.refl
+  ; ĉ = ≡.refl
+  ; t̂ = t̂
+  ; ∙ = ∙
+  ; ▷ = ▷
+  ; u = u
+  ; π = π
+  ; σ = σ
+  }
+  module G₁ where
+  module α = D.Algebra α
+  module β = D.Algebra β
+  module A = G₀ α
+  module B = G₀ β
+  module f = D.Hom f
+
+  θ₀ : A.Atom → B.Atom
+  θ₀ (A.con γ) = B.con (f.conᴿ γ)
+  θ₀ (A.ty γ a) = B.ty (f.conᴿ γ) (f.tyᴿ γ a)
+  θ₀ A.k̂ = B.k̂
+  θ₀ A.ĉ = B.ĉ
+  θ₀ (A.t̂ γ) = B.t̂ (θ₀ γ)
+
+  θ : A.CT → B.CT
+  θ (P , x) = P , λ p → θ₀ (x p)
+
+  [_]₀ : ∀ x → θ₀ (A.[ x ]₀) ≡ B.[ θ₀ x ]₀
+  [ A.con x ]₀ = ≡.refl
+  [ A.ty γ a ]₀ = ≡.refl
+  [ A.k̂ ]₀ = ≡.refl
+  [ A.ĉ ]₀ = ≡.refl
+  [ A.t̂ γ ]₀ = ≡.refl
+
+  [_] : ∀ (x : A.CT) → θ (A.[ x ]) ≡ B.[ θ x ]
+  [ P , x ] = B.mkCT≡ (λ p → p) (λ p → p) λ p q → [ x (p .∧e₂) ]₀
+
+  θ-kc : (γ : A.Atom) → A.[ γ ]₀ ≡ A.ĉ → B.[ θ₀ γ ]₀ ≡ B.ĉ
+  θ-kc γ kγ = ≡.trans (≡.sym [ γ ]₀) (≡.cong θ₀ kγ)
+
+  θ-ka : (γ a : A.Atom) → A.[ a ]₀ ≡ A.t̂ γ → B.[ θ₀ a ]₀ ≡ B.t̂ (θ₀ γ)
+  θ-ka γ a ka = ≡.trans (≡.sym [ a ]₀) (≡.cong θ₀ ka)
+
+  θ-▷₀ : (γ a : A.Atom) (kγ : A.[ γ ]₀ ≡ A.ĉ) (ka : A.[ a ]₀ ≡ A.t̂ γ)
+    → θ₀ (A.▷₀ γ a kγ ka) ≡ B.▷₀ (θ₀ γ) (θ₀ a) (θ-kc γ kγ) (θ-ka γ a ka)
+  θ-▷₀ (A.con γ) (A.ty .γ a) ≡.refl ≡.refl = ≡.cong B.con (f.▷ᴿ γ a)
+
+  θ-kb : (γ a b : A.Atom) (kγ : A.[ γ ]₀ ≡ A.ĉ) (ka : A.[ a ]₀ ≡ A.t̂ γ)
+    → A.[ b ]₀ ≡ A.t̂ (A.▷₀ γ a kγ ka)
+    → B.[ θ₀ b ]₀ ≡ B.t̂ (B.▷₀ (θ₀ γ) (θ₀ a) (θ-kc γ kγ) (θ-ka γ a ka))
+  θ-kb γ a b kγ ka kb =
+    ≡.trans (≡.sym [ b ]₀) (≡.trans (≡.cong θ₀ kb) (≡.cong B.t̂ (θ-▷₀ γ a kγ ka)))
+
+  θ-u₀ : (γ : A.Atom) (kγ : A.[ γ ]₀ ≡ A.ĉ)
+    → θ₀ (A.u₀ γ kγ) ≡ B.u₀ (θ₀ γ) (θ-kc γ kγ)
+  θ-u₀ (A.con γ) ≡.refl = ≡.cong (B.ty (f.conᴿ γ)) (f.uᴿ γ)
+
+  θ-π₀ : (γ a b : A.Atom) (kγ : A.[ γ ]₀ ≡ A.ĉ) (ka : A.[ a ]₀ ≡ A.t̂ γ)
+    (kb : A.[ b ]₀ ≡ A.t̂ (A.▷₀ γ a kγ ka))
+    → θ₀ (A.π₀ γ a b kγ ka kb)
+    ≡ B.π₀ (θ₀ γ) (θ₀ a) (θ₀ b) (θ-kc γ kγ) (θ-ka γ a ka) (θ-kb γ a b kγ ka kb)
+  θ-π₀ (A.con γ) (A.ty .γ a) (A.ty .(γ α.▷ a) b) ≡.refl ≡.refl ≡.refl =
+    ≡.cong (B.ty (f.conᴿ γ)) (f.πᴿ γ a b)
+
+  θ-σ₀ : (γ a b : A.Atom) (kγ : A.[ γ ]₀ ≡ A.ĉ) (ka : A.[ a ]₀ ≡ A.t̂ γ)
+    (kb : A.[ b ]₀ ≡ A.t̂ (A.▷₀ γ a kγ ka))
+    → θ₀ (A.σ₀ γ a b kγ ka kb)
+    ≡ B.σ₀ (θ₀ γ) (θ₀ a) (θ₀ b) (θ-kc γ kγ) (θ-ka γ a ka) (θ-kb γ a b kγ ka kb)
+  θ-σ₀ (A.con γ) (A.ty .γ a) (A.ty .(γ α.▷ a) b) ≡.refl ≡.refl ≡.refl =
+    ≡.cong (B.ty (f.conᴿ γ)) (f.σᴿ γ a b)
+
+  t̂ : ∀ γ → θ (A.tʰ γ) ≡ B.tʰ (θ γ)
+  t̂ (P , x) = B.mkCT≡ (λ p → p) (λ p → p) λ p q → ≡.refl
+
+  ∙ : θ A.∙ ≡ B.∙
+  ∙ = B.mkCT≡ (λ _ → tt*) (λ _ → tt*) λ _ _ → ≡.cong B.con f.∙ᴿ
+
+  ▷ : ∀ (γ : A.CT) (a : A.CT)
+    → A.[ γ ] ≡ A.cʰ
+    → A.[ a ] ≡ A.tʰ γ
+    → θ (A.▷ γ a) ≡ B.▷ (θ γ) (θ a)
+  ▷ γʰ aʰ kγ ka = B.mkCT≡ p q pt
+    where
+    p : proj₁ (θ (A.▷ γʰ aʰ)) → proj₁ (B.▷ (θ γʰ) (θ aʰ))
+    p (∧i pγ , (∧i pa , (∧i kγ' , (∧i ka' , tt*)))) =
+      ∧i pγ , ∧i pa , ∧i θ-kc (γʰ .proj₂ pγ) kγ' , ∧i θ-ka (γʰ .proj₂ pγ) (aʰ .proj₂ pa) ka' , tt*
+    q : proj₁ (B.▷ (θ γʰ) (θ aʰ)) → proj₁ (θ (A.▷ γʰ aʰ))
+    q _ = ∧i A.conData₁ γʰ kγ ,
+          ∧i A.tyData₁ γʰ aʰ kγ ka ,
+          ∧i A.conData₂ γʰ kγ ,
+          ∧i A.tyData₂ γʰ aʰ kγ ka ,
+          tt*
+    pt : ∀ p q → θ (A.▷ γʰ aʰ) .proj₂ p ≡ B.▷ (θ γʰ) (θ aʰ) .proj₂ q
+    pt _ _ = θ-▷₀ (γʰ .proj₂ (A.conData₁ γʰ kγ)) (aʰ .proj₂ (A.tyData₁ γʰ aʰ kγ ka)) (A.conData₂ γʰ kγ) (A.tyData₂ γʰ aʰ kγ ka)
+
+  u : ∀ (γ : A.CT) → A.[ γ ] ≡ A.cʰ → θ (A.u γ) ≡ B.u (θ γ)
+  u γʰ kγ = B.mkCT≡ p q pt
+    where
+    p : proj₁ (θ (A.u γʰ)) → proj₁ (B.u (θ γʰ))
+    p (∧i pγ , (∧i kγ' , tt*)) = ∧i pγ , ∧i θ-kc (γʰ .proj₂ pγ) kγ' , tt*
+    q : proj₁ (B.u (θ γʰ)) → proj₁ (θ (A.u γʰ))
+    q _ = ∧i A.conData₁ γʰ kγ , ∧i A.conData₂ γʰ kγ , tt*
+    pt : ∀ p q → θ (A.u γʰ) .proj₂ p ≡ B.u (θ γʰ) .proj₂ q
+    pt _ _ = θ-u₀ (γʰ .proj₂ (A.conData₁ γʰ kγ)) (A.conData₂ γʰ kγ)
+
+  π : ∀ (γ : A.CT) (a : A.CT) (b : A.CT)
+    → A.[ γ ] ≡ A.cʰ
+    → A.[ a ] ≡ A.tʰ γ
+    → A.[ b ] ≡ A.tʰ (A.▷ γ a)
+    → θ (A.π γ a b) ≡ B.π (θ γ) (θ a) (θ b)
+  π γʰ aʰ bʰ kγ ka kb = B.mkCT≡ p q pt
+    where
+    kδ = A.k▷ γʰ aʰ kγ ka
+    p : proj₁ (θ (A.π γʰ aʰ bʰ)) → proj₁ (B.π (θ γʰ) (θ aʰ) (θ bʰ))
+    p (∧i pγ , (∧i pa , (∧i pb , (∧i kγ' , (∧i ka' , (∧i kb' , tt*)))))) =
+      ∧i pγ , ∧i pa , ∧i pb , ∧i θ-kc (γʰ .proj₂ pγ) kγ' , ∧i θ-ka (γʰ .proj₂ pγ) (aʰ .proj₂ pa) ka' , ∧i θ-kb (γʰ .proj₂ pγ) (aʰ .proj₂ pa) (bʰ .proj₂ pb) kγ' ka' kb' , tt*
+    q : proj₁ (B.π (θ γʰ) (θ aʰ) (θ bʰ)) → proj₁ (θ (A.π γʰ aʰ bʰ))
+    q _ = ∧i A.conData₁ γʰ kγ ,
+          ∧i A.tyData₁ γʰ aʰ kγ ka ,
+          ∧i A.extData₁ γʰ aʰ bʰ kγ ka kδ kb ,
+          ∧i A.conData₂ γʰ kγ ,
+          ∧i A.tyData₂ γʰ aʰ kγ ka ,
+          ∧i A.extData₂ γʰ aʰ bʰ kγ ka kδ kb ,
+          tt*
+    pt : ∀ p q → θ (A.π γʰ aʰ bʰ) .proj₂ p ≡ B.π (θ γʰ) (θ aʰ) (θ bʰ) .proj₂ q
+    pt _ _ = θ-π₀ (γʰ .proj₂ (A.conData₁ γʰ kγ)) (aʰ .proj₂ (A.tyData₁ γʰ aʰ kγ ka)) (bʰ .proj₂ (A.extData₁ γʰ aʰ bʰ kγ ka kδ kb)) (A.conData₂ γʰ kγ) (A.tyData₂ γʰ aʰ kγ ka) (A.extData₂ γʰ aʰ bʰ kγ ka kδ kb)
+
+  σ : ∀ (γ : A.CT) (a : A.CT) (b : A.CT)
+    → A.[ γ ] ≡ A.cʰ
+    → A.[ a ] ≡ A.tʰ γ
+    → A.[ b ] ≡ A.tʰ (A.▷ γ a)
+    → θ (A.σ γ a b) ≡ B.σ (θ γ) (θ a) (θ b)
+  σ γʰ aʰ bʰ kγ ka kb = B.mkCT≡ p q pt
+    where
+    kδ = A.k▷ γʰ aʰ kγ ka
+    p : proj₁ (θ (A.σ γʰ aʰ bʰ)) → proj₁ (B.σ (θ γʰ) (θ aʰ) (θ bʰ))
+    p (∧i pγ , (∧i pa , (∧i pb , (∧i kγ' , (∧i ka' , (∧i kb' , tt*)))))) =
+      ∧i pγ , ∧i pa , ∧i pb , ∧i θ-kc (γʰ .proj₂ pγ) kγ' , ∧i θ-ka (γʰ .proj₂ pγ) (aʰ .proj₂ pa) ka' , ∧i θ-kb (γʰ .proj₂ pγ) (aʰ .proj₂ pa) (bʰ .proj₂ pb) kγ' ka' kb' , tt*
+    q : proj₁ (B.σ (θ γʰ) (θ aʰ) (θ bʰ)) → proj₁ (θ (A.σ γʰ aʰ bʰ))
+    q _ = ∧i A.conData₁ γʰ kγ ,
+          ∧i A.tyData₁ γʰ aʰ kγ ka ,
+          ∧i A.extData₁ γʰ aʰ bʰ kγ ka kδ kb ,
+          ∧i A.conData₂ γʰ kγ ,
+          ∧i A.tyData₂ γʰ aʰ kγ ka ,
+          ∧i A.extData₂ γʰ aʰ bʰ kγ ka kδ kb ,
+          tt*
+    pt : ∀ p q → θ (A.σ γʰ aʰ bʰ) .proj₂ p ≡ B.σ (θ γʰ) (θ aʰ) (θ bʰ) .proj₂ q
+    pt _ _ = θ-σ₀ (γʰ .proj₂ (A.conData₁ γʰ kγ)) (aʰ .proj₂ (A.tyData₁ γʰ aʰ kγ ka)) (bʰ .proj₂ (A.extData₁ γʰ aʰ bʰ kγ ka kδ kb)) (A.conData₂ γʰ kγ) (A.tyData₂ γʰ aʰ kγ ka) (A.extData₂ γʰ aʰ bʰ kγ ka kδ kb)
+
+G : Functor (D.Cat ℓ0) (W.Cat ℓ1)
+G = record
+  { ob = G₀
+  ; hom = G₁
+  ; id = id
+  ; comp = comp
+  ; resp = resp
+  }
+  where
+  id-θ₀ : ∀ {α : D.Algebra ℓ0} (x : G₀.Atom α) → G₁.θ₀ (D.id {A = α}) x ≡ x
+  id-θ₀ (G₀.con _) = ≡.refl
+  id-θ₀ (G₀.ty _ _) = ≡.refl
+  id-θ₀ G₀.k̂ = ≡.refl
+  id-θ₀ G₀.ĉ = ≡.refl
+  id-θ₀ (G₀.t̂ x) = ≡.cong G₀.t̂ (id-θ₀ x)
+
+  id : ∀ {α : D.Algebra ℓ0} → G₁ (D.id {A = α}) W.≈ W.id {α = G₀ α}
+  id {α} = W.mk≈ λ { (P , x) → A.mkCT≡ (λ p → p) (λ p → p) (λ p q → id-θ₀ (x p)) }
+    where module A = G₀ α
+
+  comp-θ₀ : ∀ {α β γ : D.Algebra ℓ0} (f : D.Hom α β) (g : D.Hom β γ) (x : G₀.Atom α)
+    → G₁.θ₀ (g D.∘ f) x ≡ G₁.θ₀ g (G₁.θ₀ f x)
+  comp-θ₀ f g (G₀.con _) = ≡.refl
+  comp-θ₀ f g (G₀.ty _ _) = ≡.refl
+  comp-θ₀ f g G₀.k̂ = ≡.refl
+  comp-θ₀ f g G₀.ĉ = ≡.refl
+  comp-θ₀ f g (G₀.t̂ x) = ≡.cong G₀.t̂ (comp-θ₀ f g x)
+
+  comp : ∀ {α β γ : D.Algebra ℓ0} (f : D.Hom α β) (g : D.Hom β γ)
+    → G₁ (g D.∘ f) W.≈ (G₁ g W.∘ G₁ f)
+  comp {α} f g = W.mk≈ λ { (P , x) → A.mkCT≡ (λ p → p) (λ p → p) (λ p q → comp-θ₀ f g (x p)) }
+    where module A = G₀ α
+
+  resp-θ₀ : ∀ {α β : D.Algebra ℓ0} {f g : D.Hom α β} → f D.≈ g → (x : G₀.Atom α)
+    → G₁.θ₀ f x ≡ G₁.θ₀ g x
+  resp-θ₀ {f = f} {g} p (G₀.con γ) = ≡.cong G₀.con (p .D.con≡ γ)
+  resp-θ₀ {f = f} {g} p (G₀.ty γ a) = ≡.dcong₂ G₀.ty (p .D.con≡ γ) (p .D.ty≡ γ a)
+  resp-θ₀ p G₀.k̂ = ≡.refl
+  resp-θ₀ p G₀.ĉ = ≡.refl
+  resp-θ₀ p (G₀.t̂ x) = ≡.cong G₀.t̂ (resp-θ₀ p x)
+
+  resp : ∀ {α β : D.Algebra ℓ0} {f g : D.Hom α β} → f D.≈ g → G₁ f W.≈ G₁ g
+  resp {α} {β} {f} {g} p = W.mk≈ λ { (P , x) → A.mkCT≡ (λ q → q) (λ q → q) (λ q r → resp-θ₀ p (x q)) }
+    where module A = G₀ α

@@ -11,11 +11,11 @@ open import QIT.Relation.Binary using (IsEquivalence)
 open import QIT.Category.Base
 open import QIT.Relation.Subset
 
-record Algebra : Set₁ where
+record Algebra ℓX : Set (lsuc ℓX) where
   infixl 5 _▷_
   field
-    Con : Set
-    Ty  : Con → Set
+    Con : Set ℓX
+    Ty  : Con → Set ℓX
     ∙   : Con
     _▷_ : ∀ γ → Ty γ → Con
     u   : (γ : Con) → Ty γ
@@ -26,7 +26,7 @@ record Algebra : Set₁ where
 
 open Algebra public
 
-record Hom (A B : Algebra) : Set₁ where
+record Hom (A B : Algebra ℓX) : Set (lsuc ℓX) where
   private
     module A = Algebra A
     module B = Algebra B
@@ -44,13 +44,13 @@ record Hom (A B : Algebra) : Set₁ where
 open Hom public
 
 -- Derived: tyᴿ commutes with subst
-tyᴿ-subst : {A B : Algebra} (f : Hom A B)
+tyᴿ-subst : {A B : Algebra ℓX} (f : Hom A B)
            → {γ γ' : Con A} (p : γ ≡ γ') (a : Ty A γ)
            → f .tyᴿ γ' (subst (Ty A) p a)
            ≡ subst (Ty B) (≡.cong (f .conᴿ) p) (f .tyᴿ γ a)
 tyᴿ-subst f ≡.refl a = ≡.refl
 
-id : ∀ {A} → Hom A A
+id : ∀ {ℓX} {A} → Hom {ℓX} A A
 id = record
   { conᴿ = λ γ → γ
   ; tyᴿ  = λ _ a → a
@@ -61,8 +61,8 @@ id = record
   ; σᴿ   = λ _ _ _ → ≡.refl
   }
 
-_∘_ : ∀ {A B C} → Hom B C → Hom A B → Hom A C
-_∘_ {A} {B} {C} g f = record
+_∘_ : ∀ {A B C} → Hom {ℓX} B C → Hom {ℓX} A B → Hom {ℓX} A C
+_∘_ {ℓX} {A} {B} {C} g f = record
   { conᴿ = λ γ   → g.conᴿ (f.conᴿ γ)
   ; tyᴿ  = λ γ a → g.tyᴿ (f.conᴿ γ) (f.tyᴿ γ a)
   ; ∙ᴿ   = ≡.trans (≡.cong g.conᴿ f.∙ᴿ) g.∙ᴿ
@@ -132,7 +132,7 @@ _∘_ {A} {B} {C} g f = record
       subst C.Ty (≡.trans (≡.cong g.conᴿ (f.▷ᴿ γ a)) (g.▷ᴿ (f.conᴿ γ) (f.tyᴿ γ a)))
                  (g.tyᴿ _ (f.tyᴿ _ b)) ∎
 
-record _≈_ {A B : Algebra} (f g : Hom A B) : Prop ℓ0 where
+record _≈_ {A B : Algebra ℓX} (f g : Hom A B) : Prop ℓX where
   constructor mk≈
   field
     con≡ : ∀ γ   → f .conᴿ γ ≡ g .conᴿ γ
@@ -140,8 +140,8 @@ record _≈_ {A B : Algebra} (f g : Hom A B) : Prop ℓ0 where
 
 open _≈_ public
 
-isEquiv≈ : ∀ {A B : Algebra} → IsEquivalence (_≈_ {A} {B})
-isEquiv≈ {A} {B} = record
+isEquiv≈ : ∀ {A B : Algebra ℓX} → IsEquivalence (_≈_ {ℓX} {A} {B})
+isEquiv≈ {ℓX} {A} {B} = record
   { refl  = mk≈ (λ _ → ≡.refl) (λ _ _ → ≡.refl)
   ; sym   = λ (mk≈ c t) → mk≈ (λ γ   → ≡.sym (c γ))
                                (λ γ a → ≡.dsym (Ty B) (c γ) (t γ a))
@@ -150,7 +150,7 @@ isEquiv≈ {A} {B} = record
           (λ γ a → ≡.dtrans (Ty B) (cp γ) (cq γ) (tp γ a) (tq γ a))
   }
 
-∘-resp-≈ : ∀ {A B C : Algebra} {f h : Hom B C} {g i : Hom A B}
+∘-resp-≈ : ∀ {A B C : Algebra ℓX} {f h : Hom B C} {g i : Hom A B}
           → f ≈ h → g ≈ i → (f ∘ g) ≈ (h ∘ i)
 ∘-resp-≈ {C = C} {f = f} {h} {g} {i} (mk≈ cp tp) (mk≈ cq tq) = mk≈
   (λ γ   → ≡.trans (≡.cong (f .conᴿ) (cq γ)) (cp (i .conᴿ γ)))
@@ -162,9 +162,9 @@ isEquiv≈ {A} {B} = record
                (≡.cong (f .tyᴿ _) (tq γ a)))
       (tp (i .conᴿ γ) (i .tyᴿ γ a)))
 
-Cat : Category (lsuc ℓ0) (lsuc ℓ0) ℓ0
-Cat = record
-  { Obj       = Algebra
+Cat : ∀ ℓX → Category (lsuc ℓX) (lsuc ℓX) ℓX
+Cat ℓX = record
+  { Obj       = Algebra ℓX
   ; _⇒_       = Hom
   ; _≈_       = _≈_
   ; id        = id
@@ -178,5 +178,5 @@ Cat = record
   ; ∘-resp-≈  = ∘-resp-≈
   }
 
-open import QIT.Category.Morphism Cat public
-open import QIT.Category.Initial Cat public
+-- open import QIT.Category.Morphism Cat public
+-- open import QIT.Category.Initial Cat public
