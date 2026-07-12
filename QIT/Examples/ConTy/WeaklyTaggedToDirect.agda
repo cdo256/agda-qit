@@ -18,15 +18,15 @@ open import QIT.Function.Base
 open import QIT.Functor.Base
 open import QIT.Category.Base
 
-F₀ : W.Algebra ℓ0 → D.Algebra ℓ0
-F₀ wa = da
+F₀ : W.Algebra ℓX → D.Algebra ℓX
+F₀ {ℓX} wa = da
   module F₀ where
   open ≡
   module WA = W.Algebra wa
   open WA using (CT; [_]; ĉ; t̂)
-  Con : Set
+  Con : Set ℓX
   Con = ΣP CT λ γ → [ γ ] ≡ ĉ
-  Ty : Con → Set
+  Ty : Con → Set ℓX
   Ty (γ , _) = ΣP CT λ a → [ a ] ≡ t̂ γ
   Ty-fst : ∀ {γ δ : Con} {a : Ty γ} → (r : γ ≡ δ) → subst Ty r a .fst ≡ a .fst
   Ty-fst refl = refl
@@ -60,7 +60,7 @@ F₀ wa = da
         ≡⟨ cong (WA.π γ (WA.σ γ a b)) (≡.sym (Ty-fst (σ▷ (γ , kγ) (a , ka) (b , kb)))) ⟩
       WA.π γ (WA.σ γ a b) (subst Ty (σ▷ (γ , kγ) (a , ka) (b , kb)) (c , _) .fst) ∎
 
-  da : D.Algebra ℓ0
+  da : D.Algebra ℓX
   da = record
     { Con = Con
     ; Ty = Ty
@@ -73,9 +73,9 @@ F₀ wa = da
     ; σπ = σπ
     }
 
-F₁ : ∀ {α β : W.Algebra ℓ0}
+F₁ : ∀ {α β : W.Algebra ℓX}
    → W.Hom α β → D.Hom (F₀ α) (F₀ β)
-F₁ {α} {β} f = record
+F₁ {ℓX} {α} {β} f = record
   { conᴿ = conᴿ
   ; tyᴿ = tyᴿ
   ; ∙ᴿ = ∙ᴿ
@@ -140,8 +140,8 @@ F₁ {α} {β} f = record
         ≡⟨ ≡.cong (β.σ (f.θ γ) (f.θ a)) (≡.sym (F₀.Ty-fst β (▷ᴿ (γ , kγ) (a , ka)))) ⟩
       β.σ (f.θ γ) (f.θ a) (subst (F₀.Ty β) (▷ᴿ (γ , kγ) (a , ka)) (tyᴿ (α.▷ γ a , α.k▷ γ a kγ ka) (b , kb)) .fst) ∎
 
-F : Functor (W.Cat ℓ0) (D.Cat ℓ0) 
-F = record
+F : ∀ ℓX → Functor (W.Cat ℓX) (D.Cat ℓX) 
+F ℓX = record
   { ob = F₀
   ; hom = F₁
   ; id = λ {α} → id {α}
@@ -149,12 +149,12 @@ F = record
   ; resp = resp }
   where
   module WCat = Category (W.Cat ℓ0)
-  id : ∀ {α : W.Algebra ℓ0} → F₁ (W.id {ℓ0} {α}) D.≈ D.id
+  id : ∀ {α : W.Algebra ℓX} → F₁ (W.id {ℓX} {α}) D.≈ D.id
   id {α} = D.mk≈ (λ _ → ≡.refl) λ _ _ → ≡.refl
-  comp : ∀ {α₁ α₂ α₃ : W.Algebra ℓ0}
+  comp : ∀ {α₁ α₂ α₃ : W.Algebra ℓX}
        → (f : W.Hom α₁ α₂) (g : W.Hom α₂ α₃)  → F₁ (g W.∘ f) D.≈ (F₁ g D.∘ F₁ f)
   comp {α₁} {α₂} {α₃} f g = D.mk≈ (λ _ → ≡.refl) (λ _ _ → ≡.refl)
-  resp : ∀ {α β : W.Algebra ℓ0} {f g : W.Hom α β}
+  resp : ∀ {α β : W.Algebra ℓX} {f g : W.Hom α β}
        → f W.≈ g → F₁ f D.≈ F₁ g
   resp {α} {β} {f} {g} p = D.mk≈ q r
     where

@@ -64,38 +64,38 @@ record Algebra ℓX : Set (lsuc ℓX) where
       → π γ a (π (▷ γ a) b c)
       ≡ π γ (σ γ a b) c
 
-record Hom {ℓX} (α β : Algebra ℓX) : Set ℓX where
+record Hom {ℓX} (A B : Algebra ℓX) : Set ℓX where
   private
-    module α = Algebra α
-    module β = Algebra β
+    module A = Algebra A
+    module B = Algebra B
   field
-    θ : α.CT → β.CT
-    [_] : ∀ (x : α.CT) → θ (α.[ x ]) ≡ β.[ θ x ]
-    k̂ : θ α.k̂ ≡ β.k̂
-    ĉ : θ α.ĉ ≡ β.ĉ
-    t̂ : ∀ (γ : α.CT) → θ (α.t̂ γ) ≡ β.t̂ (θ γ)
-    ∙ : θ α.∙ ≡ β.∙
-    ▷ : ∀ (γ : α.CT) (a : α.CT)
-      → α.[ γ ] ≡ α.ĉ
-      → α.[ a ] ≡ α.t̂ γ
-      → θ (α.▷ γ a) ≡ β.▷ (θ γ) (θ a)
-    u : ∀ (γ : α.CT)
-      → α.[ γ ] ≡ α.ĉ
-      → θ (α.u γ) ≡ β.u (θ γ)
-    π : ∀ (γ : α.CT) (a : α.CT) (b : α.CT)
-      → α.[ γ ] ≡ α.ĉ
-      → α.[ a ] ≡ α.t̂ γ
-      → α.[ b ] ≡ α.t̂ (α.▷ γ a)
-      → θ (α.π γ a b) ≡ β.π (θ γ) (θ a) (θ b)
-    σ : ∀ (γ : α.CT) (a : α.CT) (b : α.CT)
-      → α.[ γ ] ≡ α.ĉ
-      → α.[ a ] ≡ α.t̂ γ
-      → α.[ b ] ≡ α.t̂ (α.▷ γ a)
-      → θ (α.σ γ a b) ≡ β.σ (θ γ) (θ a) (θ b)
+    θ : A.CT → B.CT
+    [_] : ∀ (x : A.CT) → θ (A.[ x ]) ≡ B.[ θ x ]
+    k̂ : θ A.k̂ ≡ B.k̂
+    ĉ : θ A.ĉ ≡ B.ĉ
+    t̂ : ∀ (γ : A.CT) → θ (A.t̂ γ) ≡ B.t̂ (θ γ)
+    ∙ : θ A.∙ ≡ B.∙
+    ▷ : ∀ (γ : A.CT) (a : A.CT)
+      → A.[ γ ] ≡ A.ĉ
+      → A.[ a ] ≡ A.t̂ γ
+      → θ (A.▷ γ a) ≡ B.▷ (θ γ) (θ a)
+    u : ∀ (γ : A.CT)
+      → A.[ γ ] ≡ A.ĉ
+      → θ (A.u γ) ≡ B.u (θ γ)
+    π : ∀ (γ : A.CT) (a : A.CT) (b : A.CT)
+      → A.[ γ ] ≡ A.ĉ
+      → A.[ a ] ≡ A.t̂ γ
+      → A.[ b ] ≡ A.t̂ (A.▷ γ a)
+      → θ (A.π γ a b) ≡ B.π (θ γ) (θ a) (θ b)
+    σ : ∀ (γ : A.CT) (a : A.CT) (b : A.CT)
+      → A.[ γ ] ≡ A.ĉ
+      → A.[ a ] ≡ A.t̂ γ
+      → A.[ b ] ≡ A.t̂ (A.▷ γ a)
+      → θ (A.σ γ a b) ≡ B.σ (θ γ) (θ a) (θ b)
 
 open Hom public
 
-id : ∀ {ℓX} {α : Algebra ℓX} → Hom α α
+id : ∀ {ℓX} {A : Algebra ℓX} → Hom A A
 id {ℓX} = record
   { θ = λ x → x
   ; [_] = λ _ → ≡.refl
@@ -145,21 +145,21 @@ _∘_ {ℓX} {A} {B} {C} g f = record
       (≡.trans (≡.sym (f.[_] b)) (≡.trans (≡.cong f.θ kb) (f.t̂ (A.▷ x a))))
       (≡.cong B.t̂ (f.▷ x a kx ka))
 
-record _≈_ {ℓX} {α β : Algebra ℓX} (f g : Hom α β) : Prop ℓX where
+record _≈_ {ℓX} {A B : Algebra ℓX} (f g : Hom A B) : Prop ℓX where
   constructor mk≈
   field
     θ≡ : ∀ x → f .θ x ≡ g .θ x
 
 open _≈_ public
 
-isEquiv≈ : ∀ {ℓX} {α β : Algebra ℓX} → IsEquivalence (_≈_ {ℓX} {α} {β})
+isEquiv≈ : ∀ {ℓX} {A B : Algebra ℓX} → IsEquivalence (_≈_ {ℓX} {A} {B})
 isEquiv≈ = record
   { refl = mk≈ λ _ → ≡.refl
   ; sym = λ (mk≈ p) → mk≈ λ x → ≡.sym (p x)
   ; trans = λ (mk≈ p) (mk≈ q) → mk≈ λ x → ≡.trans (p x) (q x)
   }
 
-∘-resp-≈ : ∀ {ℓX} {α β γ : Algebra ℓX} {f h : Hom β γ} {g i : Hom α β}
+∘-resp-≈ : ∀ {ℓX} {A B γ : Algebra ℓX} {f h : Hom B γ} {g i : Hom A B}
   → f ≈ h → g ≈ i → (f ∘ g) ≈ (h ∘ i)
 ∘-resp-≈ {f = f} {h} {g} {i} (mk≈ p) (mk≈ q) =
   mk≈ λ x → ≡.trans (≡.cong (f .θ) (q x)) (p (i .θ x))
