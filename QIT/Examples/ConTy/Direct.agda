@@ -11,11 +11,11 @@ open import QIT.Relation.Binary using (IsEquivalence)
 open import QIT.Category.Base
 open import QIT.Relation.Subset
 
-record Algebra ℓX : Set (lsuc ℓX) where
+record Algebra ℓA : Set (lsuc ℓA) where
   infixl 5 _▷_
   field
-    Con : Set ℓX
-    Ty  : Con → Set ℓX
+    Con : Set ℓA
+    Ty  : Con → Set ℓA
     ∙   : Con
     _▷_ : ∀ γ → Ty γ → Con
     u   : (γ : Con) → Ty γ
@@ -26,7 +26,7 @@ record Algebra ℓX : Set (lsuc ℓX) where
 
 open Algebra public
 
-record Hom (A B : Algebra ℓX) : Set (lsuc ℓX) where
+record Hom (A : Algebra ℓA) (B : Algebra ℓB) : Set (lsuc ℓA ⊔ lsuc ℓB) where
   private
     module A = Algebra A
     module B = Algebra B
@@ -44,13 +44,13 @@ record Hom (A B : Algebra ℓX) : Set (lsuc ℓX) where
 open Hom public
 
 -- Derived: tyᴿ commutes with subst
-tyᴿ-subst : {A B : Algebra ℓX} (f : Hom A B)
+tyᴿ-subst : {A : Algebra ℓA} {B : Algebra ℓB} (f : Hom A B)
            → {γ γ' : Con A} (p : γ ≡ γ') (a : Ty A γ)
            → f .tyᴿ γ' (subst (Ty A) p a)
            ≡ subst (Ty B) (≡.cong (f .conᴿ) p) (f .tyᴿ γ a)
 tyᴿ-subst f ≡.refl a = ≡.refl
 
-id : ∀ {ℓX} {A} → Hom {ℓX} A A
+id : ∀ {ℓA} {A} → Hom {ℓA} A A
 id = record
   { conᴿ = λ γ → γ
   ; tyᴿ  = λ _ a → a
@@ -61,8 +61,9 @@ id = record
   ; σᴿ   = λ _ _ _ → ≡.refl
   }
 
-_∘_ : ∀ {A B C} → Hom {ℓX} B C → Hom {ℓX} A B → Hom {ℓX} A C
-_∘_ {ℓX} {A} {B} {C} g f = record
+_∘_ : ∀ {A : Algebra ℓA} {B : Algebra ℓB} {C : Algebra ℓC}
+    → Hom B C → Hom A B → Hom A C
+_∘_ {A = A} {B} {C} g f = record
   { conᴿ = λ γ   → g.conᴿ (f.conᴿ γ)
   ; tyᴿ  = λ γ a → g.tyᴿ (f.conᴿ γ) (f.tyᴿ γ a)
   ; ∙ᴿ   = ≡.trans (≡.cong g.conᴿ f.∙ᴿ) g.∙ᴿ
@@ -132,7 +133,7 @@ _∘_ {ℓX} {A} {B} {C} g f = record
       subst C.Ty (≡.trans (≡.cong g.conᴿ (f.▷ᴿ γ a)) (g.▷ᴿ (f.conᴿ γ) (f.tyᴿ γ a)))
                  (g.tyᴿ _ (f.tyᴿ _ b)) ∎
 
-record _≈_ {A B : Algebra ℓX} (f g : Hom A B) : Prop ℓX where
+record _≈_ {A : Algebra ℓA} {B : Algebra ℓB} (f g : Hom A B) : Prop (ℓA ⊔ ℓB) where
   constructor mk≈
   field
     con≡ : ∀ γ   → f .conᴿ γ ≡ g .conᴿ γ
@@ -140,8 +141,8 @@ record _≈_ {A B : Algebra ℓX} (f g : Hom A B) : Prop ℓX where
 
 open _≈_ public
 
-isEquiv≈ : ∀ {A B : Algebra ℓX} → IsEquivalence (_≈_ {ℓX} {A} {B})
-isEquiv≈ {ℓX} {A} {B} = record
+isEquiv≈ : ∀ {A : Algebra ℓA} {B : Algebra ℓB} → IsEquivalence (_≈_ {A = A} {B})
+isEquiv≈ {A = A} {B} = record
   { refl  = mk≈ (λ _ → ≡.refl) (λ _ _ → ≡.refl)
   ; sym   = λ (mk≈ c t) → mk≈ (λ γ   → ≡.sym (c γ))
                                (λ γ a → ≡.dsym (Ty B) (c γ) (t γ a))
@@ -150,7 +151,7 @@ isEquiv≈ {ℓX} {A} {B} = record
           (λ γ a → ≡.dtrans (Ty B) (cp γ) (cq γ) (tp γ a) (tq γ a))
   }
 
-∘-resp-≈ : ∀ {A B C : Algebra ℓX} {f h : Hom B C} {g i : Hom A B}
+∘-resp-≈ : ∀ {A B C : Algebra ℓA} {f h : Hom B C} {g i : Hom A B}
           → f ≈ h → g ≈ i → (f ∘ g) ≈ (h ∘ i)
 ∘-resp-≈ {C = C} {f = f} {h} {g} {i} (mk≈ cp tp) (mk≈ cq tq) = mk≈
   (λ γ   → ≡.trans (≡.cong (f .conᴿ) (cq γ)) (cp (i .conᴿ γ)))
@@ -162,9 +163,9 @@ isEquiv≈ {ℓX} {A} {B} = record
                (≡.cong (f .tyᴿ _) (tq γ a)))
       (tp (i .conᴿ γ) (i .tyᴿ γ a)))
 
-Cat : ∀ ℓX → Category (lsuc ℓX) (lsuc ℓX) ℓX
-Cat ℓX = record
-  { Obj       = Algebra ℓX
+Cat : ∀ ℓA → Category (lsuc ℓA) (lsuc ℓA) ℓA
+Cat ℓA = record
+  { Obj       = Algebra ℓA
   ; _⇒_       = Hom
   ; _≈_       = _≈_
   ; id        = id
@@ -180,3 +181,65 @@ Cat ℓX = record
 
 -- open import QIT.Category.Morphism Cat public
 -- open import QIT.Category.Initial Cat public
+
+LiftAlgebra : ∀ {ℓA} ℓB → Algebra ℓA → Algebra (ℓA ⊔ ℓB)
+LiftAlgebra {ℓA} ℓB A = record
+  { Con = Lift ℓB A.Con
+  ; Ty = λ (lift γ) → Lift ℓB (A.Ty γ)
+  ; ∙ = lift A.∙
+  ; _▷_ = λ (lift γ) (lift a) → lift (γ A.▷ a)
+  ; u = λ (lift γ) → lift (A.u γ)
+  ; π = λ (lift γ) (lift a) (lift b) → lift (A.π γ a b)
+  ; σ = λ (lift γ) (lift a) (lift b) → lift (A.σ γ a b)
+  ; σ▷ = λ (lift γ) (lift a) (lift b) → ≡.cong lift (A.σ▷ γ a b)
+  ; σπ = λ (lift γ) (lift a) (lift b) (lift c)
+       → ≡.trans
+           (≡.cong lift (A.σπ γ a b c))
+           (≡.cong (π' (lift γ) (σ' (lift γ) (lift a) (lift b)))
+                   (≡.sym (lift-subst (A.σ▷ γ a b) c)))
+  }
+  where
+  module A = Algebra A 
+  infixl 5 _▷'_
+  Con' : Set (ℓA ⊔ ℓB)
+  Con' = Lift ℓB A.Con
+  Ty' : Con' → Set (ℓA ⊔ ℓB)
+  Ty' (lift γ) = Lift ℓB (A.Ty γ)
+  _▷'_ : ∀ γ → Ty' γ → Con'
+  (lift γ) ▷' (lift a) = lift (γ A.▷ a)
+  π' : ∀ γ → (a : Ty' γ) → (b : Ty' (γ ▷' a)) → Ty' γ
+  π' (lift γ) (lift a) (lift b) = lift (A.π γ a b)
+  σ' : ∀ γ → (a : Ty' γ) → (b : Ty' (γ ▷' a)) → Ty' γ
+  σ' (lift γ) (lift a) (lift b) = lift (A.σ γ a b)
+
+  lift-subst : ∀ {γ δ : A.Con} (p : γ ≡ δ) (a : A.Ty γ)
+    → subst Ty' (≡.cong lift p) (lift a) ≡ lift (subst A.Ty p a)
+  lift-subst ≡.refl a = ≡.refl
+
+Lift⇒ : ∀ {ℓA} ℓB (A : Algebra ℓA) → Hom A (LiftAlgebra ℓB A)
+Lift⇒ ℓB A = record
+  { conᴿ = lift
+  ; tyᴿ = λ _ a → lift a
+  ; ∙ᴿ = ≡.refl
+  ; ▷ᴿ = λ _ _ → ≡.refl
+  ; uᴿ = λ _ → ≡.refl
+  ; πᴿ = λ _ _ _ → ≡.refl
+  ; σᴿ = λ _ _ _ → ≡.refl
+  }
+
+Lift⇐ : ∀ {ℓA} ℓB (A : Algebra ℓA) → Hom (LiftAlgebra ℓB A) A
+Lift⇐ ℓB A = record
+  { conᴿ = λ (lift γ) → γ
+  ; tyᴿ = λ (lift γ) (lift a) → a
+  ; ∙ᴿ = ≡.refl
+  ; ▷ᴿ = λ (lift γ) (lift a) → ≡.refl
+  ; uᴿ = λ (lift γ) → ≡.refl
+  ; πᴿ = λ (lift γ) (lift a) (lift b) → ≡.refl
+  ; σᴿ = λ (lift γ) (lift a) (lift b) → ≡.refl
+  }
+
+Lift⇒⇐ : ∀ {ℓA} ℓB (A : Algebra ℓA) → (Lift⇒ ℓB A ∘ Lift⇐ ℓB A) ≈ id
+Lift⇒⇐ ℓB A = mk≈ (λ (lift γ) → ≡.refl) (λ (lift γ) (lift a) → ≡.refl)
+
+Lift⇐⇒ : ∀ {ℓA} ℓB (A : Algebra ℓA) → (Lift⇐ ℓB A ∘ Lift⇒ ℓB A) ≈ id
+Lift⇐⇒ ℓB A = mk≈ (λ γ → ≡.refl) (λ γ a → ≡.refl)

@@ -18,15 +18,15 @@ open import QIT.Function.Base
 open import QIT.Functor.Base
 open import QIT.Category.Base
 
-F₀ : W.Algebra ℓX → D.Algebra ℓX
-F₀ {ℓX} wa = da
+F₀ : W.Algebra ℓA → D.Algebra ℓA
+F₀ {ℓA} wa = da
   module F₀ where
   open ≡
   module WA = W.Algebra wa
   open WA using (CT; [_]; ĉ; t̂)
-  Con : Set ℓX
+  Con : Set ℓA
   Con = ΣP CT λ γ → [ γ ] ≡ ĉ
-  Ty : Con → Set ℓX
+  Ty : Con → Set ℓA
   Ty (γ , _) = ΣP CT λ a → [ a ] ≡ t̂ γ
   Ty-fst : ∀ {γ δ : Con} {a : Ty γ} → (r : γ ≡ δ) → subst Ty r a .fst ≡ a .fst
   Ty-fst refl = refl
@@ -60,7 +60,7 @@ F₀ {ℓX} wa = da
         ≡⟨ cong (WA.π γ (WA.σ γ a b)) (≡.sym (Ty-fst (σ▷ (γ , kγ) (a , ka) (b , kb)))) ⟩
       WA.π γ (WA.σ γ a b) (subst Ty (σ▷ (γ , kγ) (a , ka) (b , kb)) (c , _) .fst) ∎
 
-  da : D.Algebra ℓX
+  da : D.Algebra ℓA
   da = record
     { Con = Con
     ; Ty = Ty
@@ -73,9 +73,9 @@ F₀ {ℓX} wa = da
     ; σπ = σπ
     }
 
-F₁ : ∀ {α β : W.Algebra ℓX}
-   → W.Hom α β → D.Hom (F₀ α) (F₀ β)
-F₁ {ℓX} {α} {β} f = record
+F₁ : ∀ {A : W.Algebra ℓA} {B : W.Algebra ℓB}
+   → W.Hom A B → D.Hom (F₀ A) (F₀ B)
+F₁ {ℓA} {A} {B} f = record
   { conᴿ = conᴿ
   ; tyᴿ = tyᴿ
   ; ∙ᴿ = ∙ᴿ
@@ -84,89 +84,89 @@ F₁ {ℓX} {α} {β} f = record
   ; πᴿ = πᴿ
   ; σᴿ = σᴿ }
   module F₁ where
-  module α = W.Algebra α
-  module β = W.Algebra β 
+  module A = W.Algebra A
+  module B = W.Algebra B 
   module f = W.Hom f
   open ≡.≡-Reasoning
-  conᴿ : F₀.Con α → F₀.Con β
+  conᴿ : F₀.Con A → F₀.Con B
   conᴿ (γ , kγ) = f.θ γ , ≡.trans (≡.sym f.[ γ ]) (≡.trans (≡.cong f.θ kγ) f.ĉ)
-  tyᴿ : (γ : F₀.Con α) → F₀.Ty α γ → F₀.Ty β (conᴿ γ)
+  tyᴿ : (γ : F₀.Con A) → F₀.Ty A γ → F₀.Ty B (conᴿ γ)
   tyᴿ (γ , kγ) (a , ka) = f.θ a , ka'
     where
-    ka' : β.[ f.θ a ] ≡ β.t̂ (conᴿ (γ , kγ) .fst)
+    ka' : B.[ f.θ a ] ≡ B.t̂ (conᴿ (γ , kγ) .fst)
     ka' =
-      β.[ f.θ a ]
+      B.[ f.θ a ]
         ≡⟨ ≡.sym f.[ a ] ⟩
-      f.θ α.[ a ]
+      f.θ A.[ a ]
         ≡⟨ ≡.cong f.θ ka ⟩
-      f.θ (α.t̂ γ)
+      f.θ (A.t̂ γ)
         ≡⟨ f.t̂ γ ⟩
-      β.t̂ (f.θ γ) ∎
+      B.t̂ (f.θ γ) ∎
 
-  ∙ᴿ : conᴿ (F₀.∙ α) ≡ F₀.∙ β
+  ∙ᴿ : conᴿ (F₀.∙ A) ≡ F₀.∙ B
   ∙ᴿ = ΣP≡ _ _ f.∙
 
-  ▷ᴿ : (γ : F₀.Con α) (a : F₀.Ty α γ) → conᴿ (F₀._▷_ α γ a) ≡ F₀._▷_ β (conᴿ γ) (tyᴿ γ a)
+  ▷ᴿ : (γ : F₀.Con A) (a : F₀.Ty A γ) → conᴿ (F₀._▷_ A γ a) ≡ F₀._▷_ B (conᴿ γ) (tyᴿ γ a)
   ▷ᴿ (γ , kγ) (a , ka) = ΣP≡ _ _ (f.▷ γ a kγ ka)
 
-  uᴿ : (γ : F₀.Con α) → tyᴿ γ (F₀.u α γ) ≡ F₀.u β (conᴿ γ)
+  uᴿ : (γ : F₀.Con A) → tyᴿ γ (F₀.u A γ) ≡ F₀.u B (conᴿ γ)
   uᴿ (γ , kγ) = ΣP≡ _ _ (f.u γ kγ)
 
-  πᴿ : (γ : F₀.Con α) (a : F₀.Ty α γ) (b : F₀.Ty α (F₀._▷_ α γ a))
-    → tyᴿ γ (F₀.π α γ a b)
-    ≡ F₀.π β (conᴿ γ) (tyᴿ γ a) (subst (F₀.Ty β) (▷ᴿ γ a) (tyᴿ (F₀._▷_ α γ a) b))
+  πᴿ : (γ : F₀.Con A) (a : F₀.Ty A γ) (b : F₀.Ty A (F₀._▷_ A γ a))
+    → tyᴿ γ (F₀.π A γ a b)
+    ≡ F₀.π B (conᴿ γ) (tyᴿ γ a) (subst (F₀.Ty B) (▷ᴿ γ a) (tyᴿ (F₀._▷_ A γ a) b))
   πᴿ (γ , kγ) (a , ka) (b , kb) = ΣP≡ _ _ p
     where
-    p : f.θ (α.π γ a b)
-      ≡ β.π (f.θ γ) (f.θ a) (subst (F₀.Ty β) (▷ᴿ (γ , kγ) (a , ka)) (tyᴿ (α.▷ γ a , α.k▷ γ a kγ ka) (b , kb)) .fst)
+    p : f.θ (A.π γ a b)
+      ≡ B.π (f.θ γ) (f.θ a) (subst (F₀.Ty B) (▷ᴿ (γ , kγ) (a , ka)) (tyᴿ (A.▷ γ a , A.k▷ γ a kγ ka) (b , kb)) .fst)
     p =
-      f.θ (α.π γ a b)
+      f.θ (A.π γ a b)
         ≡⟨ f.π γ a b kγ ka kb ⟩
-      β.π (f.θ γ) (f.θ a) (f.θ b)
-        ≡⟨ ≡.cong (β.π (f.θ γ) (f.θ a)) (≡.sym (F₀.Ty-fst β (▷ᴿ (γ , kγ) (a , ka)))) ⟩
-      β.π (f.θ γ) (f.θ a) (subst (F₀.Ty β) (▷ᴿ (γ , kγ) (a , ka)) (tyᴿ (α.▷ γ a , α.k▷ γ a kγ ka) (b , kb)) .fst) ∎
+      B.π (f.θ γ) (f.θ a) (f.θ b)
+        ≡⟨ ≡.cong (B.π (f.θ γ) (f.θ a)) (≡.sym (F₀.Ty-fst B (▷ᴿ (γ , kγ) (a , ka)))) ⟩
+      B.π (f.θ γ) (f.θ a) (subst (F₀.Ty B) (▷ᴿ (γ , kγ) (a , ka)) (tyᴿ (A.▷ γ a , A.k▷ γ a kγ ka) (b , kb)) .fst) ∎
 
-  σᴿ : (γ : F₀.Con α) (a : F₀.Ty α γ) (b : F₀.Ty α (F₀._▷_ α γ a))
-    → tyᴿ γ (F₀.σ α γ a b)
-    ≡ F₀.σ β (conᴿ γ) (tyᴿ γ a) (subst (F₀.Ty β) (▷ᴿ γ a) (tyᴿ (F₀._▷_ α γ a) b))
+  σᴿ : (γ : F₀.Con A) (a : F₀.Ty A γ) (b : F₀.Ty A (F₀._▷_ A γ a))
+    → tyᴿ γ (F₀.σ A γ a b)
+    ≡ F₀.σ B (conᴿ γ) (tyᴿ γ a) (subst (F₀.Ty B) (▷ᴿ γ a) (tyᴿ (F₀._▷_ A γ a) b))
   σᴿ (γ , kγ) (a , ka) (b , kb) = ΣP≡ _ _ p
     where
-    p : f.θ (α.σ γ a b)
-      ≡ β.σ (f.θ γ) (f.θ a) (subst (F₀.Ty β) (▷ᴿ (γ , kγ) (a , ka)) (tyᴿ (α.▷ γ a , α.k▷ γ a kγ ka) (b , kb)) .fst)
+    p : f.θ (A.σ γ a b)
+      ≡ B.σ (f.θ γ) (f.θ a) (subst (F₀.Ty B) (▷ᴿ (γ , kγ) (a , ka)) (tyᴿ (A.▷ γ a , A.k▷ γ a kγ ka) (b , kb)) .fst)
     p =
-      f.θ (α.σ γ a b)
+      f.θ (A.σ γ a b)
         ≡⟨ f.σ γ a b kγ ka kb ⟩
-      β.σ (f.θ γ) (f.θ a) (f.θ b)
-        ≡⟨ ≡.cong (β.σ (f.θ γ) (f.θ a)) (≡.sym (F₀.Ty-fst β (▷ᴿ (γ , kγ) (a , ka)))) ⟩
-      β.σ (f.θ γ) (f.θ a) (subst (F₀.Ty β) (▷ᴿ (γ , kγ) (a , ka)) (tyᴿ (α.▷ γ a , α.k▷ γ a kγ ka) (b , kb)) .fst) ∎
+      B.σ (f.θ γ) (f.θ a) (f.θ b)
+        ≡⟨ ≡.cong (B.σ (f.θ γ) (f.θ a)) (≡.sym (F₀.Ty-fst B (▷ᴿ (γ , kγ) (a , ka)))) ⟩
+      B.σ (f.θ γ) (f.θ a) (subst (F₀.Ty B) (▷ᴿ (γ , kγ) (a , ka)) (tyᴿ (A.▷ γ a , A.k▷ γ a kγ ka) (b , kb)) .fst) ∎
 
-F : ∀ ℓX → Functor (W.Cat ℓX) (D.Cat ℓX) 
-F ℓX = record
+F : ∀ ℓA → Functor (W.Cat ℓA) (D.Cat ℓA) 
+F ℓA = record
   { ob = F₀
   ; hom = F₁
-  ; id = λ {α} → id {α}
+  ; id = λ {A} → id {A}
   ; comp = comp
   ; resp = resp }
   where
   module WCat = Category (W.Cat ℓ0)
-  id : ∀ {α : W.Algebra ℓX} → F₁ (W.id {ℓX} {α}) D.≈ D.id
-  id {α} = D.mk≈ (λ _ → ≡.refl) λ _ _ → ≡.refl
-  comp : ∀ {α₁ α₂ α₃ : W.Algebra ℓX}
-       → (f : W.Hom α₁ α₂) (g : W.Hom α₂ α₃)  → F₁ (g W.∘ f) D.≈ (F₁ g D.∘ F₁ f)
-  comp {α₁} {α₂} {α₃} f g = D.mk≈ (λ _ → ≡.refl) (λ _ _ → ≡.refl)
-  resp : ∀ {α β : W.Algebra ℓX} {f g : W.Hom α β}
+  id : ∀ {A : W.Algebra ℓA} → F₁ (W.id {ℓA} {A}) D.≈ D.id
+  id {A} = D.mk≈ (λ _ → ≡.refl) λ _ _ → ≡.refl
+  comp : ∀ {A₁ A₂ A₃ : W.Algebra ℓA}
+       → (f : W.Hom A₁ A₂) (g : W.Hom A₂ A₃)  → F₁ (g W.∘ f) D.≈ (F₁ g D.∘ F₁ f)
+  comp {A₁} {A₂} {A₃} f g = D.mk≈ (λ _ → ≡.refl) (λ _ _ → ≡.refl)
+  resp : ∀ {A B : W.Algebra ℓA} {f g : W.Hom A B}
        → f W.≈ g → F₁ f D.≈ F₁ g
-  resp {α} {β} {f} {g} p = D.mk≈ q r
+  resp {A} {B} {f} {g} p = D.mk≈ q r
     where
     open ≡.≡-Reasoning
-    module α = W.Algebra α
-    module β = W.Algebra β
+    module A = W.Algebra A
+    module B = W.Algebra B
     module f = W.Hom f
     module g = W.Hom g
     module p = W._≈_ p
-    q : (γ : F₀.Con α) → F₁.conᴿ f γ ≡ F₁.conᴿ g γ
+    q : (γ : F₀.Con A) → F₁.conᴿ f γ ≡ F₁.conᴿ g γ
     q (γ , kγ) = ΣP≡ _ _ (p.θ≡ γ)
-    r : (γ : F₀.Con α) (a : F₀.Ty α γ) →
-         subst (F₀.Ty β) (q γ) (F₁.tyᴿ f γ a) ≡ F₁.tyᴿ g γ a
+    r : (γ : F₀.Con A) (a : F₀.Ty A γ) →
+         subst (F₀.Ty B) (q γ) (F₁.tyᴿ f γ a) ≡ F₁.tyᴿ g γ a
     r (γ , kγ) (a , ka) =
-      ΣP≡ _ _ (≡.trans (F₀.Ty-fst β (q (γ , kγ))) (p.θ≡ a))
+      ΣP≡ _ _ (≡.trans (F₀.Ty-fst B (q (γ , kγ))) (p.θ≡ a))

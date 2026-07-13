@@ -180,5 +180,36 @@ Cat ℓX = record
   ; ∘-resp-≈ = ∘-resp-≈
   }
 
+LiftAlgebra : ∀ {ℓX} ℓY → Algebra ℓX → Algebra (ℓX ⊔ ℓY)
+LiftAlgebra ℓY A = record
+  { CT = Lift ℓY A.CT
+  ; [_] = λ (lift x) → lift (A.[ x ])
+  ; k̂ = lift A.k̂
+  ; kk̂ = ≡.cong lift A.kk̂
+  ; ĉ = lift A.ĉ
+  ; kĉ = ≡.cong lift A.kĉ
+  ; t̂ = λ (lift γ) → lift (A.t̂ γ)
+  ; kt̂ = λ (lift γ) kγ → ≡.cong lift (A.kt̂ γ (≡.cong lower kγ))
+  ; ∙ = lift A.∙
+  ; k∙ = ≡.cong lift A.k∙
+  ; ▷ = λ (lift γ) (lift a) → lift (A.▷ γ a)
+  ; k▷ = λ (lift γ) (lift a) kγ ka → ≡.cong lift (A.k▷ γ a (≡.cong lower kγ) (≡.cong lower ka))
+  ; u = λ (lift γ) → lift (A.u γ)
+  ; ku = λ (lift γ) kγ → ≡.cong lift (A.ku γ (≡.cong lower kγ))
+  ; π = λ (lift γ) (lift a) (lift b) → lift (A.π γ a b)
+  ; kπ = λ (lift γ) (lift a) (lift b) kγ ka kb
+       → ≡.cong lift (A.kπ γ a b (≡.cong lower kγ) (≡.cong lower ka) (≡.cong lower kb))
+  ; σ = λ (lift γ) (lift a) (lift b)
+      → lift (A.σ γ a b)
+  ; kσ = λ (lift γ) (lift a) (lift b) kγ ka kb
+       → ≡.cong lift (A.kσ γ a b (≡.cong lower kγ) (≡.cong lower ka) (≡.cong lower kb))
+  ; σ▷ = λ (lift γ) (lift a) (lift b) kγ ka kb
+       → ≡.cong lift (A.σ▷ γ a b (≡.cong lower kγ) (≡.cong lower ka) (≡.cong lower kb))
+  ; σπ = λ (lift γ) (lift a) (lift b) (lift c) kγ ka kb kc
+       → ≡.cong lift (A.σπ γ a b c (≡.cong lower kγ) (≡.cong lower ka) (≡.cong lower kb) (≡.cong lower kc))
+  }
+  where
+  module A = Algebra A
+
 -- open import QIT.Category.Morphism Cat public
 -- open import QIT.Category.Initial Cat public

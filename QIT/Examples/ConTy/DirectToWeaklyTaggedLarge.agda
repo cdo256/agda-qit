@@ -288,7 +288,7 @@ G₀ {ℓA} da = wa
     module k▷ where
     p : proj₁ (return [_]₀) ∧ᵖ (λ h* → proj₁ (▷ γʰ aʰ)) → ⊤*
     p _ = tt*
-    q : LiftP ℓ0 ⊤ → proj₁ (return [_]₀) ∧ᵖ (λ h* → proj₁ (▷ γʰ aʰ))
+    q : LiftP ℓA ⊤ → proj₁ (return [_]₀) ∧ᵖ (λ h* → proj₁ (▷ γʰ aʰ))
     q _ = ∧i tt* ,
           ∧i conData₁ γʰ kγ ,
           ∧i tyData₁ γʰ aʰ kγ ka ,
