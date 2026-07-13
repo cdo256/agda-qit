@@ -64,7 +64,7 @@ record Algebra ℓX : Set (lsuc ℓX) where
       → π γ a (π (▷ γ a) b c)
       ≡ π γ (σ γ a b) c
 
-record Hom {ℓX} (A B : Algebra ℓX) : Set ℓX where
+record Hom (A : Algebra ℓA) (B : Algebra ℓB) : Set (ℓA ⊔ ℓB) where
   private
     module A = Algebra A
     module B = Algebra B

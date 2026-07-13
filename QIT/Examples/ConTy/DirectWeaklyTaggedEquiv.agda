@@ -239,13 +239,27 @@ isIso-ε' {ℓA} A = record
   rinv : (ε' A D.∘ ε⁻' A) D.≈ D.id
   rinv = D.Lift⇒⇐ (lsuc ℓA) A
 
-module _ {ℓA}
-  (Iᵂ : W.Algebra ℓA)
-  (recᵂ : (Aᵂ : W.Algebra ℓA) → W.Hom Iᵂ Aᵂ)
-  (recUniqueᵂ : {Aᵂ : W.Algebra ℓA} → (f : W.Hom Iᵂ Aᵂ) → f W.≈ recᵂ Aᵂ)
+module _ 
+  (Iᵂ : ∀ {ℓA} → W.Algebra ℓA)
+  (recᵂ : ∀ {ℓA} (Aᵂ : W.Algebra ℓA) → W.Hom Iᵂ Aᵂ)
+  (recUniqueᵂ : ∀ {ℓA} {Aᵂ : W.Algebra ℓA} → (f : W.Hom Iᵂ Aᵂ) → f W.≈ recᵂ Aᵂ)
   where
 
   Iᴰ : D.Algebra ℓA
   Iᴰ = F₀ Iᵂ
+  h : (Aᴰ : D.Algebra ℓA) → W.Hom Iᵂ (G₀ Aᴰ) 
+  h Aᴰ = recᵂ (G₀ Aᴰ)
   recᴰ : (Aᴰ : D.Algebra ℓA) → D.Hom Iᴰ Aᴰ
-  recᴰ Aᴰ = ε Aᴰ D.∘ {!F₁ ?!}
+  recᴰ Aᴰ = ε Aᴰ D.∘ F₁ (h Aᴰ)
+
+  recUniqueᴰ : {Aᴰ : D.Algebra ℓA} → (f : D.Hom Iᴰ Aᴰ) → f D.≈ recᴰ Aᴰ
+  recUniqueᴰ {Aᴰ = Aᴰ} f = D.mk≈ con≡ ty≡
+    where
+    module Iᴰ = D.Algebra Iᴰ
+    module Aᴰ = D.Algebra Aᴰ
+    module f = D.Hom f
+    con≡ : (γ : Iᴰ.Con) → f.conᴿ γ ≡ recᴰ Aᴰ .D.conᴿ γ
+    con≡ γ = {!!}
+    ty≡ : (γ : Iᴰ.Con) (a : Iᴰ.Ty γ)
+        → subst Aᴰ.Ty (con≡ γ) (f.tyᴿ γ a)
+        ≡ recᴰ Aᴰ .D.tyᴿ γ a

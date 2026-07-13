@@ -75,7 +75,7 @@ F₀ {ℓA} wa = da
 
 F₁ : ∀ {A : W.Algebra ℓA} {B : W.Algebra ℓB}
    → W.Hom A B → D.Hom (F₀ A) (F₀ B)
-F₁ {ℓA} {A} {B} f = record
+F₁ {A = A} {B} f = record
   { conᴿ = conᴿ
   ; tyᴿ = tyᴿ
   ; ∙ᴿ = ∙ᴿ
