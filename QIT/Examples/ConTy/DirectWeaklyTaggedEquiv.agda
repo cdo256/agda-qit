@@ -239,27 +239,191 @@ isIso-ε' {ℓA} A = record
   rinv : (ε' A D.∘ ε⁻' A) D.≈ D.id
   rinv = D.Lift⇒⇐ (lsuc ℓA) A
 
-module _ 
-  (Iᵂ : ∀ {ℓA} → W.Algebra ℓA)
-  (recᵂ : ∀ {ℓA} (Aᵂ : W.Algebra ℓA) → W.Hom Iᵂ Aᵂ)
-  (recUniqueᵂ : ∀ {ℓA} {Aᵂ : W.Algebra ℓA} → (f : W.Hom Iᵂ Aᵂ) → f W.≈ recᵂ Aᵂ)
+module _ {ℓA}
+  (Iᵂ : W.Algebra (lsuc ℓA))
+  (recᵂ : (Aᵂ : W.Algebra (lsuc ℓA)) → W.Hom Iᵂ Aᵂ)
+  (recUniqueᵂ : {Aᵂ : W.Algebra (lsuc ℓA)} → (f : W.Hom Iᵂ Aᵂ) → f W.≈ recᵂ Aᵂ)
   where
 
-  Iᴰ : D.Algebra ℓA
+  Iᴰ : D.Algebra (lsuc ℓA)
   Iᴰ = F₀ Iᵂ
+  module Iᵂ = W.Algebra Iᵂ
+  module Iᴰ = D.Algebra Iᴰ
+
   h : (Aᴰ : D.Algebra ℓA) → W.Hom Iᵂ (G₀ Aᴰ) 
   h Aᴰ = recᵂ (G₀ Aᴰ)
+
   recᴰ : (Aᴰ : D.Algebra ℓA) → D.Hom Iᴰ Aᴰ
   recᴰ Aᴰ = ε Aᴰ D.∘ F₁ (h Aᴰ)
 
-  recUniqueᴰ : {Aᴰ : D.Algebra ℓA} → (f : D.Hom Iᴰ Aᴰ) → f D.≈ recᴰ Aᴰ
-  recUniqueᴰ {Aᴰ = Aᴰ} f = D.mk≈ con≡ ty≡
+  invFG : {Aᴰ : D.Algebra ℓA} → D.Hom {ℓA = lsuc ℓA} (F₀ Iᵂ) (F₀ (G₀ Aᴰ))
+         → W.Hom {ℓA = lsuc ℓA} Iᵂ (G₀ Aᴰ)
+  invFG {Aᴰ = Aᴰ} fᴰ = recᵂ (G₀ Aᴰ)
+      
+  invFG-beta : {Aᴰ : D.Algebra ℓA}
+          → (fᴰ : D.Hom (F₀ Iᵂ) (F₀ (G₀ Aᴰ)))
+          → F₁ (invFG fᴰ) D.≈ fᴰ
+  invFG-beta {Aᴰ = Aᴰ} fᴰ =
+    D.mk≈ con≡ ty≡
     where
-    module Iᴰ = D.Algebra Iᴰ
+    module fᴰ = D.Hom fᴰ
     module Aᴰ = D.Algebra Aᴰ
-    module f = D.Hom f
-    con≡ : (γ : Iᴰ.Con) → f.conᴿ γ ≡ recᴰ Aᴰ .D.conᴿ γ
-    con≡ γ = {!!}
-    ty≡ : (γ : Iᴰ.Con) (a : Iᴰ.Ty γ)
-        → subst Aᴰ.Ty (con≡ γ) (f.tyᴿ γ a)
-        ≡ recᴰ Aᴰ .D.tyᴿ γ a
+    r : W.Hom Iᵂ (G₀ Aᴰ)
+    r = invFG fᴰ
+
+    module G₀Aᴰ = G₀ Aᴰ
+    module GAᴰ = W.Algebra (G₀ Aᴰ)
+    module r = W.Hom r
+    module Fr = F₁ r
+
+    Conβ : Iᵂ.CT → Prop _
+    Conβ x =
+      (kx : Iᵂ.[ x ] ≡ Iᵂ.ĉ)
+      → r.θ x ≡ fᴰ.conᴿ (x , kx) .fst
+
+    Tyβ : Iᵂ.CT → Prop _
+    Tyβ a =
+      (γ : Iᵂ.CT)
+      → (kγ : Iᵂ.[ γ ] ≡ Iᵂ.ĉ)
+      → (ka : Iᵂ.[ a ] ≡ Iᵂ.t̂ γ)
+      → r.θ a ≡ fᴰ.tyᴿ (γ , kγ) (a , ka) .fst
+
+    P : Iᵂ.CT → Prop _
+    P x = Conβ x ∧ᵖ λ _ → Tyβ x
+
+    Pᵂ : W.Algebra (lsuc ℓA)
+    Pᵂ = record
+      { CT = CT
+      ; [_] = [_]
+      ; k̂ = k̂
+      ; kk̂ = kk̂
+      ; ĉ = ĉ
+      ; kĉ = kĉ
+      ; t̂ = t̂
+      ; kt̂ = kt̂
+      ; ∙ = ∙
+      ; k∙ = k∙
+      ; ▷ = ▷
+      ; k▷ = k▷
+      ; u = u
+      ; ku = ku
+      ; π = π
+      ; kπ = kπ
+      ; σ = σ
+      ; kσ = kσ
+      ; σ▷ = σ▷
+      ; σπ = σπ
+      }
+      where
+      CT : Set (lsuc ℓA)
+      CT = ΣP Iᵂ.CT P
+
+      [_] : CT → CT
+      [ x , ∧i cx , cy ] = Iᵂ.[ x ] , ∧i c[x] , t[x]
+        where
+        open ≡.≡-Reasoning
+        c[x] : Conβ Iᵂ.[ x ]
+        c[x] kx =
+          r.θ Iᵂ.[ x ]
+            ≡⟨ r.[ x ] ⟩
+          GAᴰ.[ r.θ x ]
+            ≡⟨ {!!} ⟩
+          fᴰ.conᴿ (Iᵂ.[ x ] , kx) .fst ∎
+        t[x] : Tyβ Iᵂ.[ x ]
+
+      k̂ : CT
+      k̂ = Iᵂ.k̂ , ∧i ck̂ , tk̂
+        where
+        ck̂ : Conβ Fr.A.k̂
+        ck̂ kk̂ = ≡.trans r.k̂ {!≡.cong fst!}
+        tk̂ : Tyβ Fr.A.k̂
+
+      kk̂ : [ k̂ ] ≡ k̂
+      kk̂ = {!!}
+
+      ĉ : CT
+      ĉ = {!!}
+
+      kĉ : [ ĉ ] ≡ k̂
+      kĉ = {!!}
+
+      t̂ : CT → CT
+      t̂ = {!!}
+
+      kt̂ : (γ : CT) → [ γ ] ≡ ĉ → [ t̂ γ ] ≡ k̂
+      kt̂ = {!!}
+
+      ∙ : CT
+      ∙ = {!!}
+
+      k∙ : [ ∙ ] ≡ ĉ
+      k∙ = {!!}
+
+      ▷ : CT → CT → CT
+      ▷ = {!!}
+
+      k▷ : (γ a : CT) → [ γ ] ≡ ĉ → [ a ] ≡ t̂ γ → [ ▷ γ a ] ≡ ĉ
+      k▷ = {!!}
+
+      u : CT → CT
+      u = {!!}
+
+      ku : (γ : CT) → [ γ ] ≡ ĉ → [ u γ ] ≡ t̂ γ
+      ku = {!!}
+
+      π : CT → CT → CT → CT
+      π = {!!}
+
+      kπ : (γ a b : CT)
+        → [ γ ] ≡ ĉ
+        → [ a ] ≡ t̂ γ
+        → [ b ] ≡ t̂ (▷ γ a)
+        → [ π γ a b ] ≡ t̂ γ
+      kπ = {!!}
+
+      σ : CT → CT → CT → CT
+      σ = {!!}
+
+      kσ : (γ a b : CT)
+        → [ γ ] ≡ ĉ
+        → [ a ] ≡ t̂ γ
+        → [ b ] ≡ t̂ (▷ γ a)
+        → [ σ γ a b ] ≡ t̂ γ
+      kσ = {!!}
+
+      σ▷ : (γ a b : CT)
+        → [ γ ] ≡ ĉ
+        → [ a ] ≡ t̂ γ
+        → [ b ] ≡ t̂ (▷ γ a)
+        → ▷ (▷ γ a) b ≡ ▷ γ (σ γ a b)
+      σ▷ = {!!}
+
+      σπ : (γ a b d : CT)
+        → [ γ ] ≡ ĉ
+        → [ a ] ≡ t̂ γ
+        → [ b ] ≡ t̂ (▷ γ a)
+        → [ d ] ≡ t̂ (▷ (▷ γ a) b)
+        → π γ a (π (▷ γ a) b d) ≡ π γ (σ γ a b) d
+      σπ = {!!}
+
+    allP : (x : Iᵂ.CT) → P x
+    allP x = {!!}
+
+    con≡ : (γ : D.Con (F₀ Iᵂ)) → F₁.conᴿ (invFG fᴰ) γ ≡ fᴰ.conᴿ γ
+    con≡ (γ , kγ) =
+      ΣP≡ _ _ (allP γ .∧e₁ kγ)
+
+    ty≡ : (γ : D.Con (F₀ Iᵂ)) (a : F₀ Iᵂ .D.Ty γ) →
+           subst (D.Ty (F₀ (G₀ Aᴰ))) (con≡ γ) (D.tyᴿ (F₁ (invFG fᴰ)) γ a) ≡
+           fᴰ.tyᴿ γ a
+    ty≡ (γ , kγ) (a , ka) = {!!}
+
+  recUniqueᴰ : {Aᴰ : D.Algebra ℓA} → (f : D.Hom Iᴰ Aᴰ) → f D.≈ recᴰ Aᴰ
+  recUniqueᴰ {Aᴰ = Aᴰ} f = {!!}
+    where
+    q : D.Hom Iᴰ (F₀ (G₀ Aᴰ))
+    q = ε⁻ Aᴰ D.∘ f
+    β : (ε Aᴰ D.∘ F₁ (invFG q)) D.≈ f
+    β = {!!}
+    η : (ε Aᴰ D.∘ F₁ (invFG q)) D.≈ recᴰ Aᴰ
+    η = {!!}
