@@ -54,14 +54,26 @@ trans refl refl = refl
 transport : ∀ {ℓA} {A A' : Set ℓA} → A ≡ A' → A → A'
 transport = J (λ X _ → X)
 
+transport⁻ : ∀ {ℓA} {A A' : Set ℓA} → A ≡ A' → A' → A
+transport⁻ p = transport (sym p)
+
 subst : {A : Set ℓA} (B : A → Set ℓB) {a1 a2 : A} (p : a1 ≡ a2) → B a1 → B a2
 subst B = J (λ v _ → B v)
+
+subst⁻ : {A : Set ℓA} (B : A → Set ℓB) {a1 a2 : A} (p : a1 ≡ a2) → B a2 → B a1
+subst⁻ B p = subst B (sym p)
 
 substp : {A : Set ℓA} (B : A → Prop ℓB) {a1 a2 : A} (p : a1 ≡ a2) → B a1 → B a2
 substp B = Jp (λ v _ → B v)
 
+substp⁻ : {A : Set ℓA} (B : A → Prop ℓB) {a1 a2 : A} (p : a1 ≡ a2) → B a2 → B a1
+substp⁻ B p = substp B (sym p)
+
 transportp : {A A' : Prop ℓA} (p : A ≡ A') → A → A'
 transportp = Jp (λ v _ → v)
+
+transportp⁻ : {A A' : Prop ℓA} (p : A ≡ A') → A' → A
+transportp⁻ p = transportp (sym p)
 
 substp' : {A : Prop ℓA} (B : A → Prop ℓB) {a1 a2 : A} → B a1 → B a2
 substp' B x = x
@@ -168,6 +180,16 @@ subst-inv P refl {u} =
 dcong : {A : Set ℓA} {B : A → Set ℓB} (f : (x : A) → B x)
       → ∀ {x y} → (p : x ≡ y) → subst B p (f x) ≡ f y
 dcong f {x = x} refl = refl
+
+dcongp : {A : Set ℓA} {B : A → Set ℓB} (f : (x : A) → B x)
+      → ∀ {x y} → (p : x ≡ y) → subst B p (f x) ≡ f y
+dcongp f {x = x} refl = refl
+
+dcong-∘ : {A : Set ℓX} (B : A → Set ℓB) (C : Set ℓC)
+  → (f : C → A) (g : (c : C) → B (f c))
+  → {x y : C} (p : x ≡ y)
+  → subst B (cong f p) (g x) ≡ g y
+dcong-∘ B C f g refl = refl
 
 dcong₂ : {A : Set ℓA} {B : A → Set ℓB} {C : Set ℓC}
          (f : (x : A) → B x → C) → ∀ {x₁ x₂ y₁ y₂}
