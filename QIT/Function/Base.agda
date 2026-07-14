@@ -66,3 +66,10 @@ const a _ = a
 
 Π : (A : Set ℓA) (B : A → Set ℓB) → Set (ℓA ⊔ ℓB)
 Π A B = (a : A) → B a
+
+-- Distinct from _→_ but has the same function
+_⟶_ : (A : Set ℓA) (B : Set ℓB) → Set (ℓA ⊔ ℓB)
+A ⟶ B = A → B
+
+_↝_ : (A : Prop ℓA) (B : Set ℓB) → Set (ℓA ⊔ ℓB)
+A ↝ B = A → B

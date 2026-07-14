@@ -1,6 +1,7 @@
 open import QIT.Prelude.Universe
 open import QIT.Prelude.Types
 open import QIT.Prelude.Truncation
+open import QIT.Prelude.Identity
 
 module QIT.Prelude.Logic where
 

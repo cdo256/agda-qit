@@ -334,8 +334,25 @@ module _ {ℓA}
       k̂ : CT
       k̂ = Iᵂ.k̂ , ∧i ck̂ , tk̂
         where
+        open ≡.≡-Reasoning
         ck̂ : Conβ Fr.A.k̂
-        ck̂ kk̂ = ≡.trans r.k̂ {!≡.cong fst!}
+        ck̂ kk̂ = ⊥e (k̂≢ĉ k̂≡ĉ)
+          where
+          k̂≢ĉ : GAᴰ.k̂ ≢ GAᴰ.ĉ
+          k̂≢ĉ p = {!!}
+          k̂≡ĉ : GAᴰ.k̂ ≡ GAᴰ.ĉ
+          k̂≡ĉ =
+            GAᴰ.k̂
+              ≡⟨ ≡.sym GAᴰ.kk̂ ⟩
+            GAᴰ.[ GAᴰ.k̂ ]
+              ≡⟨ ≡.cong GAᴰ.[_] (≡.sym r.k̂) ⟩
+            GAᴰ.[ r.θ Iᵂ.k̂ ]
+              ≡⟨ ≡.sym (r.[ Iᵂ.k̂ ]) ⟩
+            r.θ Iᵂ.[ Iᵂ.k̂ ]
+              ≡⟨ ≡.cong r.θ kk̂ ⟩
+            r.θ Iᵂ.ĉ
+              ≡⟨ r.ĉ ⟩
+            GAᴰ.ĉ ∎
         tk̂ : Tyβ Fr.A.k̂
 
       kk̂ : [ k̂ ] ≡ k̂
