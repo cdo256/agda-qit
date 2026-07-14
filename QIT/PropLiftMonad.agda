@@ -55,6 +55,11 @@ module _ {ℓP} where
     r : (pq : P ≡ Q) → ≡.subst (λ ○ → ○ → X) pq f ≡ g
     r ≡.refl = funExtp λ p → f≡g p p
 
+  mk≡↓ : ∀ {ℓA} {X : Set ℓA} → {x* y* : PropLift ℓP X}
+       → (x↓ : x* ↓) → (y↓ : y* ↓) → x* .val x↓ ≡ y* .val y↓
+       → x* ≡ y*
+  mk≡↓ x↓ y↓ p = ≈→≡ (∧i (∧i (λ _ → y↓) , (λ _ → x↓)) , λ _ _ → p)
+
   ≈refl : ∀ {ℓA} {X : Set ℓA} → (x* : PropLift ℓP X) → x* ≈ x*
   ≈refl (P ⊢ f) = ∧i ∧i (λ z → z) , (λ z → z) , λ _ _ → ≡.refl
 
