@@ -1,4 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
 open import QIT.Prelude
 
 module QIT.Examples.ConTy.Direct
@@ -61,6 +60,7 @@ id = record
   ; σᴿ   = λ _ _ _ → ≡.refl
   }
 
+infixr 9 _∘_
 _∘_ : ∀ {A : Algebra ℓA} {B : Algebra ℓB} {C : Algebra ℓC}
     → Hom B C → Hom A B → Hom A C
 _∘_ {A = A} {B} {C} g f = record
@@ -151,7 +151,15 @@ isEquiv≈ {A = A} {B} = record
           (λ γ a → ≡.dtrans (Ty B) (cp γ) (cq γ) (tp γ a) (tq γ a))
   }
 
-∘-resp-≈ : ∀ {A B C : Algebra ℓA} {f h : Hom B C} {g i : Hom A B}
+open import QIT.Setoid
+
+HomSetoid : ∀ {ℓA ℓB} → (A : Algebra ℓA) (B : Algebra ℓB) → Setoid (lsuc ℓA ⊔ lsuc ℓB) (ℓA ⊔ ℓB)
+HomSetoid A B = record
+  { Carrier = Hom A B
+  ; _≈_ = _≈_
+  ; isEquivalence = isEquiv≈ }
+
+∘-resp-≈ : ∀ {A : Algebra ℓA} {B : Algebra ℓB} {C : Algebra ℓC} {f h : Hom B C} {g i : Hom A B}
           → f ≈ h → g ≈ i → (f ∘ g) ≈ (h ∘ i)
 ∘-resp-≈ {C = C} {f = f} {h} {g} {i} (mk≈ cp tp) (mk≈ cq tq) = mk≈
   (λ γ   → ≡.trans (≡.cong (f .conᴿ) (cq γ)) (cp (i .conᴿ γ)))
@@ -227,6 +235,16 @@ Lift⇒ ℓB A = record
   ; σᴿ = λ _ _ _ → ≡.refl
   }
 
+liftTy-subst : ∀ {ℓA} ℓB {A : Algebra ℓA}
+  → {γ δ : Con A} (p : γ ≡ δ) (a : Ty A γ)
+  → subst (Ty (LiftAlgebra ℓB A)) (≡.cong lift p) (lift a)
+  ≡ lift (subst (Ty A) p a)
+liftTy-subst ℓB ≡.refl a = ≡.refl
+
+Lift≡ : ∀ {ℓA ℓB} {A : Set ℓA} {x y : Lift ℓB A}
+      → lower x ≡ lower y → x ≡ y
+Lift≡ {x = lift _} {y = lift _} p = ≡.cong lift p
+
 Lift⇐ : ∀ {ℓA} ℓB (A : Algebra ℓA) → Hom (LiftAlgebra ℓB A) A
 Lift⇐ ℓB A = record
   { conᴿ = λ (lift γ) → γ
@@ -238,8 +256,49 @@ Lift⇐ ℓB A = record
   ; σᴿ = λ (lift γ) (lift a) (lift b) → ≡.refl
   }
 
+LiftHom : ∀ {ℓA ℓB} ℓC {A : Algebra ℓA} {B : Algebra ℓB}
+        → Hom A B
+        → Hom (LiftAlgebra (ℓA ⊔ ℓB ⊔ ℓC) A) (LiftAlgebra (ℓA ⊔ ℓB ⊔ ℓC) B)
+LiftHom {ℓA} {ℓB} ℓC {A} {B} f =
+  Lift⇒ (ℓA ⊔ ℓB ⊔ ℓC) B ∘ f ∘ Lift⇐ (ℓA ⊔ ℓB ⊔ ℓC) A
+
+LowerHom : ∀ {ℓA} ℓC (A : Algebra ℓA) (B : Algebra ℓB)
+         → Hom (LiftAlgebra ℓC A) (LiftAlgebra ℓC B)
+         → Hom A B
+LowerHom ℓC A B f = Lift⇐ ℓC B ∘ f ∘ Lift⇒ ℓC A
+
 Lift⇒⇐ : ∀ {ℓA} ℓB (A : Algebra ℓA) → (Lift⇒ ℓB A ∘ Lift⇐ ℓB A) ≈ id
 Lift⇒⇐ ℓB A = mk≈ (λ (lift γ) → ≡.refl) (λ (lift γ) (lift a) → ≡.refl)
 
 Lift⇐⇒ : ∀ {ℓA} ℓB (A : Algebra ℓA) → (Lift⇐ ℓB A ∘ Lift⇒ ℓB A) ≈ id
 Lift⇐⇒ ℓB A = mk≈ (λ γ → ≡.refl) (λ γ a → ≡.refl)
+
+open import QIT.Functor.Base
+
+LiftFunctor : ∀ ℓA ℓB → Functor (Cat ℓA) (Cat (ℓA ⊔ ℓB))
+LiftFunctor ℓA ℓB = record
+  { ob = LiftAlgebra (ℓA ⊔ ℓB)
+  ; hom = LiftHom (ℓA ⊔ ℓB)
+  ; id = mk≈ (λ _ → ≡.refl) (λ _ _ → ≡.refl)
+  ; comp = λ f g → mk≈ (λ _ → ≡.refl) (λ _ _ → ≡.refl)
+  ; resp = resp }
+  where
+  resp : {A B : Algebra ℓA} {f g : Hom A B}
+       → f ≈ g → LiftHom (ℓA ⊔ ℓB) f ≈ LiftHom (ℓA ⊔ ℓB) g
+  resp {A} {B} {f} {g} p = mk≈ con≡' ty≡'
+    where
+    module p = _≈_ p
+    con≡' : ∀ (γ : Con (LiftAlgebra (ℓA ⊔ ℓB) A)) → LiftHom (ℓA ⊔ ℓB) f .conᴿ γ ≡ LiftHom (ℓA ⊔ ℓB) g .conᴿ γ
+    con≡' (lift γ) = ≡.cong lift (p.con≡ γ)
+
+    ty≡' : ∀ (γ : Con (LiftAlgebra (ℓA ⊔ ℓB) A)) (a : Ty (LiftAlgebra (ℓA ⊔ ℓB) A) γ)
+       → subst (Ty (LiftAlgebra (ℓA ⊔ ℓB) B)) (con≡' γ) (LiftHom (ℓA ⊔ ℓB) f .tyᴿ γ a)
+       ≡ LiftHom (ℓA ⊔ ℓB) g .tyᴿ γ a
+    ty≡' (lift γ) (lift a) = Lift≡ r
+      where
+      q : lower (subst (Ty (LiftAlgebra (ℓA ⊔ ℓB) B)) (≡.cong lift (p.con≡ γ)) (lift (f .tyᴿ γ a)))
+        ≡ subst (Ty B) (p.con≡ γ) (f .tyᴿ γ a)
+      q = ≡.cong lower (liftTy-subst (ℓA ⊔ ℓB) {A = B} (p.con≡ γ) (f .tyᴿ γ a))
+      r : lower (subst (Ty (LiftAlgebra (ℓA ⊔ ℓB) B)) (con≡' (lift γ)) (LiftHom (ℓA ⊔ ℓB) f .tyᴿ (lift γ) (lift a)))
+        ≡ lower (LiftHom (ℓA ⊔ ℓB) g .tyᴿ (lift γ) (lift a))
+      r = ≡.trans q (p.ty≡ γ a)

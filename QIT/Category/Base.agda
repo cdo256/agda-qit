@@ -52,6 +52,8 @@ record Category (o ℓ e : Level) : Set (lsuc (o ⊔ ℓ ⊔ e)) where
     ; isEquivalence = equiv
     }
 
+  module HomReasoning A B = ≈syntax {S = hom-setoid {A} {B}}
+
   ∃!hom : ∀ {ℓP A B} → (P : A ⇒ B → Prop ℓP) → Set (ℓ ⊔ e ⊔ ℓP)
   ∃!hom = ∃! hom-setoid
 

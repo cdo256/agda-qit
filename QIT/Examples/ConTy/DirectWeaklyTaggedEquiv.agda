@@ -16,6 +16,7 @@ open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Types
 open import QIT.Maybe
+open import QIT.Setoid hiding (≡→≈)
 open import QIT.Category.Morphism
 open import QIT.Category.Initial
 open import QIT.Relation.Subset
@@ -324,23 +325,70 @@ module _ {ℓA}
         where
         open ≡.≡-Reasoning
         c[x] : Conβ Iᵂ.[ x ]
-        c[x] kx =
-          r.θ Iᵂ.[ x ]
-            ≡⟨ r.[ x ] ⟩
-          GAᴰ.[ r.θ x ]
-            ≡⟨ {!!} ⟩
-          fᴰ.conᴿ (Iᵂ.[ x ] , kx) .fst ∎
+        c[x] kx = ⊥e (G₀Aᴰ.[[x]]≢cʰ {x* = r.θ x} p)
+          where
+          p : G₀Aᴰ.[ G₀Aᴰ.[ r.θ x ] ] ≡ G₀Aᴰ.cʰ
+          p =
+            G₀Aᴰ.[ G₀Aᴰ.[ r.θ x ] ]
+              ≡⟨ ≡.cong G₀Aᴰ.[_] (≡.sym r.[ x ]) ⟩
+            G₀Aᴰ.[ r.θ Iᵂ.[ x ] ]
+              ≡⟨ ≡.sym r.[ Fr.A.[ x ] ] ⟩
+            r.θ Iᵂ.[ Iᵂ.[ x ] ]
+              ≡⟨ ≡.cong r.θ kx ⟩
+            r.θ Iᵂ.ĉ
+              ≡⟨ r.ĉ ⟩
+            G₀Aᴰ.cʰ ∎
         t[x] : Tyβ Iᵂ.[ x ]
+        t[x] γ kγ ka =
+          ⊥e (G₀Aᴰ.[[x]]≢tʰ
+            {x* = r.θ x}
+            {y* = r.θ γ}
+            x↓
+            p)
+          where
+          γ-eq : G₀Aᴰ.[ r.θ γ ] ≡ G₀Aᴰ.cʰ
+          γ-eq =
+            G₀Aᴰ.[ r.θ γ ]
+              ≡⟨ ≡.sym r.[ γ ] ⟩
+            r.θ Iᵂ.[ γ ]
+              ≡⟨ ≡.cong r.θ kγ ⟩
+            r.θ Iᵂ.ĉ
+              ≡⟨ r.ĉ ⟩
+            G₀Aᴰ.cʰ ∎
+
+          γ-eq≈ : G₀Aᴰ.[ r.θ γ ] ≈ G₀Aᴰ.cʰ
+          γ-eq≈ = ≡→≈ γ-eq
+
+          γ↓ : r.θ γ ↓
+          γ↓ =
+            γ-eq≈ .∧e₁ .∧e₂ tt* .∧e₂
+
+          p : G₀Aᴰ.[ G₀Aᴰ.[ r.θ x ] ] ≡ G₀Aᴰ.tʰ (r.θ γ)
+          p =
+            G₀Aᴰ.[ G₀Aᴰ.[ r.θ x ] ]
+              ≡⟨ ≡.cong G₀Aᴰ.[_] (≡.sym r.[ x ]) ⟩
+            G₀Aᴰ.[ r.θ Iᵂ.[ x ] ]
+              ≡⟨ ≡.sym r.[ Fr.A.[ x ] ] ⟩
+            r.θ Iᵂ.[ Iᵂ.[ x ] ]
+              ≡⟨ ≡.cong r.θ ka ⟩
+            r.θ (Iᵂ.t̂ γ)
+              ≡⟨ r.t̂ γ ⟩
+            G₀Aᴰ.tʰ (r.θ γ) ∎
+
+          p≈ : G₀Aᴰ.[ G₀Aᴰ.[ r.θ x ] ]
+              ≈ G₀Aᴰ.tʰ (r.θ γ)
+          p≈ = ≡→≈ p
+
+          x↓ : r.θ x ↓
+          x↓ = (p≈ .∧e₁ .∧e₂ (∧i tt* , γ↓)) .∧e₂ .∧e₂
 
       k̂ : CT
       k̂ = Iᵂ.k̂ , ∧i ck̂ , tk̂
         where
         open ≡.≡-Reasoning
         ck̂ : Conβ Fr.A.k̂
-        ck̂ kk̂ = ⊥e (k̂≢ĉ k̂≡ĉ)
+        ck̂ kk̂ = ⊥e (G₀Aᴰ.kʰ≢cʰ k̂≡ĉ)
           where
-          k̂≢ĉ : GAᴰ.k̂ ≢ GAᴰ.ĉ
-          k̂≢ĉ p = {!!}
           k̂≡ĉ : GAᴰ.k̂ ≡ GAᴰ.ĉ
           k̂≡ĉ =
             GAᴰ.k̂
@@ -355,6 +403,7 @@ module _ {ℓA}
               ≡⟨ r.ĉ ⟩
             GAᴰ.ĉ ∎
         tk̂ : Tyβ Fr.A.k̂
+        tk̂ = ?
 
       kk̂ : [ k̂ ] ≡ k̂
       kk̂ = {!!}
@@ -436,12 +485,28 @@ module _ {ℓA}
            fᴰ.tyᴿ γ a
     ty≡ (γ , kγ) (a , ka) = {!!}
 
-  recUniqueᴰ : {Aᴰ : D.Algebra ℓA} → (f : D.Hom Iᴰ Aᴰ) → f D.≈ recᴰ Aᴰ
-  recUniqueᴰ {Aᴰ = Aᴰ} f = {!!}
+  recUniqueᴰ : {Aᴰ : D.Algebra ℓA} → (fᴰ : D.Hom Iᴰ Aᴰ) → fᴰ D.≈ recᴰ Aᴰ
+  recUniqueᴰ {Aᴰ = Aᴰ} fᴰ = D≈.trans Iᴰ Aᴰ (D≈.sym (F₀ Iᵂ) Aᴰ β) η
     where
+    module D≈ {ℓA} {ℓB} A B = ≈.Setoid (D.HomSetoid {ℓA} {ℓB} A B)
+    module Dᶜ ℓA = Category (D.Cat ℓA)
+    module F ℓA = Functor (F ℓA)
     q : D.Hom Iᴰ (F₀ (G₀ Aᴰ))
-    q = ε⁻ Aᴰ D.∘ f
-    β : (ε Aᴰ D.∘ F₁ (invFG q)) D.≈ f
-    β = {!!}
+    q = ε⁻ Aᴰ D.∘ fᴰ
+    β : (ε Aᴰ D.∘ F₁ (invFG q)) D.≈ fᴰ
+    β =
+      ε Aᴰ D.∘ F₁ (invFG q)
+        ≈⟨ D.∘-resp-≈ (D≈.refl (F₀ (G₀ Aᴰ)) Aᴰ {ε Aᴰ}) (invFG-beta q) ⟩
+      ε Aᴰ D.∘ (ε⁻ Aᴰ D.∘ fᴰ)
+        ≈⟨ D≈.refl Iᴰ Aᴰ ⟩
+      fᴰ ∎
+      where
+      open ≈.≈syntax {S = D.HomSetoid Iᴰ Aᴰ}
     η : (ε Aᴰ D.∘ F₁ (invFG q)) D.≈ recᴰ Aᴰ
-    η = {!!}
+    η =
+      ε Aᴰ D.∘ F₁ (invFG q)
+        ≈⟨ D.∘-resp-≈ (D≈.refl (F₀ (G₀ Aᴰ)) Aᴰ {ε Aᴰ})
+                      (F.resp (lsuc ℓA) (recUniqueᵂ (invFG q))) ⟩
+      ε Aᴰ D.∘ F₁ (recᵂ (G₀ Aᴰ)) ∎
+      where
+      open ≈.≈syntax {S = D.HomSetoid Iᴰ Aᴰ}
