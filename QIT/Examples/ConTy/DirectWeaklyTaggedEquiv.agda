@@ -24,6 +24,7 @@ open import QIT.Functor.Base
 open import QIT.Category.Base
 open import QIT.Functor.NatTrans 
 open import QIT.Functor.Properties
+open import QIT.PropLiftMonad
 
 ε : ∀ {ℓA} (A : D.Algebra ℓA) → D.Hom (F₀ (G₀ A)) A
 ε {ℓA} A = record
@@ -42,7 +43,7 @@ open import QIT.Functor.Properties
   module DFA = D.Algebra (F₀ (G₀ A))
 
   conAtom : DFA.Con → G.Atom
-  conAtom (γ , kγ) = γ .proj₂ (G.conData₁ γ kγ)
+  conAtom (γ , kγ) = γ .val (G.conData₁ γ kγ)
 
   conAtom-isCon : (γ : DFA.Con) → G.[ conAtom γ ]₀ ≡ G.ĉ
   conAtom-isCon (γ , kγ) = G.conData₂ γ kγ
@@ -51,7 +52,7 @@ open import QIT.Functor.Properties
   conᴿ γ = G.Con₀ (conAtom γ) (conAtom-isCon γ)
 
   tyAtom : (γ : DFA.Con) → DFA.Ty γ → G.Atom
-  tyAtom (γ , kγ) (a , ka) = a .proj₂ (G.tyData₁ γ a kγ ka)
+  tyAtom (γ , kγ) (a , ka) = a .val (G.tyData₁ γ a kγ ka)
 
   tyAtom-isTy : (γ : DFA.Con) (a : DFA.Ty γ)
     → G.[ tyAtom γ a ]₀ ≡ G.t̂ (conAtom γ)
@@ -95,7 +96,7 @@ open import QIT.Functor.Properties
   module FGA = F₀ (G₀ A)
 
   ι : G.Atom → G.CT
-  ι x = ⊤* , λ _ → x
+  ι x = ⊤* ⊢ λ _ → x
 
   kcon : (γ : DA.Con) → G.[ ι (G.con γ) ] ≡ G.cʰ
   kcon γ = G.mkCT≡ (λ _ → tt*) (λ _ → ∧i tt* , tt*) λ _ _ → ≡.refl
@@ -106,27 +107,27 @@ open import QIT.Functor.Properties
   ▷ι : (γ : DA.Con) (a : DA.Ty γ) → G.▷ (ι (G.con γ)) (ι (G.ty γ a)) ≡ ι (G.con (γ DA.▷ a))
   ▷ι γ a = G.mkCT≡ (λ _ → tt*) q λ _ _ → ≡.refl
     where
-    q : LiftP ℓA ⊤ → proj₁ (G.▷ (ι (G.con γ)) (ι (G.ty γ a)))
+    q : LiftP ℓA ⊤ → G.▷ (ι (G.con γ)) (ι (G.ty γ a)) .Cond
     q _ = ∧i tt* , ∧i tt* , ∧i ≡.refl , ∧i ≡.refl , tt*
 
   uι : (γ : DA.Con) → G.u (ι (G.con γ)) ≡ ι (G.ty γ (DA.u γ))
   uι γ = G.mkCT≡ (λ _ → tt*) q λ _ _ → ≡.refl
     where
-    q : LiftP ℓA ⊤ → proj₁ (G.u (ι (G.con γ)))
+    q : LiftP ℓA ⊤ → G.u (ι (G.con γ)) .Cond
     q _ = ∧i tt* , ∧i ≡.refl , tt*
 
   πι : (γ : DA.Con) (a : DA.Ty γ) (b : DA.Ty (γ DA.▷ a))
     → G.π (ι (G.con γ)) (ι (G.ty γ a)) (ι (G.ty (γ DA.▷ a) b)) ≡ ι (G.ty γ (DA.π γ a b))
   πι γ a b = G.mkCT≡ (λ _ → tt*) q λ _ _ → ≡.refl
     where
-    q : LiftP ℓA ⊤ → proj₁ (G.π (ι (G.con γ)) (ι (G.ty γ a)) (ι (G.ty (γ DA.▷ a) b)))
+    q : LiftP ℓA ⊤ → G.π (ι (G.con γ)) (ι (G.ty γ a)) (ι (G.ty (γ DA.▷ a) b)) .Cond
     q _ = ∧i tt* , ∧i tt* , ∧i tt* , ∧i ≡.refl , ∧i ≡.refl , ∧i ≡.refl , tt*
 
   σι : (γ : DA.Con) (a : DA.Ty γ) (b : DA.Ty (γ DA.▷ a))
     → G.σ (ι (G.con γ)) (ι (G.ty γ a)) (ι (G.ty (γ DA.▷ a) b)) ≡ ι (G.ty γ (DA.σ γ a b))
   σι γ a b = G.mkCT≡ (λ _ → tt*) q λ _ _ → ≡.refl
     where
-    q : LiftP ℓA ⊤ → proj₁ (G.σ (ι (G.con γ)) (ι (G.ty γ a)) (ι (G.ty (γ DA.▷ a) b)))
+    q : LiftP ℓA ⊤ → G.σ (ι (G.con γ)) (ι (G.ty γ a)) (ι (G.ty (γ DA.▷ a) b)) .Cond
     q _ = ∧i tt* , ∧i tt* , ∧i tt* , ∧i ≡.refl , ∧i ≡.refl , ∧i ≡.refl , tt*
 
   conᴿ : DA.Con → DFA.Con
@@ -183,8 +184,8 @@ open import QIT.Functor.Properties
   ι : G.Atom → G.CT
   ι = ε⁻.ι A
 
-  inhabited→ι : (x : G.CT) → (p : x .proj₁) → x ≡ ι (x .proj₂ p)
-  inhabited→ι (P , f) p = G.mkCT≡ (λ _ → tt*) (λ _ → p) (λ q _ → ≡.congp f)
+  inhabited→ι : (x : G.CT) → (p : x .Cond) → x ≡ ι (x .val p)
+  inhabited→ι (P ⊢ f) p = G.mkCT≡ (λ _ → tt*) (λ _ → p) (λ q _ → ≡.congp f)
 
   Ty₀-η : (γ a : G.Atom)
     → (kγ : G.[ γ ]₀ ≡ G.ĉ)
@@ -195,7 +196,7 @@ open import QIT.Functor.Properties
   con≡ : (γ : DFA.Con) → (ε⁻ A D.∘ ε A) .D.conᴿ γ ≡ D.conᴿ (D.id {A = F₀ (G₀ A)}) γ
   con≡ γ@(x , kx) = ΣP≡ _ _ p
     where
-    witness : x .proj₁
+    witness : x ↓
     witness = G.conData₁ x kx
     p : ι (G.con (ε.conᴿ A γ)) ≡ x
     p =
@@ -208,7 +209,7 @@ open import QIT.Functor.Properties
       ≡ D.tyᴿ (D.id {A = F₀ (G₀ A)}) γ a
   ty≡ γ@(x , kx) a@(y , ky) = ΣP≡ _ _ p
     where
-    witness : y .proj₁
+    witness : y .Cond
     witness = G.tyData₁ x y kx ky
     q : ι (G.ty (ε.conᴿ A γ) (ε.tyᴿ A γ a)) ≡ y
     q =
