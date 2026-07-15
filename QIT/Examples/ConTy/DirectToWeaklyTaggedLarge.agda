@@ -92,7 +92,7 @@ G₀ {ℓA} da = wa
     ĉ≢t̂ : ∀ {x} → ĉ ≢ t̂ x
     ĉ≢t̂ p = ⊥e* (encode p)
 
-  open EncodeAtom
+  open EncodeAtom public
 
   kʰ≢cʰ : kʰ ≢ cʰ
   kʰ≢cʰ p = k̂≢ĉ (return-inj p)
