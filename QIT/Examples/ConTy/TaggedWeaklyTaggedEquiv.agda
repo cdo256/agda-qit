@@ -1,7 +1,10 @@
 {-# OPTIONS --allow-unsolved-metas #-}
 open import QIT.Prelude
 
-module QIT.Examples.ConTy.TaggedWeaklyTaggedEquiv ⦃ a!c* : A!C ⦄ where
+module QIT.Examples.ConTy.TaggedWeaklyTaggedEquiv
+  ⦃ pathElim* : PathElim ⦄
+  ⦃ a!c* : A!C ⦄
+  where
 
 open import QIT.Prelude
 open import QIT.Prop
@@ -71,15 +74,15 @@ import QIT.Examples.ConTy.WeaklyTagged as WT
 --   kt̂ : (γ : CT) → [ γ ] ≡ ĉ → [ t̂' γ ] ≡ k̂
 --   kt̂ (con x) kγ = refl
 
-T→D : T.Algebra → D.Algebra
+T→D : T.Algebra → D.Algebra ℓ0
 T→D ta = record
   { Con = Con
   ; Ty = Ty
   ; ∙ = ∙
   ; _▷_ = _▷_
   ; u = u
-  ; π = λ {Γ} → π {Γ}
-  ; σ = λ {Γ} → σ {Γ}
+  ; π = π
+  ; σ = σ
   ; σ▷ = σ▷
   ; σπ = σπ
   }
@@ -95,28 +98,34 @@ T→D ta = record
   (γ , ky) ▷ (a , ka) = TA.▷ γ ky a ka , TA.k▷ γ ky a ka
   u : ∀ Γ → Ty Γ
   u (γ , ky) = TA.u γ ky , TA.ku γ ky
-  π : {Γ : Con} → (A : Ty Γ) (B : Ty (Γ ▷ A)) → Ty Γ
-  π {(γ , ky)} (a , ka) (b , kb) =
+  π : (Γ : Con) → (A : Ty Γ) (B : Ty (Γ ▷ A)) → Ty Γ
+  π (γ , ky) (a , ka) (b , kb) =
     TA.π γ ky a ka b kb , TA.kπ γ ky a ka b kb
-  σ : {Γ : Con} → (A : Ty Γ) (B : Ty (Γ ▷ A)) → Ty Γ
-  σ {(γ , ky)} (a , ka) (b , kb) =
+  σ : (Γ : Con) → (A : Ty Γ) (B : Ty (Γ ▷ A)) → Ty Γ
+  σ (γ , ky) (a , ka) (b , kb) =
     TA.σ γ ky a ka b kb , TA.kσ γ ky a ka b kb
-  σ▷ : {γ : Con} {a : Ty γ} {b : Ty (γ ▷ a)} →
-      ((γ ▷ a) ▷ b) ≡ (γ ▷ σ {γ} a b)
-  σ▷ {γ , kγ} {a , ka} {b , kb} =
+  σ▷ : (γ : Con) (a : Ty γ) (b : Ty (γ ▷ a)) →
+      ((γ ▷ a) ▷ b) ≡ (γ ▷ σ γ a b)
+  σ▷ (γ , kγ) (a , ka) (b , kb) =
     ΣP≡ (((γ , kγ) ▷ (a , ka)) ▷ (b , kb))
-        ((γ , kγ) ▷ σ (a , ka) (b , kb))
+        ((γ , kγ) ▷ σ (γ , kγ) (a , ka) (b , kb))
         (TA.σ▷ γ kγ a ka b kb)
-  σπ : {γ : Con} {a : Ty γ} {b : Ty (γ ▷ a)}
-       {c : Ty ((γ ▷ a) ▷ b)} →
-       π {γ} a (π {γ ▷ a} b c) ≡ π {γ} (σ {γ} a b) (subst Ty σ▷ c)
-  σπ {γ , kγ} {a , ka} {b , kb} {c , kc} =
-    ΣP≡ (π (a , ka) (π (b , kb) (c , kc))) (π (σ (a , ka) (b , kb)) (subst Ty σ▷ (c , kc)))
+  σπ : (γ : Con) (a : Ty γ) (b : Ty (γ ▷ a))
+       (c : Ty ((γ ▷ a) ▷ b)) →
+       π γ a (π (γ ▷ a) b c)
+       ≡ π γ (σ γ a b) (subst Ty (σ▷ γ a b) c)
+  σπ (γ , kγ) (a , ka) (b , kb) (c , kc) =
+    ΣP≡
+      (π (γ , kγ) (a , ka) (π ((γ , kγ) ▷ (a , ka)) (b , kb) (c , kc)))
+      (π (γ , kγ) (σ (γ , kγ) (a , ka) (b , kb))
+         (subst Ty (σ▷ (γ , kγ) (a , ka) (b , kb)) (c , kc)))
         (≡.trans (TA.σπ γ kγ a ka b kb c kc)
                  (≡.dcongsp (TA.π γ kγ (TA.σ γ kγ a ka b kb) (TA.kσ γ kγ a ka b kb))
-                            (≡.sym (≡.Jp (λ _ p → fst (subst Ty p (c , kc)) ≡ c) σ▷ ≡.refl))))
+                            (≡.sym (≡.Jp (λ _ p → fst (subst Ty p (c , kc)) ≡ c)
+                                           (σ▷ (γ , kγ) (a , ka) (b , kb))
+                                           ≡.refl))))
 
-D→T : D.Algebra → T.Algebra
+D→T : D.Algebra ℓ0 → T.Algebra
 D→T da = record
   { CT = CT
   ; [_] = [_]
@@ -187,7 +196,7 @@ D→T da = record
   Con→Con' γ = con γ , refl
   Con'→Con : Con' → Con
   Con'→Con (con γ , kγ) = γ
-  ConIso : Con ↔ Con'
+  ConIso : Con ≅ˢ Con'
   ConIso = record
     { to = Con→Con'
     ; from = Con'→Con
@@ -220,8 +229,8 @@ D→T da = record
       q : (ty (subst Ty p a) , _) ≡ (ty a , _)
       q = ΣP≡ (ty (subst Ty (con-inj (t̂-inj ka)) a) , refl)
               (ty a , ka) r
-  module ConIso = _↔_ ConIso
-  module TyIso = _↔_ TyIso
+  module ConIso = _≅ˢ_ ConIso
+  module TyIso = _≅ˢ_ TyIso
   
 
   ce : (P : (γ : CT) (kγ : [ γ ] ≡ ĉ) → Set)
@@ -270,7 +279,7 @@ D→T da = record
     P γ kγ a ka = (b : CT) → [ b ] ≡ t̂ (▷ γ kγ a ka) (k▷ γ kγ a ka)
       → ΣP CT λ δ → [ δ ] ≡ t̂ γ kγ
     q : ∀ γ a → P (con γ) refl (ty a) refl
-    q γ a (ty {δ} b) kb = ty (DA.π a (subst Ty (con-inj (t̂-inj kb)) b)) , refl
+    q γ a (ty {δ} b) kb = ty (DA.π γ a (subst Ty (con-inj (t̂-inj kb)) b)) , refl
 
   π : (γ : CT) (kγ : [ γ ] ≡ ĉ)
     → (a : CT) (ka : [ a ] ≡ t̂ γ kγ)
@@ -294,7 +303,7 @@ D→T da = record
     P γ kγ a ka = (b : CT) → [ b ] ≡ t̂ (▷ γ kγ a ka) (k▷ γ kγ a ka)
       → ΣP CT λ δ → [ δ ] ≡ t̂ γ kγ
     q : ∀ γ a → P (con γ) refl (ty a) refl
-    q γ a (ty {δ} b) kb = ty (DA.σ a (subst Ty (con-inj (t̂-inj kb)) b)) , refl
+    q γ a (ty {δ} b) kb = ty (DA.σ γ a (subst Ty (con-inj (t̂-inj kb)) b)) , refl
 
   σ : (γ : CT) (kγ : [ γ ] ≡ ĉ)
     → (a : CT) (ka : [ a ] ≡ t̂ γ kγ)
@@ -314,8 +323,8 @@ D→T da = record
     → ▷ (▷ γ kγ a ka) (k▷ γ kγ a ka) b kb
     ≡ ▷ γ kγ (σ γ kγ a ka b kb) (kσ γ kγ a ka b kb)
   σ▷ (con γ) refl (ty a) refl (ty {δ} b) kb =
-    ≡.trans (≡.cong con step₁)
-             (≡.cong con (DA.σ▷ {a = a} {b = b'}))
+    ≡.trans q
+             (≡.cong con (DA.σ▷ γ a b'))
     where
     p : δ ≡ γ DA.▷ a
     p = con-inj (t̂-inj kb)
@@ -323,8 +332,18 @@ D→T da = record
     b' : Ty (γ DA.▷ a)
     b' = subst Ty p b
 
-    step₁ : δ DA.▷ b ≡ (γ DA.▷ a) DA.▷ b'
-    step₁ = ≡.dcong₂ (λ (Γ : Con) (B : Ty Γ) → Γ DA.▷ B) p ≡.refl
+    r : δ DA.▷ b ≡ (γ DA.▷ a) DA.▷ b'
+    r = ≡.dcong₂ (λ (Γ : Con) (B : Ty Γ) → Γ DA.▷ B) p ≡.refl
+
+    q : ▷ (▷ (con γ) refl (ty a) refl) refl (ty b) kb
+      ≡ con ((γ DA.▷ a) DA.▷ b')
+    q =
+      ▷ (▷ (con γ) refl (ty a) refl) refl (ty b) kb
+        ≡⟨ {!!} ⟩
+      ▷ (▷ (con γ) refl (ty a) refl) refl (ty b) kb
+        ≡⟨ {!!} ⟩
+      con (γ DA.▷ a DA.▷ b') ∎
+      where open ≡-Reasoning
 
   σπ : (γ : CT) (kγ : [ γ ] ≡ ĉ)
     → (a : CT) (ka : [ a ] ≡ t̂ γ kγ)
@@ -335,10 +354,11 @@ D→T da = record
                   (kπ (▷ γ _ a _) (k▷ γ kγ a ka) b kb c kc)
     ≡ π γ kγ (σ γ kγ a ka b kb) (kσ γ kγ a ka b kb) c
       (≡.trans kc (≡.dcongsp t̂ (σ▷ γ kγ a ka b kb)))
-  σπ (con γ) refl (ty a) refl (ty b) refl (ty c) refl = ≡.cong ty DA.σπ
+  σπ (con γ) refl (ty a) refl (ty b) refl (ty c) refl =
+    ≡.cong ty (DA.σπ γ a b c)
 
 
-WT→D : WT.Algebra → D.Algebra
+WT→D : WT.Algebra ℓ0 → D.Algebra ℓ0
 WT→D wta = record
   { Con = Con
   ; Ty = Ty
