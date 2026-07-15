@@ -403,31 +403,124 @@ module _ {ℓA}
               ≡⟨ r.ĉ ⟩
             GAᴰ.ĉ ∎
         tk̂ : Tyβ Fr.A.k̂
-        tk̂ = ?
+        tk̂ γ kγ ka = ⊥e (G₀Aᴰ.[kʰ]≢tʰ {x* = r.θ γ} p)
+          where
+          p : GAᴰ.[ GAᴰ.k̂ ] ≡ GAᴰ.t̂ (r.θ γ)
+          p =
+            GAᴰ.[ GAᴰ.k̂ ]
+              ≡⟨ ≡.cong GAᴰ.[_] (≡.sym r.k̂) ⟩
+            GAᴰ.[ r.θ Iᵂ.k̂ ]
+              ≡⟨ ≡.sym (r.[ Iᵂ.k̂ ]) ⟩
+            r.θ Iᵂ.[ Iᵂ.k̂ ]
+              ≡⟨ ≡.cong r.θ ka ⟩
+            r.θ (Iᵂ.t̂ γ)
+              ≡⟨ r.t̂ γ ⟩
+            GAᴰ.t̂ (r.θ γ) ∎
 
       kk̂ : [ k̂ ] ≡ k̂
-      kk̂ = {!!}
+      kk̂ = ΣP≡ _ _ Iᵂ.kk̂
 
       ĉ : CT
-      ĉ = {!!}
+      ĉ = Iᵂ.ĉ , ∧i cĉ , tĉ
+        where
+        open ≡.≡-Reasoning
+        cĉ : Conβ Iᵂ.ĉ
+        cĉ kĉ = ⊥e (G₀Aᴰ.kʰ≢cʰ k̂≡ĉ)
+          where
+          k̂≡ĉ : GAᴰ.k̂ ≡ GAᴰ.ĉ
+          k̂≡ĉ =
+            GAᴰ.k̂
+              ≡⟨ ≡.sym GAᴰ.kĉ ⟩
+            GAᴰ.[ GAᴰ.ĉ ]
+              ≡⟨ ≡.cong GAᴰ.[_] (≡.sym r.ĉ) ⟩
+            GAᴰ.[ r.θ Iᵂ.ĉ ]
+              ≡⟨ ≡.sym (r.[ Iᵂ.ĉ ]) ⟩
+            r.θ Iᵂ.[ Iᵂ.ĉ ]
+              ≡⟨ ≡.cong r.θ kĉ ⟩
+            r.θ Iᵂ.ĉ
+              ≡⟨ r.ĉ ⟩
+            GAᴰ.ĉ ∎
+        tĉ : Tyβ Iᵂ.ĉ
+        tĉ γ kγ ka = ⊥e (G₀Aᴰ.[cʰ]≢tʰ {x* = r.θ γ} p)
+          where
+          p : GAᴰ.[ GAᴰ.ĉ ] ≡ GAᴰ.t̂ (r.θ γ)
+          p =
+            GAᴰ.[ GAᴰ.ĉ ]
+              ≡⟨ ≡.cong GAᴰ.[_] (≡.sym r.ĉ) ⟩
+            GAᴰ.[ r.θ Iᵂ.ĉ ]
+              ≡⟨ ≡.sym (r.[ Iᵂ.ĉ ]) ⟩
+            r.θ Iᵂ.[ Iᵂ.ĉ ]
+              ≡⟨ ≡.cong r.θ ka ⟩
+            r.θ (Iᵂ.t̂ γ)
+              ≡⟨ r.t̂ γ ⟩
+            GAᴰ.t̂ (r.θ γ) ∎
 
       kĉ : [ ĉ ] ≡ k̂
-      kĉ = {!!}
+      kĉ = ΣP≡ _ _ Iᵂ.kĉ
 
       t̂ : CT → CT
-      t̂ = {!!}
+      t̂ (x , ∧i cx , tx) = Iᵂ.t̂ x , ∧i ct , tyt
+        where
+        open ≡.≡-Reasoning
+        ct : Conβ (Iᵂ.t̂ x)
+        ct kx = ⊥e (G₀Aᴰ.[tʰ]≢cʰ {x* = r.θ x} p)
+          where
+          p : GAᴰ.[ GAᴰ.t̂ (r.θ x) ] ≡ GAᴰ.ĉ
+          p =
+            GAᴰ.[ GAᴰ.t̂ (r.θ x) ]
+              ≡⟨ ≡.cong GAᴰ.[_] (≡.sym (r.t̂ x)) ⟩
+            GAᴰ.[ r.θ (Iᵂ.t̂ x) ]
+              ≡⟨ ≡.sym (r.[ Iᵂ.t̂ x ]) ⟩
+            r.θ Iᵂ.[ Iᵂ.t̂ x ]
+              ≡⟨ ≡.cong r.θ kx ⟩
+            r.θ Iᵂ.ĉ
+              ≡⟨ r.ĉ ⟩
+            GAᴰ.ĉ ∎
+        tyt : Tyβ (Iᵂ.t̂ x)
+        tyt = {!!}
 
       kt̂ : (γ : CT) → [ γ ] ≡ ĉ → [ t̂ γ ] ≡ k̂
-      kt̂ = {!!}
+      kt̂ (x , ∧i cx , tx) kγ = ΣP≡ _ _ (Iᵂ.kt̂ x (≡.cong fst kγ))
 
       ∙ : CT
-      ∙ = {!!}
+      ∙ = Iᵂ.∙ , ∧i c∙ , t∙
+        where
+        open ≡.≡-Reasoning
+        c∙ : Conβ Iᵂ.∙
+        c∙ k∙ =
+          r.θ Iᵂ.∙
+            ≡⟨ r.∙ ⟩
+          GAᴰ.∙
+            ≡⟨ ≡.sym (≡.cong fst fᴰ.∙ᴿ) ⟩
+          fᴰ.conᴿ (Iᵂ.∙ , k∙) .fst ∎
+        t∙ : Tyβ Iᵂ.∙
+        t∙ γ kγ ka = ⊥e (G₀Aᴰ.cʰ≢tʰ {x = r.θ γ} p)
+          where
+          p : GAᴰ.ĉ ≡ GAᴰ.t̂ (r.θ γ)
+          p =
+            GAᴰ.ĉ
+              ≡⟨ ≡.sym GAᴰ.k∙ ⟩
+            GAᴰ.[ GAᴰ.∙ ]
+              ≡⟨ ≡.cong GAᴰ.[_] (≡.sym r.∙) ⟩
+            GAᴰ.[ r.θ Iᵂ.∙ ]
+              ≡⟨ ≡.sym (r.[ Iᵂ.∙ ]) ⟩
+            r.θ Iᵂ.[ Iᵂ.∙ ]
+              ≡⟨ ≡.cong r.θ ka ⟩
+            r.θ (Iᵂ.t̂ γ)
+              ≡⟨ r.t̂ γ ⟩
+            GAᴰ.t̂ (r.θ γ) ∎
 
       k∙ : [ ∙ ] ≡ ĉ
-      k∙ = {!!}
+      k∙ = ΣP≡ _ _ Iᵂ.k∙
 
       ▷ : CT → CT → CT
-      ▷ = {!!}
+      ▷ (γ , pγ) (a , pa) =
+        Iᵂ.▷ γ a , ∧i c▷ , t▷
+        where
+        c▷ : Conβ (Fr.A.▷ γ a)
+        c▷ = {!!}
+        t▷ : Tyβ (Fr.A.▷ γ a)
+        t▷ γ kγ ka = ⊥e {!!}
 
       k▷ : (γ a : CT) → [ γ ] ≡ ĉ → [ a ] ≡ t̂ γ → [ ▷ γ a ] ≡ ĉ
       k▷ = {!!}
