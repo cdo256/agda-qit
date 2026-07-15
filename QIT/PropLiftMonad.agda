@@ -158,3 +158,34 @@ module _ {ℓP} where
     mfx≈mgy = ≡→≈ mfx≡mgy
     y↓ : y* ↓
     y↓ = mfx≈mgy .∧e₁ .∧e₁ (∧i tt* , x↓) .∧e₂
+
+  assume⁻ : {X : Set ℓX} {y* : PropLift ℓP X}
+    → (P : Prop ℓP)
+    → (x* : P → PropLift ℓP X)
+    → assume P x* ↓
+    → P ∧ᵖ λ p → x* p ↓
+  assume⁻ P x* assume↓ = assume↓ 
+
+  map⁻ : {X : Set ℓX} {Y : Set ℓY}
+    → (f : X → Y) (x* : PropLift ℓP X)
+    → map f x* ↓
+    → x* ↓
+  map⁻ f x* map↓ = map↓ .∧e₂
+
+  >>=⁻ : {X : Set ℓX} {Y : Set ℓY}
+    → (x* : PropLift ℓP X) (f* : X → PropLift ℓP Y)
+    → (x* >>= f*) ↓
+    → x* ↓ ∧ᵖ λ p → f* (x* .val p) ↓
+  >>=⁻ f* x* bind↓ = bind↓
+
+  >>⁻ : {X : Set ℓX} {Y : Set ℓY}
+    → (x* : PropLift ℓP X) (y* : PropLift ℓP Y)
+    → (x* >> y*) ↓
+    → x* ↓ ∧ᵖ λ _ → y* ↓
+  >>⁻ x* y* bind↓ = bind↓
+
+  <*>⁻ : {X : Set ℓX} {Y : Set ℓY}
+    → (f* : PropLift ℓP (X → Y)) (x* : PropLift ℓP X)
+    → (f* <*> x*) ↓
+    → f* ↓ ∧ᵖ λ _ → x* ↓
+  <*>⁻ f* x* app↓ = app↓
