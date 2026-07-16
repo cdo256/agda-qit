@@ -12,6 +12,7 @@ open import QIT.Relation.Binary using (IsEquivalence)
 open import QIT.Category.Base
 
 record Algebra ℓX : Set (lsuc ℓX) where
+  no-eta-equality
   field
     CT : Set ℓX
     [_] : CT → CT
@@ -64,7 +65,85 @@ record Algebra ℓX : Set (lsuc ℓX) where
       → π γ a (π (▷ γ a) b c)
       ≡ π γ (σ γ a b) c
 
+record AlgebraWithMotive {ℓX} (CT : Set ℓX) : Set (lsuc ℓX) where
+  no-eta-equality
+  field
+    [_] : CT → CT
+    k̂ : CT
+    kk̂ : [ k̂ ] ≡ k̂
+    ĉ : CT
+    kĉ : [ ĉ ] ≡ k̂
+    t̂ : (γ : CT) → CT
+    kt̂ : (γ : CT)
+      → [ γ ] ≡ ĉ
+      → [ t̂ γ ] ≡ k̂
+
+    ∙ : CT
+    k∙ : [ ∙ ] ≡ ĉ
+    ▷ : (γ : CT) (a : CT) → CT
+    k▷ : (γ : CT) (a : CT)
+      → [ γ ] ≡ ĉ
+      → [ a ] ≡ t̂ γ
+      → [ ▷ γ a ] ≡ ĉ
+    u : (γ : CT) → CT
+    ku : (γ : CT)
+      → [ γ ] ≡ ĉ
+      → [ u γ ] ≡ t̂ γ 
+    π : (γ : CT) (a : CT) (b : CT) → CT
+    kπ : (γ : CT) (a : CT) (b : CT) 
+      → [ γ ] ≡ ĉ
+      → [ a ] ≡ t̂ γ
+      → [ b ] ≡ t̂ (▷ γ a)
+      → [ π γ a b ] ≡ t̂ γ 
+    σ : (γ : CT) (a : CT) (b : CT) → CT
+    kσ : (γ : CT) (a : CT) (b : CT) 
+      → [ γ ] ≡ ĉ
+      → [ a ] ≡ t̂ γ
+      → [ b ] ≡ t̂ (▷ γ a)
+      → [ σ γ a b ] ≡ t̂ γ 
+    σ▷ : (γ : CT) (a : CT) (b : CT)
+      → [ γ ] ≡ ĉ
+      → [ a ] ≡ t̂ γ
+      → [ b ] ≡ t̂ (▷ γ a)
+      → ▷ (▷ γ a) b
+      ≡ ▷ γ (σ γ a b)
+    σπ : (γ : CT)
+      → (a : CT) 
+      → (b : CT) 
+      → (c : CT) 
+      → [ γ ] ≡ ĉ
+      → [ a ] ≡ t̂ γ
+      → [ b ] ≡ t̂ (▷ γ a)
+      → [ c ] ≡ t̂ (▷ (▷ γ a) b)
+      → π γ a (π (▷ γ a) b c)
+      ≡ π γ (σ γ a b) c
+
+  toAlgebra : Algebra ℓX
+  toAlgebra = record
+    { CT = CT
+    ; [_] = [_]
+    ; k̂ = k̂
+    ; kk̂ = kk̂
+    ; ĉ = ĉ
+    ; kĉ = kĉ
+    ; t̂ = t̂
+    ; kt̂ = kt̂
+    ; ∙ = ∙
+    ; k∙ = k∙
+    ; ▷ = ▷
+    ; k▷ = k▷
+    ; u = u
+    ; ku = ku
+    ; π = π
+    ; kπ = kπ
+    ; σ = σ
+    ; kσ = kσ
+    ; σ▷ = σ▷
+    ; σπ = σπ
+    }
+
 record Hom (A : Algebra ℓA) (B : Algebra ℓB) : Set (ℓA ⊔ ℓB) where
+  no-eta-equality
   private
     module A = Algebra A
     module B = Algebra B
@@ -93,10 +172,8 @@ record Hom (A : Algebra ℓA) (B : Algebra ℓB) : Set (ℓA ⊔ ℓB) where
       → A.[ b ] ≡ A.t̂ (A.▷ γ a)
       → θ (A.σ γ a b) ≡ B.σ (θ γ) (θ a) (θ b)
 
-open Hom public
-
-id : ∀ {ℓX} {A : Algebra ℓX} → Hom A A
-id {ℓX} = record
+id : ∀ {ℓA} {A : Algebra ℓA} → Hom A A
+id = record
   { θ = λ x → x
   ; [_] = λ _ → ≡.refl
   ; k̂ = ≡.refl
@@ -109,8 +186,8 @@ id {ℓX} = record
   ; σ = λ _ _ _ _ _ _ → ≡.refl
   }
 
-_∘_ : ∀ {ℓX} {A B C : Algebra ℓX} → Hom B C → Hom A B → Hom A C
-_∘_ {ℓX} {A} {B} {C} g f = record
+_∘_ : ∀ {ℓA ℓB ℓC} {A : Algebra ℓA} {B : Algebra ℓB} {C : Algebra ℓC} → Hom B C → Hom A B → Hom A C
+_∘_ {A = A} {B} {C} g f = record
   { θ = λ x → g.θ (f.θ x)
   ; [_] = λ x → ≡.trans (≡.cong g.θ (f.[_] x)) (g.[_] (f.θ x))
   ; k̂ = ≡.trans (≡.cong g.θ f.k̂) g.k̂
@@ -145,24 +222,37 @@ _∘_ {ℓX} {A} {B} {C} g f = record
       (≡.trans (≡.sym (f.[_] b)) (≡.trans (≡.cong f.θ kb) (f.t̂ (A.▷ x a))))
       (≡.cong B.t̂ (f.▷ x a kx ka))
 
-record _≈_ {ℓX} {A B : Algebra ℓX} (f g : Hom A B) : Prop ℓX where
+record _≈_ {ℓA ℓB} {A : Algebra ℓA} {B : Algebra ℓB} (f g : Hom A B) : Prop (ℓA ⊔ ℓB) where
   constructor mk≈
+  module f = Hom f
+  module g = Hom g
   field
-    θ≡ : ∀ x → f .θ x ≡ g .θ x
+    θ≡ : ∀ x → f.θ x ≡ g.θ x
 
-open _≈_ public
-
-isEquiv≈ : ∀ {ℓX} {A B : Algebra ℓX} → IsEquivalence (_≈_ {ℓX} {A} {B})
+isEquiv≈ : ∀ {ℓA ℓB} {A : Algebra ℓA} {B : Algebra ℓB} → IsEquivalence (_≈_ {A = A} {B})
 isEquiv≈ = record
   { refl = mk≈ λ _ → ≡.refl
   ; sym = λ (mk≈ p) → mk≈ λ x → ≡.sym (p x)
   ; trans = λ (mk≈ p) (mk≈ q) → mk≈ λ x → ≡.trans (p x) (q x)
   }
 
-∘-resp-≈ : ∀ {ℓX} {A B γ : Algebra ℓX} {f h : Hom B γ} {g i : Hom A B}
+open import QIT.Setoid
+
+HomSetoid : ∀ {ℓA ℓB} (A : Algebra ℓA) (B : Algebra ℓB) → Setoid (ℓA ⊔ ℓB) (ℓA ⊔ ℓB)
+HomSetoid A B = record
+  { Carrier = Hom A B
+  ; _≈_ = _≈_
+  ; isEquivalence = isEquiv≈ }
+
+∘-resp-≈ : ∀ {ℓA ℓB ℓC} {A : Algebra ℓA} {B : Algebra ℓB} {C : Algebra ℓC} {f h : Hom B C} {g i : Hom A B}
   → f ≈ h → g ≈ i → (f ∘ g) ≈ (h ∘ i)
 ∘-resp-≈ {f = f} {h} {g} {i} (mk≈ p) (mk≈ q) =
-  mk≈ λ x → ≡.trans (≡.cong (f .θ) (q x)) (p (i .θ x))
+  mk≈ λ x → ≡.trans (≡.cong (f.θ) (q x)) (p (i.θ x))
+  where
+  module f = Hom f
+  module g = Hom g
+  module h = Hom h
+  module i = Hom i
 
 Cat : ∀ ℓX → Category (lsuc ℓX) ℓX ℓX
 Cat ℓX = record
@@ -211,5 +301,6 @@ LiftAlgebra ℓY A = record
   where
   module A = Algebra A
 
--- open import QIT.Category.Morphism Cat public
--- open import QIT.Category.Initial Cat public
+module Cat ℓA where
+  open import QIT.Category.Morphism (Cat ℓA) public
+  open import QIT.Category.Initial (Cat ℓA) public
