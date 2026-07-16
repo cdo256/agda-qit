@@ -39,6 +39,9 @@ module _ {ℓP} where
   _↓ : ∀ {X : Set ℓX} → PropLift ℓP X → Prop ℓP
   (P ⊢ _) ↓ = P
 
+  _!_ : ∀ {X : Set ℓX} → (x* : PropLift ℓP X) → x* ↓ → X
+  (P ⊢ x) ! p = x p
+
   _≈_ : ∀ {ℓA} {X : Set ℓA} → PropLift ℓP X → PropLift ℓP X → Prop _
   (P ⊢ f) ≈ (Q ⊢ g) =
     (P ⇔ Q) ∧ ∀ p q → f p ≡ g q
@@ -56,7 +59,7 @@ module _ {ℓP} where
     r ≡.refl = funExtp λ p → f≡g p p
 
   mk≡↓ : ∀ {ℓA} {X : Set ℓA} → {x* y* : PropLift ℓP X}
-       → (x↓ : x* ↓) → (y↓ : y* ↓) → x* .val x↓ ≡ y* .val y↓
+       → (x↓ : x* ↓) → (y↓ : y* ↓) → x* ! x↓ ≡ y* ! y↓
        → x* ≡ y*
   mk≡↓ x↓ y↓ p = ≈→≡ (∧i (∧i (λ _ → y↓) , (λ _ → x↓)) , λ _ _ → p)
 
@@ -65,6 +68,15 @@ module _ {ℓP} where
 
   ≡→≈ : ∀ {ℓA} {X : Set ℓA} → {x* y* : PropLift ℓP X} → x* ≡ y* → x* ≈ y*
   ≡→≈ {x* = x*} {y*} p = substp (x* ≈_) p (≈refl x*)
+
+  extractCond : {X : Set ℓA} → {x y : PropLift ℓP X} → x ≡ y
+        → (qy : y .Cond) → x .Cond
+  extractCond ≡.refl qy = qy
+
+  extractVal : {X : Set ℓA} → {x y : PropLift ℓP X} → (p : x ≡ y)
+    → (qy : y .Cond)
+    → x ! (extractCond p qy) ≡ y ! qy
+  extractVal ≡.refl qy = ≡.refl
 
   return-inj : {X : Set ℓX} {x y : X} → return x ≡ return y → x ≡ y
   return-inj {ℓX} {X} {x} {y} p =
@@ -152,7 +164,7 @@ module _ {ℓP} where
     → (∀ x y → f x ≢ g y)
     → map f x* ≢ map g y*
   map≢map f g x* y* x↓ fg≢ mfx≡mgy =
-    fg≢ (x* .val x↓) (y* .val y↓) (mfx≈mgy .∧e₂ (∧i tt* , x↓) (∧i tt* , y↓))
+    fg≢ (x* ! x↓) (y* ! y↓) (mfx≈mgy .∧e₂ (∧i tt* , x↓) (∧i tt* , y↓))
     where
     mfx≈mgy : map f x* ≈ map g y*
     mfx≈mgy = ≡→≈ mfx≡mgy
@@ -175,7 +187,7 @@ module _ {ℓP} where
   >>=⁻ : {X : Set ℓX} {Y : Set ℓY}
     → (x* : PropLift ℓP X) (f* : X → PropLift ℓP Y)
     → (x* >>= f*) ↓
-    → x* ↓ ∧ᵖ λ p → f* (x* .val p) ↓
+    → x* ↓ ∧ᵖ λ p → f* (x* ! p) ↓
   >>=⁻ f* x* bind↓ = bind↓
 
   >>⁻ : {X : Set ℓX} {Y : Set ℓY}

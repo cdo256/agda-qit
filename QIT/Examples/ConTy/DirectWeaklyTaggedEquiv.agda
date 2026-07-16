@@ -317,16 +317,28 @@ module _ {ℓA}
         ≡⟨ r.t̂ γ ⟩
       G₀A.tʰ (θ γ) ∎
 
-    con↓ : ∀ (γ : I.CT)
+    con↓ : ∀ γ
       → (kγ : I.[ γ ] ≡ I.ĉ)
       → θ γ ↓
     con↓ γ kγ = G₀A.con↓ (θ γ) (θkγ kγ)
+
+    getCon : ∀ γ
+      → (kγ : I.[ γ ] ≡ I.ĉ)
+      → G₀A.Atom
+    getCon γ kγ = G₀A.getConAtom (θ γ) (θkγ kγ)
+
+    ty↓ : ∀ γ a
+      → (kγ : I.[ γ ] ≡ I.ĉ)
+      → (ka : I.[ a ] ≡ I.t̂ γ)
+      → θ a ↓
+    ty↓ γ a kγ ka =
+      G₀A.ty↓ (θ γ) (θ a) (θkγ kγ) (θka kγ ka )
 
     η : D.Hom (F₀ I) A
     η .D.conᴿ (γ , kγ) =
       {!!}
       where
-      cd₁ = G₀A.con↓ {!γ!}
+      cd₁ = con↓ γ
     η .D.tyᴿ (γ , kγ) (a , ka) =
       {!!} 
     η .D.∙ᴿ = {!!}

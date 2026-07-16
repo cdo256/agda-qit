@@ -29,6 +29,7 @@ G₀ : D.Algebra ℓA → W.Algebra (lsuc ℓA)
 G₀ {ℓA} da = wa
   module G₀ where
   open ≡
+  open ≡.≡-Reasoning
   module DA = D.Algebra da
   data Atom : Set ℓA where
     con : DA.Con → Atom
@@ -161,10 +162,10 @@ G₀ {ℓA} da = wa
     where
     p≈ : [ x* ] ≈ cʰ
     p≈ = ≡→≈ p
-    x↓ : x* .Cond
+    x↓ : x* ↓
     x↓ = p≈ .∧e₁ .∧e₂ tt* .∧e₂
     x : Atom
-    x = x* .val x↓
+    x = x* ! x↓
     kx : [ x ]₀ ≡ ĉ
     kx = p≈ .∧e₂ (∧i tt* , x↓) tt*
     γ : DA.Con
@@ -191,9 +192,9 @@ G₀ {ℓA} da = wa
     y↓ =
       (p≈ .∧e₁ .∧e₁ (∧i tt* , x↓)) .∧e₂
     x : Atom
-    x = x* .val x↓
+    x = x* ! x↓
     y : Atom
-    y = y* .val y↓
+    y = y* ! y↓
     kxy : [ x ]₀ ≡ t̂ y
     kxy =
       p≈ .∧e₂
@@ -269,7 +270,7 @@ G₀ {ℓA} da = wa
     mk≡↓ (∧i tt* , ∧i tt* , x↓) tt* ([[x]]₀≡k̂ x)
     where
     x : Atom
-    x = x* .val x↓
+    x = x* ! x↓
 
   Con₀ : (γ : Atom) → [ γ ]₀ ≡ ĉ → DA.Con
   Con₀ γ kγ = ConΣ→Con (γ , kγ)
@@ -369,30 +370,50 @@ G₀ {ℓA} da = wa
   σπ₀ (con γ) (ty .γ a) (ty .(γ DA.▷ a) b) (ty .((γ DA.▷ a) DA.▷ b) d) refl refl refl refl =
     cong (ty γ) (DA.σπ γ a b d)
 
-  extractCond : {X : Set ℓA} → {x y : PropLift ℓP X} → x ≡ y
-        → (qy : y .Cond) → x .Cond
-  extractCond refl qy = qy
-
-  extractVal : {X : Set ℓA} → {x y : PropLift ℓP X} → (p : x ≡ y)
-    → (qy : y .Cond)
-    → x .val (extractCond p qy) ≡ y .val qy
-  extractVal refl qy = refl
-
   con↓ : (γʰ : CT) → [ γʰ ] ≡ cʰ
-    → γʰ .Cond
+    → γʰ ↓
   con↓ γʰ kγ = extractCond kγ tt* .∧e₂
 
-  getCon : (γʰ : CT) → (kγ : [ γʰ ] ≡ cʰ)
-    → [ γʰ .val (con↓ γʰ kγ) ]₀ ≡ ĉ
-  getCon γʰ kγ = extractVal kγ tt*
+  getConAtom : (γʰ : CT) → (kγ : [ γʰ ] ≡ cʰ)
+    → Atom
+  getConAtom γʰ kγ = γʰ ! (con↓ γʰ kγ)
 
-  ty↓ : (γʰ aʰ : CT) (kγ : [ γʰ ] ≡ cʰ) (ka : [ aʰ ] ≡ tʰ γʰ)
-    → aʰ .Cond
+  conKind : (γʰ : CT) → (kγ : [ γʰ ] ≡ cʰ)
+    → [ getConAtom γʰ kγ ]₀ ≡ ĉ
+  conKind γʰ kγ = extractVal kγ tt*
+
+  getConΣ : (γʰ : CT) → (kγ : [ γʰ ] ≡ cʰ) → ConΣ
+  getConΣ γʰ kγ = getConAtom γʰ kγ , conKind γʰ kγ 
+
+  getCon : (γʰ : CT) → (kγ : [ γʰ ] ≡ cʰ) → DA.Con
+  getCon γʰ kγ = ConΣ→Con (getConΣ γʰ kγ)
+
+  ty↓ : (γʰ aʰ : CT) (kγ : [ γʰ ] ≡ cʰ) (ka : [ aʰ ] ≡ tʰ γʰ) → aʰ ↓
   ty↓ γʰ aʰ kγ ka = extractCond ka (∧i tt* , con↓ γʰ kγ) .∧e₂
 
-  getTy : (γʰ aʰ : CT) (kγ : [ γʰ ] ≡ cʰ) (ka : [ aʰ ] ≡ tʰ γʰ)
-    → [ aʰ .val (ty↓ γʰ aʰ kγ ka) ]₀ ≡ t̂ (γʰ .val (con↓ γʰ kγ))
-  getTy γʰ aʰ kγ ka = extractVal ka (∧i tt* , con↓ γʰ kγ)
+  getTyAtom : (γʰ aʰ : CT)
+    → (kγ : [ γʰ ] ≡ cʰ)
+    → (ka : [ aʰ ] ≡ tʰ γʰ)
+    → Atom
+  getTyAtom γʰ aʰ kγ ka = aʰ ! (ty↓ γʰ aʰ kγ ka)
+
+  tyKind : (γʰ aʰ : CT)
+    → (kγ : [ γʰ ] ≡ cʰ)
+    → (ka : [ aʰ ] ≡ tʰ γʰ)
+    → [ getTyAtom γʰ aʰ kγ ka ]₀ ≡ t̂ (getConAtom γʰ kγ)
+  tyKind γʰ aʰ kγ ka = extractVal ka (∧i tt* , con↓ γʰ kγ)
+
+  getTyΣ : (γʰ aʰ : CT)
+    → (kγ : [ γʰ ] ≡ cʰ)
+    → (ka : [ aʰ ] ≡ tʰ γʰ)
+    → TyΣ (getConΣ γʰ kγ)
+  getTyΣ γʰ aʰ kγ ka = getTyAtom γʰ aʰ kγ ka , tyKind γʰ aʰ kγ ka
+
+  getTy : (γʰ aʰ : CT)
+    → (kγ : [ γʰ ] ≡ cʰ)
+    → (ka : [ aʰ ] ≡ tʰ γʰ)
+    → DA.Ty (getCon γʰ kγ)
+  getTy γʰ aʰ kγ ka = TyΣ→Ty (getTyΣ γʰ aʰ kγ ka)
 
   ∙ : CT
   ∙ = return ∙₀
@@ -415,11 +436,11 @@ G₀ {ℓA} da = wa
   ▷⁻-a γʰ aʰ ty▷↓ = ty▷↓ .∧e₂ .∧e₁
   ▷⁻-kγ : ∀ γʰ aʰ
     → (ty▷↓ : (▷ γʰ aʰ) ↓)
-    → [ γʰ .val (▷⁻-γ γʰ aʰ ty▷↓) ]₀ ≡ ĉ
+    → [ γʰ ! (▷⁻-γ γʰ aʰ ty▷↓) ]₀ ≡ ĉ
   ▷⁻-kγ γʰ aʰ ty▷↓ = ty▷↓ .∧e₂ .∧e₂ .∧e₁
   ▷⁻-ka : ∀ γʰ aʰ
     → (ty▷↓ : (▷ γʰ aʰ) ↓)
-    → [ aʰ .val (▷⁻-a γʰ aʰ ty▷↓) ]₀ ≡ t̂ (γʰ .val (▷⁻-γ γʰ aʰ ty▷↓))
+    → [ aʰ ! (▷⁻-a γʰ aʰ ty▷↓) ]₀ ≡ t̂ (γʰ ! (▷⁻-γ γʰ aʰ ty▷↓))
   ▷⁻-ka γʰ aʰ ty▷↓ = ty▷↓ .∧e₂ .∧e₂ .∧e₂ .∧e₁
 
   u : CT → CT
@@ -434,7 +455,7 @@ G₀ {ℓA} da = wa
   u⁻-γ γʰ u↓ = u↓ .∧e₁
   u⁻-kγ : ∀ γʰ
     → (u↓ : u γʰ ↓)
-    → [ γʰ .val (u⁻-γ γʰ u↓) ]₀ ≡ ĉ
+    → [ γʰ ! (u⁻-γ γʰ u↓) ]₀ ≡ ĉ
   u⁻-kγ γʰ u↓ = u↓ .∧e₂ .∧e₁
 
   π : CT → CT → CT → CT
@@ -464,17 +485,17 @@ G₀ {ℓA} da = wa
   π⁻-b γʰ aʰ bʰ π↓ = π↓ .∧e₂ .∧e₂ .∧e₁
   π⁻-kγ : ∀ γʰ aʰ bʰ
     → (π↓ : π γʰ aʰ bʰ ↓)
-    → [ γʰ .val (π⁻-γ γʰ aʰ bʰ π↓) ]₀ ≡ ĉ
+    → [ γʰ ! (π⁻-γ γʰ aʰ bʰ π↓) ]₀ ≡ ĉ
   π⁻-kγ γʰ aʰ bʰ π↓ = π↓ .∧e₂ .∧e₂ .∧e₂ .∧e₁
   π⁻-ka : ∀ γʰ aʰ bʰ
     → (π↓ : π γʰ aʰ bʰ ↓)
-    → [ aʰ .val (π⁻-a γʰ aʰ bʰ π↓) ]₀ ≡ t̂ (γʰ .val (π⁻-γ γʰ aʰ bʰ π↓))
+    → [ aʰ ! (π⁻-a γʰ aʰ bʰ π↓) ]₀ ≡ t̂ (γʰ ! (π⁻-γ γʰ aʰ bʰ π↓))
   π⁻-ka γʰ aʰ bʰ π↓ = π↓ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁
   π⁻-kb : ∀ γʰ aʰ bʰ
     → (π↓ : π γʰ aʰ bʰ ↓)
-    → [ bʰ .val (π⁻-b γʰ aʰ bʰ π↓) ]₀
-    ≡ t̂ (▷₀ (γʰ .val (π⁻-γ γʰ aʰ bʰ π↓))
-             (aʰ .val (π⁻-a γʰ aʰ bʰ π↓))
+    → [ bʰ ! (π⁻-b γʰ aʰ bʰ π↓) ]₀
+    ≡ t̂ (▷₀ (γʰ ! (π⁻-γ γʰ aʰ bʰ π↓))
+             (aʰ ! (π⁻-a γʰ aʰ bʰ π↓))
              (π⁻-kγ γʰ aʰ bʰ π↓)
              (π⁻-ka γʰ aʰ bʰ π↓))
   π⁻-kb γʰ aʰ bʰ π↓ = π↓ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁
@@ -503,17 +524,17 @@ G₀ {ℓA} da = wa
   σ⁻-b γʰ aʰ bʰ σ↓ = σ↓ .∧e₂ .∧e₂ .∧e₁
   σ⁻-kγ : ∀ γʰ aʰ bʰ
     → (σ↓ : σ γʰ aʰ bʰ ↓)
-    → [ γʰ .val (σ⁻-γ γʰ aʰ bʰ σ↓) ]₀ ≡ ĉ
+    → [ γʰ ! (σ⁻-γ γʰ aʰ bʰ σ↓) ]₀ ≡ ĉ
   σ⁻-kγ γʰ aʰ bʰ σ↓ = σ↓ .∧e₂ .∧e₂ .∧e₂ .∧e₁
   σ⁻-ka : ∀ γʰ aʰ bʰ
     → (σ↓ : σ γʰ aʰ bʰ ↓)
-    → [ aʰ .val (σ⁻-a γʰ aʰ bʰ σ↓) ]₀ ≡ t̂ (γʰ .val (σ⁻-γ γʰ aʰ bʰ σ↓))
+    → [ aʰ ! (σ⁻-a γʰ aʰ bʰ σ↓) ]₀ ≡ t̂ (γʰ ! (σ⁻-γ γʰ aʰ bʰ σ↓))
   σ⁻-ka γʰ aʰ bʰ σ↓ = σ↓ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁
   σ⁻-kb : ∀ γʰ aʰ bʰ
     → (σ↓ : σ γʰ aʰ bʰ ↓)
-    → [ bʰ .val (σ⁻-b γʰ aʰ bʰ σ↓) ]₀
-    ≡ t̂ (▷₀ (γʰ .val (σ⁻-γ γʰ aʰ bʰ σ↓))
-             (aʰ .val (σ⁻-a γʰ aʰ bʰ σ↓))
+    → [ bʰ ! (σ⁻-b γʰ aʰ bʰ σ↓) ]₀
+    ≡ t̂ (▷₀ (γʰ ! (σ⁻-γ γʰ aʰ bʰ σ↓))
+             (aʰ ! (σ⁻-a γʰ aʰ bʰ σ↓))
              (σ⁻-kγ γʰ aʰ bʰ σ↓)
              (σ⁻-ka γʰ aʰ bʰ σ↓))
   σ⁻-kb γʰ aʰ bʰ σ↓ = σ↓ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁
@@ -523,20 +544,20 @@ G₀ {ℓA} da = wa
     → (ka : [ aʰ ] ≡ tʰ γʰ)
     → (kδ : [ ▷ γʰ aʰ ] ≡ cʰ)
     → (kb : [ bʰ ] ≡ tʰ (▷ γʰ aʰ))
-    → bʰ .Cond
+    → bʰ ↓
   ty▷↓ γʰ aʰ bʰ kγ ka kδ kb = extractCond kb (∧i tt* , con↓ (▷ γʰ aʰ) kδ) .∧e₂
 
-  getTy▷ : (γʰ aʰ bʰ : CT)
+  getTy▷-kind : (γʰ aʰ bʰ : CT)
     → (kγ : [ γʰ ] ≡ cʰ)
     → (ka : [ aʰ ] ≡ tʰ γʰ)
     → (kδ : [ ▷ γʰ aʰ ] ≡ cʰ)
     → (kb : [ bʰ ] ≡ tʰ (▷ γʰ aʰ))
-    → [ bʰ .val (ty▷↓ γʰ aʰ bʰ kγ ka kδ kb) ]₀
-    ≡ t̂ (▷₀ (γʰ .val (con↓ γʰ kγ))
-             (aʰ .val (ty↓ γʰ aʰ kγ ka))
-             (getCon γʰ kγ)
-             (getTy γʰ aʰ kγ ka))
-  getTy▷ γʰ aʰ bʰ kγ ka kδ kb = getTy (▷ γʰ aʰ) bʰ kδ kb
+    → [ bʰ ! (ty▷↓ γʰ aʰ bʰ kγ ka kδ kb) ]₀
+    ≡ t̂ (▷₀ (γʰ ! (con↓ γʰ kγ))
+             (aʰ ! (ty↓ γʰ aʰ kγ ka))
+             (conKind γʰ kγ)
+             (tyKind γʰ aʰ kγ ka))
+  getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb = tyKind (▷ γʰ aʰ) bʰ kδ kb
 
   kk̂ : [ kʰ ] ≡ kʰ
   kk̂ = mk≡↓ (∧i tt* , tt*) tt* refl
@@ -553,27 +574,28 @@ G₀ {ℓA} da = wa
   k▷ : (γʰ aʰ : CT) → [ γʰ ] ≡ cʰ → [ aʰ ] ≡ tʰ γʰ → [ ▷ γʰ aʰ ] ≡ cʰ
   k▷ γʰ aʰ kγ ka = mk≡↓ q tt* refl
     module k▷ where
-    q : return [_]₀ .Cond ∧ᵖ (λ h* → ▷ γʰ aʰ .Cond)
+    q : [ ▷ γʰ aʰ ] ↓
     q = ∧i tt* ,
         ∧i con↓ γʰ kγ ,
         ∧i ty↓ γʰ aʰ kγ ka ,
-        ∧i getCon γʰ kγ ,
-        ∧i getTy γʰ aʰ kγ ka ,
+        ∧i conKind γʰ kγ ,
+        ∧i tyKind γʰ aʰ kγ ka ,
         tt*
 
   ku : (γʰ : CT) → [ γʰ ] ≡ cʰ → [ u γʰ ] ≡ tʰ γʰ
-  ku γʰ kγ = mk≡↓ uq tq val≡
+  ku γʰ kγ = mk≡↓ l↓ r↓ val≡
     module ku where
-    tq : tʰ γʰ .Cond
-    tq = ∧i tt* , con↓ γʰ kγ
-    q : tʰ γʰ .Cond → [ u γʰ ] .Cond
-    q _ = ∧i tt* , ∧i con↓ γʰ kγ , ∧i getCon γʰ kγ , tt*
-    uq : [ u γʰ ] .Cond
-    uq = q tq
-    val≡ : [ u γʰ ] .val uq ≡ tʰ γʰ .val tq
+    l↓ : [ u γʰ ] ↓
+    l↓ = ∧i tt* , ∧i con↓ γʰ kγ , ∧i conKind γʰ kγ , tt*
+    r↓ : tʰ γʰ ↓
+    r↓ = ∧i tt* , con↓ γʰ kγ
+    val≡ : [ u γʰ ] ! l↓ ≡ tʰ γʰ ! r↓
     val≡ =
-      trans (ku₀ (γʰ .val (con↓ γʰ kγ)) (getCon γʰ kγ))
-            (cong t̂ (congp (γʰ .val)))
+      [ u γʰ ] ! l↓
+        ≡⟨ ku₀ (γʰ ! (con↓ γʰ kγ)) (conKind γʰ kγ) ⟩
+      t̂ (γʰ ! (con↓ γʰ kγ))
+        ≡⟨ refl ⟩
+      tʰ γʰ ! r↓ ∎
 
   kπ : (γʰ aʰ bʰ : CT)
     → [ γʰ ] ≡ cʰ
@@ -583,27 +605,27 @@ G₀ {ℓA} da = wa
   kπ γʰ aʰ bʰ kγ ka kb = mk≡↓ pq tq val≡
     module kπ where
     kδ = k▷ γʰ aʰ kγ ka
-    tq : tʰ γʰ .Cond
+    tq : tʰ γʰ ↓
     tq = ∧i tt* , con↓ γʰ kγ
-    q : tʰ γʰ .Cond → [ π γʰ aʰ bʰ ] .Cond
+    q : tʰ γʰ ↓ → [ π γʰ aʰ bʰ ] ↓
     q _ = ∧i tt* ,
           ∧i con↓ γʰ kγ ,
           ∧i ty↓ γʰ aʰ kγ ka ,
           ∧i ty▷↓ γʰ aʰ bʰ kγ ka kδ kb ,
-          ∧i getCon γʰ kγ ,
-          ∧i getTy γʰ aʰ kγ ka ,
-          ∧i getTy▷ γʰ aʰ bʰ kγ ka kδ kb ,
+          ∧i conKind γʰ kγ ,
+          ∧i tyKind γʰ aʰ kγ ka ,
+          ∧i getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb ,
           tt*
-    pq : [ π γʰ aʰ bʰ ] .Cond
+    pq : [ π γʰ aʰ bʰ ] ↓
     pq = q tq
-    val≡ : [ π γʰ aʰ bʰ ] .val pq ≡ tʰ γʰ .val tq
+    val≡ : [ π γʰ aʰ bʰ ] ! pq ≡ tʰ γʰ ! tq
     val≡ =
-      trans (kπ₀ (γʰ .val (con↓ γʰ kγ))
-                  (aʰ .val (ty↓ γʰ aʰ kγ ka))
-                  (bʰ .val (ty▷↓ γʰ aʰ bʰ kγ ka kδ kb))
-                  (getCon γʰ kγ)
-                  (getTy γʰ aʰ kγ ka)
-                  (getTy▷ γʰ aʰ bʰ kγ ka kδ kb))
+      trans (kπ₀ (γʰ ! (con↓ γʰ kγ))
+                  (aʰ ! (ty↓ γʰ aʰ kγ ka))
+                  (bʰ ! (ty▷↓ γʰ aʰ bʰ kγ ka kδ kb))
+                  (conKind γʰ kγ)
+                  (tyKind γʰ aʰ kγ ka)
+                  (getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb))
             (cong t̂ (congp (γʰ .val)))
 
   kσ : (γʰ aʰ bʰ : CT)
@@ -614,27 +636,27 @@ G₀ {ℓA} da = wa
   kσ γʰ aʰ bʰ kγ ka kb = mk≡↓ pq tq val≡
     module kσ where
     kδ = k▷ γʰ aʰ kγ ka
-    tq : tʰ γʰ .Cond
+    tq : tʰ γʰ ↓
     tq = ∧i tt* , con↓ γʰ kγ
-    q : tʰ γʰ .Cond → [ σ γʰ aʰ bʰ ] .Cond
+    q : tʰ γʰ ↓ → [ σ γʰ aʰ bʰ ] ↓
     q _ = ∧i tt* ,
           ∧i con↓ γʰ kγ ,
           ∧i ty↓ γʰ aʰ kγ ka ,
           ∧i ty▷↓ γʰ aʰ bʰ kγ ka kδ kb ,
-          ∧i getCon γʰ kγ ,
-          ∧i getTy γʰ aʰ kγ ka ,
-          ∧i getTy▷ γʰ aʰ bʰ kγ ka kδ kb ,
+          ∧i conKind γʰ kγ ,
+          ∧i tyKind γʰ aʰ kγ ka ,
+          ∧i getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb ,
           tt*
-    pq : [ σ γʰ aʰ bʰ ] .Cond
+    pq : [ σ γʰ aʰ bʰ ] ↓
     pq = q tq
-    val≡ : [ σ γʰ aʰ bʰ ] .val pq ≡ tʰ γʰ .val tq
+    val≡ : [ σ γʰ aʰ bʰ ] ! pq ≡ tʰ γʰ ! tq
     val≡ =
-      trans (kσ₀ (γʰ .val (con↓ γʰ kγ))
-                  (aʰ .val (ty↓ γʰ aʰ kγ ka))
-                  (bʰ .val (ty▷↓ γʰ aʰ bʰ kγ ka kδ kb))
-                  (getCon γʰ kγ)
-                  (getTy γʰ aʰ kγ ka)
-                  (getTy▷ γʰ aʰ bʰ kγ ka kδ kb))
+      trans (kσ₀ (γʰ ! (con↓ γʰ kγ))
+                  (aʰ ! (ty↓ γʰ aʰ kγ ka))
+                  (bʰ ! (ty▷↓ γʰ aʰ bʰ kγ ka kδ kb))
+                  (conKind γʰ kγ)
+                  (tyKind γʰ aʰ kγ ka)
+                  (getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb))
             (cong t̂ (congp (γʰ .val)))
 
   σ▷ : (γʰ aʰ bʰ : CT)
@@ -645,28 +667,28 @@ G₀ {ℓA} da = wa
   σ▷ γʰ aʰ bʰ kγ ka kb = mk≡↓ pq qq val≡
     module σ▷ where
     kδ = k▷ γʰ aʰ kγ ka
-    qq : ▷ γʰ (σ γʰ aʰ bʰ) .Cond
+    qq : ▷ γʰ (σ γʰ aʰ bʰ) ↓
     qq = ∧i con↓ γʰ kγ ,
           ∧i ty↓ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb) ,
-          ∧i getCon γʰ kγ ,
-          ∧i getTy γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb) ,
+          ∧i conKind γʰ kγ ,
+          ∧i tyKind γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb) ,
           tt*
-    q : ▷ γʰ (σ γʰ aʰ bʰ) .Cond → ▷ (▷ γʰ aʰ) bʰ .Cond
+    q : ▷ γʰ (σ γʰ aʰ bʰ) ↓ → ▷ (▷ γʰ aʰ) bʰ ↓
     q _ = ∧i con↓ (▷ γʰ aʰ) kδ ,
           ∧i ty↓ (▷ γʰ aʰ) bʰ kδ kb ,
-          ∧i getCon (▷ γʰ aʰ) kδ ,
-          ∧i getTy (▷ γʰ aʰ) bʰ kδ kb ,
+          ∧i conKind (▷ γʰ aʰ) kδ ,
+          ∧i tyKind (▷ γʰ aʰ) bʰ kδ kb ,
           tt*
-    pq : ▷ (▷ γʰ aʰ) bʰ .Cond
+    pq : ▷ (▷ γʰ aʰ) bʰ ↓
     pq = q qq
-    val≡ : ▷ (▷ γʰ aʰ) bʰ .val pq ≡ ▷ γʰ (σ γʰ aʰ bʰ) .val qq
+    val≡ : ▷ (▷ γʰ aʰ) bʰ ! pq ≡ ▷ γʰ (σ γʰ aʰ bʰ) ! qq
     val≡ =
-      σ▷₀ (γʰ .val (con↓ γʰ kγ))
-          (aʰ .val (ty↓ γʰ aʰ kγ ka))
-          (bʰ .val (ty▷↓ γʰ aʰ bʰ kγ ka kδ kb))
-          (getCon γʰ kγ)
-          (getTy γʰ aʰ kγ ka)
-          (getTy▷ γʰ aʰ bʰ kγ ka kδ kb)
+      σ▷₀ (γʰ ! (con↓ γʰ kγ))
+          (aʰ ! (ty↓ γʰ aʰ kγ ka))
+          (bʰ ! (ty▷↓ γʰ aʰ bʰ kγ ka kδ kb))
+          (conKind γʰ kγ)
+          (tyKind γʰ aʰ kγ ka)
+          (getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb)
 
   σπ : (γʰ aʰ bʰ dʰ : CT)
     → [ γʰ ] ≡ cʰ
@@ -678,34 +700,38 @@ G₀ {ℓA} da = wa
     module σπ where
     kδ = k▷ γʰ aʰ kγ ka
     kε = k▷ (▷ γʰ aʰ) bʰ kδ kb
-    qq : π γʰ (σ γʰ aʰ bʰ) dʰ .Cond
+    qq : π γʰ (σ γʰ aʰ bʰ) dʰ ↓
     qq = ∧i con↓ γʰ kγ ,
           ∧i ty↓ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb) ,
-          ∧i ty↓ (▷ γʰ (σ γʰ aʰ bʰ)) dʰ (k▷ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb)) (substp (λ x → [ dʰ ] ≡ tʰ x) (σ▷ γʰ aʰ bʰ kγ ka kb) kc) ,
-          ∧i getCon γʰ kγ ,
-          ∧i getTy γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb) ,
-          ∧i getTy (▷ γʰ (σ γʰ aʰ bʰ)) dʰ (k▷ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb)) (substp (λ x → [ dʰ ] ≡ tʰ x) (σ▷ γʰ aʰ bʰ kγ ka kb) kc) ,
+          ∧i ty↓ (▷ γʰ (σ γʰ aʰ bʰ)) dʰ
+                 (k▷ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb))
+                 (substp (λ x → [ dʰ ] ≡ tʰ x) (σ▷ γʰ aʰ bʰ kγ ka kb) kc) ,
+          ∧i conKind γʰ kγ ,
+          ∧i tyKind γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb) ,
+          ∧i tyKind (▷ γʰ (σ γʰ aʰ bʰ)) dʰ
+                    (k▷ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb))
+                    (substp (λ x → [ dʰ ] ≡ tʰ x) (σ▷ γʰ aʰ bʰ kγ ka kb) kc) ,
           tt*
-    q : π γʰ (σ γʰ aʰ bʰ) dʰ .Cond → π γʰ aʰ (π (▷ γʰ aʰ) bʰ dʰ) .Cond
+    q : π γʰ (σ γʰ aʰ bʰ) dʰ ↓ → π γʰ aʰ (π (▷ γʰ aʰ) bʰ dʰ) ↓
     q _ = ∧i con↓ γʰ kγ ,
           ∧i ty↓ γʰ aʰ kγ ka ,
           ∧i ty↓ (▷ γʰ aʰ) (π (▷ γʰ aʰ) bʰ dʰ) kδ (kπ (▷ γʰ aʰ) bʰ dʰ kδ kb kc) ,
-          ∧i getCon γʰ kγ ,
-          ∧i getTy γʰ aʰ kγ ka ,
-          ∧i getTy (▷ γʰ aʰ) (π (▷ γʰ aʰ) bʰ dʰ) kδ (kπ (▷ γʰ aʰ) bʰ dʰ kδ kb kc) ,
+          ∧i conKind γʰ kγ ,
+          ∧i tyKind γʰ aʰ kγ ka ,
+          ∧i tyKind (▷ γʰ aʰ) (π (▷ γʰ aʰ) bʰ dʰ) kδ (kπ (▷ γʰ aʰ) bʰ dʰ kδ kb kc) ,
           tt*
-    pq : π γʰ aʰ (π (▷ γʰ aʰ) bʰ dʰ) .Cond
+    pq : π γʰ aʰ (π (▷ γʰ aʰ) bʰ dʰ) ↓
     pq = q qq
-    val≡ : π γʰ aʰ (π (▷ γʰ aʰ) bʰ dʰ) .val pq ≡ π γʰ (σ γʰ aʰ bʰ) dʰ .val qq
+    val≡ : π γʰ aʰ (π (▷ γʰ aʰ) bʰ dʰ) ! pq ≡ π γʰ (σ γʰ aʰ bʰ) dʰ ! qq
     val≡ =
-      σπ₀ (γʰ .val (con↓ γʰ kγ))
-          (aʰ .val (ty↓ γʰ aʰ kγ ka))
-          (bʰ .val (ty▷↓ γʰ aʰ bʰ kγ ka kδ kb))
-          (dʰ .val (ty▷↓ (▷ γʰ aʰ) bʰ dʰ kδ kb kε kc))
-          (getCon γʰ kγ)
-          (getTy γʰ aʰ kγ ka)
-          (getTy▷ γʰ aʰ bʰ kγ ka kδ kb)
-          (getTy▷ (▷ γʰ aʰ) bʰ dʰ kδ kb kε kc)
+      σπ₀ (γʰ ! (con↓ γʰ kγ))
+          (aʰ ! (ty↓ γʰ aʰ kγ ka))
+          (bʰ ! (ty▷↓ γʰ aʰ bʰ kγ ka kδ kb))
+          (dʰ ! (ty▷↓ (▷ γʰ aʰ) bʰ dʰ kδ kb kε kc))
+          (conKind γʰ kγ)
+          (tyKind γʰ aʰ kγ ka)
+          (getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb)
+          (getTy▷-kind (▷ γʰ aʰ) bʰ dʰ kδ kb kε kc)
 
   wa : W.Algebra (lsuc ℓA)
   wa = record
@@ -817,34 +843,34 @@ G₁ {ℓA} {A} {B} f = record
     → θ (GA.▷ γ a) ≡ GB.▷ (θ γ) (θ a)
   ▷ γʰ aʰ kγ ka = mk≡↓ pq qq val≡
     where
-    qq : (GB.▷ (θ γʰ) (θ aʰ)) .Cond
+    qq : (GB.▷ (θ γʰ) (θ aʰ)) ↓
     qq = ∧i GA.con↓ γʰ kγ ,
          ∧i GA.ty↓ γʰ aʰ kγ ka ,
-         ∧i θ-kc (γʰ .val (GA.con↓ γʰ kγ)) (GA.getCon γʰ kγ) ,
-         ∧i θ-ka (γʰ .val (GA.con↓ γʰ kγ)) (aʰ .val (GA.ty↓ γʰ aʰ kγ ka)) (GA.getTy γʰ aʰ kγ ka) ,
+         ∧i θ-kc (γʰ ! (GA.con↓ γʰ kγ)) (GA.conKind γʰ kγ) ,
+         ∧i θ-ka (γʰ ! (GA.con↓ γʰ kγ)) (aʰ ! (GA.ty↓ γʰ aʰ kγ ka)) (GA.tyKind γʰ aʰ kγ ka) ,
          liftp tt
-    q : (GB.▷ (θ γʰ) (θ aʰ)) .Cond → (θ (GA.▷ γʰ aʰ)) .Cond
+    q : (GB.▷ (θ γʰ) (θ aʰ)) ↓ → (θ (GA.▷ γʰ aʰ)) ↓
     q _ = ∧i GA.con↓ γʰ kγ ,
           ∧i GA.ty↓ γʰ aʰ kγ ka ,
-          ∧i GA.getCon γʰ kγ ,
-          ∧i GA.getTy γʰ aʰ kγ ka ,
+          ∧i GA.conKind γʰ kγ ,
+          ∧i GA.tyKind γʰ aʰ kγ ka ,
           liftp tt
-    pq : (θ (GA.▷ γʰ aʰ)) .Cond
+    pq : (θ (GA.▷ γʰ aʰ)) ↓
     pq = q qq
-    val≡ : θ (GA.▷ γʰ aʰ) .val pq ≡ GB.▷ (θ γʰ) (θ aʰ) .val qq
-    val≡ = θ-▷₀ (γʰ .val (GA.con↓ γʰ kγ)) (aʰ .val (GA.ty↓ γʰ aʰ kγ ka)) (GA.getCon γʰ kγ) (GA.getTy γʰ aʰ kγ ka)
+    val≡ : θ (GA.▷ γʰ aʰ) ! pq ≡ GB.▷ (θ γʰ) (θ aʰ) ! qq
+    val≡ = θ-▷₀ (γʰ ! (GA.con↓ γʰ kγ)) (aʰ ! (GA.ty↓ γʰ aʰ kγ ka)) (GA.conKind γʰ kγ) (GA.tyKind γʰ aʰ kγ ka)
 
   u : ∀ (γ : GA.CT) → GA.[ γ ] ≡ GA.cʰ → θ (GA.u γ) ≡ GB.u (θ γ)
   u γʰ kγ = mk≡↓ pq qq val≡
     where
-    qq : (GB.u (θ γʰ)) .Cond
-    qq = ∧i GA.con↓ γʰ kγ , ∧i θ-kc (γʰ .val (GA.con↓ γʰ kγ)) (GA.getCon γʰ kγ) , liftp tt
-    q : (GB.u (θ γʰ)) .Cond → (θ (GA.u γʰ)) .Cond
-    q _ = ∧i GA.con↓ γʰ kγ , ∧i GA.getCon γʰ kγ , liftp tt
-    pq : (θ (GA.u γʰ)) .Cond
+    qq : (GB.u (θ γʰ)) ↓
+    qq = ∧i GA.con↓ γʰ kγ , ∧i θ-kc (γʰ ! (GA.con↓ γʰ kγ)) (GA.conKind γʰ kγ) , liftp tt
+    q : (GB.u (θ γʰ)) ↓ → (θ (GA.u γʰ)) ↓
+    q _ = ∧i GA.con↓ γʰ kγ , ∧i GA.conKind γʰ kγ , liftp tt
+    pq : (θ (GA.u γʰ)) ↓
     pq = q qq
-    val≡ : θ (GA.u γʰ) .val pq ≡ GB.u (θ γʰ) .val qq
-    val≡ = θ-u₀ (γʰ .val (GA.con↓ γʰ kγ)) (GA.getCon γʰ kγ)
+    val≡ : θ (GA.u γʰ) ! pq ≡ GB.u (θ γʰ) ! qq
+    val≡ = θ-u₀ (γʰ ! (GA.con↓ γʰ kγ)) (GA.conKind γʰ kγ)
 
   π : ∀ (γ : GA.CT) (a : GA.CT) (b : GA.CT)
     → GA.[ γ ] ≡ GA.cʰ
@@ -854,26 +880,34 @@ G₁ {ℓA} {A} {B} f = record
   π γʰ aʰ bʰ kγ ka kb = mk≡↓ pq qq val≡
     where
     kδ = GA.k▷ γʰ aʰ kγ ka
-    qq : (GB.π (θ γʰ) (θ aʰ) (θ bʰ)) .Cond
+    qq : (GB.π (θ γʰ) (θ aʰ) (θ bʰ)) ↓
     qq = ∧i GA.con↓ γʰ kγ ,
          ∧i GA.ty↓ γʰ aʰ kγ ka ,
          ∧i GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb ,
-         ∧i θ-kc (γʰ .val (GA.con↓ γʰ kγ)) (GA.getCon γʰ kγ) ,
-         ∧i θ-ka (γʰ .val (GA.con↓ γʰ kγ)) (aʰ .val (GA.ty↓ γʰ aʰ kγ ka)) (GA.getTy γʰ aʰ kγ ka) ,
-         ∧i θ-kb (γʰ .val (GA.con↓ γʰ kγ)) (aʰ .val (GA.ty↓ γʰ aʰ kγ ka)) (bʰ .val (GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb)) (GA.getCon γʰ kγ) (GA.getTy γʰ aʰ kγ ka) (GA.getTy▷ γʰ aʰ bʰ kγ ka kδ kb) ,
+         ∧i θ-kc (γʰ ! (GA.con↓ γʰ kγ))
+                 (GA.conKind γʰ kγ) ,
+         ∧i θ-ka (γʰ ! (GA.con↓ γʰ kγ))
+                 (aʰ ! (GA.ty↓ γʰ aʰ kγ ka))
+                 (GA.tyKind γʰ aʰ kγ ka) ,
+         ∧i θ-kb (γʰ ! (GA.con↓ γʰ kγ)) (aʰ ! (GA.ty↓ γʰ aʰ kγ ka)) (bʰ ! (GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb)) (GA.conKind γʰ kγ) (GA.tyKind γʰ aʰ kγ ka) (GA.getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb) ,
          liftp tt
-    q : (GB.π (θ γʰ) (θ aʰ) (θ bʰ)) .Cond → (θ (GA.π γʰ aʰ bʰ)) .Cond
+    q : (GB.π (θ γʰ) (θ aʰ) (θ bʰ)) ↓ → (θ (GA.π γʰ aʰ bʰ)) ↓
     q _ = ∧i GA.con↓ γʰ kγ ,
           ∧i GA.ty↓ γʰ aʰ kγ ka ,
           ∧i GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb ,
-          ∧i GA.getCon γʰ kγ ,
-          ∧i GA.getTy γʰ aʰ kγ ka ,
-          ∧i GA.getTy▷ γʰ aʰ bʰ kγ ka kδ kb ,
+          ∧i GA.conKind γʰ kγ ,
+          ∧i GA.tyKind γʰ aʰ kγ ka ,
+          ∧i GA.getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb ,
           liftp tt
-    pq : (θ (GA.π γʰ aʰ bʰ)) .Cond
+    pq : (θ (GA.π γʰ aʰ bʰ)) ↓
     pq = q qq
-    val≡ : θ (GA.π γʰ aʰ bʰ) .val pq ≡ GB.π (θ γʰ) (θ aʰ) (θ bʰ) .val qq
-    val≡ = θ-π₀ (γʰ .val (GA.con↓ γʰ kγ)) (aʰ .val (GA.ty↓ γʰ aʰ kγ ka)) (bʰ .val (GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb)) (GA.getCon γʰ kγ) (GA.getTy γʰ aʰ kγ ka) (GA.getTy▷ γʰ aʰ bʰ kγ ka kδ kb)
+    val≡ : θ (GA.π γʰ aʰ bʰ) ! pq ≡ GB.π (θ γʰ) (θ aʰ) (θ bʰ) ! qq
+    val≡ = θ-π₀ (γʰ ! (GA.con↓ γʰ kγ))
+                (aʰ ! (GA.ty↓ γʰ aʰ kγ ka))
+                (bʰ ! (GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb))
+                (GA.conKind γʰ kγ)
+                (GA.tyKind γʰ aʰ kγ ka)
+                (GA.getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb)
 
   σ : ∀ (γ : GA.CT) (a : GA.CT) (b : GA.CT)
     → GA.[ γ ] ≡ GA.cʰ
@@ -883,26 +917,26 @@ G₁ {ℓA} {A} {B} f = record
   σ γʰ aʰ bʰ kγ ka kb = mk≡↓ pq qq val≡
     where
     kδ = GA.k▷ γʰ aʰ kγ ka
-    qq : (GB.σ (θ γʰ) (θ aʰ) (θ bʰ)) .Cond
+    qq : (GB.σ (θ γʰ) (θ aʰ) (θ bʰ)) ↓
     qq = ∧i GA.con↓ γʰ kγ ,
          ∧i GA.ty↓ γʰ aʰ kγ ka ,
          ∧i GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb ,
-         ∧i θ-kc (γʰ .val (GA.con↓ γʰ kγ)) (GA.getCon γʰ kγ) ,
-         ∧i θ-ka (γʰ .val (GA.con↓ γʰ kγ)) (aʰ .val (GA.ty↓ γʰ aʰ kγ ka)) (GA.getTy γʰ aʰ kγ ka) ,
-         ∧i θ-kb (γʰ .val (GA.con↓ γʰ kγ)) (aʰ .val (GA.ty↓ γʰ aʰ kγ ka)) (bʰ .val (GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb)) (GA.getCon γʰ kγ) (GA.getTy γʰ aʰ kγ ka) (GA.getTy▷ γʰ aʰ bʰ kγ ka kδ kb) ,
+         ∧i θ-kc (γʰ ! (GA.con↓ γʰ kγ)) (GA.conKind γʰ kγ) ,
+         ∧i θ-ka (γʰ ! (GA.con↓ γʰ kγ)) (aʰ ! (GA.ty↓ γʰ aʰ kγ ka)) (GA.tyKind γʰ aʰ kγ ka) ,
+         ∧i θ-kb (γʰ ! (GA.con↓ γʰ kγ)) (aʰ ! (GA.ty↓ γʰ aʰ kγ ka)) (bʰ ! (GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb)) (GA.conKind γʰ kγ) (GA.tyKind γʰ aʰ kγ ka) (GA.getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb) ,
          liftp tt
-    q : (GB.σ (θ γʰ) (θ aʰ) (θ bʰ)) .Cond → (θ (GA.σ γʰ aʰ bʰ)) .Cond
+    q : (GB.σ (θ γʰ) (θ aʰ) (θ bʰ)) ↓ → (θ (GA.σ γʰ aʰ bʰ)) ↓
     q _ = ∧i GA.con↓ γʰ kγ ,
           ∧i GA.ty↓ γʰ aʰ kγ ka ,
           ∧i GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb ,
-          ∧i GA.getCon γʰ kγ ,
-          ∧i GA.getTy γʰ aʰ kγ ka ,
-          ∧i GA.getTy▷ γʰ aʰ bʰ kγ ka kδ kb ,
+          ∧i GA.conKind γʰ kγ ,
+          ∧i GA.tyKind γʰ aʰ kγ ka ,
+          ∧i GA.getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb ,
           liftp tt
-    pq : (θ (GA.σ γʰ aʰ bʰ)) .Cond
+    pq : (θ (GA.σ γʰ aʰ bʰ)) ↓
     pq = q qq
-    val≡ : θ (GA.σ γʰ aʰ bʰ) .val pq ≡ GB.σ (θ γʰ) (θ aʰ) (θ bʰ) .val qq
-    val≡ = θ-σ₀ (γʰ .val (GA.con↓ γʰ kγ)) (aʰ .val (GA.ty↓ γʰ aʰ kγ ka)) (bʰ .val (GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb)) (GA.getCon γʰ kγ) (GA.getTy γʰ aʰ kγ ka) (GA.getTy▷ γʰ aʰ bʰ kγ ka kδ kb)
+    val≡ : θ (GA.σ γʰ aʰ bʰ) ! pq ≡ GB.σ (θ γʰ) (θ aʰ) (θ bʰ) ! qq
+    val≡ = θ-σ₀ (γʰ ! (GA.con↓ γʰ kγ)) (aʰ ! (GA.ty↓ γʰ aʰ kγ ka)) (bʰ ! (GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb)) (GA.conKind γʰ kγ) (GA.tyKind γʰ aʰ kγ ka) (GA.getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb)
 
 G : ∀ {ℓA} → Functor (D.Cat ℓA) (W.Cat (lsuc ℓA))
 G = record
