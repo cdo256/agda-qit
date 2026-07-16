@@ -146,7 +146,7 @@ import QIT.Examples.ConTy.Direct
 import QIT.Examples.ConTy.DirectToWeaklyTaggedLarge
 import QIT.Examples.ConTy.WeaklyTaggedToDirect
 -- import QIT.Examples.ConTy.DirectToWeaklyTagged2
--- import QIT.Examples.ConTy.DirectWeaklyTaggedEquiv
+import QIT.Examples.ConTy.DirectWeaklyTaggedEquiv
 -- import QIT.Examples.ConTy.DisplayedReduction
 import QIT.Examples.ConTy.Erased
 -- import QIT.Examples.ConTy.ErasedElim

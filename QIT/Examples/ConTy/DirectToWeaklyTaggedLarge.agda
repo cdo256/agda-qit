@@ -369,30 +369,30 @@ G₀ {ℓA} da = wa
   σπ₀ (con γ) (ty .γ a) (ty .(γ DA.▷ a) b) (ty .((γ DA.▷ a) DA.▷ b) d) refl refl refl refl =
     cong (ty γ) (DA.σπ γ a b d)
 
-  pull₁ : {X : Set ℓA} → {x y : PropLift ℓP X} → x ≡ y
+  extractCond : {X : Set ℓA} → {x y : PropLift ℓP X} → x ≡ y
         → (qy : y .Cond) → x .Cond
-  pull₁ refl qy = qy
+  extractCond refl qy = qy
 
-  pull₂ : {X : Set ℓA} → {x y : PropLift ℓP X} → (p : x ≡ y)
+  extractVal : {X : Set ℓA} → {x y : PropLift ℓP X} → (p : x ≡ y)
     → (qy : y .Cond)
-    → x .val (pull₁ p qy) ≡ y .val qy
-  pull₂ refl qy = refl
+    → x .val (extractCond p qy) ≡ y .val qy
+  extractVal refl qy = refl
 
-  conData₁ : (γʰ : CT) → [ γʰ ] ≡ cʰ
+  con↓ : (γʰ : CT) → [ γʰ ] ≡ cʰ
     → γʰ .Cond
-  conData₁ γʰ kγ = pull₁ kγ tt* .∧e₂
+  con↓ γʰ kγ = extractCond kγ tt* .∧e₂
 
-  conData₂ : (γʰ : CT) → (kγ : [ γʰ ] ≡ cʰ)
-    → [ γʰ .val (conData₁ γʰ kγ) ]₀ ≡ ĉ
-  conData₂ γʰ kγ = pull₂ kγ tt*
+  getCon : (γʰ : CT) → (kγ : [ γʰ ] ≡ cʰ)
+    → [ γʰ .val (con↓ γʰ kγ) ]₀ ≡ ĉ
+  getCon γʰ kγ = extractVal kγ tt*
 
-  tyData₁ : (γʰ aʰ : CT) (kγ : [ γʰ ] ≡ cʰ) (ka : [ aʰ ] ≡ tʰ γʰ)
+  ty↓ : (γʰ aʰ : CT) (kγ : [ γʰ ] ≡ cʰ) (ka : [ aʰ ] ≡ tʰ γʰ)
     → aʰ .Cond
-  tyData₁ γʰ aʰ kγ ka = pull₁ ka (∧i tt* , conData₁ γʰ kγ) .∧e₂
+  ty↓ γʰ aʰ kγ ka = extractCond ka (∧i tt* , con↓ γʰ kγ) .∧e₂
 
-  tyData₂ : (γʰ aʰ : CT) (kγ : [ γʰ ] ≡ cʰ) (ka : [ aʰ ] ≡ tʰ γʰ)
-    → [ aʰ .val (tyData₁ γʰ aʰ kγ ka) ]₀ ≡ t̂ (γʰ .val (conData₁ γʰ kγ))
-  tyData₂ γʰ aʰ kγ ka = pull₂ ka (∧i tt* , conData₁ γʰ kγ)
+  getTy : (γʰ aʰ : CT) (kγ : [ γʰ ] ≡ cʰ) (ka : [ aʰ ] ≡ tʰ γʰ)
+    → [ aʰ .val (ty↓ γʰ aʰ kγ ka) ]₀ ≡ t̂ (γʰ .val (con↓ γʰ kγ))
+  getTy γʰ aʰ kγ ka = extractVal ka (∧i tt* , con↓ γʰ kγ)
 
   ∙ : CT
   ∙ = return ∙₀
@@ -408,19 +408,19 @@ G₀ {ℓA} da = wa
   ▷⁻-γ : ∀ γʰ aʰ
     → (▷ γʰ aʰ) ↓
     → γʰ ↓
-  ▷⁻-γ γʰ aʰ ▷↓ = ▷↓ .∧e₁
+  ▷⁻-γ γʰ aʰ ty▷↓ = ty▷↓ .∧e₁
   ▷⁻-a : ∀ γʰ aʰ
     → (▷ γʰ aʰ) ↓
     → aʰ ↓
-  ▷⁻-a γʰ aʰ ▷↓ = ▷↓ .∧e₂ .∧e₁
+  ▷⁻-a γʰ aʰ ty▷↓ = ty▷↓ .∧e₂ .∧e₁
   ▷⁻-kγ : ∀ γʰ aʰ
-    → (▷↓ : (▷ γʰ aʰ) ↓)
-    → [ γʰ .val (▷⁻-γ γʰ aʰ ▷↓) ]₀ ≡ ĉ
-  ▷⁻-kγ γʰ aʰ ▷↓ = ▷↓ .∧e₂ .∧e₂ .∧e₁
+    → (ty▷↓ : (▷ γʰ aʰ) ↓)
+    → [ γʰ .val (▷⁻-γ γʰ aʰ ty▷↓) ]₀ ≡ ĉ
+  ▷⁻-kγ γʰ aʰ ty▷↓ = ty▷↓ .∧e₂ .∧e₂ .∧e₁
   ▷⁻-ka : ∀ γʰ aʰ
-    → (▷↓ : (▷ γʰ aʰ) ↓)
-    → [ aʰ .val (▷⁻-a γʰ aʰ ▷↓) ]₀ ≡ t̂ (γʰ .val (▷⁻-γ γʰ aʰ ▷↓))
-  ▷⁻-ka γʰ aʰ ▷↓ = ▷↓ .∧e₂ .∧e₂ .∧e₂ .∧e₁
+    → (ty▷↓ : (▷ γʰ aʰ) ↓)
+    → [ aʰ .val (▷⁻-a γʰ aʰ ty▷↓) ]₀ ≡ t̂ (γʰ .val (▷⁻-γ γʰ aʰ ty▷↓))
+  ▷⁻-ka γʰ aʰ ty▷↓ = ty▷↓ .∧e₂ .∧e₂ .∧e₂ .∧e₁
 
   u : CT → CT
   u γʰ =
@@ -518,25 +518,25 @@ G₀ {ℓA} da = wa
              (σ⁻-ka γʰ aʰ bʰ σ↓))
   σ⁻-kb γʰ aʰ bʰ σ↓ = σ↓ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁
 
-  extData₁ : (γʰ aʰ bʰ : CT)
+  ty▷↓ : (γʰ aʰ bʰ : CT)
     → (kγ : [ γʰ ] ≡ cʰ)
     → (ka : [ aʰ ] ≡ tʰ γʰ)
     → (kδ : [ ▷ γʰ aʰ ] ≡ cʰ)
     → (kb : [ bʰ ] ≡ tʰ (▷ γʰ aʰ))
     → bʰ .Cond
-  extData₁ γʰ aʰ bʰ kγ ka kδ kb = pull₁ kb (∧i tt* , conData₁ (▷ γʰ aʰ) kδ) .∧e₂
+  ty▷↓ γʰ aʰ bʰ kγ ka kδ kb = extractCond kb (∧i tt* , con↓ (▷ γʰ aʰ) kδ) .∧e₂
 
-  extData₂ : (γʰ aʰ bʰ : CT)
+  getTy▷ : (γʰ aʰ bʰ : CT)
     → (kγ : [ γʰ ] ≡ cʰ)
     → (ka : [ aʰ ] ≡ tʰ γʰ)
     → (kδ : [ ▷ γʰ aʰ ] ≡ cʰ)
     → (kb : [ bʰ ] ≡ tʰ (▷ γʰ aʰ))
-    → [ bʰ .val (extData₁ γʰ aʰ bʰ kγ ka kδ kb) ]₀
-    ≡ t̂ (▷₀ (γʰ .val (conData₁ γʰ kγ))
-             (aʰ .val (tyData₁ γʰ aʰ kγ ka))
-             (conData₂ γʰ kγ)
-             (tyData₂ γʰ aʰ kγ ka))
-  extData₂ γʰ aʰ bʰ kγ ka kδ kb = tyData₂ (▷ γʰ aʰ) bʰ kδ kb
+    → [ bʰ .val (ty▷↓ γʰ aʰ bʰ kγ ka kδ kb) ]₀
+    ≡ t̂ (▷₀ (γʰ .val (con↓ γʰ kγ))
+             (aʰ .val (ty↓ γʰ aʰ kγ ka))
+             (getCon γʰ kγ)
+             (getTy γʰ aʰ kγ ka))
+  getTy▷ γʰ aʰ bʰ kγ ka kδ kb = getTy (▷ γʰ aʰ) bʰ kδ kb
 
   kk̂ : [ kʰ ] ≡ kʰ
   kk̂ = mk≡↓ (∧i tt* , tt*) tt* refl
@@ -545,7 +545,7 @@ G₀ {ℓA} da = wa
   kĉ = mk≡↓ (∧i tt* , tt*) tt* refl
 
   kt̂ : (γʰ : CT) → [ γʰ ] ≡ cʰ → [ tʰ γʰ ] ≡ kʰ
-  kt̂ γʰ kγ = mk≡↓ (∧i tt* , ∧i tt* , conData₁ γʰ kγ) tt* refl
+  kt̂ γʰ kγ = mk≡↓ (∧i tt* , ∧i tt* , con↓ γʰ kγ) tt* refl
 
   k∙ : [ ∙ ] ≡ cʰ
   k∙ = mk≡↓ (∧i tt* , tt*) tt* refl
@@ -555,24 +555,24 @@ G₀ {ℓA} da = wa
     module k▷ where
     q : return [_]₀ .Cond ∧ᵖ (λ h* → ▷ γʰ aʰ .Cond)
     q = ∧i tt* ,
-        ∧i conData₁ γʰ kγ ,
-        ∧i tyData₁ γʰ aʰ kγ ka ,
-        ∧i conData₂ γʰ kγ ,
-        ∧i tyData₂ γʰ aʰ kγ ka ,
+        ∧i con↓ γʰ kγ ,
+        ∧i ty↓ γʰ aʰ kγ ka ,
+        ∧i getCon γʰ kγ ,
+        ∧i getTy γʰ aʰ kγ ka ,
         tt*
 
   ku : (γʰ : CT) → [ γʰ ] ≡ cʰ → [ u γʰ ] ≡ tʰ γʰ
   ku γʰ kγ = mk≡↓ uq tq val≡
     module ku where
     tq : tʰ γʰ .Cond
-    tq = ∧i tt* , conData₁ γʰ kγ
+    tq = ∧i tt* , con↓ γʰ kγ
     q : tʰ γʰ .Cond → [ u γʰ ] .Cond
-    q _ = ∧i tt* , ∧i conData₁ γʰ kγ , ∧i conData₂ γʰ kγ , tt*
+    q _ = ∧i tt* , ∧i con↓ γʰ kγ , ∧i getCon γʰ kγ , tt*
     uq : [ u γʰ ] .Cond
     uq = q tq
     val≡ : [ u γʰ ] .val uq ≡ tʰ γʰ .val tq
     val≡ =
-      trans (ku₀ (γʰ .val (conData₁ γʰ kγ)) (conData₂ γʰ kγ))
+      trans (ku₀ (γʰ .val (con↓ γʰ kγ)) (getCon γʰ kγ))
             (cong t̂ (congp (γʰ .val)))
 
   kπ : (γʰ aʰ bʰ : CT)
@@ -584,26 +584,26 @@ G₀ {ℓA} da = wa
     module kπ where
     kδ = k▷ γʰ aʰ kγ ka
     tq : tʰ γʰ .Cond
-    tq = ∧i tt* , conData₁ γʰ kγ
+    tq = ∧i tt* , con↓ γʰ kγ
     q : tʰ γʰ .Cond → [ π γʰ aʰ bʰ ] .Cond
     q _ = ∧i tt* ,
-          ∧i conData₁ γʰ kγ ,
-          ∧i tyData₁ γʰ aʰ kγ ka ,
-          ∧i extData₁ γʰ aʰ bʰ kγ ka kδ kb ,
-          ∧i conData₂ γʰ kγ ,
-          ∧i tyData₂ γʰ aʰ kγ ka ,
-          ∧i extData₂ γʰ aʰ bʰ kγ ka kδ kb ,
+          ∧i con↓ γʰ kγ ,
+          ∧i ty↓ γʰ aʰ kγ ka ,
+          ∧i ty▷↓ γʰ aʰ bʰ kγ ka kδ kb ,
+          ∧i getCon γʰ kγ ,
+          ∧i getTy γʰ aʰ kγ ka ,
+          ∧i getTy▷ γʰ aʰ bʰ kγ ka kδ kb ,
           tt*
     pq : [ π γʰ aʰ bʰ ] .Cond
     pq = q tq
     val≡ : [ π γʰ aʰ bʰ ] .val pq ≡ tʰ γʰ .val tq
     val≡ =
-      trans (kπ₀ (γʰ .val (conData₁ γʰ kγ))
-                  (aʰ .val (tyData₁ γʰ aʰ kγ ka))
-                  (bʰ .val (extData₁ γʰ aʰ bʰ kγ ka kδ kb))
-                  (conData₂ γʰ kγ)
-                  (tyData₂ γʰ aʰ kγ ka)
-                  (extData₂ γʰ aʰ bʰ kγ ka kδ kb))
+      trans (kπ₀ (γʰ .val (con↓ γʰ kγ))
+                  (aʰ .val (ty↓ γʰ aʰ kγ ka))
+                  (bʰ .val (ty▷↓ γʰ aʰ bʰ kγ ka kδ kb))
+                  (getCon γʰ kγ)
+                  (getTy γʰ aʰ kγ ka)
+                  (getTy▷ γʰ aʰ bʰ kγ ka kδ kb))
             (cong t̂ (congp (γʰ .val)))
 
   kσ : (γʰ aʰ bʰ : CT)
@@ -615,26 +615,26 @@ G₀ {ℓA} da = wa
     module kσ where
     kδ = k▷ γʰ aʰ kγ ka
     tq : tʰ γʰ .Cond
-    tq = ∧i tt* , conData₁ γʰ kγ
+    tq = ∧i tt* , con↓ γʰ kγ
     q : tʰ γʰ .Cond → [ σ γʰ aʰ bʰ ] .Cond
     q _ = ∧i tt* ,
-          ∧i conData₁ γʰ kγ ,
-          ∧i tyData₁ γʰ aʰ kγ ka ,
-          ∧i extData₁ γʰ aʰ bʰ kγ ka kδ kb ,
-          ∧i conData₂ γʰ kγ ,
-          ∧i tyData₂ γʰ aʰ kγ ka ,
-          ∧i extData₂ γʰ aʰ bʰ kγ ka kδ kb ,
+          ∧i con↓ γʰ kγ ,
+          ∧i ty↓ γʰ aʰ kγ ka ,
+          ∧i ty▷↓ γʰ aʰ bʰ kγ ka kδ kb ,
+          ∧i getCon γʰ kγ ,
+          ∧i getTy γʰ aʰ kγ ka ,
+          ∧i getTy▷ γʰ aʰ bʰ kγ ka kδ kb ,
           tt*
     pq : [ σ γʰ aʰ bʰ ] .Cond
     pq = q tq
     val≡ : [ σ γʰ aʰ bʰ ] .val pq ≡ tʰ γʰ .val tq
     val≡ =
-      trans (kσ₀ (γʰ .val (conData₁ γʰ kγ))
-                  (aʰ .val (tyData₁ γʰ aʰ kγ ka))
-                  (bʰ .val (extData₁ γʰ aʰ bʰ kγ ka kδ kb))
-                  (conData₂ γʰ kγ)
-                  (tyData₂ γʰ aʰ kγ ka)
-                  (extData₂ γʰ aʰ bʰ kγ ka kδ kb))
+      trans (kσ₀ (γʰ .val (con↓ γʰ kγ))
+                  (aʰ .val (ty↓ γʰ aʰ kγ ka))
+                  (bʰ .val (ty▷↓ γʰ aʰ bʰ kγ ka kδ kb))
+                  (getCon γʰ kγ)
+                  (getTy γʰ aʰ kγ ka)
+                  (getTy▷ γʰ aʰ bʰ kγ ka kδ kb))
             (cong t̂ (congp (γʰ .val)))
 
   σ▷ : (γʰ aʰ bʰ : CT)
@@ -646,27 +646,27 @@ G₀ {ℓA} da = wa
     module σ▷ where
     kδ = k▷ γʰ aʰ kγ ka
     qq : ▷ γʰ (σ γʰ aʰ bʰ) .Cond
-    qq = ∧i conData₁ γʰ kγ ,
-          ∧i tyData₁ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb) ,
-          ∧i conData₂ γʰ kγ ,
-          ∧i tyData₂ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb) ,
+    qq = ∧i con↓ γʰ kγ ,
+          ∧i ty↓ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb) ,
+          ∧i getCon γʰ kγ ,
+          ∧i getTy γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb) ,
           tt*
     q : ▷ γʰ (σ γʰ aʰ bʰ) .Cond → ▷ (▷ γʰ aʰ) bʰ .Cond
-    q _ = ∧i conData₁ (▷ γʰ aʰ) kδ ,
-          ∧i tyData₁ (▷ γʰ aʰ) bʰ kδ kb ,
-          ∧i conData₂ (▷ γʰ aʰ) kδ ,
-          ∧i tyData₂ (▷ γʰ aʰ) bʰ kδ kb ,
+    q _ = ∧i con↓ (▷ γʰ aʰ) kδ ,
+          ∧i ty↓ (▷ γʰ aʰ) bʰ kδ kb ,
+          ∧i getCon (▷ γʰ aʰ) kδ ,
+          ∧i getTy (▷ γʰ aʰ) bʰ kδ kb ,
           tt*
     pq : ▷ (▷ γʰ aʰ) bʰ .Cond
     pq = q qq
     val≡ : ▷ (▷ γʰ aʰ) bʰ .val pq ≡ ▷ γʰ (σ γʰ aʰ bʰ) .val qq
     val≡ =
-      σ▷₀ (γʰ .val (conData₁ γʰ kγ))
-          (aʰ .val (tyData₁ γʰ aʰ kγ ka))
-          (bʰ .val (extData₁ γʰ aʰ bʰ kγ ka kδ kb))
-          (conData₂ γʰ kγ)
-          (tyData₂ γʰ aʰ kγ ka)
-          (extData₂ γʰ aʰ bʰ kγ ka kδ kb)
+      σ▷₀ (γʰ .val (con↓ γʰ kγ))
+          (aʰ .val (ty↓ γʰ aʰ kγ ka))
+          (bʰ .val (ty▷↓ γʰ aʰ bʰ kγ ka kδ kb))
+          (getCon γʰ kγ)
+          (getTy γʰ aʰ kγ ka)
+          (getTy▷ γʰ aʰ bʰ kγ ka kδ kb)
 
   σπ : (γʰ aʰ bʰ dʰ : CT)
     → [ γʰ ] ≡ cʰ
@@ -679,33 +679,33 @@ G₀ {ℓA} da = wa
     kδ = k▷ γʰ aʰ kγ ka
     kε = k▷ (▷ γʰ aʰ) bʰ kδ kb
     qq : π γʰ (σ γʰ aʰ bʰ) dʰ .Cond
-    qq = ∧i conData₁ γʰ kγ ,
-          ∧i tyData₁ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb) ,
-          ∧i tyData₁ (▷ γʰ (σ γʰ aʰ bʰ)) dʰ (k▷ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb)) (substp (λ x → [ dʰ ] ≡ tʰ x) (σ▷ γʰ aʰ bʰ kγ ka kb) kc) ,
-          ∧i conData₂ γʰ kγ ,
-          ∧i tyData₂ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb) ,
-          ∧i tyData₂ (▷ γʰ (σ γʰ aʰ bʰ)) dʰ (k▷ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb)) (substp (λ x → [ dʰ ] ≡ tʰ x) (σ▷ γʰ aʰ bʰ kγ ka kb) kc) ,
+    qq = ∧i con↓ γʰ kγ ,
+          ∧i ty↓ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb) ,
+          ∧i ty↓ (▷ γʰ (σ γʰ aʰ bʰ)) dʰ (k▷ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb)) (substp (λ x → [ dʰ ] ≡ tʰ x) (σ▷ γʰ aʰ bʰ kγ ka kb) kc) ,
+          ∧i getCon γʰ kγ ,
+          ∧i getTy γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb) ,
+          ∧i getTy (▷ γʰ (σ γʰ aʰ bʰ)) dʰ (k▷ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb)) (substp (λ x → [ dʰ ] ≡ tʰ x) (σ▷ γʰ aʰ bʰ kγ ka kb) kc) ,
           tt*
     q : π γʰ (σ γʰ aʰ bʰ) dʰ .Cond → π γʰ aʰ (π (▷ γʰ aʰ) bʰ dʰ) .Cond
-    q _ = ∧i conData₁ γʰ kγ ,
-          ∧i tyData₁ γʰ aʰ kγ ka ,
-          ∧i tyData₁ (▷ γʰ aʰ) (π (▷ γʰ aʰ) bʰ dʰ) kδ (kπ (▷ γʰ aʰ) bʰ dʰ kδ kb kc) ,
-          ∧i conData₂ γʰ kγ ,
-          ∧i tyData₂ γʰ aʰ kγ ka ,
-          ∧i tyData₂ (▷ γʰ aʰ) (π (▷ γʰ aʰ) bʰ dʰ) kδ (kπ (▷ γʰ aʰ) bʰ dʰ kδ kb kc) ,
+    q _ = ∧i con↓ γʰ kγ ,
+          ∧i ty↓ γʰ aʰ kγ ka ,
+          ∧i ty↓ (▷ γʰ aʰ) (π (▷ γʰ aʰ) bʰ dʰ) kδ (kπ (▷ γʰ aʰ) bʰ dʰ kδ kb kc) ,
+          ∧i getCon γʰ kγ ,
+          ∧i getTy γʰ aʰ kγ ka ,
+          ∧i getTy (▷ γʰ aʰ) (π (▷ γʰ aʰ) bʰ dʰ) kδ (kπ (▷ γʰ aʰ) bʰ dʰ kδ kb kc) ,
           tt*
     pq : π γʰ aʰ (π (▷ γʰ aʰ) bʰ dʰ) .Cond
     pq = q qq
     val≡ : π γʰ aʰ (π (▷ γʰ aʰ) bʰ dʰ) .val pq ≡ π γʰ (σ γʰ aʰ bʰ) dʰ .val qq
     val≡ =
-      σπ₀ (γʰ .val (conData₁ γʰ kγ))
-          (aʰ .val (tyData₁ γʰ aʰ kγ ka))
-          (bʰ .val (extData₁ γʰ aʰ bʰ kγ ka kδ kb))
-          (dʰ .val (extData₁ (▷ γʰ aʰ) bʰ dʰ kδ kb kε kc))
-          (conData₂ γʰ kγ)
-          (tyData₂ γʰ aʰ kγ ka)
-          (extData₂ γʰ aʰ bʰ kγ ka kδ kb)
-          (extData₂ (▷ γʰ aʰ) bʰ dʰ kδ kb kε kc)
+      σπ₀ (γʰ .val (con↓ γʰ kγ))
+          (aʰ .val (ty↓ γʰ aʰ kγ ka))
+          (bʰ .val (ty▷↓ γʰ aʰ bʰ kγ ka kδ kb))
+          (dʰ .val (ty▷↓ (▷ γʰ aʰ) bʰ dʰ kδ kb kε kc))
+          (getCon γʰ kγ)
+          (getTy γʰ aʰ kγ ka)
+          (getTy▷ γʰ aʰ bʰ kγ ka kδ kb)
+          (getTy▷ (▷ γʰ aʰ) bʰ dʰ kδ kb kε kc)
 
   wa : W.Algebra (lsuc ℓA)
   wa = record
@@ -818,33 +818,33 @@ G₁ {ℓA} {A} {B} f = record
   ▷ γʰ aʰ kγ ka = mk≡↓ pq qq val≡
     where
     qq : (GB.▷ (θ γʰ) (θ aʰ)) .Cond
-    qq = ∧i GA.conData₁ γʰ kγ ,
-         ∧i GA.tyData₁ γʰ aʰ kγ ka ,
-         ∧i θ-kc (γʰ .val (GA.conData₁ γʰ kγ)) (GA.conData₂ γʰ kγ) ,
-         ∧i θ-ka (γʰ .val (GA.conData₁ γʰ kγ)) (aʰ .val (GA.tyData₁ γʰ aʰ kγ ka)) (GA.tyData₂ γʰ aʰ kγ ka) ,
+    qq = ∧i GA.con↓ γʰ kγ ,
+         ∧i GA.ty↓ γʰ aʰ kγ ka ,
+         ∧i θ-kc (γʰ .val (GA.con↓ γʰ kγ)) (GA.getCon γʰ kγ) ,
+         ∧i θ-ka (γʰ .val (GA.con↓ γʰ kγ)) (aʰ .val (GA.ty↓ γʰ aʰ kγ ka)) (GA.getTy γʰ aʰ kγ ka) ,
          liftp tt
     q : (GB.▷ (θ γʰ) (θ aʰ)) .Cond → (θ (GA.▷ γʰ aʰ)) .Cond
-    q _ = ∧i GA.conData₁ γʰ kγ ,
-          ∧i GA.tyData₁ γʰ aʰ kγ ka ,
-          ∧i GA.conData₂ γʰ kγ ,
-          ∧i GA.tyData₂ γʰ aʰ kγ ka ,
+    q _ = ∧i GA.con↓ γʰ kγ ,
+          ∧i GA.ty↓ γʰ aʰ kγ ka ,
+          ∧i GA.getCon γʰ kγ ,
+          ∧i GA.getTy γʰ aʰ kγ ka ,
           liftp tt
     pq : (θ (GA.▷ γʰ aʰ)) .Cond
     pq = q qq
     val≡ : θ (GA.▷ γʰ aʰ) .val pq ≡ GB.▷ (θ γʰ) (θ aʰ) .val qq
-    val≡ = θ-▷₀ (γʰ .val (GA.conData₁ γʰ kγ)) (aʰ .val (GA.tyData₁ γʰ aʰ kγ ka)) (GA.conData₂ γʰ kγ) (GA.tyData₂ γʰ aʰ kγ ka)
+    val≡ = θ-▷₀ (γʰ .val (GA.con↓ γʰ kγ)) (aʰ .val (GA.ty↓ γʰ aʰ kγ ka)) (GA.getCon γʰ kγ) (GA.getTy γʰ aʰ kγ ka)
 
   u : ∀ (γ : GA.CT) → GA.[ γ ] ≡ GA.cʰ → θ (GA.u γ) ≡ GB.u (θ γ)
   u γʰ kγ = mk≡↓ pq qq val≡
     where
     qq : (GB.u (θ γʰ)) .Cond
-    qq = ∧i GA.conData₁ γʰ kγ , ∧i θ-kc (γʰ .val (GA.conData₁ γʰ kγ)) (GA.conData₂ γʰ kγ) , liftp tt
+    qq = ∧i GA.con↓ γʰ kγ , ∧i θ-kc (γʰ .val (GA.con↓ γʰ kγ)) (GA.getCon γʰ kγ) , liftp tt
     q : (GB.u (θ γʰ)) .Cond → (θ (GA.u γʰ)) .Cond
-    q _ = ∧i GA.conData₁ γʰ kγ , ∧i GA.conData₂ γʰ kγ , liftp tt
+    q _ = ∧i GA.con↓ γʰ kγ , ∧i GA.getCon γʰ kγ , liftp tt
     pq : (θ (GA.u γʰ)) .Cond
     pq = q qq
     val≡ : θ (GA.u γʰ) .val pq ≡ GB.u (θ γʰ) .val qq
-    val≡ = θ-u₀ (γʰ .val (GA.conData₁ γʰ kγ)) (GA.conData₂ γʰ kγ)
+    val≡ = θ-u₀ (γʰ .val (GA.con↓ γʰ kγ)) (GA.getCon γʰ kγ)
 
   π : ∀ (γ : GA.CT) (a : GA.CT) (b : GA.CT)
     → GA.[ γ ] ≡ GA.cʰ
@@ -855,25 +855,25 @@ G₁ {ℓA} {A} {B} f = record
     where
     kδ = GA.k▷ γʰ aʰ kγ ka
     qq : (GB.π (θ γʰ) (θ aʰ) (θ bʰ)) .Cond
-    qq = ∧i GA.conData₁ γʰ kγ ,
-         ∧i GA.tyData₁ γʰ aʰ kγ ka ,
-         ∧i GA.extData₁ γʰ aʰ bʰ kγ ka kδ kb ,
-         ∧i θ-kc (γʰ .val (GA.conData₁ γʰ kγ)) (GA.conData₂ γʰ kγ) ,
-         ∧i θ-ka (γʰ .val (GA.conData₁ γʰ kγ)) (aʰ .val (GA.tyData₁ γʰ aʰ kγ ka)) (GA.tyData₂ γʰ aʰ kγ ka) ,
-         ∧i θ-kb (γʰ .val (GA.conData₁ γʰ kγ)) (aʰ .val (GA.tyData₁ γʰ aʰ kγ ka)) (bʰ .val (GA.extData₁ γʰ aʰ bʰ kγ ka kδ kb)) (GA.conData₂ γʰ kγ) (GA.tyData₂ γʰ aʰ kγ ka) (GA.extData₂ γʰ aʰ bʰ kγ ka kδ kb) ,
+    qq = ∧i GA.con↓ γʰ kγ ,
+         ∧i GA.ty↓ γʰ aʰ kγ ka ,
+         ∧i GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb ,
+         ∧i θ-kc (γʰ .val (GA.con↓ γʰ kγ)) (GA.getCon γʰ kγ) ,
+         ∧i θ-ka (γʰ .val (GA.con↓ γʰ kγ)) (aʰ .val (GA.ty↓ γʰ aʰ kγ ka)) (GA.getTy γʰ aʰ kγ ka) ,
+         ∧i θ-kb (γʰ .val (GA.con↓ γʰ kγ)) (aʰ .val (GA.ty↓ γʰ aʰ kγ ka)) (bʰ .val (GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb)) (GA.getCon γʰ kγ) (GA.getTy γʰ aʰ kγ ka) (GA.getTy▷ γʰ aʰ bʰ kγ ka kδ kb) ,
          liftp tt
     q : (GB.π (θ γʰ) (θ aʰ) (θ bʰ)) .Cond → (θ (GA.π γʰ aʰ bʰ)) .Cond
-    q _ = ∧i GA.conData₁ γʰ kγ ,
-          ∧i GA.tyData₁ γʰ aʰ kγ ka ,
-          ∧i GA.extData₁ γʰ aʰ bʰ kγ ka kδ kb ,
-          ∧i GA.conData₂ γʰ kγ ,
-          ∧i GA.tyData₂ γʰ aʰ kγ ka ,
-          ∧i GA.extData₂ γʰ aʰ bʰ kγ ka kδ kb ,
+    q _ = ∧i GA.con↓ γʰ kγ ,
+          ∧i GA.ty↓ γʰ aʰ kγ ka ,
+          ∧i GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb ,
+          ∧i GA.getCon γʰ kγ ,
+          ∧i GA.getTy γʰ aʰ kγ ka ,
+          ∧i GA.getTy▷ γʰ aʰ bʰ kγ ka kδ kb ,
           liftp tt
     pq : (θ (GA.π γʰ aʰ bʰ)) .Cond
     pq = q qq
     val≡ : θ (GA.π γʰ aʰ bʰ) .val pq ≡ GB.π (θ γʰ) (θ aʰ) (θ bʰ) .val qq
-    val≡ = θ-π₀ (γʰ .val (GA.conData₁ γʰ kγ)) (aʰ .val (GA.tyData₁ γʰ aʰ kγ ka)) (bʰ .val (GA.extData₁ γʰ aʰ bʰ kγ ka kδ kb)) (GA.conData₂ γʰ kγ) (GA.tyData₂ γʰ aʰ kγ ka) (GA.extData₂ γʰ aʰ bʰ kγ ka kδ kb)
+    val≡ = θ-π₀ (γʰ .val (GA.con↓ γʰ kγ)) (aʰ .val (GA.ty↓ γʰ aʰ kγ ka)) (bʰ .val (GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb)) (GA.getCon γʰ kγ) (GA.getTy γʰ aʰ kγ ka) (GA.getTy▷ γʰ aʰ bʰ kγ ka kδ kb)
 
   σ : ∀ (γ : GA.CT) (a : GA.CT) (b : GA.CT)
     → GA.[ γ ] ≡ GA.cʰ
@@ -884,25 +884,25 @@ G₁ {ℓA} {A} {B} f = record
     where
     kδ = GA.k▷ γʰ aʰ kγ ka
     qq : (GB.σ (θ γʰ) (θ aʰ) (θ bʰ)) .Cond
-    qq = ∧i GA.conData₁ γʰ kγ ,
-         ∧i GA.tyData₁ γʰ aʰ kγ ka ,
-         ∧i GA.extData₁ γʰ aʰ bʰ kγ ka kδ kb ,
-         ∧i θ-kc (γʰ .val (GA.conData₁ γʰ kγ)) (GA.conData₂ γʰ kγ) ,
-         ∧i θ-ka (γʰ .val (GA.conData₁ γʰ kγ)) (aʰ .val (GA.tyData₁ γʰ aʰ kγ ka)) (GA.tyData₂ γʰ aʰ kγ ka) ,
-         ∧i θ-kb (γʰ .val (GA.conData₁ γʰ kγ)) (aʰ .val (GA.tyData₁ γʰ aʰ kγ ka)) (bʰ .val (GA.extData₁ γʰ aʰ bʰ kγ ka kδ kb)) (GA.conData₂ γʰ kγ) (GA.tyData₂ γʰ aʰ kγ ka) (GA.extData₂ γʰ aʰ bʰ kγ ka kδ kb) ,
+    qq = ∧i GA.con↓ γʰ kγ ,
+         ∧i GA.ty↓ γʰ aʰ kγ ka ,
+         ∧i GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb ,
+         ∧i θ-kc (γʰ .val (GA.con↓ γʰ kγ)) (GA.getCon γʰ kγ) ,
+         ∧i θ-ka (γʰ .val (GA.con↓ γʰ kγ)) (aʰ .val (GA.ty↓ γʰ aʰ kγ ka)) (GA.getTy γʰ aʰ kγ ka) ,
+         ∧i θ-kb (γʰ .val (GA.con↓ γʰ kγ)) (aʰ .val (GA.ty↓ γʰ aʰ kγ ka)) (bʰ .val (GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb)) (GA.getCon γʰ kγ) (GA.getTy γʰ aʰ kγ ka) (GA.getTy▷ γʰ aʰ bʰ kγ ka kδ kb) ,
          liftp tt
     q : (GB.σ (θ γʰ) (θ aʰ) (θ bʰ)) .Cond → (θ (GA.σ γʰ aʰ bʰ)) .Cond
-    q _ = ∧i GA.conData₁ γʰ kγ ,
-          ∧i GA.tyData₁ γʰ aʰ kγ ka ,
-          ∧i GA.extData₁ γʰ aʰ bʰ kγ ka kδ kb ,
-          ∧i GA.conData₂ γʰ kγ ,
-          ∧i GA.tyData₂ γʰ aʰ kγ ka ,
-          ∧i GA.extData₂ γʰ aʰ bʰ kγ ka kδ kb ,
+    q _ = ∧i GA.con↓ γʰ kγ ,
+          ∧i GA.ty↓ γʰ aʰ kγ ka ,
+          ∧i GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb ,
+          ∧i GA.getCon γʰ kγ ,
+          ∧i GA.getTy γʰ aʰ kγ ka ,
+          ∧i GA.getTy▷ γʰ aʰ bʰ kγ ka kδ kb ,
           liftp tt
     pq : (θ (GA.σ γʰ aʰ bʰ)) .Cond
     pq = q qq
     val≡ : θ (GA.σ γʰ aʰ bʰ) .val pq ≡ GB.σ (θ γʰ) (θ aʰ) (θ bʰ) .val qq
-    val≡ = θ-σ₀ (γʰ .val (GA.conData₁ γʰ kγ)) (aʰ .val (GA.tyData₁ γʰ aʰ kγ ka)) (bʰ .val (GA.extData₁ γʰ aʰ bʰ kγ ka kδ kb)) (GA.conData₂ γʰ kγ) (GA.tyData₂ γʰ aʰ kγ ka) (GA.extData₂ γʰ aʰ bʰ kγ ka kδ kb)
+    val≡ = θ-σ₀ (γʰ .val (GA.con↓ γʰ kγ)) (aʰ .val (GA.ty↓ γʰ aʰ kγ ka)) (bʰ .val (GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb)) (GA.getCon γʰ kγ) (GA.getTy γʰ aʰ kγ ka) (GA.getTy▷ γʰ aʰ bʰ kγ ka kδ kb)
 
 G : ∀ {ℓA} → Functor (D.Cat ℓA) (W.Cat (lsuc ℓA))
 G = record

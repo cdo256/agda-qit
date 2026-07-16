@@ -45,20 +45,20 @@ open import QIT.PropLiftMonad
   module DFA = D.Algebra (F₀ (G₀ A))
 
   conAtom : DFA.Con → G.Atom
-  conAtom (γ , kγ) = γ .val (G.conData₁ γ kγ)
+  conAtom (γ , kγ) = γ .val (G.con↓ γ kγ)
 
   conAtom-isCon : (γ : DFA.Con) → G.[ conAtom γ ]₀ ≡ G.ĉ
-  conAtom-isCon (γ , kγ) = G.conData₂ γ kγ
+  conAtom-isCon (γ , kγ) = G.getCon γ kγ
 
   conᴿ : DFA.Con → DA.Con
   conᴿ γ = G.Con₀ (conAtom γ) (conAtom-isCon γ)
 
   tyAtom : (γ : DFA.Con) → DFA.Ty γ → G.Atom
-  tyAtom (γ , kγ) (a , ka) = a .val (G.tyData₁ γ a kγ ka)
+  tyAtom (γ , kγ) (a , ka) = a .val (G.ty↓ γ a kγ ka)
 
   tyAtom-isTy : (γ : DFA.Con) (a : DFA.Ty γ)
     → G.[ tyAtom γ a ]₀ ≡ G.t̂ (conAtom γ)
-  tyAtom-isTy (γ , kγ) (a , ka) = G.tyData₂ γ a kγ ka
+  tyAtom-isTy (γ , kγ) (a , ka) = G.getTy γ a kγ ka
 
   tyᴿ : (γ : DFA.Con) → DFA.Ty γ → DA.Ty (conᴿ γ)
   tyᴿ γ a = G.Ty₀ (conAtom γ) (tyAtom γ a) (conAtom-isCon γ) (tyAtom-isTy γ a)
@@ -203,7 +203,7 @@ open import QIT.PropLiftMonad
     where
     open ≡
     witness : x ↓
-    witness = G.conData₁ x kx
+    witness = G.con↓ x kx
     p : ι (G.con (ε.conᴿ A γ)) ≡ x
     p =
       trans
@@ -217,7 +217,7 @@ open import QIT.PropLiftMonad
     where
     open ≡
     witness : y .Cond
-    witness = G.tyData₁ x y kx ky
+    witness = G.ty↓ x y kx ky
     q : ι (G.ty (ε.conᴿ A γ) (ε.tyᴿ A γ a)) ≡ y
     q =
       trans
@@ -317,16 +317,16 @@ module _ {ℓA}
         ≡⟨ r.t̂ γ ⟩
       G₀A.tʰ (θ γ) ∎
 
-    conM : ∀ (γ : I.CT)
+    con↓ : ∀ (γ : I.CT)
       → (kγ : I.[ γ ] ≡ I.ĉ)
-      → W.Hom.θ (recᵂ (G₀ A)) γ .Cond
-    conM γ kγ = G₀A.conData₁ (θ γ) (θkγ kγ)
+      → θ γ ↓
+    con↓ γ kγ = G₀A.con↓ (θ γ) (θkγ kγ)
 
     η : D.Hom (F₀ I) A
     η .D.conᴿ (γ , kγ) =
       {!!}
       where
-      cd₁ = G₀A.conData₁ {!γ!}
+      cd₁ = G₀A.con↓ {!γ!}
     η .D.tyᴿ (γ , kγ) (a , ka) =
       {!!} 
     η .D.∙ᴿ = {!!}
