@@ -120,6 +120,9 @@ G₀ {ℓA} da = wa
   [[x]]₀≡k̂ ĉ = refl
   [[x]]₀≡k̂ (t̂ x) = refl
 
+  [k̂]₀≡k̂ : [ k̂ ]₀ ≡ k̂
+  [k̂]₀≡k̂ = refl
+
   [_] : CT → CT
   [_] = map [_]₀
 
@@ -151,11 +154,22 @@ G₀ {ℓA} da = wa
   ConΣ = ΣP Atom λ γ → [ γ ]₀ ≡ ĉ
   ConΣ→Con : ConΣ → DA.Con
   ConΣ→Con (con γ , kγ) = γ
+  Con→ConΣ : DA.Con → ConΣ
+  Con→ConΣ γ = (con γ , refl)
   TyΣ : (γ : ConΣ) → Set ℓA
   TyΣ γ = ΣP Atom λ a → [ a ]₀ ≡ t̂ (γ .fst)
   TyΣ→Ty : {γ : ConΣ} → TyΣ γ → (DA.Ty (ConΣ→Con γ))
   TyΣ→Ty {con γ , kγ} (ty γ' a , ka) =
     ≡.subst DA.Ty (con-inj (t̂-inj ka)) a
+  Ty→TyΣ : {γ : DA.Con} → (a : DA.Ty γ) → TyΣ (Con→ConΣ γ)
+  Ty→TyΣ {γ} a = ty γ a , refl
+
+  ConΣ≅Con : ConΣ ≅ˢ DA.Con
+  ConΣ≅Con = record
+    { to = ConΣ→Con
+    ; from = Con→ConΣ
+    ; rinv = λ {(con γ , refl) → refl}
+    ; linv = λ γ → refl }
 
   []≡cʰ→return : ∀ {x*} → [ x* ] ≡ cʰ → ΣP DA.Con λ γ → x* ≡ return (con γ)
   []≡cʰ→return {x*} p = γ , x*≡returnγ
@@ -289,6 +303,9 @@ G₀ {ℓA} da = wa
 
   k▷₀ : (γ a : Atom) → (kγ : [ γ ]₀ ≡ ĉ) → (ka : [ a ]₀ ≡ t̂ γ) → [ ▷₀ γ a kγ ka ]₀ ≡ ĉ
   k▷₀ γ a kγ ka = refl
+
+  ▷Σ : (γ : ConΣ) (a : TyΣ γ) → ConΣ
+  ▷Σ (γ , kγ) (a , ka) = ▷₀ γ a kγ ka , k▷₀ γ a kγ ka
 
   u₀ : (γ : Atom) → (kγ : [ γ ]₀ ≡ ĉ) → Atom
   u₀ γ kγ = ty (Con₀ γ kγ) (DA.u (Con₀ γ kγ))
@@ -733,6 +750,24 @@ G₀ {ℓA} da = wa
           (getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb)
           (getTy▷-kind (▷ γʰ aʰ) bʰ dʰ kδ kb kε kc)
 
+  [kʰ]≡kʰ : [ kʰ ] ≡ kʰ
+  [kʰ]≡kʰ = mk≡↓ (∧i tt* , tt*) tt* refl
+
+  [∙]≡ĉ : [ ∙ ] ≡ cʰ
+  [∙]≡ĉ = mk≡↓ (∧i tt* , tt*) tt* refl
+
+  [▷]≡ĉ : ∀ γ a
+    → (kγ : [ γ ] ≡ cʰ)
+    → (ka : [ a ] ≡ tʰ γ)
+    → [ ▷ γ a ] ≡ cʰ
+  [▷]≡ĉ γ a kγ ka =
+    mk≡↓ (∧i tt*
+         , ∧i con↓ γ kγ
+         , ∧i (ty↓ γ a kγ ka)
+         , ∧i conKind γ kγ
+         , ∧i (tyKind γ a kγ ka)
+         , tt*) tt* refl
+
   wa : W.Algebra (lsuc ℓA)
   wa = record
     { CT = CT
@@ -889,7 +924,12 @@ G₁ {ℓA} {A} {B} f = record
          ∧i θ-ka (γʰ ! (GA.con↓ γʰ kγ))
                  (aʰ ! (GA.ty↓ γʰ aʰ kγ ka))
                  (GA.tyKind γʰ aʰ kγ ka) ,
-         ∧i θ-kb (γʰ ! (GA.con↓ γʰ kγ)) (aʰ ! (GA.ty↓ γʰ aʰ kγ ka)) (bʰ ! (GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb)) (GA.conKind γʰ kγ) (GA.tyKind γʰ aʰ kγ ka) (GA.getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb) ,
+         ∧i θ-kb (γʰ ! (GA.con↓ γʰ kγ))
+                 (aʰ ! (GA.ty↓ γʰ aʰ kγ ka))
+                 (bʰ ! (GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb))
+                 (GA.conKind γʰ kγ)
+                 (GA.tyKind γʰ aʰ kγ ka)
+                 (GA.getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb) ,
          liftp tt
     q : (GB.π (θ γʰ) (θ aʰ) (θ bʰ)) ↓ → (θ (GA.π γʰ aʰ bʰ)) ↓
     q _ = ∧i GA.con↓ γʰ kγ ,

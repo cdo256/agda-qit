@@ -18,102 +18,107 @@ record DispAlgebra ℓX : Set (lsuc (ℓI ⊔ ℓX)) where
   no-eta-equality
   field
     CT : I.CT → Set ℓX
-    [_] : ∀ {x} → CT x → CT (I.[ x ])
+    [] : ∀ x → CT x → CT (I.[ x ])
     k̂ : CT I.k̂
-    kk̂ : subst {ℓI} {ℓX} {I.CT} CT I.kk̂ ([ k̂ ]) ≡ k̂
+    kk̂ : subst {ℓI} {ℓX} {I.CT} CT I.kk̂ ([] I.k̂ k̂) ≡ k̂
     ĉ : CT I.ĉ
-    kĉ : subst CT I.kĉ ([ ĉ ]) ≡ k̂
-    t̂ : ∀ {γ} → CT γ → CT (I.t̂ γ)
-    kt̂ : ∀ {γ} (γᴰ : CT γ)
+    kĉ : subst CT I.kĉ ([] I.ĉ ĉ) ≡ k̂
+    t̂ : ∀ γ → CT γ → CT (I.t̂ γ)
+    kt̂ : ∀ γ (γᴰ : CT γ)
       → (kγ : I.[ γ ] ≡ I.ĉ)
-      → subst CT (I.kt̂ γ kγ) ([ t̂ γᴰ ]) ≡ k̂
+      → subst CT (I.kt̂ γ kγ) ([] (I.t̂ γ) (t̂ γ γᴰ)) ≡ k̂
 
     ∙ : CT I.∙
-    k∙ : subst CT I.k∙ ([ ∙ ]) ≡ ĉ
-    ▷ : ∀ {γ a} → CT γ → CT a → CT (I.▷ γ a)
-    k▷ : ∀ {γ a} (γᴰ : CT γ) (aᴰ : CT a)
+    k∙ : subst CT I.k∙ ([] I.∙ ∙) ≡ ĉ
+    ▷ : ∀ γ a → CT γ → CT a → CT (I.▷ γ a)
+    k▷ : ∀ γ a (γᴰ : CT γ) (aᴰ : CT a)
       → (kγ : I.[ γ ] ≡ I.ĉ)
       → (ka : I.[ a ] ≡ I.t̂ γ)
-      → subst CT (I.k▷ γ a kγ ka) ([ ▷ γᴰ aᴰ ]) ≡ ĉ
-    u : ∀ {γ} → CT γ → CT (I.u γ)
-    ku : ∀ {γ} (γᴰ : CT γ)
+      → subst CT (I.k▷ γ a kγ ka)
+          ([] (I.▷ γ a) (▷ γ a γᴰ aᴰ)) ≡ ĉ
+    u : ∀ γ → CT γ → CT (I.u γ)
+    ku : ∀ γ (γᴰ : CT γ)
       → (kγ : I.[ γ ] ≡ I.ĉ)
-      → subst CT (I.ku γ kγ) ([ u γᴰ ]) ≡ t̂ γᴰ
-    π : ∀ {γ a b} → CT γ → CT a → CT b → CT (I.π γ a b)
-    kπ : ∀ {γ a b} (γᴰ : CT γ) (aᴰ : CT a) (bᴰ : CT b)
-      → (kγ : I.[ γ ] ≡ I.ĉ)
-      → (ka : I.[ a ] ≡ I.t̂ γ)
-      → (kb : I.[ b ] ≡ I.t̂ (I.▷ γ a))
-      → subst CT (I.kπ γ a b kγ ka kb) ([ π γᴰ aᴰ bᴰ ]) ≡ t̂ γᴰ
-    σ : ∀ {γ a b} → CT γ → CT a → CT b → CT (I.σ γ a b)
-    kσ : ∀ {γ a b} (γᴰ : CT γ) (aᴰ : CT a) (bᴰ : CT b)
+      → subst CT (I.ku γ kγ) ([] (I.u γ) (u γ γᴰ)) ≡ t̂ γ γᴰ
+    π : ∀ γ a b → CT γ → CT a → CT b → CT (I.π γ a b)
+    kπ : ∀ γ a b (γᴰ : CT γ) (aᴰ : CT a) (bᴰ : CT b)
       → (kγ : I.[ γ ] ≡ I.ĉ)
       → (ka : I.[ a ] ≡ I.t̂ γ)
       → (kb : I.[ b ] ≡ I.t̂ (I.▷ γ a))
-      → subst CT (I.kσ γ a b kγ ka kb) ([ σ γᴰ aᴰ bᴰ ]) ≡ t̂ γᴰ
-    σ▷ : ∀ {γ a b}
+      → subst CT (I.kπ γ a b kγ ka kb)
+          ([] (I.π γ a b) (π γ a b γᴰ aᴰ bᴰ)) ≡ t̂ γ γᴰ
+    σ : ∀ γ a b → CT γ → CT a → CT b → CT (I.σ γ a b)
+    kσ : ∀ γ a b (γᴰ : CT γ) (aᴰ : CT a) (bᴰ : CT b)
+      → (kγ : I.[ γ ] ≡ I.ĉ)
+      → (ka : I.[ a ] ≡ I.t̂ γ)
+      → (kb : I.[ b ] ≡ I.t̂ (I.▷ γ a))
+      → subst CT (I.kσ γ a b kγ ka kb)
+          ([] (I.σ γ a b) (σ γ a b γᴰ aᴰ bᴰ)) ≡ t̂ γ γᴰ
+    σ▷ : ∀ γ a b
       (γᴰ : CT γ) (aᴰ : CT a) (bᴰ : CT b)
       → (kγ : I.[ γ ] ≡ I.ĉ)
       → (ka : I.[ a ] ≡ I.t̂ γ)
       → (kb : I.[ b ] ≡ I.t̂ (I.▷ γ a))
-      → subst CT (I.σ▷ γ a b kγ ka kb) (▷ (▷ γᴰ aᴰ) bᴰ)
-      ≡ ▷ γᴰ (σ γᴰ aᴰ bᴰ)
-    σπ : ∀ {γ a b c}
+      → subst CT (I.σ▷ γ a b kγ ka kb)
+          (▷ (I.▷ γ a) b (▷ γ a γᴰ aᴰ) bᴰ)
+      ≡ ▷ γ (I.σ γ a b) γᴰ (σ γ a b γᴰ aᴰ bᴰ)
+    σπ : ∀ γ a b c
       (γᴰ : CT γ) (aᴰ : CT a) (bᴰ : CT b) (cᴰ : CT c)
       → (kγ : I.[ γ ] ≡ I.ĉ)
       → (ka : I.[ a ] ≡ I.t̂ γ)
       → (kb : I.[ b ] ≡ I.t̂ (I.▷ γ a))
       → (kc : I.[ c ] ≡ I.t̂ (I.▷ (I.▷ γ a) b))
       → subst CT (I.σπ γ a b c kγ ka kb kc)
-          (π γᴰ aᴰ (π (▷ γᴰ aᴰ) bᴰ cᴰ))
-      ≡ π γᴰ (σ γᴰ aᴰ bᴰ) cᴰ
+          (π γ a (I.π (I.▷ γ a) b c)
+             γᴰ aᴰ (π (I.▷ γ a) b c (▷ γ a γᴰ aᴰ) bᴰ cᴰ))
+      ≡ π γ (I.σ γ a b) c γᴰ (σ γ a b γᴰ aᴰ bᴰ) cᴰ
 
 ΣAlg : ∀ {ℓX} → DispAlgebra ℓX → Algebra (ℓI ⊔ ℓX)
 ΣAlg D = record
   { CT = Σ I.CT D.CT
-  ; [_] = λ (x , xᴰ) → I.[ x ] , D.[ xᴰ ]
+  ; [_] = λ (x , xᴰ) → I.[ x ] , D.[] x xᴰ
   ; k̂ = I.k̂ , D.k̂
   ; kk̂ = Σ≡ I.kk̂ D.kk̂
   ; ĉ = I.ĉ , D.ĉ
   ; kĉ = Σ≡ I.kĉ D.kĉ
-  ; t̂ = λ (γ , γᴰ) → I.t̂ γ , D.t̂ γᴰ
+  ; t̂ = λ (γ , γᴰ) → I.t̂ γ , D.t̂ γ γᴰ
   ; kt̂ = λ (γ , γᴰ) kγ
       → Σ≡ (I.kt̂ γ (cb kγ))
-          (D.kt̂ γᴰ (cb kγ))
+          (D.kt̂ γ γᴰ (cb kγ))
   ; ∙ = I.∙ , D.∙
   ; k∙ = Σ≡ I.k∙ D.k∙
-  ; ▷ = λ (γ , γᴰ) (a , aᴰ) → I.▷ γ a , D.▷ γᴰ aᴰ
+  ; ▷ = λ (γ , γᴰ) (a , aᴰ) → I.▷ γ a , D.▷ γ a γᴰ aᴰ
   ; k▷ = λ (γ , γᴰ) (a , aᴰ) kγ ka
       → Σ≡ (I.k▷ γ a (cb kγ) (cb ka))
-          (D.k▷ γᴰ aᴰ (cb kγ) (cb ka))
-  ; u = λ (γ , γᴰ) → I.u γ , D.u γᴰ
+          (D.k▷ γ a γᴰ aᴰ (cb kγ) (cb ka))
+  ; u = λ (γ , γᴰ) → I.u γ , D.u γ γᴰ
   ; ku = λ (γ , γᴰ) kγ
       → Σ≡ (I.ku γ (cb kγ))
-          (D.ku γᴰ (cb kγ))
+          (D.ku γ γᴰ (cb kγ))
   ; π = λ (γ , γᴰ) (a , aᴰ) (b , bᴰ)
-      → I.π γ a b , D.π γᴰ aᴰ bᴰ
+      → I.π γ a b , D.π γ a b γᴰ aᴰ bᴰ
   ; kπ = λ (γ , γᴰ) (a , aᴰ) (b , bᴰ) kγ ka kb
       → Σ≡ (I.kπ γ a b
                (cb kγ) (cb ka) (cb kb))
-          (D.kπ γᴰ aᴰ bᴰ
+          (D.kπ γ a b γᴰ aᴰ bᴰ
                (cb kγ) (cb ka) (cb kb))
   ; σ = λ (γ , γᴰ) (a , aᴰ) (b , bᴰ)
-      → I.σ γ a b , D.σ γᴰ aᴰ bᴰ
+      → I.σ γ a b , D.σ γ a b γᴰ aᴰ bᴰ
   ; kσ = λ (γ , γᴰ) (a , aᴰ) (b , bᴰ) kγ ka kb
       → Σ≡ (I.kσ γ a b
                (cb kγ) (cb ka) (cb kb))
-          (D.kσ γᴰ aᴰ bᴰ
+          (D.kσ γ a b γᴰ aᴰ bᴰ
                (cb kγ) (cb ka) (cb kb))
   ; σ▷ = λ (γ , γᴰ) (a , aᴰ) (b , bᴰ) kγ ka kb
       → Σ≡ (I.σ▷ γ a b
                (cb kγ) (cb ka) (cb kb))
-          (D.σ▷ γᴰ aᴰ bᴰ
+          (D.σ▷ γ a b γᴰ aᴰ bᴰ
                (cb kγ) (cb ka) (cb kb))
   ; σπ = λ (γ , γᴰ) (a , aᴰ) (b , bᴰ) (c , cᴰ) kγ ka kb kc
       → Σ≡ (I.σπ γ a b c
                (cb kγ) (cb ka)
                (cb kb) (cb kc))
-          (D.σπ γᴰ aᴰ bᴰ cᴰ
+          (D.σπ γ a b c γᴰ aᴰ bᴰ cᴰ
                (cb kγ) (cb ka)
                (cb kb) (cb kc))
   }
@@ -192,60 +197,60 @@ runD {ℓM} M DA x = subst (λ F → F x) DA.motive y
   y : DD.CT x
   y = subst DD.CT (EH.fst≡ x) (sndΣ pair)
 
-CodeRows : DispAlgebraWithMotive (λ x → I.CT → Prop ℓI)
-CodeRows = record
-  { DA = record
-    { CT = λ _ → I.CT → Prop ℓI
-    ; [_] = Row[]
-    ; k̂ = {!!}
-    ; kk̂ = {!!}
-    ; ĉ = {!!}
-    ; kĉ = {!!}
-    ; t̂ = {!!}
-    ; kt̂ = {!!}
-    ; ∙ = {!!}
-    ; k∙ = {!!}
-    ; ▷ = {!!}
-    ; k▷ = {!!}
-    ; u = {!!}
-    ; ku = {!!}
-    ; π = {!!}
-    ; kπ = {!!}
-    ; σ = {!!}
-    ; kσ = {!!}
-    ; σ▷ = {!!}
-    ; σπ = {!!}
-    }
-  ; motive = ≡.refl }
-  where
-  Row[] : (I.CT → Prop ℓI) → I.CT → Prop ℓI
-  Row[] rowP = runD (λ _ → Prop ℓI) RowAlg
-    where
-    RowAlg : DispAlgebraWithMotive (λ _ → Prop ℓI)
-    RowAlg = record
-      { DA = record
-        { CT = λ _ → Prop ℓI
-        ; [_] = λ {x} P → {!!} 
-        ; k̂ = {!!}
-        ; kk̂ = {!!}
-        ; ĉ = {!!}
-        ; kĉ = {!!}
-        ; t̂ = {!!}
-        ; kt̂ = {!!}
-        ; ∙ = {!!}
-        ; k∙ = {!!}
-        ; ▷ = {!!}
-        ; k▷ = {!!}
-        ; u = {!!}
-        ; ku = {!!}
-        ; π = {!!}
-        ; kπ = {!!}
-        ; σ = {!!}
-        ; kσ = {!!}
-        ; σ▷ = {!!}
-        ; σπ = {!!}
-        }
-      ; motive = {!!} }
+-- CodeRows : DispAlgebraWithMotive (λ x → I.CT → Prop ℓI)
+-- CodeRows = record
+--   { DA = record
+--     { CT = λ _ → I.CT → Prop ℓI
+--     ; [_] = Row[]
+--     ; k̂ = {!!}
+--     ; kk̂ = {!!}
+--     ; ĉ = {!!}
+--     ; kĉ = {!!}
+--     ; t̂ = {!!}
+--     ; kt̂ = {!!}
+--     ; ∙ = {!!}
+--     ; k∙ = {!!}
+--     ; ▷ = {!!}
+--     ; k▷ = {!!}
+--     ; u = {!!}
+--     ; ku = {!!}
+--     ; π = {!!}
+--     ; kπ = {!!}
+--     ; σ = {!!}
+--     ; kσ = {!!}
+--     ; σ▷ = {!!}
+--     ; σπ = {!!}
+--     }
+--   ; motive = ≡.refl }
+--   where
+--   Row[] : (I.CT → Prop ℓI) → I.CT → Prop ℓI
+--   Row[] rowP = runD (λ _ → Prop ℓI) RowAlg
+--     where
+--     RowAlg : DispAlgebraWithMotive (λ _ → Prop ℓI)
+--     RowAlg = record
+--       { DA = record
+--         { CT = λ _ → Prop ℓI
+--         ; [_] = λ {x} P → {!!} 
+--         ; k̂ = {!!}
+--         ; kk̂ = {!!}
+--         ; ĉ = {!!}
+--         ; kĉ = {!!}
+--         ; t̂ = {!!}
+--         ; kt̂ = {!!}
+--         ; ∙ = {!!}
+--         ; k∙ = {!!}
+--         ; ▷ = {!!}
+--         ; k▷ = {!!}
+--         ; u = {!!}
+--         ; ku = {!!}
+--         ; π = {!!}
+--         ; kπ = {!!}
+--         ; σ = {!!}
+--         ; kσ = {!!}
+--         ; σ▷ = {!!}
+--         ; σπ = {!!}
+--         }
+--       ; motive = {!!} }
 
 -- -- record InversionMotive (x : I.CT) : Set (lsuc ℓA) where
 -- --   no-eta-equality

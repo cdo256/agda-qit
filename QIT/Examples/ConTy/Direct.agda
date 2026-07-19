@@ -10,6 +10,9 @@ open import QIT.Relation.Binary using (IsEquivalence)
 open import QIT.Category.Base
 open import QIT.Relation.Subset
 
+infixr 9 _∘_
+infix  4 _≈_
+
 record Algebra ℓA : Set (lsuc ℓA) where
   infixl 5 _▷_
   field
@@ -60,7 +63,6 @@ id = record
   ; σᴿ   = λ _ _ _ → ≡.refl
   }
 
-infixr 9 _∘_
 _∘_ : ∀ {A : Algebra ℓA} {B : Algebra ℓB} {C : Algebra ℓC}
     → Hom B C → Hom A B → Hom A C
 _∘_ {A = A} {B} {C} g f = record

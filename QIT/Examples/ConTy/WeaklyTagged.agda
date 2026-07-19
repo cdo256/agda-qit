@@ -11,6 +11,9 @@ open import QIT.Relation.Nullary
 open import QIT.Relation.Binary using (IsEquivalence)
 open import QIT.Category.Base
 
+infix  4 _≈_
+infixr 9 _∘_
+
 record Algebra ℓX : Set (lsuc ℓX) where
   no-eta-equality
   field

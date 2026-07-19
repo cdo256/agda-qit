@@ -21,6 +21,8 @@ record PropLift ℓP (X : Set ℓX) : Set (lsuc ℓP ⊔ ℓX) where
 open PropLift public
 
 module _ {ℓP} where
+  infixl 7 _!_
+  infixl 8 _↓
   return : {X : Set ℓX} → X → PropLift ℓP X
   return x = ⊤* ⊢ λ _ → x
   fail : {X : Set ℓX} → PropLift ℓP X
@@ -201,3 +203,9 @@ module _ {ℓP} where
     → (f* <*> x*) ↓
     → f* ↓ ∧ᵖ λ _ → x* ↓
   <*>⁻ f* x* app↓ = app↓
+
+  x↓→return : {X : Set ℓX} {x* : PropLift ℓP X}
+    → (x* : PropLift ℓP X)
+    → (x↓ : x* ↓)
+    → x* ≡ return (x* ! x↓)
+  x↓→return x* x↓ = mk≡↓ x↓ tt* ≡.refl
