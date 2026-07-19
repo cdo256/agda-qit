@@ -517,42 +517,21 @@ module _ {ℓA}
       εFI = ε FI
       module εFI = ε FI
       module εFI₀ = D.Hom εFI
+      con≡₀' : (γ : I.CT) (kγ : I.[ γ ] ≡ I.ĉ)
+        → (kγ' : G₀FI.[ return (G₀FI.con (γ , kγ)) ] ≡ G₀FI.cʰ)
+        → ι.θ (εFI.conᴿ (return (G₀FI.con (γ , kγ)) , kγ') .fst) ≡ return (G₀FI.con (γ , kγ))
+      con≡₀' γ kγ kγ' = {!!}
       con≡₀ : (γ : GFI.CT) (kγ : GFI.[ γ ] ≡ GFI.ĉ)
+        → {γ↓ : γ ↓}
+        → Singleton (γ ! γ↓)
         → ι.θ (εFI.conᴿ (γ , kγ) .fst) ≡ γ
-      con≡₀ γ kγ with inspect (γ ! G₀FI.con↓ γ kγ)
-      ... | G₀.con (δ , kδ) , pγ! = {!!}
+      con≡₀ γ kγ (G₀.con (δ , kδ) , pγ!) = trans (trans (cong ι.θ {!!}) {!!}) {!!}
         where
+        kγ'' : G₀FI.[ return (G₀FI.con (δ , kδ)) ] ≡ G₀FI.cʰ
+        s : ι.θ (εFI.conᴿ (return (G₀FI.con (δ , kδ)) , kγ'') .fst)
+          ≡ return (G₀FI.con (δ , kδ))
+        s = con≡₀' δ kδ (trans (map-beta G₀FI.[_]₀ (G₀FI.con (δ , kδ))) refl)
         open DispAlgebra
-        module DecCT where
-          Dec↓ : G₀FI.CT → Set
-          Dec↓ x = Decᵖ (x ↓)
-          θDec↓ : I.CT → Set
-          θDec↓ x = Dec↓ (ι.θ x)
-
-          open DispAlgebra
-          Dec↓-Alg : DispAlgebra _
-          Dec↓-Alg .CT x = θDec↓ x
-          Dec↓-Alg .[] x (yes px) = {!!}
-          Dec↓-Alg .[] x (no ¬px) = no (λ p[x] → ¬px (G₀FI.[]⁻ {!x!} {!p[x]!}))
-          Dec↓-Alg .k̂ = {!!}
-          Dec↓-Alg .kk̂ = {!!}
-          Dec↓-Alg .ĉ = {!!}
-          Dec↓-Alg .kĉ = {!!}
-          Dec↓-Alg .t̂ = {!!}
-          Dec↓-Alg .kt̂ = {!!}
-          Dec↓-Alg .∙ = {!!}
-          Dec↓-Alg .k∙ = {!!}
-          Dec↓-Alg .▷ = {!!}
-          Dec↓-Alg .k▷ = {!!}
-          Dec↓-Alg .u = {!!}
-          Dec↓-Alg .ku = {!!}
-          Dec↓-Alg .π = {!!}
-          Dec↓-Alg .kπ = {!!}
-          Dec↓-Alg .σ = {!!}
-          Dec↓-Alg .kσ = {!!}
-          Dec↓-Alg .σ▷ = {!!}
-          Dec↓-Alg .σπ = {!!}
-
         module Beta where
           record Beta (x : I.CT) : Set _ where
             constructor mkBeta
@@ -685,28 +664,28 @@ module _ {ℓA}
           βA .kσ γ a b γᴰ aᴰ bᴰ kγ ka kb = refl
           βA .σ▷ γ a b γᴰ aᴰ bᴰ kγ ka kb = refl
           βA .σπ γ a b c γᴰ aᴰ bᴰ cᴰ kγ ka kb kc = {!!}
-      ... | G₀.ty δ a , pγ! = ⊥e (G₀FI.ĉ≢t̂ (sym q))
+      con≡₀ γ kγ (G₀.ty δ a , pγ!) = ⊥e (G₀FI.ĉ≢t̂ (sym q))
         where
         q : G₀FI.t̂ (G₀FI.con δ) ≡ G₀FI.ĉ
         q = trans (cong G₀FI.[_]₀ pγ!) (G₀FI.conKind γ kγ)
-      ... | G₀.k̂ , pγ! = ⊥e (G₀FI.k̂≢ĉ q)
+      con≡₀ γ kγ (G₀.k̂ , pγ!) = ⊥e (G₀FI.k̂≢ĉ q)
         where
         q : G₀FI.k̂ ≡ G₀FI.ĉ
         q = trans (cong G₀FI.[_]₀ pγ!) (G₀FI.conKind γ kγ)
-      ... | G₀.ĉ , pγ! = ⊥e (G₀FI.k̂≢ĉ q)
+      con≡₀ γ kγ (G₀.ĉ , pγ!) = ⊥e (G₀FI.k̂≢ĉ q)
         where
         q : G₀FI.k̂ ≡ G₀FI.ĉ
         q = trans (cong G₀FI.[_]₀ pγ!) (G₀FI.conKind γ kγ)
-      ... | G₀.t̂ δ , pγ! = ⊥e (G₀FI.k̂≢ĉ q)
+      con≡₀ γ kγ (G₀.t̂ δ , pγ!) = ⊥e (G₀FI.k̂≢ĉ q)
         where
         q : G₀FI.k̂ ≡ G₀FI.ĉ
         q = trans (cong G₀FI.[_]₀ pγ!) (G₀FI.conKind γ kγ)
       con≡ : (γ : FGFI.Con) → Fι.conᴿ (εFI.conᴿ γ) ≡ γ
-      con≡ (γ , kγ) = ΣP≡ _ _ (con≡₀ γ kγ)
-{-
-      ty≡ : (γ : FI.Con) (a : FI.Ty γ)
-          → subst FI.Ty (con≡ γ) (Fι.tyᴿ (εFI.conᴿ γ) (εFI.tyᴿ γ a)) ≡ a
+      con≡ (γ , kγ) = ΣP≡ _ _ (con≡₀ γ kγ (inspect (γ ! G₀FI.con↓ γ kγ)))
+      ty≡ : (γ : FGFI.Con) (a : FGFI.Ty γ)
+          → subst FGFI.Ty (con≡ γ) (Fι.tyᴿ (εFI.conᴿ γ) (εFI.tyᴿ γ a)) ≡ a
 
+{-
     ε∘Fι≡id : ε FI D.∘ Fι D.≈ D.id
     ε∘Fι≡id = {!D.mk≈ con≡ ty≡!}
       where
