@@ -15,6 +15,7 @@ data ⊤ : Prop where
 ⊤* = LiftP _ ⊤
 
 pattern tt* = liftp tt
+{-# DISPLAY liftp ⊤.tt = tt* #-}
 
 infix 6 ¬_
 ¬_ : Prop ℓA → Prop ℓA

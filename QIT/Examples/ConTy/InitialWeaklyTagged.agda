@@ -173,6 +173,19 @@ run X A = rec.θ A.toAlgebra
   where
   module A = AlgebraWithMotive A
 
+rec₂ : ∀ {ℓM}
+  → (M : Set (ℓM ⊔ ℓA))
+  → (A : AlgebraWithMotive (AlgebraWithMotive M))
+  → I.CT → I.CT → M
+rec₂ {ℓM} M A x y = m₂
+  where
+  M' : Set _
+  M' = AlgebraWithMotive M
+  m₁ : M'
+  m₁ = run M' A x
+  m₂ : M
+  m₂ = run M m₁ y
+
 record DispAlgebraWithMotive {ℓX} (M : I.CT → Set ℓX) : Set (lsuc ℓI ⊔ lsuc ℓX) where
   field
     DA : DispAlgebra ℓX
@@ -197,114 +210,182 @@ runD {ℓM} M DA x = subst (λ F → F x) DA.motive y
   y : DD.CT x
   y = subst DD.CT (EH.fst≡ x) (sndΣ pair)
 
--- CodeRows : DispAlgebraWithMotive (λ x → I.CT → Prop ℓI)
--- CodeRows = record
---   { DA = record
---     { CT = λ _ → I.CT → Prop ℓI
---     ; [_] = Row[]
---     ; k̂ = {!!}
---     ; kk̂ = {!!}
---     ; ĉ = {!!}
---     ; kĉ = {!!}
---     ; t̂ = {!!}
---     ; kt̂ = {!!}
---     ; ∙ = {!!}
---     ; k∙ = {!!}
---     ; ▷ = {!!}
---     ; k▷ = {!!}
---     ; u = {!!}
---     ; ku = {!!}
---     ; π = {!!}
---     ; kπ = {!!}
---     ; σ = {!!}
---     ; kσ = {!!}
---     ; σ▷ = {!!}
---     ; σπ = {!!}
---     }
---   ; motive = ≡.refl }
+elim₂ : ∀ {ℓM}
+  → (M : I.CT → I.CT → Set (ℓM ⊔ ℓA))
+  → (A : DispAlgebraWithMotive (λ x → DispAlgebraWithMotive (λ y → M x y)))
+  → ∀ x y → M x y
+elim₂ {ℓM} M A x y = m₂
+  where
+  M' : (x : I.CT) → Set _
+  M' x = DispAlgebraWithMotive (λ y → M x y)
+  m₁ : M' x
+  m₁ = runD M' A x
+  m₂ : M x y
+  m₂ = runD (M x) m₁ y
+  
+
+{-
+Codes : ∀
+  → DispAlgebraWithMotive (λ _ → DispAlgebraWithMotive (λ _ → Code))
+Codes = record
+  { DA = record
+    { CT = λ _ → DispAlgebraWithMotive (λ _ → Code)
+    ; [] = λ x mx → record
+      { DA = record
+        { CT = λ _ → Code
+        ; [] = λ y ym → {!!}
+        ; k̂ = {!!}
+        ; kk̂ = {!!}
+        ; ĉ = {!!}
+        ; kĉ = {!!}
+        ; t̂ = {!!}
+        ; kt̂ = {!!}
+        ; ∙ = {!!}
+        ; k∙ = {!!}
+        ; ▷ = {!!}
+        ; k▷ = {!!}
+        ; u = {!!}
+        ; ku = {!!}
+        ; π = {!!}
+        ; kπ = {!!}
+        ; σ = {!!}
+        ; kσ = {!!}
+        ; σ▷ = {!!}
+        ; σπ = {!!}
+        }
+      ; motive = {!!} }
+    ; k̂ = {!!}
+    ; kk̂ = {!!}
+    ; ĉ = {!!}
+    ; kĉ = {!!}
+    ; t̂ = {!!}
+    ; kt̂ = {!!}
+    ; ∙ = {!!}
+    ; k∙ = {!!}
+    ; ▷ = {!!}
+    ; k▷ = {!!}
+    ; u = {!!}
+    ; ku = {!!}
+    ; π = {!!}
+    ; kπ = {!!}
+    ; σ = {!!}
+    ; kσ = {!!}
+    ; σ▷ = {!!}
+    ; σπ = {!!}
+    }
+  ; motive = {!!} }
+
+
+
+CodeRows : DispAlgebraWithMotive (λ x → I.CT → Prop ℓI)
+CodeRows = record
+  { DA = record
+    { CT = λ _ → I.CT → Prop ℓI
+    ; [_] = Row[]
+    ; k̂ = {!!}
+    ; kk̂ = {!!}
+    ; ĉ = {!!}
+    ; kĉ = {!!}
+    ; t̂ = {!!}
+    ; kt̂ = {!!}
+    ; ∙ = {!!}
+    ; k∙ = {!!}
+    ; ▷ = {!!}
+    ; k▷ = {!!}
+    ; u = {!!}
+    ; ku = {!!}
+    ; π = {!!}
+    ; kπ = {!!}
+    ; σ = {!!}
+    ; kσ = {!!}
+    ; σ▷ = {!!}
+    ; σπ = {!!}
+    }
+  ; motive = ≡.refl }
+  where
+  Row[] : (I.CT → Prop ℓI) → I.CT → Prop ℓI
+  Row[] rowP = runD (λ _ → Prop ℓI) RowAlg
+    where
+    RowAlg : DispAlgebraWithMotive (λ _ → Prop ℓI)
+    RowAlg = record
+      { DA = record
+        { CT = λ _ → Prop ℓI
+        ; [_] = λ {x} P → {!!} 
+        ; k̂ = {!!}
+        ; kk̂ = {!!}
+        ; ĉ = {!!}
+        ; kĉ = {!!}
+        ; t̂ = {!!}
+        ; kt̂ = {!!}
+        ; ∙ = {!!}
+        ; k∙ = {!!}
+        ; ▷ = {!!}
+        ; k▷ = {!!}
+        ; u = {!!}
+        ; ku = {!!}
+        ; π = {!!}
+        ; kπ = {!!}
+        ; σ = {!!}
+        ; kσ = {!!}
+        ; σ▷ = {!!}
+        ; σπ = {!!}
+        }
+      ; motive = {!!} }
+
+-- record InversionMotive (x : I.CT) : Set (lsuc ℓA) where
+--   no-eta-equality
+--   field
+--     []-inv-kγ : ∀ γ a
+--       → x ≡ (I.▷ γ a)
+--       → I.[ I.▷ γ a ] ≡ I.ĉ
+--       → I.[ γ ] ≡ I.ĉ
+--     ▷-inv-kγ : ∀ γ a
+--       → x ≡ (I.▷ γ a)
+--       → I.[ I.▷ γ a ] ≡ I.ĉ
+--       → I.[ γ ] ≡ I.ĉ
+--     ▷-inv-ka : ∀ γ a
+--       → x ≡ (I.▷ γ a)
+--       → I.[ I.▷ γ a ] ≡ I.ĉ
+--       → I.[ a ] ≡ I.t̂ γ
+--     u-inv-kγ : ∀ {γ γ'}
+--       → x ≡ I.u γ
+--       → I.[ I.u γ ] ≡ I.t̂ γ'
+--       → I.[ γ ] ≡ I.ĉ
+--     u-inv-γγ' : ∀ {γ γ'}
+--       → x ≡ I.u γ
+--       → I.[ I.u γ ] ≡ I.t̂ γ'
+--       → γ ≡ γ'
+
+-- InversionAlgebra : DispAlgebra (lsuc ℓA)
+-- InversionAlgebra = record
+--   { CT = InversionMotive
+--   ; [_] = {!!}
+--   ; k̂ = {!!}
+--   ; kk̂ = {!!}
+--   ; ĉ = {!!}
+--   ; kĉ = {!!}
+--   ; t̂ = {!!}
+--   ; kt̂ = {!!}
+--   ; ∙ = {!!}
+--   ; k∙ = {!!}
+--   ; ▷ = {!!}
+--   ; k▷ = {!!}
+--   ; u = {!!}
+--   ; ku = {!!}
+--   ; π = {!!}
+--   ; kπ = {!!}
+--   ; σ = {!!}
+--   ; kσ = {!!}
+--   ; σ▷ = {!!}
+--   ; σπ = {!!}
+--   }
 --   where
---   Row[] : (I.CT → Prop ℓI) → I.CT → Prop ℓI
---   Row[] rowP = runD (λ _ → Prop ℓI) RowAlg
+--   [_]ᴰ : ∀ {x : I.CT} → InversionMotive x → InversionMotive I.[ x ]
+--   [_]ᴰ {x} xᴹ = record
+--     { ▷-inv-kγ = λ { γ a k▷ x≡ → {!!} }
+--     ; ▷-inv-ka = {!!}
+--     ; u-inv-kγ = {!!}
+--     ; u-inv-γγ' = {!!} }
 --     where
---     RowAlg : DispAlgebraWithMotive (λ _ → Prop ℓI)
---     RowAlg = record
---       { DA = record
---         { CT = λ _ → Prop ℓI
---         ; [_] = λ {x} P → {!!} 
---         ; k̂ = {!!}
---         ; kk̂ = {!!}
---         ; ĉ = {!!}
---         ; kĉ = {!!}
---         ; t̂ = {!!}
---         ; kt̂ = {!!}
---         ; ∙ = {!!}
---         ; k∙ = {!!}
---         ; ▷ = {!!}
---         ; k▷ = {!!}
---         ; u = {!!}
---         ; ku = {!!}
---         ; π = {!!}
---         ; kπ = {!!}
---         ; σ = {!!}
---         ; kσ = {!!}
---         ; σ▷ = {!!}
---         ; σπ = {!!}
---         }
---       ; motive = {!!} }
-
--- -- record InversionMotive (x : I.CT) : Set (lsuc ℓA) where
--- --   no-eta-equality
--- --   field
--- --     []-inv-kγ : ∀ γ a
--- --       → x ≡ (I.▷ γ a)
--- --       → I.[ I.▷ γ a ] ≡ I.ĉ
--- --       → I.[ γ ] ≡ I.ĉ
--- --     ▷-inv-kγ : ∀ γ a
--- --       → x ≡ (I.▷ γ a)
--- --       → I.[ I.▷ γ a ] ≡ I.ĉ
--- --       → I.[ γ ] ≡ I.ĉ
--- --     ▷-inv-ka : ∀ γ a
--- --       → x ≡ (I.▷ γ a)
--- --       → I.[ I.▷ γ a ] ≡ I.ĉ
--- --       → I.[ a ] ≡ I.t̂ γ
--- --     u-inv-kγ : ∀ {γ γ'}
--- --       → x ≡ I.u γ
--- --       → I.[ I.u γ ] ≡ I.t̂ γ'
--- --       → I.[ γ ] ≡ I.ĉ
--- --     u-inv-γγ' : ∀ {γ γ'}
--- --       → x ≡ I.u γ
--- --       → I.[ I.u γ ] ≡ I.t̂ γ'
--- --       → γ ≡ γ'
-
--- -- InversionAlgebra : DispAlgebra (lsuc ℓA)
--- -- InversionAlgebra = record
--- --   { CT = InversionMotive
--- --   ; [_] = {!!}
--- --   ; k̂ = {!!}
--- --   ; kk̂ = {!!}
--- --   ; ĉ = {!!}
--- --   ; kĉ = {!!}
--- --   ; t̂ = {!!}
--- --   ; kt̂ = {!!}
--- --   ; ∙ = {!!}
--- --   ; k∙ = {!!}
--- --   ; ▷ = {!!}
--- --   ; k▷ = {!!}
--- --   ; u = {!!}
--- --   ; ku = {!!}
--- --   ; π = {!!}
--- --   ; kπ = {!!}
--- --   ; σ = {!!}
--- --   ; kσ = {!!}
--- --   ; σ▷ = {!!}
--- --   ; σπ = {!!}
--- --   }
--- --   where
--- --   [_]ᴰ : ∀ {x : I.CT} → InversionMotive x → InversionMotive I.[ x ]
--- --   [_]ᴰ {x} xᴹ = record
--- --     { ▷-inv-kγ = λ { γ a k▷ x≡ → {!!} }
--- --     ; ▷-inv-ka = {!!}
--- --     ; u-inv-kγ = {!!}
--- --     ; u-inv-γγ' = {!!} }
--- --     where
--- --     module xᴹ = InversionMotive xᴹ
+--     module xᴹ = InversionMotive xᴹ
+-}

@@ -134,6 +134,10 @@ congp₂ : ∀ {a b c} {A : Prop a} {B : Prop b} {C : Set c} (f : A → B → C)
       → ∀ {a1 a2 b1 b2} → f a1 b1 ≡ f a2 b2
 congp₂ _ = refl
 
+dcongp₂ : ∀ {a b c} {A : Prop a} {B : A → Prop b} {C : ∀ a → B a → Set c} (f : ∀ a b → C a b)
+        → ∀ {a1 a2 b1 b2} → f a1 b1 ≡ f a2 b2
+dcongp₂ _ = refl
+
 cong₂ : ∀ {a b c} {A : Set a} {B : Set b} {C : Set c} (f : A → B → C)
       → ∀ {a1 a2 b1 b2} → a1 ≡ a2 → b1 ≡ b2 → f a1 b1 ≡ f a2 b2
 cong₂ f refl refl = refl

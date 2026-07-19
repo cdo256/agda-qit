@@ -171,6 +171,9 @@ G₀ {ℓA} da = wa
     ; rinv = λ {(con γ , refl) → refl}
     ; linv = λ γ → refl }
 
+  []⁻ : ∀ x* → [ x* ] ↓ → x* ↓
+  []⁻ x* [x]↓ = [x]↓ .∧e₂
+
   []≡cʰ→return : ∀ {x*} → [ x* ] ≡ cʰ → ΣP DA.Con λ γ → x* ≡ return (con γ)
   []≡cʰ→return {x*} p = γ , x*≡returnγ
     where
@@ -459,6 +462,13 @@ G₀ {ℓA} da = wa
     → (ty▷↓ : (▷ γʰ aʰ) ↓)
     → [ aʰ ! (▷⁻-a γʰ aʰ ty▷↓) ]₀ ≡ t̂ (γʰ ! (▷⁻-γ γʰ aʰ ty▷↓))
   ▷⁻-ka γʰ aʰ ty▷↓ = ty▷↓ .∧e₂ .∧e₂ .∧e₂ .∧e₁
+
+  ▷≡return : ∀ γ̂ â
+    → (kγ : [ γ̂ ]₀ ≡ ĉ)
+    → (ka : [ â ]₀ ≡ t̂ γ̂)
+    → ▷ (return γ̂) (return â) ≡ return (▷₀ γ̂ â kγ ka)
+  ▷≡return γ̂ â kγ ka =
+    mk≡↓ (∧i tt* , ∧i tt* , ∧i kγ , ∧i ka , tt*) tt* refl
 
   u : CT → CT
   u γʰ =
