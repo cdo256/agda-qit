@@ -1,6 +1,10 @@
 open import QIT.Prelude
 
-module QIT.Examples.ConTy.QW ⦃ a!c* : A!C ⦄ where
+module QIT.Examples.ConTy.QW
+  ⦃ a!c* : A!C ⦄
+  ⦃ funExt* : FunExt ⦄
+  ⦃ pathElim* : PathElim ⦄
+  where
 
 open import QIT.Prelude
 open import QIT.Prop
@@ -120,7 +124,7 @@ module Equations where
     f pσ-b = b
 
   v : V → Expr V
-  v v = varᴱ v {λ()}
+  v v = varᴱ v
 
   γ = v vγ
   a = v va
