@@ -525,12 +525,23 @@ module _ {ℓA}
         → {γ↓ : γ ↓}
         → Singleton (γ ! γ↓)
         → ι.θ (εFI.conᴿ (γ , kγ) .fst) ≡ γ
-      con≡₀ γ kγ (G₀.con (δ , kδ) , pγ!) = trans (trans (cong ι.θ {!!}) {!!}) {!!}
+      con≡₀ γ kγ {γ↓} (G₀FI.con (δ , kδ) , pγ!) = -- trans (trans (cong ι.θ {!!}) (mk≡↓ {x* = ι.θ {!!}} {!p!} γ↓ {!!})) refl
+        ι.θ (εFI.conᴿ (γ , kγ) .fst)
+          ≡⟨ cong
+               (λ ○ → ι.θ (fst (εFI.conᴿ ○)))
+               {γ , kγ} {return (G₀FI.con (δ , kδ)) , kγ''}
+               (ΣP≡ _ _ (mk≡↓ γ↓ tt* (sym pγ!))) ⟩
+        ι.θ (εFI.conᴿ (return (G₀FI.con (δ , kδ)) , kγ'') .fst)
+          ≡⟨ s ⟩
+        return (G₀FI.con (δ , kδ))
+          ≡⟨ mk≡↓ tt* γ↓ pγ! ⟩
+        γ ∎
         where
         kγ'' : G₀FI.[ return (G₀FI.con (δ , kδ)) ] ≡ G₀FI.cʰ
+        kγ'' = trans (map-beta G₀FI.[_]₀ (G₀FI.con (δ , kδ))) refl
         s : ι.θ (εFI.conᴿ (return (G₀FI.con (δ , kδ)) , kγ'') .fst)
           ≡ return (G₀FI.con (δ , kδ))
-        s = con≡₀' δ kδ (trans (map-beta G₀FI.[_]₀ (G₀FI.con (δ , kδ))) refl)
+        s = con≡₀' δ kδ kγ''
         open DispAlgebra
         module Beta where
           record Beta (x : I.CT) : Set _ where
