@@ -518,9 +518,14 @@ module _ {ℓA}
       module εFI = ε FI
       module εFI₀ = D.Hom εFI
       con≡₀' : (γ : I.CT) (kγ : I.[ γ ] ≡ I.ĉ)
-        → (kγ' : G₀FI.[ return (G₀FI.con (γ , kγ)) ] ≡ G₀FI.cʰ)
-        → ι.θ (εFI.conᴿ (return (G₀FI.con (γ , kγ)) , kγ') .fst) ≡ return (G₀FI.con (γ , kγ))
-      con≡₀' γ kγ kγ' = {!!}
+        → (kδ : G₀FI.[ return (G₀FI.con (γ , kγ)) ] ≡ G₀FI.cʰ)
+        → ι.θ (εFI.conᴿ (return (G₀FI.con (γ , kγ)) , kδ) .fst) ≡ return (G₀FI.con (γ , kγ))
+      con≡₀' γ kγ kδ =
+        ι.θ (εFI.conᴿ (return (G₀FI.con (γ , kγ)) , kδ) .fst)
+          ≡⟨ {!!} ⟩
+        ι.θ (εFI.conᴿ (return (G₀FI.con (γ , kγ)) , kδ) .fst)
+          ≡⟨ {!!} ⟩
+        return (G₀FI.con (γ , kγ)) ∎
       con≡₀ : (γ : GFI.CT) (kγ : GFI.[ γ ] ≡ GFI.ĉ)
         → {γ↓ : γ ↓}
         → Singleton (γ ! γ↓)
