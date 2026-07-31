@@ -1,7 +1,6 @@
 open import QIT.Prelude
 open import QIT.QW.Signature
 open import QIT.Plump.Algebra
-open import QIT.QW.Plump
 open import QIT.Relation.SetQuotient
 
 module QIT.QW.Cocontinuity 
@@ -15,3 +14,4 @@ module QIT.QW.Cocontinuity
   where
 
 import QIT.QW.Cocontinuity.FromDepthPreservation
+import QIT.QW.Cocontinuity.ForW

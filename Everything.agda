@@ -2,10 +2,6 @@ open import QIT.Prelude
 
 module Everything ⦃ a!c* : A!C ⦄ ⦃ fe* : FunExt ⦄ ⦃ pathElim* : PathElim ⦄ where
 
--- Changes:
---  - QIT.Prelude.Universe: Export universe variables.
---  - QIT.Prelude.Logic: Rename intro and elim rules.
-
 -- Base
 import QIT.Prelude.Universe
 import QIT.Prelude.Truncation
@@ -21,6 +17,8 @@ import QIT.Types
 import QIT.HLevel
 import QIT.Logic
 import QIT.Prop
+import QIT.Identity
+import QIT.Logic
 
 -- Relations
 import QIT.Relation.Base
@@ -47,8 +45,6 @@ import QIT.Fin.Properties
 
 -- Set
 import QIT.Function.Base
-import QIT.Identity
-import QIT.Logic
 import QIT.Set.Base
 import QIT.Set.Bijection
 -- import QIT.Set.Cantor
@@ -87,19 +83,19 @@ import QIT.Category.Set
 import QIT.Category.Setoid
 import QIT.Category.FamilyOfSetoids
 
--- Container
-import QIT.Container.Base
-import QIT.Container.Functor
-import QIT.Container.Indexed
-import QIT.Container.StrictFunctor
-import QIT.Container.Properties
-
 -- Functor
 import QIT.Functor.Base
 import QIT.Functor.Properties
 import QIT.Functor.NatTrans
 import QIT.Functor.Diagram
 import QIT.Functor.Quotient
+
+-- Container
+import QIT.Container.Base
+import QIT.Container.Functor
+import QIT.Container.Indexed
+import QIT.Container.StrictFunctor
+import QIT.Container.Properties
 
 -- Colimits
 import QIT.Colimit.Base
@@ -110,7 +106,6 @@ import QIT.Colimit
 import QIT.QW.W
 import QIT.QW.Equation
 import QIT.QW.Signature
-import QIT.QW.Plump
 import QIT.QW.Subclasses
 import QIT.QW.Algebra
 import QIT.QW.Stage
@@ -146,7 +141,7 @@ import QIT.Examples.ConTy.Direct
 import QIT.Examples.ConTy.DirectToWeaklyTaggedLarge
 import QIT.Examples.ConTy.WeaklyTaggedToDirect
 -- import QIT.Examples.ConTy.DirectToWeaklyTagged2
-import QIT.Examples.ConTy.DirectWeaklyTaggedEquiv
+-- import QIT.Examples.ConTy.DirectWeaklyTaggedEquiv
 -- import QIT.Examples.ConTy.DisplayedReduction
 import QIT.Examples.ConTy.Erased
 -- import QIT.Examples.ConTy.ErasedElim
