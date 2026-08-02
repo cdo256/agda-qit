@@ -20,13 +20,8 @@ record Algebra ℓX : Set (lsuc ℓX) where
     CT : Set ℓX
     [_] : CT → CT
     k̂ : CT
-    kk̂ : [ k̂ ] ≡ k̂
     ĉ : CT
-    kĉ : [ ĉ ] ≡ k̂
     t̂ : (γ : CT) → CT
-    kt̂ : (γ : CT)
-      → [ γ ] ≡ ĉ
-      → [ t̂ γ ] ≡ k̂
 
     ∙ : CT
     k∙ : [ ∙ ] ≡ ĉ
@@ -35,22 +30,49 @@ record Algebra ℓX : Set (lsuc ℓX) where
       → [ γ ] ≡ ĉ
       → [ a ] ≡ t̂ γ
       → [ ▷ γ a ] ≡ ĉ
+    ▷-γ : ∀ γ a
+      → [ ▷ γ a ] ≡ ĉ
+      → [ γ ] ≡ ĉ
+    ▷-a : ∀ γ a
+      → [ ▷ γ a ] ≡ ĉ
+      → [ a ] ≡ t̂ γ
     u : (γ : CT) → CT
     ku : (γ : CT)
       → [ γ ] ≡ ĉ
       → [ u γ ] ≡ t̂ γ 
+    u-γ : ∀ γ
+      → [ u γ ] ≡ t̂ γ
+      → [ γ ] ≡ ĉ
     π : (γ : CT) (a : CT) (b : CT) → CT
     kπ : (γ : CT) (a : CT) (b : CT) 
       → [ γ ] ≡ ĉ
       → [ a ] ≡ t̂ γ
       → [ b ] ≡ t̂ (▷ γ a)
       → [ π γ a b ] ≡ t̂ γ 
+    π-γ : (γ : CT) (a : CT) (b : CT) 
+      → [ π γ a b ] ≡ t̂ γ 
+      → [ γ ] ≡ ĉ
+    π-a : (γ : CT) (a : CT) (b : CT) 
+      → [ π γ a b ] ≡ t̂ γ 
+      → [ a ] ≡ t̂ γ
+    π-b : (γ : CT) (a : CT) (b : CT) 
+      → [ π γ a b ] ≡ t̂ γ 
+      → [ b ] ≡ t̂ (▷ γ a)
     σ : (γ : CT) (a : CT) (b : CT) → CT
     kσ : (γ : CT) (a : CT) (b : CT) 
       → [ γ ] ≡ ĉ
       → [ a ] ≡ t̂ γ
       → [ b ] ≡ t̂ (▷ γ a)
       → [ σ γ a b ] ≡ t̂ γ 
+    σ-γ : (γ : CT) (a : CT) (b : CT) 
+      → [ σ γ a b ] ≡ t̂ γ 
+      → [ γ ] ≡ ĉ
+    σ-a : (γ : CT) (a : CT) (b : CT) 
+      → [ σ γ a b ] ≡ t̂ γ 
+      → [ a ] ≡ t̂ γ
+    σ-b : (γ : CT) (a : CT) (b : CT) 
+      → [ σ γ a b ] ≡ t̂ γ 
+      → [ b ] ≡ t̂ (▷ γ a)
     σ▷ : (γ : CT) (a : CT) (b : CT)
       → [ γ ] ≡ ĉ
       → [ a ] ≡ t̂ γ
@@ -68,82 +90,12 @@ record Algebra ℓX : Set (lsuc ℓX) where
       → π γ a (π (▷ γ a) b c)
       ≡ π γ (σ γ a b) c
 
-record AlgebraWithMotive {ℓX} (CT : Set ℓX) : Set (lsuc ℓX) where
-  no-eta-equality
+record AlgebraWithMotive {ℓA} (M : Set ℓA) : Set (lsuc ℓA) where
   field
-    [_] : CT → CT
-    k̂ : CT
-    kk̂ : [ k̂ ] ≡ k̂
-    ĉ : CT
-    kĉ : [ ĉ ] ≡ k̂
-    t̂ : (γ : CT) → CT
-    kt̂ : (γ : CT)
-      → [ γ ] ≡ ĉ
-      → [ t̂ γ ] ≡ k̂
-
-    ∙ : CT
-    k∙ : [ ∙ ] ≡ ĉ
-    ▷ : (γ : CT) (a : CT) → CT
-    k▷ : (γ : CT) (a : CT)
-      → [ γ ] ≡ ĉ
-      → [ a ] ≡ t̂ γ
-      → [ ▷ γ a ] ≡ ĉ
-    u : (γ : CT) → CT
-    ku : (γ : CT)
-      → [ γ ] ≡ ĉ
-      → [ u γ ] ≡ t̂ γ 
-    π : (γ : CT) (a : CT) (b : CT) → CT
-    kπ : (γ : CT) (a : CT) (b : CT) 
-      → [ γ ] ≡ ĉ
-      → [ a ] ≡ t̂ γ
-      → [ b ] ≡ t̂ (▷ γ a)
-      → [ π γ a b ] ≡ t̂ γ 
-    σ : (γ : CT) (a : CT) (b : CT) → CT
-    kσ : (γ : CT) (a : CT) (b : CT) 
-      → [ γ ] ≡ ĉ
-      → [ a ] ≡ t̂ γ
-      → [ b ] ≡ t̂ (▷ γ a)
-      → [ σ γ a b ] ≡ t̂ γ 
-    σ▷ : (γ : CT) (a : CT) (b : CT)
-      → [ γ ] ≡ ĉ
-      → [ a ] ≡ t̂ γ
-      → [ b ] ≡ t̂ (▷ γ a)
-      → ▷ (▷ γ a) b
-      ≡ ▷ γ (σ γ a b)
-    σπ : (γ : CT)
-      → (a : CT) 
-      → (b : CT) 
-      → (c : CT) 
-      → [ γ ] ≡ ĉ
-      → [ a ] ≡ t̂ γ
-      → [ b ] ≡ t̂ (▷ γ a)
-      → [ c ] ≡ t̂ (▷ (▷ γ a) b)
-      → π γ a (π (▷ γ a) b c)
-      ≡ π γ (σ γ a b) c
-
-  toAlgebra : Algebra ℓX
-  toAlgebra = record
-    { CT = CT
-    ; [_] = [_]
-    ; k̂ = k̂
-    ; kk̂ = kk̂
-    ; ĉ = ĉ
-    ; kĉ = kĉ
-    ; t̂ = t̂
-    ; kt̂ = kt̂
-    ; ∙ = ∙
-    ; k∙ = k∙
-    ; ▷ = ▷
-    ; k▷ = k▷
-    ; u = u
-    ; ku = ku
-    ; π = π
-    ; kπ = kπ
-    ; σ = σ
-    ; kσ = kσ
-    ; σ▷ = σ▷
-    ; σπ = σπ
-    }
+    DA : Algebra ℓA
+  open Algebra DA public
+  field
+    motive : CT ≡ M
 
 record Hom (A : Algebra ℓA) (B : Algebra ℓB) : Set (ℓA ⊔ ℓB) where
   no-eta-equality
@@ -278,31 +230,49 @@ LiftAlgebra ℓY A = record
   { CT = Lift ℓY A.CT
   ; [_] = λ (lift x) → lift (A.[ x ])
   ; k̂ = lift A.k̂
-  ; kk̂ = ≡.cong lift A.kk̂
   ; ĉ = lift A.ĉ
-  ; kĉ = ≡.cong lift A.kĉ
   ; t̂ = λ (lift γ) → lift (A.t̂ γ)
-  ; kt̂ = λ (lift γ) kγ → ≡.cong lift (A.kt̂ γ (≡.cong lower kγ))
   ; ∙ = lift A.∙
-  ; k∙ = ≡.cong lift A.k∙
+  ; k∙ = ↑ A.k∙
   ; ▷ = λ (lift γ) (lift a) → lift (A.▷ γ a)
-  ; k▷ = λ (lift γ) (lift a) kγ ka → ≡.cong lift (A.k▷ γ a (≡.cong lower kγ) (≡.cong lower ka))
+  ; k▷ = λ (lift γ) (lift a) kγ ka → ↑ (A.k▷ γ a (↓ kγ) (↓ ka))
+  ; ▷-γ = λ (lift γ) (lift a) k▷ → ↑ (A.▷-γ γ a (↓ k▷))
+  ; ▷-a = λ (lift γ) (lift a) k▷ → ↑ (A.▷-a γ a (↓ k▷))
   ; u = λ (lift γ) → lift (A.u γ)
-  ; ku = λ (lift γ) kγ → ≡.cong lift (A.ku γ (≡.cong lower kγ))
+  ; ku = λ (lift γ) kγ → ↑ (A.ku γ (↓ kγ))
+  ; u-γ = λ (lift γ) ku → ↑ (A.u-γ γ (↓ ku))
   ; π = λ (lift γ) (lift a) (lift b) → lift (A.π γ a b)
   ; kπ = λ (lift γ) (lift a) (lift b) kγ ka kb
-       → ≡.cong lift (A.kπ γ a b (≡.cong lower kγ) (≡.cong lower ka) (≡.cong lower kb))
+       → ↑ (A.kπ γ a b (↓ kγ) (↓ ka) (↓ kb))
+  ; π-γ = λ (lift γ) (lift a) (lift b) kπ
+       → ↑ (A.π-γ γ a b (↓ kπ))
+  ; π-a = λ (lift γ) (lift a) (lift b) kπ
+       → ↑ (A.π-a γ a b (↓ kπ))
+  ; π-b = λ (lift γ) (lift a) (lift b) kπ
+       → ↑ (A.π-b γ a b (↓ kπ))
   ; σ = λ (lift γ) (lift a) (lift b)
       → lift (A.σ γ a b)
   ; kσ = λ (lift γ) (lift a) (lift b) kγ ka kb
-       → ≡.cong lift (A.kσ γ a b (≡.cong lower kγ) (≡.cong lower ka) (≡.cong lower kb))
+       → ↑ (A.kσ γ a b (↓ kγ) (↓ ka) (↓ kb))
+  ; σ-γ = λ (lift γ) (lift a) (lift b) kσ
+       → ↑ (A.σ-γ γ a b (↓ kσ))
+  ; σ-a = λ (lift γ) (lift a) (lift b) kσ
+       → ↑ (A.σ-a γ a b (↓ kσ))
+  ; σ-b = λ (lift γ) (lift a) (lift b) kσ
+       → ↑ (A.σ-b γ a b (↓ kσ))
   ; σ▷ = λ (lift γ) (lift a) (lift b) kγ ka kb
-       → ≡.cong lift (A.σ▷ γ a b (≡.cong lower kγ) (≡.cong lower ka) (≡.cong lower kb))
+       → ↑ (A.σ▷ γ a b (↓ kγ) (↓ ka) (↓ kb))
   ; σπ = λ (lift γ) (lift a) (lift b) (lift c) kγ ka kb kc
-       → ≡.cong lift (A.σπ γ a b c (≡.cong lower kγ) (≡.cong lower ka) (≡.cong lower kb) (≡.cong lower kc))
+       → ↑ (A.σπ γ a b c (↓ kγ) (↓ ka) (↓ kb) (↓ kc))
   }
   where
   module A = Algebra A
+  ↑_ : ∀ {x y : A.CT} (p : x ≡ y)
+    → lift {ℓA' = ℓP} x ≡ lift {ℓA' = ℓP} y
+  ↑ p = ≡.cong lift p
+  ↓_ : ∀ {x y : Lift ℓP A.CT} (p : x ≡ y)
+    → lower {ℓA' = ℓP} x ≡ lower {ℓA' = ℓP} y
+  ↓ p = ≡.cong lower p
 
 module Cat ℓA where
   open import QIT.Category.Morphism (Cat ℓA) public
