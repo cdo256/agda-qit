@@ -802,6 +802,99 @@ G₀ {ℓA} da = wa
     a↓ : a ↓
     a↓ = ▷⁻-a γ a ▷↓
 
+  u-γ : (γ : CT) → [ u γ ] ≡ tʰ γ → [ γ ] ≡ cʰ
+  u-γ γ ku = mk≡↓ ([]↓ γ γ↓) tt* (u⁻-kγ γ u↓)
+    where
+    mutual
+      [uγ]↓ : [ u γ ] ↓
+      [uγ]↓ = extractCond ku (tʰ-γ↓ γ γ↓)
+      u↓ : u γ ↓
+      u↓ = []⁻ (u γ) [uγ]↓
+      γ↓ : γ ↓
+      γ↓ = u⁻-γ γ u↓
+
+  π-γ : (γ a b : CT) → [ π γ a b ] ≡ tʰ γ → [ γ ] ≡ cʰ
+  π-γ γ a b kπ = mk≡↓ ([]↓ γ γ↓) tt* (π⁻-kγ γ a b π↓)
+    where
+    mutual
+      [πγab]↓ : [ π γ a b ] ↓
+      [πγab]↓ = extractCond kπ (tʰ-γ↓ γ γ↓)
+      π↓ : π γ a b ↓
+      π↓ = []⁻ (π γ a b) [πγab]↓
+      γ↓ : γ ↓
+      γ↓ = π⁻-γ γ a b π↓
+
+  π-a : (γ a b : CT) → [ π γ a b ] ≡ tʰ γ → [ a ] ≡ tʰ γ
+  π-a γ a b kπ = mk≡↓ ([]↓ a a↓) (tʰ-γ↓ γ γ↓) (π⁻-ka γ a b π↓)
+    where
+    mutual
+      [πγab]↓ : [ π γ a b ] ↓
+      [πγab]↓ = extractCond kπ (tʰ-γ↓ γ γ↓)
+      π↓ : π γ a b ↓
+      π↓ = []⁻ (π γ a b) [πγab]↓
+      γ↓ : γ ↓
+      γ↓ = π⁻-γ γ a b π↓
+      a↓ : a ↓
+      a↓ = π⁻-a γ a b π↓
+
+  π-b : (γ a b : CT) → [ π γ a b ] ≡ tʰ γ → [ b ] ≡ tʰ (▷ γ a)
+  π-b γ a b kπ = mk≡↓ ([]↓ b b↓) (tʰ-γ↓ (▷ γ a) δ↓) (π⁻-kb γ a b π↓)
+    where
+    mutual
+      [πγab]↓ : [ π γ a b ] ↓
+      [πγab]↓ = extractCond kπ (tʰ-γ↓ γ γ↓)
+      π↓ : π γ a b ↓
+      π↓ = []⁻ (π γ a b) [πγab]↓
+      γ↓ : γ ↓
+      γ↓ = π⁻-γ γ a b π↓
+      a↓ : a ↓
+      a↓ = π⁻-a γ a b π↓
+      b↓ : b ↓
+      b↓ = π⁻-b γ a b π↓
+      δ↓ : ▷ γ a ↓
+      δ↓ = ∧i γ↓ , ∧i a↓ , ∧i π⁻-kγ γ a b π↓ , ∧i π⁻-ka γ a b π↓ , tt*
+
+  σ-γ : (γ a b : CT) → [ σ γ a b ] ≡ tʰ γ → [ γ ] ≡ cʰ
+  σ-γ γ a b kσ = mk≡↓ ([]↓ γ γ↓) tt* (σ⁻-kγ γ a b σ↓)
+    where
+    mutual
+      [σγab]↓ : [ σ γ a b ] ↓
+      [σγab]↓ = extractCond kσ (tʰ-γ↓ γ γ↓)
+      σ↓ : σ γ a b ↓
+      σ↓ = []⁻ (σ γ a b) [σγab]↓
+      γ↓ : γ ↓
+      γ↓ = σ⁻-γ γ a b σ↓
+
+  σ-a : (γ a b : CT) → [ σ γ a b ] ≡ tʰ γ → [ a ] ≡ tʰ γ
+  σ-a γ a b kσ = mk≡↓ ([]↓ a a↓) (tʰ-γ↓ γ γ↓) (σ⁻-ka γ a b σ↓)
+    where
+    mutual
+      [σγab]↓ : [ σ γ a b ] ↓
+      [σγab]↓ = extractCond kσ (tʰ-γ↓ γ γ↓)
+      σ↓ : σ γ a b ↓
+      σ↓ = []⁻ (σ γ a b) [σγab]↓
+      γ↓ : γ ↓
+      γ↓ = σ⁻-γ γ a b σ↓
+      a↓ : a ↓
+      a↓ = σ⁻-a γ a b σ↓
+
+  σ-b : (γ a b : CT) → [ σ γ a b ] ≡ tʰ γ → [ b ] ≡ tʰ (▷ γ a)
+  σ-b γ a b kσ = mk≡↓ ([]↓ b b↓) (tʰ-γ↓ (▷ γ a) δ↓) (σ⁻-kb γ a b σ↓)
+    where
+    mutual
+      [σγab]↓ : [ σ γ a b ] ↓
+      [σγab]↓ = extractCond kσ (tʰ-γ↓ γ γ↓)
+      σ↓ : σ γ a b ↓
+      σ↓ = []⁻ (σ γ a b) [σγab]↓
+      γ↓ : γ ↓
+      γ↓ = σ⁻-γ γ a b σ↓
+      a↓ : a ↓
+      a↓ = σ⁻-a γ a b σ↓
+      b↓ : b ↓
+      b↓ = σ⁻-b γ a b σ↓
+      δ↓ : ▷ γ a ↓
+      δ↓ = ∧i γ↓ , ∧i a↓ , ∧i σ⁻-kγ γ a b σ↓ , ∧i σ⁻-ka γ a b σ↓ , tt*
+
   wa : W.Algebra (lsuc ℓA)
   wa = record
     { CT = CT
@@ -817,17 +910,17 @@ G₀ {ℓA} da = wa
     ; ▷-a = ▷-a
     ; u = u
     ; ku = ku
-    ; u-γ = {!!}
+    ; u-γ = u-γ
     ; π = π
     ; kπ = kπ
-    ; π-γ = {!!}
-    ; π-a = {!!}
-    ; π-b = {!!}
+    ; π-γ = π-γ
+    ; π-a = π-a
+    ; π-b = π-b
     ; σ = σ
     ; kσ = kσ
-    ; σ-γ = {!!}
-    ; σ-a = {!!}
-    ; σ-b = {!!}
+    ; σ-γ = σ-γ
+    ; σ-a = σ-a
+    ; σ-b = σ-b
     ; σ▷ = σ▷
     ; σπ = σπ
     }
