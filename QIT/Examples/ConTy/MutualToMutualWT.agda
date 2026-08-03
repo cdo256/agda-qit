@@ -26,7 +26,7 @@ open import QIT.Category.Base
 open import QIT.PropLiftMonad
 
 G₀ : M.Algebra ℓA → W.Algebra (lsuc ℓA)
-G₀ {ℓA} da = {!wa!}
+G₀ {ℓA} da = wa
   module G₀ where
   open ≡
   open ≡.≡-Reasoning
@@ -214,61 +214,6 @@ G₀ {ℓA} da = {!wa!}
     x≡ty = []₀≡t̂→ty kx .snd
     x*≡return : x* ≡ return (ty a)
     x*≡return = mk≡↓ x↓ tt* x≡ty
-
-  -- [kʰ]≢cʰ : [ kʰ ] ≢ cʰ
-  -- [kʰ]≢cʰ p =
-  --   let x , q = map-return-inj [_]₀ kʰ ĉ p
-  --   in ⊥e* (encode q)
-
-  -- [kʰ]≢tʰ : ∀ {x*} → [ kʰ ] ≢ tʰ
-  -- [kʰ]≢tʰ {x*} p = ⊥e* (encode (u .snd))
-  --   where
-  --   u : ΣP Atom (λ x → t̂ x ≡ [ k̂ ]₀)
-  --   u = map-return-inj t̂ x* [ k̂ ]₀ (sym (≡.trans (sym (map-beta [_]₀ k̂)) p))
-
-  -- [cʰ]≢cʰ : [ cʰ ] ≢ cʰ
-  -- [cʰ]≢cʰ p =
-  --   let x , q = map-return-inj [_]₀ kʰ ĉ p
-  --   in ⊥e* (encode q)
-
-  -- [cʰ]≢tʰ : ∀ {x*} → [ cʰ ] ≢ tʰ x*
-  -- [cʰ]≢tʰ {x*} p = ⊥e* (encode (u .snd))
-  --   where
-  --   u : ΣP Atom (λ x → t̂ x ≡ [ ĉ ]₀)
-  --   u = map-return-inj t̂ x* [ ĉ ]₀ (sym (≡.trans (sym (map-beta [_]₀ ĉ)) p))
-
-  -- [tʰ]≢cʰ : ∀ {x*} → [ tʰ x* ] ≢ cʰ
-  -- [tʰ]≢cʰ {x*} p = q (≡.trans (≡.sym (map-fold [_]₀ t̂ x*)) p)
-  --   where
-  --   q : map ([_]₀ ∘ t̂) x* ≢ return ĉ
-  --   q = map≢return ([_]₀ ∘ t̂) x* ĉ λ x ()
-
-  -- [tʰ]≢tʰ : ∀ {x* y*} → x* ↓ → [ tʰ x* ] ≢ tʰ y*
-  -- [tʰ]≢tʰ {x*} {y*} x↓ p = map≢map ([_]₀ ∘ t̂) t̂ x* y* x↓ (λ _ _ ()) q
-  --   where
-  --   q : map ([_]₀ ∘ t̂) x* ≡ map t̂ y*
-  --   q = trans (sym (map-fold [_]₀ t̂ x*)) p
-
-  -- [[x]]≢cʰ : ∀ {x*} → [ [ x* ] ] ≢ cʰ
-  -- [[x]]≢cʰ {x*} p =
-  --   map≢return
-  --     ([_]₀ ∘ [_]₀) x* ĉ
-  --     (λ x q → k̂≢ĉ (trans (sym ([[x]]₀≡k̂ x)) q))
-  --     (trans (sym (map-fold [_]₀ [_]₀ x*)) p)
-
-  -- [[x]]≢tʰ : ∀ {x* y*} → x* ↓ → [ [ x* ] ] ≢ tʰ y*
-  -- [[x]]≢tʰ {x*} {y*} x↓ p =
-  --   map≢map
-  --     ([_]₀ ∘ [_]₀) t̂ x* y* x↓
-  --     (λ x y q → k̂≢t̂ (trans (sym ([[x]]₀≡k̂ x)) q))
-  --     (trans (sym (map-fold [_]₀ [_]₀ x*)) p)
-
-  -- [[x]]≡kʰ : ∀ x* → x* ↓ → [ [ x* ] ] ≡ kʰ
-  -- [[x]]≡kʰ x* x↓ =
-  --   mk≡↓ (∧i tt* , ∧i tt* , x↓) tt* ([[x]]₀≡k̂ x)
-  --   where
-  --   x : Atom
-  --   x = x* ! x↓
 
   Con₀ : (γ : Atom) → [ γ ]₀ ≡ ĉ → MA.Con
   Con₀ γ kγ = ConΣ→Con (γ , kγ)
@@ -566,49 +511,57 @@ G₀ {ℓA} da = {!wa!}
     val≡ : ty₁ (u γʰ) ! l↓ ≡ γʰ ! r↓
     val≡ = u₁₀ (γʰ ! r↓) (conKind γʰ kγ)
 
-{- 
-
   π : CT → CT → CT → CT
   π γʰ aʰ bʰ =
     γʰ >>= λ γ →
     aʰ >>= λ a →
     bʰ >>= λ b →
     assume ([ γ ]₀ ≡ ĉ) λ kγ →
-    assume ([ a ]₀ ≡ t̂ γ) λ ka →
-    assume ([ b ]₀ ≡ t̂ (▷₀ γ a kγ ka)) λ kb →
-    return (ty (Con₀ γ kγ)
-               (MA.π (Con₀ γ kγ)
-                     (Ty₀ γ a kγ ka)
-                     (Ty₀ (▷₀ γ a kγ ka) b (k▷₀ γ a kγ ka) kb)))
+    assume ([ a ]₀ ≡ t̂) λ ka →
+    assume (ty₁₀ a ka ≡ γ) λ ka₁ →
+    assume ([ b ]₀ ≡ t̂) λ kb →
+    assume (ty₁₀ b kb ≡ ▷₀ γ a kγ ka ka₁) λ kb₁ →
+    return (π₀ γ a b kγ ka ka₁ kb kb₁)
 
-  π⁻-γ : ∀ γʰ aʰ bʰ
-    → π γʰ aʰ bʰ ↓
-    → γʰ ↓
+  π⁻-γ : ∀ γʰ aʰ bʰ → π γʰ aʰ bʰ ↓ → γʰ ↓
   π⁻-γ γʰ aʰ bʰ π↓ = π↓ .∧e₁
-  π⁻-a : ∀ γʰ aʰ bʰ
-    → π γʰ aʰ bʰ ↓
-    → aʰ ↓
+
+  π⁻-a : ∀ γʰ aʰ bʰ → π γʰ aʰ bʰ ↓ → aʰ ↓
   π⁻-a γʰ aʰ bʰ π↓ = π↓ .∧e₂ .∧e₁
-  π⁻-b : ∀ γʰ aʰ bʰ
-    → π γʰ aʰ bʰ ↓
-    → bʰ ↓
+
+  π⁻-b : ∀ γʰ aʰ bʰ → π γʰ aʰ bʰ ↓ → bʰ ↓
   π⁻-b γʰ aʰ bʰ π↓ = π↓ .∧e₂ .∧e₂ .∧e₁
+
   π⁻-kγ : ∀ γʰ aʰ bʰ
     → (π↓ : π γʰ aʰ bʰ ↓)
     → [ γʰ ! (π⁻-γ γʰ aʰ bʰ π↓) ]₀ ≡ ĉ
   π⁻-kγ γʰ aʰ bʰ π↓ = π↓ .∧e₂ .∧e₂ .∧e₂ .∧e₁
+
   π⁻-ka : ∀ γʰ aʰ bʰ
     → (π↓ : π γʰ aʰ bʰ ↓)
-    → [ aʰ ! (π⁻-a γʰ aʰ bʰ π↓) ]₀ ≡ t̂ (γʰ ! (π⁻-γ γʰ aʰ bʰ π↓))
+    → [ aʰ ! (π⁻-a γʰ aʰ bʰ π↓) ]₀ ≡ t̂
   π⁻-ka γʰ aʰ bʰ π↓ = π↓ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁
+
+  π⁻-ka₁ : ∀ γʰ aʰ bʰ
+    → (π↓ : π γʰ aʰ bʰ ↓)
+    → ty₁₀ (aʰ ! (π⁻-a γʰ aʰ bʰ π↓)) (π⁻-ka γʰ aʰ bʰ π↓)
+      ≡ γʰ ! (π⁻-γ γʰ aʰ bʰ π↓)
+  π⁻-ka₁ γʰ aʰ bʰ π↓ = π↓ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁
+
   π⁻-kb : ∀ γʰ aʰ bʰ
     → (π↓ : π γʰ aʰ bʰ ↓)
-    → [ bʰ ! (π⁻-b γʰ aʰ bʰ π↓) ]₀
-    ≡ t̂ (▷₀ (γʰ ! (π⁻-γ γʰ aʰ bʰ π↓))
-             (aʰ ! (π⁻-a γʰ aʰ bʰ π↓))
-             (π⁻-kγ γʰ aʰ bʰ π↓)
-             (π⁻-ka γʰ aʰ bʰ π↓))
-  π⁻-kb γʰ aʰ bʰ π↓ = π↓ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁
+    → [ bʰ ! (π⁻-b γʰ aʰ bʰ π↓) ]₀ ≡ t̂
+  π⁻-kb γʰ aʰ bʰ π↓ = π↓ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁
+
+  π⁻-kb₁ : ∀ γʰ aʰ bʰ
+    → (π↓ : π γʰ aʰ bʰ ↓)
+    → ty₁₀ (bʰ ! (π⁻-b γʰ aʰ bʰ π↓)) (π⁻-kb γʰ aʰ bʰ π↓)
+      ≡ ▷₀ (γʰ ! (π⁻-γ γʰ aʰ bʰ π↓))
+           (aʰ ! (π⁻-a γʰ aʰ bʰ π↓))
+           (π⁻-kγ γʰ aʰ bʰ π↓)
+           (π⁻-ka γʰ aʰ bʰ π↓)
+           (π⁻-ka₁ γʰ aʰ bʰ π↓)
+  π⁻-kb₁ γʰ aʰ bʰ π↓ = π↓ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁
 
   σ : CT → CT → CT → CT
   σ γʰ aʰ bʰ =
@@ -616,396 +569,389 @@ G₀ {ℓA} da = {!wa!}
     aʰ >>= λ a →
     bʰ >>= λ b →
     assume ([ γ ]₀ ≡ ĉ) λ kγ →
-    assume ([ a ]₀ ≡ t̂ γ) λ ka →
-    assume ([ b ]₀ ≡ t̂ (▷₀ γ a kγ ka)) λ kb →
-    return (σ₀ γ a b kγ ka kb)
+    assume ([ a ]₀ ≡ t̂) λ ka →
+    assume (ty₁₀ a ka ≡ γ) λ ka₁ →
+    assume ([ b ]₀ ≡ t̂) λ kb →
+    assume (ty₁₀ b kb ≡ ▷₀ γ a kγ ka ka₁) λ kb₁ →
+    return (σ₀ γ a b kγ ka ka₁ kb kb₁)
 
-  σ⁻-γ : ∀ γʰ aʰ bʰ
-    → σ γʰ aʰ bʰ ↓
-    → γʰ ↓
+  σ⁻-γ : ∀ γʰ aʰ bʰ → σ γʰ aʰ bʰ ↓ → γʰ ↓
   σ⁻-γ γʰ aʰ bʰ σ↓ = σ↓ .∧e₁
-  σ⁻-a : ∀ γʰ aʰ bʰ
-    → σ γʰ aʰ bʰ ↓
-    → aʰ ↓
+
+  σ⁻-a : ∀ γʰ aʰ bʰ → σ γʰ aʰ bʰ ↓ → aʰ ↓
   σ⁻-a γʰ aʰ bʰ σ↓ = σ↓ .∧e₂ .∧e₁
-  σ⁻-b : ∀ γʰ aʰ bʰ
-    → σ γʰ aʰ bʰ ↓
-    → bʰ ↓
+
+  σ⁻-b : ∀ γʰ aʰ bʰ → σ γʰ aʰ bʰ ↓ → bʰ ↓
   σ⁻-b γʰ aʰ bʰ σ↓ = σ↓ .∧e₂ .∧e₂ .∧e₁
+
   σ⁻-kγ : ∀ γʰ aʰ bʰ
     → (σ↓ : σ γʰ aʰ bʰ ↓)
     → [ γʰ ! (σ⁻-γ γʰ aʰ bʰ σ↓) ]₀ ≡ ĉ
   σ⁻-kγ γʰ aʰ bʰ σ↓ = σ↓ .∧e₂ .∧e₂ .∧e₂ .∧e₁
+
   σ⁻-ka : ∀ γʰ aʰ bʰ
     → (σ↓ : σ γʰ aʰ bʰ ↓)
-    → [ aʰ ! (σ⁻-a γʰ aʰ bʰ σ↓) ]₀ ≡ t̂ (γʰ ! (σ⁻-γ γʰ aʰ bʰ σ↓))
+    → [ aʰ ! (σ⁻-a γʰ aʰ bʰ σ↓) ]₀ ≡ t̂
   σ⁻-ka γʰ aʰ bʰ σ↓ = σ↓ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁
+
+  σ⁻-ka₁ : ∀ γʰ aʰ bʰ
+    → (σ↓ : σ γʰ aʰ bʰ ↓)
+    → ty₁₀ (aʰ ! (σ⁻-a γʰ aʰ bʰ σ↓)) (σ⁻-ka γʰ aʰ bʰ σ↓)
+      ≡ γʰ ! (σ⁻-γ γʰ aʰ bʰ σ↓)
+  σ⁻-ka₁ γʰ aʰ bʰ σ↓ = σ↓ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁
+
   σ⁻-kb : ∀ γʰ aʰ bʰ
     → (σ↓ : σ γʰ aʰ bʰ ↓)
-    → [ bʰ ! (σ⁻-b γʰ aʰ bʰ σ↓) ]₀
-    ≡ t̂ (▷₀ (γʰ ! (σ⁻-γ γʰ aʰ bʰ σ↓))
-             (aʰ ! (σ⁻-a γʰ aʰ bʰ σ↓))
-             (σ⁻-kγ γʰ aʰ bʰ σ↓)
-             (σ⁻-ka γʰ aʰ bʰ σ↓))
-  σ⁻-kb γʰ aʰ bʰ σ↓ = σ↓ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁
+    → [ bʰ ! (σ⁻-b γʰ aʰ bʰ σ↓) ]₀ ≡ t̂
+  σ⁻-kb γʰ aʰ bʰ σ↓ = σ↓ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁
 
-  ty▷↓ : (γʰ aʰ bʰ : CT)
-    → (kγ : [ γʰ ] ≡ cʰ)
-    → (ka : [ aʰ ] ≡ tʰ γʰ)
-    → (kδ : [ ▷ γʰ aʰ ] ≡ cʰ)
-    → (kb : [ bʰ ] ≡ tʰ (▷ γʰ aʰ))
-    → bʰ ↓
-  ty▷↓ γʰ aʰ bʰ kγ ka kδ kb = extractCond kb (∧i tt* , con↓ (▷ γʰ aʰ) kδ) .∧e₂
-
-  getTy▷-kind : (γʰ aʰ bʰ : CT)
-    → (kγ : [ γʰ ] ≡ cʰ)
-    → (ka : [ aʰ ] ≡ tʰ γʰ)
-    → (kδ : [ ▷ γʰ aʰ ] ≡ cʰ)
-    → (kb : [ bʰ ] ≡ tʰ (▷ γʰ aʰ))
-    → [ bʰ ! (ty▷↓ γʰ aʰ bʰ kγ ka kδ kb) ]₀
-    ≡ t̂ (▷₀ (γʰ ! (con↓ γʰ kγ))
-             (aʰ ! (ty↓ γʰ aʰ kγ ka))
-             (conKind γʰ kγ)
-             (tyKind γʰ aʰ kγ ka))
-  getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb = tyKind (▷ γʰ aʰ) bʰ kδ kb
-
-  kk̂ : [ kʰ ] ≡ kʰ
-  kk̂ = mk≡↓ (∧i tt* , tt*) tt* refl
-
-  kĉ : [ cʰ ] ≡ kʰ
-  kĉ = mk≡↓ (∧i tt* , tt*) tt* refl
-
-  kt̂ : (γʰ : CT) → [ γʰ ] ≡ cʰ → [ tʰ γʰ ] ≡ kʰ
-  kt̂ γʰ kγ = mk≡↓ (∧i tt* , ∧i tt* , con↓ γʰ kγ) tt* refl
+  σ⁻-kb₁ : ∀ γʰ aʰ bʰ
+    → (σ↓ : σ γʰ aʰ bʰ ↓)
+    → ty₁₀ (bʰ ! (σ⁻-b γʰ aʰ bʰ σ↓)) (σ⁻-kb γʰ aʰ bʰ σ↓)
+      ≡ ▷₀ (γʰ ! (σ⁻-γ γʰ aʰ bʰ σ↓))
+           (aʰ ! (σ⁻-a γʰ aʰ bʰ σ↓))
+           (σ⁻-kγ γʰ aʰ bʰ σ↓)
+           (σ⁻-ka γʰ aʰ bʰ σ↓)
+           (σ⁻-ka₁ γʰ aʰ bʰ σ↓)
+  σ⁻-kb₁ γʰ aʰ bʰ σ↓ = σ↓ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁
 
   k∙ : [ ∙ ] ≡ cʰ
   k∙ = mk≡↓ (∧i tt* , tt*) tt* refl
 
-  k▷ : (γʰ aʰ : CT) → [ γʰ ] ≡ cʰ → [ aʰ ] ≡ tʰ γʰ → [ ▷ γʰ aʰ ] ≡ cʰ
-  k▷ γʰ aʰ kγ ka = mk≡↓ q tt* refl
-    module k▷ where
+  k▷ : (γʰ aʰ : CT)
+    → [ γʰ ] ≡ cʰ
+    → [ aʰ ] ≡ tʰ
+    → ty₁ aʰ ≡ γʰ
+    → [ ▷ γʰ aʰ ] ≡ cʰ
+  k▷ γʰ aʰ kγ ka ka₁ = mk≡↓ q tt* val≡
+    where
     q : [ ▷ γʰ aʰ ] ↓
-    q = ∧i tt* ,
-        ∧i con↓ γʰ kγ ,
-        ∧i ty↓ γʰ aʰ kγ ka ,
-        ∧i conKind γʰ kγ ,
-        ∧i tyKind γʰ aʰ kγ ka ,
-        tt*
-
-  ku : (γʰ : CT) → [ γʰ ] ≡ cʰ → [ u γʰ ] ≡ tʰ γʰ
-  ku γʰ kγ = mk≡↓ l↓ r↓ val≡
-    module ku where
-    l↓ : [ u γʰ ] ↓
-    l↓ = ∧i tt* , ∧i con↓ γʰ kγ , ∧i conKind γʰ kγ , tt*
-    r↓ : tʰ γʰ ↓
-    r↓ = ∧i tt* , con↓ γʰ kγ
-    val≡ : [ u γʰ ] ! l↓ ≡ tʰ γʰ ! r↓
-    val≡ =
-      [ u γʰ ] ! l↓
-        ≡⟨ ku₀ (γʰ ! (con↓ γʰ kγ)) (conKind γʰ kγ) ⟩
-      t̂ (γʰ ! (con↓ γʰ kγ))
-        ≡⟨ refl ⟩
-      tʰ γʰ ! r↓ ∎
+    q = ∧i tt* , ∧i con↓ γʰ kγ , ∧i ty↓ aʰ ka , ∧i conKind γʰ kγ , ∧i tyKind aʰ ka , ∧i getTy₁-kind γʰ aʰ kγ ka ka₁ , tt*
+    val≡ : [ ▷ γʰ aʰ ] ! q ≡ cʰ ! tt*
+    val≡ = k▷₀ (γʰ ! (con↓ γʰ kγ)) (aʰ ! (ty↓ aʰ ka)) (conKind γʰ kγ) (tyKind aʰ ka) (getTy₁-kind γʰ aʰ kγ ka ka₁)
 
   kπ : (γʰ aʰ bʰ : CT)
     → [ γʰ ] ≡ cʰ
-    → [ aʰ ] ≡ tʰ γʰ
-    → [ bʰ ] ≡ tʰ (▷ γʰ aʰ)
-    → [ π γʰ aʰ bʰ ] ≡ tʰ γʰ
-  kπ γʰ aʰ bʰ kγ ka kb = mk≡↓ pq tq val≡
-    module kπ where
-    kδ = k▷ γʰ aʰ kγ ka
-    tq : tʰ γʰ ↓
-    tq = ∧i tt* , con↓ γʰ kγ
-    q : tʰ γʰ ↓ → [ π γʰ aʰ bʰ ] ↓
-    q _ = ∧i tt* ,
-          ∧i con↓ γʰ kγ ,
-          ∧i ty↓ γʰ aʰ kγ ka ,
-          ∧i ty▷↓ γʰ aʰ bʰ kγ ka kδ kb ,
-          ∧i conKind γʰ kγ ,
-          ∧i tyKind γʰ aʰ kγ ka ,
-          ∧i getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb ,
-          tt*
-    pq : [ π γʰ aʰ bʰ ] ↓
-    pq = q tq
-    val≡ : [ π γʰ aʰ bʰ ] ! pq ≡ tʰ γʰ ! tq
-    val≡ =
-      trans (kπ₀ (γʰ ! (con↓ γʰ kγ))
-                  (aʰ ! (ty↓ γʰ aʰ kγ ka))
-                  (bʰ ! (ty▷↓ γʰ aʰ bʰ kγ ka kδ kb))
-                  (conKind γʰ kγ)
-                  (tyKind γʰ aʰ kγ ka)
-                  (getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb))
-            (cong t̂ (congp (γʰ .val)))
+    → [ aʰ ] ≡ tʰ
+    → ty₁ aʰ ≡ γʰ
+    → [ bʰ ] ≡ tʰ
+    → ty₁ bʰ ≡ ▷ γʰ aʰ
+    → [ π γʰ aʰ bʰ ] ≡ tʰ
+  kπ γʰ aʰ bʰ kγ ka ka₁ kb kb₁ = mk≡↓ l↓ tt* val≡
+    where
+    π↓ : π γʰ aʰ bʰ ↓
+    π↓ = ∧i con↓ γʰ kγ , ∧i ty↓ aʰ ka , ∧i ty↓ bʰ kb , ∧i conKind γʰ kγ , ∧i tyKind aʰ ka , ∧i getTy₁-kind γʰ aʰ kγ ka ka₁ , ∧i tyKind bʰ kb , ∧i getTy₁-kind (▷ γʰ aʰ) bʰ (k▷ γʰ aʰ kγ ka ka₁) kb kb₁ , tt*
+    l↓ : [ π γʰ aʰ bʰ ] ↓
+    l↓ = ∧i tt* , ∧i π⁻-γ γʰ aʰ bʰ π↓ , ∧i π⁻-a γʰ aʰ bʰ π↓ , ∧i π⁻-b γʰ aʰ bʰ π↓ , ∧i π⁻-kγ γʰ aʰ bʰ π↓ , ∧i π⁻-ka γʰ aʰ bʰ π↓ , ∧i π⁻-ka₁ γʰ aʰ bʰ π↓ , ∧i π⁻-kb γʰ aʰ bʰ π↓ , ∧i π⁻-kb₁ γʰ aʰ bʰ π↓ , tt*
+    val≡ : [ π γʰ aʰ bʰ ] ! l↓ ≡ tʰ ! tt*
+    val≡ = kπ₀ (γʰ ! (π⁻-γ γʰ aʰ bʰ π↓)) (aʰ ! (π⁻-a γʰ aʰ bʰ π↓)) (bʰ ! (π⁻-b γʰ aʰ bʰ π↓)) (π⁻-kγ γʰ aʰ bʰ π↓) (π⁻-ka γʰ aʰ bʰ π↓) (π⁻-ka₁ γʰ aʰ bʰ π↓) (π⁻-kb γʰ aʰ bʰ π↓) (π⁻-kb₁ γʰ aʰ bʰ π↓)
+
+  π₁ : (γʰ aʰ bʰ : CT)
+    → [ π γʰ aʰ bʰ ] ≡ tʰ
+    → ty₁ (π γʰ aʰ bʰ) ≡ γʰ
+  π₁ γʰ aʰ bʰ kπ = mk≡↓ l↓ r↓ val≡
+    where
+    mutual
+      [πγab]↓ : [ π γʰ aʰ bʰ ] ↓
+      [πγab]↓ = extractCond kπ tt*
+      π↓ : π γʰ aʰ bʰ ↓
+      π↓ = []⁻ (π γʰ aʰ bʰ) [πγab]↓
+      l↓ : ty₁ (π γʰ aʰ bʰ) ↓
+      l↓ = ∧i π↓ , ∧i extractVal kπ tt* , tt*
+      r↓ : γʰ ↓
+      r↓ = π⁻-γ γʰ aʰ bʰ π↓
+      val≡ : ty₁ (π γʰ aʰ bʰ) ! l↓ ≡ γʰ ! r↓
+      val≡ = π₁₀ (γʰ ! r↓) (aʰ ! (π⁻-a γʰ aʰ bʰ π↓)) (bʰ ! (π⁻-b γʰ aʰ bʰ π↓)) (π⁻-kγ γʰ aʰ bʰ π↓) (π⁻-ka γʰ aʰ bʰ π↓) (π⁻-ka₁ γʰ aʰ bʰ π↓) (π⁻-kb γʰ aʰ bʰ π↓) (π⁻-kb₁ γʰ aʰ bʰ π↓)
 
   kσ : (γʰ aʰ bʰ : CT)
     → [ γʰ ] ≡ cʰ
-    → [ aʰ ] ≡ tʰ γʰ
-    → [ bʰ ] ≡ tʰ (▷ γʰ aʰ)
-    → [ σ γʰ aʰ bʰ ] ≡ tʰ γʰ
-  kσ γʰ aʰ bʰ kγ ka kb = mk≡↓ pq tq val≡
-    module kσ where
-    kδ = k▷ γʰ aʰ kγ ka
-    tq : tʰ γʰ ↓
-    tq = ∧i tt* , con↓ γʰ kγ
-    q : tʰ γʰ ↓ → [ σ γʰ aʰ bʰ ] ↓
-    q _ = ∧i tt* ,
-          ∧i con↓ γʰ kγ ,
-          ∧i ty↓ γʰ aʰ kγ ka ,
-          ∧i ty▷↓ γʰ aʰ bʰ kγ ka kδ kb ,
-          ∧i conKind γʰ kγ ,
-          ∧i tyKind γʰ aʰ kγ ka ,
-          ∧i getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb ,
-          tt*
-    pq : [ σ γʰ aʰ bʰ ] ↓
-    pq = q tq
-    val≡ : [ σ γʰ aʰ bʰ ] ! pq ≡ tʰ γʰ ! tq
-    val≡ =
-      trans (kσ₀ (γʰ ! (con↓ γʰ kγ))
-                  (aʰ ! (ty↓ γʰ aʰ kγ ka))
-                  (bʰ ! (ty▷↓ γʰ aʰ bʰ kγ ka kδ kb))
-                  (conKind γʰ kγ)
-                  (tyKind γʰ aʰ kγ ka)
-                  (getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb))
-            (cong t̂ (congp (γʰ .val)))
+    → [ aʰ ] ≡ tʰ
+    → ty₁ aʰ ≡ γʰ
+    → [ bʰ ] ≡ tʰ
+    → ty₁ bʰ ≡ ▷ γʰ aʰ
+    → [ σ γʰ aʰ bʰ ] ≡ tʰ
+  kσ γʰ aʰ bʰ kγ ka ka₁ kb kb₁ = mk≡↓ l↓ tt* val≡
+    where
+    σ↓ : σ γʰ aʰ bʰ ↓
+    σ↓ = ∧i con↓ γʰ kγ , ∧i ty↓ aʰ ka , ∧i ty↓ bʰ kb , ∧i conKind γʰ kγ , ∧i tyKind aʰ ka , ∧i getTy₁-kind γʰ aʰ kγ ka ka₁ , ∧i tyKind bʰ kb , ∧i getTy₁-kind (▷ γʰ aʰ) bʰ (k▷ γʰ aʰ kγ ka ka₁) kb kb₁ , tt*
+    l↓ : [ σ γʰ aʰ bʰ ] ↓
+    l↓ = ∧i tt* , ∧i σ⁻-γ γʰ aʰ bʰ σ↓ , ∧i σ⁻-a γʰ aʰ bʰ σ↓ , ∧i σ⁻-b γʰ aʰ bʰ σ↓ , ∧i σ⁻-kγ γʰ aʰ bʰ σ↓ , ∧i σ⁻-ka γʰ aʰ bʰ σ↓ , ∧i σ⁻-ka₁ γʰ aʰ bʰ σ↓ , ∧i σ⁻-kb γʰ aʰ bʰ σ↓ , ∧i σ⁻-kb₁ γʰ aʰ bʰ σ↓ , tt*
+    val≡ : [ σ γʰ aʰ bʰ ] ! l↓ ≡ tʰ ! tt*
+    val≡ = kσ₀ (γʰ ! (σ⁻-γ γʰ aʰ bʰ σ↓)) (aʰ ! (σ⁻-a γʰ aʰ bʰ σ↓)) (bʰ ! (σ⁻-b γʰ aʰ bʰ σ↓)) (σ⁻-kγ γʰ aʰ bʰ σ↓) (σ⁻-ka γʰ aʰ bʰ σ↓) (σ⁻-ka₁ γʰ aʰ bʰ σ↓) (σ⁻-kb γʰ aʰ bʰ σ↓) (σ⁻-kb₁ γʰ aʰ bʰ σ↓)
+
+  σ₁ : (γʰ aʰ bʰ : CT)
+    → [ σ γʰ aʰ bʰ ] ≡ tʰ
+    → ty₁ (σ γʰ aʰ bʰ) ≡ γʰ
+  σ₁ γʰ aʰ bʰ kσ = mk≡↓ l↓ r↓ val≡
+    where
+    mutual
+      [σγab]↓ : [ σ γʰ aʰ bʰ ] ↓
+      [σγab]↓ = extractCond kσ tt*
+      σ↓ : σ γʰ aʰ bʰ ↓
+      σ↓ = []⁻ (σ γʰ aʰ bʰ) [σγab]↓
+      l↓ : ty₁ (σ γʰ aʰ bʰ) ↓
+      l↓ = ∧i σ↓ , ∧i extractVal kσ tt* , tt*
+      r↓ : γʰ ↓
+      r↓ = σ⁻-γ γʰ aʰ bʰ σ↓
+      val≡ : ty₁ (σ γʰ aʰ bʰ) ! l↓ ≡ γʰ ! r↓
+      val≡ = σ₁₀ (γʰ ! r↓) (aʰ ! (σ⁻-a γʰ aʰ bʰ σ↓)) (bʰ ! (σ⁻-b γʰ aʰ bʰ σ↓)) (σ⁻-kγ γʰ aʰ bʰ σ↓) (σ⁻-ka γʰ aʰ bʰ σ↓) (σ⁻-ka₁ γʰ aʰ bʰ σ↓) (σ⁻-kb γʰ aʰ bʰ σ↓) (σ⁻-kb₁ γʰ aʰ bʰ σ↓)
 
   σ▷ : (γʰ aʰ bʰ : CT)
     → [ γʰ ] ≡ cʰ
-    → [ aʰ ] ≡ tʰ γʰ
-    → [ bʰ ] ≡ tʰ (▷ γʰ aʰ)
+    → [ aʰ ] ≡ tʰ
+    → ty₁ aʰ ≡ γʰ
+    → [ bʰ ] ≡ tʰ
+    → ty₁ bʰ ≡ ▷ γʰ aʰ
     → ▷ (▷ γʰ aʰ) bʰ ≡ ▷ γʰ (σ γʰ aʰ bʰ)
-  σ▷ γʰ aʰ bʰ kγ ka kb = mk≡↓ pq qq val≡
-    module σ▷ where
-    kδ = k▷ γʰ aʰ kγ ka
+  σ▷ γʰ aʰ bʰ kγ ka ka₁ kb kb₁ = mk≡↓ pq qq val≡
+    where
+    kδ : [ ▷ γʰ aʰ ] ≡ cʰ
+    kδ = k▷ γʰ aʰ kγ ka ka₁
     qq : ▷ γʰ (σ γʰ aʰ bʰ) ↓
-    qq = ∧i con↓ γʰ kγ ,
-          ∧i ty↓ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb) ,
-          ∧i conKind γʰ kγ ,
-          ∧i tyKind γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb) ,
-          tt*
-    q : ▷ γʰ (σ γʰ aʰ bʰ) ↓ → ▷ (▷ γʰ aʰ) bʰ ↓
-    q _ = ∧i con↓ (▷ γʰ aʰ) kδ ,
-          ∧i ty↓ (▷ γʰ aʰ) bʰ kδ kb ,
-          ∧i conKind (▷ γʰ aʰ) kδ ,
-          ∧i tyKind (▷ γʰ aʰ) bʰ kδ kb ,
-          tt*
+    qq = ∧i con↓ γʰ kγ , ∧i ty↓ (σ γʰ aʰ bʰ) (kσ γʰ aʰ bʰ kγ ka ka₁ kb kb₁) , ∧i conKind γʰ kγ , ∧i tyKind (σ γʰ aʰ bʰ) (kσ γʰ aʰ bʰ kγ ka ka₁ kb kb₁) , ∧i getTy₁-kind γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka ka₁ kb kb₁) (σ₁ γʰ aʰ bʰ (kσ γʰ aʰ bʰ kγ ka ka₁ kb kb₁)) , tt*
     pq : ▷ (▷ γʰ aʰ) bʰ ↓
-    pq = q qq
+    pq = ∧i con↓ (▷ γʰ aʰ) kδ , ∧i ty↓ bʰ kb , ∧i conKind (▷ γʰ aʰ) kδ , ∧i tyKind bʰ kb , ∧i getTy₁-kind (▷ γʰ aʰ) bʰ kδ kb kb₁ , tt*
     val≡ : ▷ (▷ γʰ aʰ) bʰ ! pq ≡ ▷ γʰ (σ γʰ aʰ bʰ) ! qq
-    val≡ =
-      σ▷₀ (γʰ ! (con↓ γʰ kγ))
-          (aʰ ! (ty↓ γʰ aʰ kγ ka))
-          (bʰ ! (ty▷↓ γʰ aʰ bʰ kγ ka kδ kb))
-          (conKind γʰ kγ)
-          (tyKind γʰ aʰ kγ ka)
-          (getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb)
+    val≡ = σ▷₀ (γʰ ! (con↓ γʰ kγ)) (aʰ ! (ty↓ aʰ ka)) (bʰ ! (ty↓ bʰ kb)) (conKind γʰ kγ) (tyKind aʰ ka) (getTy₁-kind γʰ aʰ kγ ka ka₁) (tyKind bʰ kb) (getTy₁-kind (▷ γʰ aʰ) bʰ kδ kb kb₁)
 
   σπ : (γʰ aʰ bʰ dʰ : CT)
     → [ γʰ ] ≡ cʰ
-    → [ aʰ ] ≡ tʰ γʰ
-    → [ bʰ ] ≡ tʰ (▷ γʰ aʰ)
-    → [ dʰ ] ≡ tʰ (▷ (▷ γʰ aʰ) bʰ)
+    → [ aʰ ] ≡ tʰ
+    → ty₁ aʰ ≡ γʰ
+    → [ bʰ ] ≡ tʰ
+    → ty₁ bʰ ≡ ▷ γʰ aʰ
+    → [ dʰ ] ≡ tʰ
+    → ty₁ dʰ ≡ ▷ (▷ γʰ aʰ) bʰ
     → π γʰ aʰ (π (▷ γʰ aʰ) bʰ dʰ) ≡ π γʰ (σ γʰ aʰ bʰ) dʰ
-  σπ γʰ aʰ bʰ dʰ kγ ka kb kc = mk≡↓ pq qq val≡
-    module σπ where
-    kδ = k▷ γʰ aʰ kγ ka
-    kε = k▷ (▷ γʰ aʰ) bʰ kδ kb
+  σπ γʰ aʰ bʰ dʰ kγ ka ka₁ kb kb₁ kc kc₁ = mk≡↓ pq qq val≡
+    where
+    kδ : [ ▷ γʰ aʰ ] ≡ cʰ
+    kδ = k▷ γʰ aʰ kγ ka ka₁
+    kε : [ ▷ (▷ γʰ aʰ) bʰ ] ≡ cʰ
+    kε = k▷ (▷ γʰ aʰ) bʰ kδ kb kb₁
     qq : π γʰ (σ γʰ aʰ bʰ) dʰ ↓
-    qq = ∧i con↓ γʰ kγ ,
-          ∧i ty↓ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb) ,
-          ∧i ty↓ (▷ γʰ (σ γʰ aʰ bʰ)) dʰ
-                 (k▷ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb))
-                 (substp (λ x → [ dʰ ] ≡ tʰ x) (σ▷ γʰ aʰ bʰ kγ ka kb) kc) ,
-          ∧i conKind γʰ kγ ,
-          ∧i tyKind γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb) ,
-          ∧i tyKind (▷ γʰ (σ γʰ aʰ bʰ)) dʰ
-                    (k▷ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka kb))
-                    (substp (λ x → [ dʰ ] ≡ tʰ x) (σ▷ γʰ aʰ bʰ kγ ka kb) kc) ,
-          tt*
-    q : π γʰ (σ γʰ aʰ bʰ) dʰ ↓ → π γʰ aʰ (π (▷ γʰ aʰ) bʰ dʰ) ↓
-    q _ = ∧i con↓ γʰ kγ ,
-          ∧i ty↓ γʰ aʰ kγ ka ,
-          ∧i ty↓ (▷ γʰ aʰ) (π (▷ γʰ aʰ) bʰ dʰ) kδ (kπ (▷ γʰ aʰ) bʰ dʰ kδ kb kc) ,
-          ∧i conKind γʰ kγ ,
-          ∧i tyKind γʰ aʰ kγ ka ,
-          ∧i tyKind (▷ γʰ aʰ) (π (▷ γʰ aʰ) bʰ dʰ) kδ (kπ (▷ γʰ aʰ) bʰ dʰ kδ kb kc) ,
-          tt*
+    qq = ∧i con↓ γʰ kγ , ∧i ty↓ (σ γʰ aʰ bʰ) (kσ γʰ aʰ bʰ kγ ka ka₁ kb kb₁) , ∧i ty↓ dʰ kc , ∧i conKind γʰ kγ , ∧i tyKind (σ γʰ aʰ bʰ) (kσ γʰ aʰ bʰ kγ ka ka₁ kb kb₁) , ∧i getTy₁-kind γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka ka₁ kb kb₁) (σ₁ γʰ aʰ bʰ (kσ γʰ aʰ bʰ kγ ka ka₁ kb kb₁)) , ∧i tyKind dʰ kc , ∧i getTy₁-kind (▷ γʰ (σ γʰ aʰ bʰ)) dʰ (k▷ γʰ (σ γʰ aʰ bʰ) kγ (kσ γʰ aʰ bʰ kγ ka ka₁ kb kb₁) (σ₁ γʰ aʰ bʰ (kσ γʰ aʰ bʰ kγ ka ka₁ kb kb₁))) kc (substp (λ x → ty₁ dʰ ≡ x) (σ▷ γʰ aʰ bʰ kγ ka ka₁ kb kb₁) kc₁) , tt*
     pq : π γʰ aʰ (π (▷ γʰ aʰ) bʰ dʰ) ↓
-    pq = q qq
+    pq = ∧i con↓ γʰ kγ , ∧i ty↓ aʰ ka , ∧i ty↓ (π (▷ γʰ aʰ) bʰ dʰ) (kπ (▷ γʰ aʰ) bʰ dʰ kδ kb kb₁ kc kc₁) , ∧i conKind γʰ kγ , ∧i tyKind aʰ ka , ∧i getTy₁-kind γʰ aʰ kγ ka ka₁ , ∧i tyKind (π (▷ γʰ aʰ) bʰ dʰ) (kπ (▷ γʰ aʰ) bʰ dʰ kδ kb kb₁ kc kc₁) , ∧i getTy₁-kind (▷ γʰ aʰ) (π (▷ γʰ aʰ) bʰ dʰ) kδ (kπ (▷ γʰ aʰ) bʰ dʰ kδ kb kb₁ kc kc₁) (π₁ (▷ γʰ aʰ) bʰ dʰ (kπ (▷ γʰ aʰ) bʰ dʰ kδ kb kb₁ kc kc₁)) , tt*
     val≡ : π γʰ aʰ (π (▷ γʰ aʰ) bʰ dʰ) ! pq ≡ π γʰ (σ γʰ aʰ bʰ) dʰ ! qq
-    val≡ =
-      σπ₀ (γʰ ! (con↓ γʰ kγ))
-          (aʰ ! (ty↓ γʰ aʰ kγ ka))
-          (bʰ ! (ty▷↓ γʰ aʰ bʰ kγ ka kδ kb))
-          (dʰ ! (ty▷↓ (▷ γʰ aʰ) bʰ dʰ kδ kb kε kc))
-          (conKind γʰ kγ)
-          (tyKind γʰ aʰ kγ ka)
-          (getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb)
-          (getTy▷-kind (▷ γʰ aʰ) bʰ dʰ kδ kb kε kc)
-
-  [kʰ]≡kʰ : [ kʰ ] ≡ kʰ
-  [kʰ]≡kʰ = mk≡↓ (∧i tt* , tt*) tt* refl
-
-  [∙]≡ĉ : [ ∙ ] ≡ cʰ
-  [∙]≡ĉ = mk≡↓ (∧i tt* , tt*) tt* refl
-
-  [▷]≡ĉ : ∀ γ a
-    → (kγ : [ γ ] ≡ cʰ)
-    → (ka : [ a ] ≡ tʰ γ)
-    → [ ▷ γ a ] ≡ cʰ
-  [▷]≡ĉ γ a kγ ka =
-    mk≡↓ (∧i tt*
-         , ∧i con↓ γ kγ
-         , ∧i (ty↓ γ a kγ ka)
-         , ∧i conKind γ kγ
-         , ∧i (tyKind γ a kγ ka)
-         , tt*) tt* refl
-
-  tʰ-γ↓ : (γ : CT) → γ ↓ → tʰ γ ↓
-  tʰ-γ↓ γ γ↓ = ∧i tt* , γ↓
+    val≡ = σπ₀ (γʰ ! (con↓ γʰ kγ)) (aʰ ! (ty↓ aʰ ka)) (bʰ ! (ty↓ bʰ kb)) (dʰ ! (ty↓ dʰ kc)) (conKind γʰ kγ) (tyKind aʰ ka) (getTy₁-kind γʰ aʰ kγ ka ka₁) (tyKind bʰ kb) (getTy₁-kind (▷ γʰ aʰ) bʰ kδ kb kb₁) (tyKind dʰ kc) (getTy₁-kind (▷ (▷ γʰ aʰ) bʰ) dʰ kε kc kc₁)
 
   ▷-γ : (γ a : CT) → [ ▷ γ a ] ≡ cʰ → [ γ ] ≡ cʰ
-  ▷-γ γ a k▷ = mk≡↓ ([]↓ γ γ↓) tt* (▷⁻-kγ γ a ▷↓)
+  ▷-γ γ a k▷' = mk≡↓ ([]↓ γ γ↓) tt* (▷⁻-kγ γ a ▷↓)
     where
     ▷↓ : ▷ γ a ↓
-    ▷↓ = con↓ (▷ γ a) k▷
+    ▷↓ = con↓ (▷ γ a) k▷'
     γ↓ : γ ↓
     γ↓ = ▷⁻-γ γ a ▷↓
 
-  ▷-a : (γ a : CT) → [ ▷ γ a ] ≡ cʰ → [ a ] ≡ tʰ γ
-  ▷-a γ a k▷ = mk≡↓ ([]↓ a a↓) (tʰ-γ↓ γ γ↓) (▷⁻-ka γ a ▷↓)
+  ▷-a : (γ a : CT) → [ ▷ γ a ] ≡ cʰ → [ a ] ≡ tʰ
+  ▷-a γ a k▷' = mk≡↓ ([]↓ a a↓) tt* (▷⁻-ka γ a ▷↓)
     where
     ▷↓ : ▷ γ a ↓
-    ▷↓ = con↓ (▷ γ a) k▷
-    γ↓ : γ ↓
-    γ↓ = ▷⁻-γ γ a ▷↓
+    ▷↓ = con↓ (▷ γ a) k▷'
     a↓ : a ↓
     a↓ = ▷⁻-a γ a ▷↓
 
-  u-γ : (γ : CT) → [ u γ ] ≡ tʰ γ → [ γ ] ≡ cʰ
-  u-γ γ ku = mk≡↓ ([]↓ γ γ↓) tt* (u⁻-kγ γ u↓)
+  ▷-a₁ : (γ a : CT) → [ ▷ γ a ] ≡ cʰ → ty₁ a ≡ γ
+  ▷-a₁ γ a k▷' = mk≡↓ l↓ r↓ (▷⁻-ka₁ γ a ▷↓)
+    where
+    ▷↓ : ▷ γ a ↓
+    ▷↓ = con↓ (▷ γ a) k▷'
+    a↓ : a ↓
+    a↓ = ▷⁻-a γ a ▷↓
+    γ↓ : γ ↓
+    γ↓ = ▷⁻-γ γ a ▷↓
+    l↓ : ty₁ a ↓
+    l↓ = ∧i a↓ , ∧i ▷⁻-ka γ a ▷↓ , tt*
+    r↓ : γ ↓
+    r↓ = γ↓
+
+  u-γ : (γ : CT) → [ u γ ] ≡ tʰ → [ γ ] ≡ cʰ
+  u-γ γ ku' = mk≡↓ ([]↓ γ γ↓) tt* (u⁻-kγ γ u↓)
     where
     mutual
       [uγ]↓ : [ u γ ] ↓
-      [uγ]↓ = extractCond ku (tʰ-γ↓ γ γ↓)
+      [uγ]↓ = extractCond ku' tt*
       u↓ : u γ ↓
       u↓ = []⁻ (u γ) [uγ]↓
       γ↓ : γ ↓
       γ↓ = u⁻-γ γ u↓
 
-  π-γ : (γ a b : CT) → [ π γ a b ] ≡ tʰ γ → [ γ ] ≡ cʰ
-  π-γ γ a b kπ = mk≡↓ ([]↓ γ γ↓) tt* (π⁻-kγ γ a b π↓)
+  π-γ : (γ a b : CT) → [ π γ a b ] ≡ tʰ → [ γ ] ≡ cʰ
+  π-γ γ a b kπ' = mk≡↓ ([]↓ γ γ↓) tt* (π⁻-kγ γ a b π↓)
     where
     mutual
       [πγab]↓ : [ π γ a b ] ↓
-      [πγab]↓ = extractCond kπ (tʰ-γ↓ γ γ↓)
+      [πγab]↓ = extractCond kπ' tt*
       π↓ : π γ a b ↓
       π↓ = []⁻ (π γ a b) [πγab]↓
       γ↓ : γ ↓
       γ↓ = π⁻-γ γ a b π↓
 
-  π-a : (γ a b : CT) → [ π γ a b ] ≡ tʰ γ → [ a ] ≡ tʰ γ
-  π-a γ a b kπ = mk≡↓ ([]↓ a a↓) (tʰ-γ↓ γ γ↓) (π⁻-ka γ a b π↓)
+  π-a : (γ a b : CT) → [ π γ a b ] ≡ tʰ → [ a ] ≡ tʰ
+  π-a γ a b kπ' = mk≡↓ ([]↓ a a↓) tt* (π⁻-ka γ a b π↓)
     where
     mutual
       [πγab]↓ : [ π γ a b ] ↓
-      [πγab]↓ = extractCond kπ (tʰ-γ↓ γ γ↓)
+      [πγab]↓ = extractCond kπ' tt*
       π↓ : π γ a b ↓
       π↓ = []⁻ (π γ a b) [πγab]↓
-      γ↓ : γ ↓
-      γ↓ = π⁻-γ γ a b π↓
       a↓ : a ↓
       a↓ = π⁻-a γ a b π↓
 
-  π-b : (γ a b : CT) → [ π γ a b ] ≡ tʰ γ → [ b ] ≡ tʰ (▷ γ a)
-  π-b γ a b kπ = mk≡↓ ([]↓ b b↓) (tʰ-γ↓ (▷ γ a) δ↓) (π⁻-kb γ a b π↓)
+  π-a₁ : (γ a b : CT) → [ π γ a b ] ≡ tʰ → ty₁ a ≡ γ
+  π-a₁ γ a b kπ' = mk≡↓ l↓ r↓ (π⁻-ka₁ γ a b π↓)
     where
     mutual
       [πγab]↓ : [ π γ a b ] ↓
-      [πγab]↓ = extractCond kπ (tʰ-γ↓ γ γ↓)
+      [πγab]↓ = extractCond kπ' tt*
       π↓ : π γ a b ↓
       π↓ = []⁻ (π γ a b) [πγab]↓
-      γ↓ : γ ↓
-      γ↓ = π⁻-γ γ a b π↓
       a↓ : a ↓
       a↓ = π⁻-a γ a b π↓
+      γ↓ : γ ↓
+      γ↓ = π⁻-γ γ a b π↓
+      l↓ : ty₁ a ↓
+      l↓ = ∧i a↓ , ∧i π⁻-ka γ a b π↓ , tt*
+      r↓ : γ ↓
+      r↓ = γ↓
+
+  π-b : (γ a b : CT) → [ π γ a b ] ≡ tʰ → [ b ] ≡ tʰ
+  π-b γ a b kπ' = mk≡↓ ([]↓ b b↓) tt* (π⁻-kb γ a b π↓)
+    where
+    mutual
+      [πγab]↓ : [ π γ a b ] ↓
+      [πγab]↓ = extractCond kπ' tt*
+      π↓ : π γ a b ↓
+      π↓ = []⁻ (π γ a b) [πγab]↓
+      b↓ : b ↓
+      b↓ = π⁻-b γ a b π↓
+
+  π-b₁ : (γ a b : CT) → [ π γ a b ] ≡ tʰ → ty₁ b ≡ ▷ γ a
+  π-b₁ γ a b kπ' = mk≡↓ l↓ r↓ (π⁻-kb₁ γ a b π↓)
+    where
+    mutual
+      [πγab]↓ : [ π γ a b ] ↓
+      [πγab]↓ = extractCond kπ' tt*
+      π↓ : π γ a b ↓
+      π↓ = []⁻ (π γ a b) [πγab]↓
       b↓ : b ↓
       b↓ = π⁻-b γ a b π↓
       δ↓ : ▷ γ a ↓
-      δ↓ = ∧i γ↓ , ∧i a↓ , ∧i π⁻-kγ γ a b π↓ , ∧i π⁻-ka γ a b π↓ , tt*
+      δ↓ = ∧i π⁻-γ γ a b π↓ , ∧i π⁻-a γ a b π↓ , ∧i π⁻-kγ γ a b π↓ , ∧i π⁻-ka γ a b π↓ , ∧i π⁻-ka₁ γ a b π↓ , tt*
+      l↓ : ty₁ b ↓
+      l↓ = ∧i b↓ , ∧i π⁻-kb γ a b π↓ , tt*
+      r↓ : ▷ γ a ↓
+      r↓ = δ↓
 
-  σ-γ : (γ a b : CT) → [ σ γ a b ] ≡ tʰ γ → [ γ ] ≡ cʰ
-  σ-γ γ a b kσ = mk≡↓ ([]↓ γ γ↓) tt* (σ⁻-kγ γ a b σ↓)
+  σ-γ : (γ a b : CT) → [ σ γ a b ] ≡ tʰ → [ γ ] ≡ cʰ
+  σ-γ γ a b kσ' = mk≡↓ ([]↓ γ γ↓) tt* (σ⁻-kγ γ a b σ↓)
     where
     mutual
       [σγab]↓ : [ σ γ a b ] ↓
-      [σγab]↓ = extractCond kσ (tʰ-γ↓ γ γ↓)
+      [σγab]↓ = extractCond kσ' tt*
       σ↓ : σ γ a b ↓
       σ↓ = []⁻ (σ γ a b) [σγab]↓
       γ↓ : γ ↓
       γ↓ = σ⁻-γ γ a b σ↓
 
-  σ-a : (γ a b : CT) → [ σ γ a b ] ≡ tʰ γ → [ a ] ≡ tʰ γ
-  σ-a γ a b kσ = mk≡↓ ([]↓ a a↓) (tʰ-γ↓ γ γ↓) (σ⁻-ka γ a b σ↓)
+  σ-a : (γ a b : CT) → [ σ γ a b ] ≡ tʰ → [ a ] ≡ tʰ
+  σ-a γ a b kσ' = mk≡↓ ([]↓ a a↓) tt* (σ⁻-ka γ a b σ↓)
     where
     mutual
       [σγab]↓ : [ σ γ a b ] ↓
-      [σγab]↓ = extractCond kσ (tʰ-γ↓ γ γ↓)
+      [σγab]↓ = extractCond kσ' tt*
       σ↓ : σ γ a b ↓
       σ↓ = []⁻ (σ γ a b) [σγab]↓
-      γ↓ : γ ↓
-      γ↓ = σ⁻-γ γ a b σ↓
       a↓ : a ↓
       a↓ = σ⁻-a γ a b σ↓
 
-  σ-b : (γ a b : CT) → [ σ γ a b ] ≡ tʰ γ → [ b ] ≡ tʰ (▷ γ a)
-  σ-b γ a b kσ = mk≡↓ ([]↓ b b↓) (tʰ-γ↓ (▷ γ a) δ↓) (σ⁻-kb γ a b σ↓)
+  σ-a₁ : (γ a b : CT) → [ σ γ a b ] ≡ tʰ → ty₁ a ≡ γ
+  σ-a₁ γ a b kσ' = mk≡↓ l↓ r↓ (σ⁻-ka₁ γ a b σ↓)
     where
     mutual
       [σγab]↓ : [ σ γ a b ] ↓
-      [σγab]↓ = extractCond kσ (tʰ-γ↓ γ γ↓)
+      [σγab]↓ = extractCond kσ' tt*
       σ↓ : σ γ a b ↓
       σ↓ = []⁻ (σ γ a b) [σγab]↓
-      γ↓ : γ ↓
-      γ↓ = σ⁻-γ γ a b σ↓
       a↓ : a ↓
       a↓ = σ⁻-a γ a b σ↓
+      γ↓ : γ ↓
+      γ↓ = σ⁻-γ γ a b σ↓
+      l↓ : ty₁ a ↓
+      l↓ = ∧i a↓ , ∧i σ⁻-ka γ a b σ↓ , tt*
+      r↓ : γ ↓
+      r↓ = γ↓
+
+  σ-b : (γ a b : CT) → [ σ γ a b ] ≡ tʰ → [ b ] ≡ tʰ
+  σ-b γ a b kσ' = mk≡↓ ([]↓ b b↓) tt* (σ⁻-kb γ a b σ↓)
+    where
+    mutual
+      [σγab]↓ : [ σ γ a b ] ↓
+      [σγab]↓ = extractCond kσ' tt*
+      σ↓ : σ γ a b ↓
+      σ↓ = []⁻ (σ γ a b) [σγab]↓
+      b↓ : b ↓
+      b↓ = σ⁻-b γ a b σ↓
+
+  σ-b₁ : (γ a b : CT) → [ σ γ a b ] ≡ tʰ → ty₁ b ≡ ▷ γ a
+  σ-b₁ γ a b kσ' = mk≡↓ l↓ r↓ (σ⁻-kb₁ γ a b σ↓)
+    where
+    mutual
+      [σγab]↓ : [ σ γ a b ] ↓
+      [σγab]↓ = extractCond kσ' tt*
+      σ↓ : σ γ a b ↓
+      σ↓ = []⁻ (σ γ a b) [σγab]↓
       b↓ : b ↓
       b↓ = σ⁻-b γ a b σ↓
       δ↓ : ▷ γ a ↓
-      δ↓ = ∧i γ↓ , ∧i a↓ , ∧i σ⁻-kγ γ a b σ↓ , ∧i σ⁻-ka γ a b σ↓ , tt*
+      δ↓ = ∧i σ⁻-γ γ a b σ↓ , ∧i σ⁻-a γ a b σ↓ , ∧i σ⁻-kγ γ a b σ↓ , ∧i σ⁻-ka γ a b σ↓ , ∧i σ⁻-ka₁ γ a b σ↓ , tt*
+      l↓ : ty₁ b ↓
+      l↓ = ∧i b↓ , ∧i σ⁻-kb γ a b σ↓ , tt*
+      r↓ : ▷ γ a ↓
+      r↓ = δ↓
 
   wa : W.Algebra (lsuc ℓA)
   wa = record
     { CT = CT
     ; [_] = [_]
-    ; k̂ = kʰ
     ; ĉ = cʰ
     ; t̂ = tʰ
+    ; ty₁ = ty₁
     ; ∙ = ∙
     ; k∙ = k∙
     ; ▷ = ▷
     ; k▷ = k▷
     ; ▷-γ = ▷-γ
     ; ▷-a = ▷-a
+    ; ▷-a₁ = ▷-a₁
     ; u = u
     ; ku = ku
+    ; u₁ = u₁
     ; u-γ = u-γ
     ; π = π
     ; kπ = kπ
+    ; π₁ = π₁
     ; π-γ = π-γ
     ; π-a = π-a
+    ; π-a₁ = π-a₁
     ; π-b = π-b
+    ; π-b₁ = π-b₁
     ; σ = σ
     ; kσ = kσ
+    ; σ₁ = σ₁
     ; σ-γ = σ-γ
     ; σ-a = σ-a
+    ; σ-a₁ = σ-a₁
     ; σ-b = σ-b
+    ; σ-b₁ = σ-b₁
     ; σ▷ = σ▷
     ; σπ = σπ
     }
 
-G₁ : ∀ {ℓA} {A B : M.Algebra ℓA} → M.Hom A B → W.Hom (G₀ A) (G₀ B)
+{-
+
+  G₁ : ∀ {ℓA} {A B : M.Algebra ℓA} → M.Hom A B → W.Hom (G₀ A) (G₀ B)
 G₁ {ℓA} {A} {B} f = record
   { θ = θ
   ; [_] = [_]
