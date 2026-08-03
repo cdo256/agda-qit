@@ -431,6 +431,7 @@ open import QIT.Category.Morphism
     module G₀A = G₀ A
     module FGA = M.Algebra (F₀ (G₀ A))
     module F₀G₀A = F₀ (G₀ A)
+    open ≡.≡-Reasoning
 
     conᴿ : A.Con → FGA.Con
     conᴿ γ = γ
@@ -453,7 +454,11 @@ open import QIT.Category.Morphism
       p = ≡.sym (G₀.Ty-fst A a₁)
 
     uᴿ : ∀ γ → tyᴿ (A.u γ) ≡ FGA.u (conᴿ γ)
-    uᴿ γ = Σ≡ (A.u₁ γ) {!!}
+    uᴿ γ = Σ≡ (A.u₁ γ) (ΣP≡ _ _ p)
+      where
+      p : subst G₀A.Ty (A.u₁ γ) (A.u γ , ≡.refl) .fst
+        ≡ A.u γ 
+      p = G₀A.Ty-fst (A.u₁ γ)
 
     πᴿ : ∀ γ a b
       → (a₁ : A.ty₁ a ≡ γ)
@@ -462,7 +467,35 @@ open import QIT.Category.Morphism
       → (b₁' : FGA.ty₁ (tyᴿ b) ≡ FGA.▷ (conᴿ γ) (tyᴿ a) a₁')
       → tyᴿ (A.π γ a b a₁ b₁)
       ≡ FGA.π (conᴿ γ) (tyᴿ a) (tyᴿ b) a₁' b₁'
-    πᴿ = {!!}
+    πᴿ γ a b a₁ b₁ a₁' b₁' = Σ≡ (A.π₁ γ a b a₁ b₁) (ΣP≡ _ _ p)
+      where
+      pa : subst GA.Ty a₁' (a , ≡.refl) .fst ≡ a
+      pa = G₀A.Ty-fst a₁'
+
+      pb : subst (λ _ → A.Ty) (≡.sym pa) b
+         ≡ subst GA.Ty b₁' (b , ≡.refl) .fst
+      pb = ≡.trans
+             (≡.subst-const A.Ty b (≡.sym pa))
+             (≡.sym (G₀A.Ty-fst b₁'))
+
+      p : subst GA.Ty (A.π₁ γ a b a₁ b₁)
+           (A.π γ a b a₁ b₁ , ≡.refl) .fst
+           ≡
+           GA.π (conᴿ γ) (F₀G₀A.mkTy (tyᴿ a) a₁')
+           (F₀G₀A.mkTy (tyᴿ b) b₁') .fst
+      p =
+        subst GA.Ty (A.π₁ γ a b a₁ b₁)
+          (A.π γ a b a₁ b₁ , ≡.refl) .fst
+          ≡⟨ G₀A.Ty-fst (A.π₁ γ a b a₁ b₁) ⟩
+        A.π γ a b a₁ b₁
+          ≡⟨ ≡.dcongsspp (A.π γ) (≡.sym pa) pb ⟩
+        A.π γ (subst GA.Ty a₁' (a , ≡.refl) .fst)
+              (subst GA.Ty b₁' (b , ≡.refl) .fst)
+              (subst GA.Ty a₁' (a , ≡.refl) .snd)
+              (subst GA.Ty b₁' (b , ≡.refl) .snd)
+          ≡⟨ ≡.refl ⟩
+        GA.π (conᴿ γ) (F₀G₀A.mkTy (tyᴿ a) a₁')
+           (F₀G₀A.mkTy (tyᴿ b) b₁') .fst ∎
 
     σᴿ : ∀ γ a b
       → (a₁ : A.ty₁ a ≡ γ)
@@ -471,7 +504,42 @@ open import QIT.Category.Morphism
       → (b₁' : FGA.ty₁ (tyᴿ b) ≡ FGA.▷ (conᴿ γ) (tyᴿ a) a₁')
       → tyᴿ (A.σ γ a b a₁ b₁)
       ≡ FGA.σ (conᴿ γ) (tyᴿ a) (tyᴿ b) a₁' b₁'
-    σᴿ = {!!}
+    σᴿ γ a b a₁ b₁ a₁' b₁' = Σ≡ (A.σ₁ γ a b a₁ b₁) (ΣP≡ _ _ p)
+      where
+      pa : subst GA.Ty a₁' (a , ≡.refl) .fst ≡ a
+      pa = G₀A.Ty-fst a₁'
+
+      pb : subst (λ _ → A.Ty) (≡.sym pa) b ≡ subst GA.Ty b₁' (b , ≡.refl) .fst
+      pb = ≡.trans
+             (≡.subst-const A.Ty b (≡.sym pa))
+             (≡.sym (G₀A.Ty-fst b₁'))
+
+      p : subst GA.Ty (A.σ₁ γ a b a₁ b₁)
+           (A.σ γ a b a₁ b₁ , ≡.refl) .fst
+           ≡
+           GA.σ (conᴿ γ) (F₀G₀A.mkTy (tyᴿ a) a₁')
+           (F₀G₀A.mkTy (tyᴿ b) b₁') .fst
+      p =
+        subst GA.Ty (A.σ₁ γ a b a₁ b₁)
+          (A.σ γ a b a₁ b₁ , ≡.refl) .fst
+          ≡⟨ G₀A.Ty-fst (A.σ₁ γ a b a₁ b₁) ⟩
+        A.σ γ a b a₁ b₁
+          ≡⟨ ≡.dcongsspp (A.σ γ)
+               (≡.sym pa)
+               pb ⟩
+        A.σ γ (subst GA.Ty a₁' (a , ≡.refl) .fst)
+              (subst GA.Ty b₁' (b , ≡.refl) .fst)
+              (subst GA.Ty a₁' (a , ≡.refl) .snd)
+              (subst GA.Ty b₁' (b , ≡.refl) .snd)
+          ≡⟨ ≡.refl ⟩
+        GA.σ γ (subst GA.Ty a₁' (a , ≡.refl))
+               (subst GA.Ty b₁' (b , ≡.refl)) .fst
+          ≡⟨ ≡.refl ⟩
+        GA.σ γ (F₀G₀A.mkTy (A.ty₁ a , a , ≡.refl) a₁')
+           (F₀G₀A.mkTy (tyᴿ b) b₁') .fst
+          ≡⟨ ≡.refl ⟩
+        GA.σ (conᴿ γ) (F₀G₀A.mkTy (tyᴿ a) a₁')
+           (F₀G₀A.mkTy (tyᴿ b) b₁') .fst ∎
 
   ε₀ : (A : M.Algebra ℓA) → M.Cat ℓA [ F₀ (G₀ A) , A ]
   ε₀ A = record
@@ -485,6 +553,8 @@ open import QIT.Category.Morphism
     ; σᴿ = σᴿ
     }
     module ε₀ where
+    open ≡
+    open ≡-Reasoning
     module A = M.Algebra A
     module GA = D.Algebra (G₀ A)
     module G₀A = G₀ A
@@ -492,25 +562,25 @@ open import QIT.Category.Morphism
     module F₀G₀A = F₀ (G₀ A)
 
     conᴿ : FGA.Con → A.Con
-    conᴿ = λ z → G₀A.MA.∙
+    conᴿ γ = γ
 
     tyᴿ : FGA.Ty → A.Ty
-    tyᴿ = λ z → proj₂ z .fst
+    tyᴿ (γ , (a , a₁)) = a
 
     ty₁ᴿ : ∀ a → A.ty₁ (tyᴿ a) ≡ conᴿ (FGA.ty₁ a)
-    ty₁ᴿ = {!!}
+    ty₁ᴿ (γ , (a , a₁)) = a₁
 
     ∙ᴿ : conᴿ FGA.∙ ≡ A.∙
-    ∙ᴿ = _≡_.refl
+    ∙ᴿ = ≡.refl
 
     ▷ᴿ : ∀ γ a
       → (a₁ : FGA.ty₁ a ≡ γ)
       → (a₁' : A.ty₁ (tyᴿ a) ≡ conᴿ γ)
       → conᴿ (FGA.▷ γ a a₁) ≡ A.▷ (conᴿ γ) (tyᴿ a) a₁'
-    ▷ᴿ = {!!}
+    ▷ᴿ γ (γ , a , refl) refl refl = refl
 
     uᴿ : ∀ γ → tyᴿ (FGA.u γ) ≡ A.u (conᴿ γ)
-    uᴿ = {!!}
+    uᴿ γ = refl
 
     πᴿ : ∀ γ a b
       → (a₁ : FGA.ty₁ a ≡ γ)
@@ -519,7 +589,17 @@ open import QIT.Category.Morphism
       → (b₁' : A.ty₁ (tyᴿ b) ≡ A.▷ (conᴿ γ) (tyᴿ a) a₁')
       → tyᴿ (FGA.π γ a b a₁ b₁)
       ≡ A.π (conᴿ γ) (tyᴿ a) (tyᴿ b) a₁' b₁'
-    πᴿ = {!!}
+    πᴿ γ (γ , a , refl) (δ , b , refl) refl b₁ refl b₁' =
+      tyᴿ
+       (FGA.π (A.ty₁ a)
+        (A.ty₁ a , a , refl) (A.ty₁ b , b , refl) refl b₁)
+        ≡⟨ refl ⟩
+      A.π (A.ty₁ a) (F₀G₀A.mkTy (A.ty₁ a , a , refl) refl .fst) 
+        (F₀G₀A.mkTy (A.ty₁ b , b , refl) b₁ .fst)
+        (F₀G₀A.mkTy (A.ty₁ a , a , refl) refl .snd)
+        (F₀G₀A.mkTy (A.ty₁ b , b , refl) b₁ .snd)
+        ≡⟨ dcongsspp (A.π (A.ty₁ a)) refl (G₀.Ty-fst A b₁) ⟩
+      A.π (A.ty₁ a) a b refl b₁' ∎
 
     σᴿ : ∀ γ a b
       → (a₁ : FGA.ty₁ a ≡ γ)
@@ -528,19 +608,45 @@ open import QIT.Category.Morphism
       → (b₁' : A.ty₁ (tyᴿ b) ≡ A.▷ (conᴿ γ) (tyᴿ a) a₁')
       → tyᴿ (FGA.σ γ a b a₁ b₁)
       ≡ A.σ (conᴿ γ) (tyᴿ a) (tyᴿ b) a₁' b₁'
-    σᴿ = {!!}
+    σᴿ γ (γ , a , refl) (δ , b , refl) refl b₁ refl b₁' =
+      tyᴿ
+       (FGA.σ (A.ty₁ a)
+        (A.ty₁ a , a , refl) (A.ty₁ b , b , refl) refl b₁)
+        ≡⟨ refl ⟩
+      A.σ (A.ty₁ a) (F₀G₀A.mkTy (A.ty₁ a , a , refl) refl .fst) 
+        (F₀G₀A.mkTy (A.ty₁ b , b , refl) b₁ .fst)
+        (F₀G₀A.mkTy (A.ty₁ a , a , refl) refl .snd)
+        (F₀G₀A.mkTy (A.ty₁ b , b , refl) b₁ .snd)
+        ≡⟨ dcongsspp (A.σ (A.ty₁ a)) refl (G₀.Ty-fst A b₁) ⟩
+      A.σ (A.ty₁ a) a b refl b₁' ∎
 
   ε₁ : {A B : M.Algebra ℓA} (f : M.Hom A B)
     → f M.∘ ε₀ A
-    M.≈ ε₀ B M.∘ F₁ (G₁ f)
-  ε₁ {A} {B} f = {!!}
+    M.≈ ε₀ B M.∘ F₁ (G₁ {A = A} {B} f)
+  ε₁ {A} {B} f = M.mk≈ (λ γ → ≡.refl) (λ a → ≡.refl)
 
   isIso-ε : ∀ A → IsIso (M.Cat ℓA) (ε₀ A)
   isIso-ε A = record
     { f⁻¹ = ε⁻₀ A
-    ; linv = {!!}
-    ; rinv = {!!}
+    ; linv = M.mk≈ (λ γ → ≡.refl) p
+    ; rinv = M.mk≈ (λ γ → ≡.refl) (λ a → ≡.refl)
     }
+    where
+    module isIso-ε where
+    open ≡
+    open ≡-Reasoning
+    module A = M.Algebra A
+    module GA = D.Algebra (G₀ A)
+    module G₀A = G₀ A
+    module FGA = M.Algebra (F₀ (G₀ A))
+    module F₀GA = F₀ (G₀ A)
+    module ε⁻A = M.Hom (ε⁻₀ A)
+    module εA = M.Hom (ε₀ A)
+    module ε⁻εA = M.Hom (ε⁻₀ A M.∘ ε₀ A)
+    p : (a : FGA.Ty)
+      → ε⁻εA.tyᴿ a ≡ a
+    p (γ , a , a₁) =
+      Σ≡ a₁ (ΣP≡ _ _ (G₀A.Ty-fst a₁))
 
 equiv : Equivalence (D.Cat ℓA) (M.Cat ℓA)
 equiv {ℓA} = record
@@ -548,5 +654,3 @@ equiv {ℓA} = record
   ; G = G
   ; η = η
   ; ε = ε }
-
--- -}

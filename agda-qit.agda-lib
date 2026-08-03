@@ -1,5 +1,9 @@
 name: agda-qit
 depend: standard-library
 include: .
-flags: --with-K --prop --rewriting
+flags:
+  --with-K
+  --prop
+  --rewriting
+  --show-irrelevant
 

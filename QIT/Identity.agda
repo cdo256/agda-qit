@@ -207,6 +207,18 @@ dcongsp : ∀ {a b c} {A : Set a} {B : A → Prop b} {C : Set c}
        → f x₁ y₁ ≡ f x₂ y₂
 dcongsp f refl = refl
 
+dcongsspp : ∀ {ℓA ℓB ℓC ℓD ℓE}
+  → {A : Set ℓA} {B : A → Set ℓB}
+  → {C : (a : A) → (b : B a) → Prop ℓC}
+  → {D : (a : A) → (b : B a) → (c : C a b) → Prop ℓD}
+  → {E : Set ℓE}
+  → (f : (a : A) → (b : B a) → (c : C a b) → D a b c → E)
+  → ∀ {a₁ a₂ b₁ b₂ c₁ c₂ d₁ d₂}
+  → (pa : a₁ ≡ a₂)
+  → (pb : subst B pa b₁ ≡ b₂)
+  → f a₁ b₁ c₁ d₁ ≡ f a₂ b₂ c₂ d₂
+dcongsspp f refl refl = refl
+
 dsubst₂ : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : A → Set ℓB} (C : ∀ a → B a → Set ℓC)
        → {a1 a2 : A} {b1 : B a1} {b2 : B a2}
        → (p : a1 ≡ a2) (q : subst B p b1 ≡ b2)
@@ -275,6 +287,15 @@ dtrans B refl refl refl refl = sym (subst-inv B refl)
    → (p : a1 ≡ a2) (q : subst B p b1 ≡ b2)
    → _≡_ {A = Σ A B} (a1 , b1) (a2 , b2)
 Σ≡ refl refl = refl
+
+ΣPfst≡ : ∀ {ℓA ℓB ℓC}
+  → {A : Set ℓA}
+  → {B : Set ℓB}
+  → (C : A → B → Prop ℓC)
+  → {a1 a2 : A} (p : a1 ≡ a2)
+  → (b : B) (c : C a1 b)
+  → subst (λ a → ΣP B (C a)) p (b , c) .fst ≡ b
+ΣPfst≡ C refl b c = refl
 
 substΣP : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB}
         → {a1 a2 : A} (p : a1 ≡ a2) (b : B a1) → Σ A B
