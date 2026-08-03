@@ -392,7 +392,7 @@ G₀ {ℓA} da = wa
 
   con↓ : (γʰ : CT) → [ γʰ ] ≡ cʰ
     → γʰ ↓
-  con↓ γʰ kγ = extractCond kγ tt* .∧e₂
+  con↓ γʰ kγ = transp↓⁻ kγ tt* .∧e₂
 
   getConAtom : (γʰ : CT) → (kγ : [ γʰ ] ≡ cʰ)
     → Atom
@@ -400,7 +400,7 @@ G₀ {ℓA} da = wa
 
   conKind : (γʰ : CT) → (kγ : [ γʰ ] ≡ cʰ)
     → [ getConAtom γʰ kγ ]₀ ≡ ĉ
-  conKind γʰ kγ = extractVal kγ tt*
+  conKind γʰ kγ = transp!⁻ kγ tt*
 
   getConΣ : (γʰ : CT) → (kγ : [ γʰ ] ≡ cʰ) → ConΣ
   getConΣ γʰ kγ = getConAtom γʰ kγ , conKind γʰ kγ 
@@ -409,7 +409,7 @@ G₀ {ℓA} da = wa
   getCon γʰ kγ = ConΣ→Con (getConΣ γʰ kγ)
 
   ty↓ : (γʰ aʰ : CT) (kγ : [ γʰ ] ≡ cʰ) (ka : [ aʰ ] ≡ tʰ γʰ) → aʰ ↓
-  ty↓ γʰ aʰ kγ ka = extractCond ka (∧i tt* , con↓ γʰ kγ) .∧e₂
+  ty↓ γʰ aʰ kγ ka = transp↓⁻ ka (∧i tt* , con↓ γʰ kγ) .∧e₂
 
   []↓ : ∀ x → x ↓ → [ x ] ↓
   []↓ x x↓ = ∧i tt* , x↓
@@ -424,7 +424,7 @@ G₀ {ℓA} da = wa
     → (kγ : [ γʰ ] ≡ cʰ)
     → (ka : [ aʰ ] ≡ tʰ γʰ)
     → [ getTyAtom γʰ aʰ kγ ka ]₀ ≡ t̂ (getConAtom γʰ kγ)
-  tyKind γʰ aʰ kγ ka = extractVal ka (∧i tt* , con↓ γʰ kγ)
+  tyKind γʰ aʰ kγ ka = transp!⁻ ka (∧i tt* , con↓ γʰ kγ)
 
   getTyΣ : (γʰ aʰ : CT)
     → (kγ : [ γʰ ] ≡ cʰ)
@@ -575,7 +575,7 @@ G₀ {ℓA} da = wa
     → (kδ : [ ▷ γʰ aʰ ] ≡ cʰ)
     → (kb : [ bʰ ] ≡ tʰ (▷ γʰ aʰ))
     → bʰ ↓
-  ty▷↓ γʰ aʰ bʰ kγ ka kδ kb = extractCond kb (∧i tt* , con↓ (▷ γʰ aʰ) kδ) .∧e₂
+  ty▷↓ γʰ aʰ bʰ kγ ka kδ kb = transp↓⁻ kb (∧i tt* , con↓ (▷ γʰ aʰ) kδ) .∧e₂
 
   getTy▷-kind : (γʰ aʰ bʰ : CT)
     → (kγ : [ γʰ ] ≡ cʰ)
@@ -807,7 +807,7 @@ G₀ {ℓA} da = wa
     where
     mutual
       [uγ]↓ : [ u γ ] ↓
-      [uγ]↓ = extractCond ku (tʰ-γ↓ γ γ↓)
+      [uγ]↓ = transp↓⁻ ku (tʰ-γ↓ γ γ↓)
       u↓ : u γ ↓
       u↓ = []⁻ (u γ) [uγ]↓
       γ↓ : γ ↓
@@ -818,7 +818,7 @@ G₀ {ℓA} da = wa
     where
     mutual
       [πγab]↓ : [ π γ a b ] ↓
-      [πγab]↓ = extractCond kπ (tʰ-γ↓ γ γ↓)
+      [πγab]↓ = transp↓⁻ kπ (tʰ-γ↓ γ γ↓)
       π↓ : π γ a b ↓
       π↓ = []⁻ (π γ a b) [πγab]↓
       γ↓ : γ ↓
@@ -829,7 +829,7 @@ G₀ {ℓA} da = wa
     where
     mutual
       [πγab]↓ : [ π γ a b ] ↓
-      [πγab]↓ = extractCond kπ (tʰ-γ↓ γ γ↓)
+      [πγab]↓ = transp↓⁻ kπ (tʰ-γ↓ γ γ↓)
       π↓ : π γ a b ↓
       π↓ = []⁻ (π γ a b) [πγab]↓
       γ↓ : γ ↓
@@ -842,7 +842,7 @@ G₀ {ℓA} da = wa
     where
     mutual
       [πγab]↓ : [ π γ a b ] ↓
-      [πγab]↓ = extractCond kπ (tʰ-γ↓ γ γ↓)
+      [πγab]↓ = transp↓⁻ kπ (tʰ-γ↓ γ γ↓)
       π↓ : π γ a b ↓
       π↓ = []⁻ (π γ a b) [πγab]↓
       γ↓ : γ ↓
@@ -859,7 +859,7 @@ G₀ {ℓA} da = wa
     where
     mutual
       [σγab]↓ : [ σ γ a b ] ↓
-      [σγab]↓ = extractCond kσ (tʰ-γ↓ γ γ↓)
+      [σγab]↓ = transp↓⁻ kσ (tʰ-γ↓ γ γ↓)
       σ↓ : σ γ a b ↓
       σ↓ = []⁻ (σ γ a b) [σγab]↓
       γ↓ : γ ↓
@@ -870,7 +870,7 @@ G₀ {ℓA} da = wa
     where
     mutual
       [σγab]↓ : [ σ γ a b ] ↓
-      [σγab]↓ = extractCond kσ (tʰ-γ↓ γ γ↓)
+      [σγab]↓ = transp↓⁻ kσ (tʰ-γ↓ γ γ↓)
       σ↓ : σ γ a b ↓
       σ↓ = []⁻ (σ γ a b) [σγab]↓
       γ↓ : γ ↓
@@ -883,7 +883,7 @@ G₀ {ℓA} da = wa
     where
     mutual
       [σγab]↓ : [ σ γ a b ] ↓
-      [σγab]↓ = extractCond kσ (tʰ-γ↓ γ γ↓)
+      [σγab]↓ = transp↓⁻ kσ (tʰ-γ↓ γ γ↓)
       σ↓ : σ γ a b ↓
       σ↓ = []⁻ (σ γ a b) [σγab]↓
       γ↓ : γ ↓

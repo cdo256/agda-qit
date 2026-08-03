@@ -71,14 +71,23 @@ module _ {ℓP} where
   ≡→≈ : ∀ {ℓA} {X : Set ℓA} → {x* y* : PropLift ℓP X} → x* ≡ y* → x* ≈ y*
   ≡→≈ {x* = x*} {y*} p = substp (x* ≈_) p (≈refl x*)
 
-  extractCond : {X : Set ℓA} → {x y : PropLift ℓP X} → x ≡ y
-        → (qy : y .Cond) → x .Cond
-  extractCond ≡.refl qy = qy
+  transp↓ : {X : Set ℓA} → {x* y* : PropLift ℓP X} → x* ≡ y*
+    → (qx : x* ↓) → y* ↓
+  transp↓ ≡.refl qx = qx
 
-  extractVal : {X : Set ℓA} → {x y : PropLift ℓP X} → (p : x ≡ y)
-    → (qy : y .Cond)
-    → x ! (extractCond p qy) ≡ y ! qy
-  extractVal ≡.refl qy = ≡.refl
+  transp↓⁻ : {X : Set ℓA} → {x* y* : PropLift ℓP X} → x* ≡ y*
+    → (qy : y* ↓) → x* ↓
+  transp↓⁻ ≡.refl qy = qy
+
+  transp! : {X : Set ℓA} → {x* y* : PropLift ℓP X} → (p : x* ≡ y*)
+    → (x↓ : x* ↓)
+    → x* ! x↓ ≡ y* ! (transp↓ p x↓)
+  transp! ≡.refl qx = ≡.refl
+
+  transp!⁻ : {X : Set ℓA} → {x* y* : PropLift ℓP X} → (p : x* ≡ y*)
+    → (qy : y* ↓)
+    → x* ! (transp↓⁻ p qy) ≡ y* ! qy
+  transp!⁻ ≡.refl qy = ≡.refl
 
   return-inj : {X : Set ℓX} {x y : X} → return x ≡ return y → x ≡ y
   return-inj {ℓX} {X} {x} {y} p =
