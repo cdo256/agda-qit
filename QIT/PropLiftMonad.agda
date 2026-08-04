@@ -89,6 +89,12 @@ module _ {ℓP} where
     → x* ! (transp↓⁻ p qy) ≡ y* ! qy
   transp!⁻ ≡.refl qy = ≡.refl
 
+  transp↓! : {X : Set ℓA} → {x* y* : PropLift ℓP X} → (p : x* ≡ y*)
+    → (qx : x* ↓)
+    → y* ↓ ∧ᵖ λ qy
+    → x* ! qx ≡ y* ! qy
+  transp↓! p qx = ∧i transp↓ p qx , transp! p qx
+
   return-inj : {X : Set ℓX} {x y : X} → return x ≡ return y → x ≡ y
   return-inj {ℓX} {X} {x} {y} p =
     ≡.funExtp⁻ r tt*
