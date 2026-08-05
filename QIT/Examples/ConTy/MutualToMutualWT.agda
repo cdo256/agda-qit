@@ -970,19 +970,19 @@ G₀ {ℓA} da = wa
     ; σπ = σπ
     }
 
-{-
 G₁ : ∀ {ℓA} {A B : M.Algebra ℓA} → M.Hom A B → W.Hom (G₀ A) (G₀ B)
 G₁ {ℓA} {A} {B} f = record
   { θ = θ
   ; [_] = [_]
-  ; ĉ = ≡.refl
+  -- ; ĉ = ≡.refl
+{-
   ; t̂ = t̂
   ; ty₁ = ty₁
   ; ∙ = ∙
   ; ▷ = ▷
   ; u = u
   ; π = π
-  ; σ = σ
+  ; σ = σ -}
   }
   module G₁ where
   open ≡
@@ -1000,7 +1000,7 @@ G₁ {ℓA} {A} {B} f = record
   θ₀ GA.t̂ = GB.t̂
 
   θ : GA.CT → GB.CT
-  θ (P ⊢ x) = P ⊢ λ p → θ₀ (x p)
+  θ = map θ₀
 
   [_]₀ : ∀ x → θ₀ (GA.[ x ]₀) ≡ GB.[ θ₀ x ]₀
   [ GA.con x ]₀ = ≡.refl
@@ -1010,7 +1010,7 @@ G₁ {ℓA} {A} {B} f = record
   [ GA.t̂ ]₀ = ≡.refl
 
   [_] : ∀ (x : GA.CT) → θ (GA.[ x ]) ≡ GB.[ θ x ]
-  [ P ⊢ x ] = GB.mkCT≡ (λ p → p) (λ p → p) λ p q → [ x (p .∧e₂) ]₀
+  [ P ⊢ x ] = GB.mkCT≡ (λ p → p) (λ p → p) λ p q → [ x (p .∧e₂ .∧e₂) ]₀
 
   θ-kc : (γ : GA.Atom) → GA.[ γ ]₀ ≡ GA.ĉ → GB.[ θ₀ γ ]₀ ≡ GB.ĉ
   θ-kc γ kγ = ≡.trans (≡.sym [ γ ]₀) (≡.cong θ₀ kγ)
@@ -1022,7 +1022,24 @@ G₁ {ℓA} {A} {B} f = record
   ty₁₀ (GA.ty a) ≡.refl = ≡.cong GB.con (≡.sym (f.ty₁ᴿ a))
 
   ty₁ : ∀ x → θ (GA.ty₁ x) ≡ GB.ty₁ (θ x)
-  ty₁ (P ⊢ x) = PropLift≡ ≡.refl (funExtp λ { (∧i p , ∧i ka , tt*) → ty₁₀ (x p) ka })
+  ty₁ x* = mk≡ p q r
+    where
+    p : θ (GA.ty₁ x*) ↓ → GB.ty₁ (θ x*) ↓
+    p (∧i tt* , ∧i x↓ , ∧i kx , tt*) with x* ! x↓
+    ... | G₀.ty a = ∧i ∧i tt* , x↓ , ∧i refl , tt*
+    q : GB.ty₁ (θ x*) ↓ → θ (GA.ty₁ x*) ↓
+    q (∧i ∧i tt* , x↓ , ∧i kθx , tt*) with x* ! x↓
+    ... | G₀.ty a = ∧i tt* , ∧i x↓ , ∧i refl , tt*
+    r : ∀ l↓ r↓ → θ (GA.ty₁ x*) ! l↓ ≡ GB.ty₁ (θ x*) ! r↓
+    r (∧i tt* , ∧i x↓ , ∧i kx , tt*) (∧i ∧i tt* , x↓' , ∧i kθx , tt*) with inspect (x* ! x↓)
+    ... | G₀.ty a , p = {!!}
+{-
+    map θ₀ (GA.ty₁ x*)
+      ≡⟨ {!!} ⟩
+    GB.ty₁ (map θ₀ x*) ∎
+    where
+    open ≡.≡-Reasoning
+  -- PropLift≡ ≡.refl (funExtp λ { (∧i p , ∧i ka , tt*) → ty₁₀ (x p) ka })
 
   θ-ka₁ : (γ a : GA.Atom)
     → (kγ : GA.[ γ ]₀ ≡ GA.ĉ)

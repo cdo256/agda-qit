@@ -49,16 +49,21 @@ module _ {ℓP} where
     (P ⇔ Q) ∧ ∀ p q → f p ≡ g q
 
   PropLift≡ : {X : Set ℓX} {x* y* : PropLift ℓP X}
-    → (p : x* .Cond ≡ y* .Cond)
-    → (q : subst (_↝ X) p (x* .val) ≡ (y* .val))
+    → (p : x* ↓ ≡ y* ↓)
+    → (q : subst (_↝ X) p (x* !_) ≡ (y* !_))
     → x* ≡ y*
-  PropLift≡ ≡.refl ≡.refl = ≡.refl
+  PropLift≡ p q = ≡.dcong₂ _⊢_ p q
 
   ≈→≡ : ∀ {ℓA} {X : Set ℓA} → {x* y* : PropLift ℓP X} → x* ≈ y* → x* ≡ y*
   ≈→≡ {X = X} {P ⊢ f} {Q ⊢ g} (∧i p⇔q , f≡g) = PropLift≡ (propExt p⇔q) (r (propExt p⇔q))
     where
     r : (pq : P ≡ Q) → ≡.subst (λ ○ → ○ → X) pq f ≡ g
     r ≡.refl = funExtp λ p → f≡g p p
+
+  mk≡ : ∀ {ℓA} {X : Set ℓA} → {x* y* : PropLift ℓP X}
+       → (x* ↓ → y* ↓) → (y* ↓ → x* ↓) → (∀ x↓ y↓ → x* ! x↓ ≡ y* ! y↓)
+       → x* ≡ y*
+  mk≡ x↓→y↓ y↓→x↓ x!≡y! = ≈→≡ (∧i ∧i x↓→y↓ , y↓→x↓ , x!≡y!)
 
   mk≡↓ : ∀ {ℓA} {X : Set ℓA} → {x* y* : PropLift ℓP X}
        → (x↓ : x* ↓) → (y↓ : y* ↓) → x* ! x↓ ≡ y* ! y↓
