@@ -219,7 +219,7 @@ G₀ {ℓA} da = wa
     x*≡return = mk≡↓ x↓ tt* x≡ty
 
   kty₁ : ∀ a* → [ a* ] ≡ tʰ → [ ty₁ a* ] ≡ cʰ
-  kty₁ a* ka = mk≡↓ {!!} tt* {!!}
+  kty₁ a* ka = mk≡↓ [ty₁a]↓ tt* val≡
     where
     a↓ : a* ↓
     a↓ = []⁻ a* (transp↓⁻ ka tt*)
@@ -227,6 +227,13 @@ G₀ {ℓA} da = wa
     w = []≡tʰ→return ka
     ty↓ : ty₁ a* ↓
     ty↓ = ∧i a↓ , (∧i (transp!⁻ ka tt*) , tt*)
+    [ty₁a]↓ : [ ty₁ a* ] ↓
+    [ty₁a]↓ = ∧i tt* , ty↓
+    q : ty₁ (return (ty (w .fst))) ↓ ∧ᵖ λ q↓
+      → ty₁ a* ! ty↓ ≡ ty₁ (return (ty (w .fst))) ! q↓
+    q = transp↓! (cong ty₁ (w .snd)) ty↓
+    val≡ : [ ty₁ a* ] ! [ty₁a]↓ ≡ cʰ ! tt*
+    val≡ = trans (cong [_]₀ (q .∧e₂)) refl
 
   Con₀ : (γ : Atom) → [ γ ]₀ ≡ ĉ → MA.Con
   Con₀ γ kγ = ConΣ→Con (γ , kγ)
@@ -963,13 +970,11 @@ G₀ {ℓA} da = wa
     ; σπ = σπ
     }
 
-{- 
-
 G₁ : ∀ {ℓA} {A B : M.Algebra ℓA} → M.Hom A B → W.Hom (G₀ A) (G₀ B)
 G₁ {ℓA} {A} {B} f = record
   { θ = θ
   ; [_] = [_]
-  ; ĉ = ≡.refl
+  ; ĉ = ĉ
   ; t̂ = t̂
   ; ty₁ = ty₁
   ; ∙ = ∙
@@ -979,6 +984,7 @@ G₁ {ℓA} {A} {B} f = record
   ; σ = σ
   }
   module G₁ where
+  open ≡
   module A = M.Algebra A
   module B = M.Algebra B
   module GA = G₀ A
@@ -993,20 +999,17 @@ G₁ {ℓA} {A} {B} f = record
   θ₀ GA.t̂ = GB.t̂
 
   θ : GA.CT → GB.CT
-  θ (P ⊢ x) = P ⊢ λ p → θ₀ (x p)
+  θ = map θ₀
 
   [_]₀ : ∀ x → θ₀ (GA.[ x ]₀) ≡ GB.[ θ₀ x ]₀
-  [ GA.con x ]₀ = ≡.refl
-  [ GA.ty γ a ]₀ = ≡.refl
+  [ GA.con γ ]₀ = ≡.refl
+  [ GA.ty a ]₀ = ≡.refl
   [ GA.k̂ ]₀ = ≡.refl
   [ GA.ĉ ]₀ = ≡.refl
   [ GA.t̂ ]₀ = ≡.refl
 
   [_] : ∀ (x : GA.CT) → θ (GA.[ x ]) ≡ GB.[ θ x ]
-  [ P ⊢ x ] = GB.mkCT≡ (λ p → p) (λ p → p) λ p q → [ x (p .∧e₂) ]₀
-
-  ty₁₀ : ∀ a → θ₀ (GA.ty₁₀ a) ≡ GB.ty₁₀ (θ₀ a)
-  ty₁₀ (GA.ty a) = ≡.cong GB.con (f.ty₁ᴿ a)
+  [ P ⊢ x ] = GB.mkCT≡ (λ p → p) (λ p → p) λ p q → [ x (p .∧e₂ .∧e₂) ]₀
 
   θ-kc : (γ : GA.Atom) → GA.[ γ ]₀ ≡ GA.ĉ → GB.[ θ₀ γ ]₀ ≡ GB.ĉ
   θ-kc γ kγ = ≡.trans (≡.sym [ γ ]₀) (≡.cong θ₀ kγ)
@@ -1014,12 +1017,31 @@ G₁ {ℓA} {A} {B} f = record
   θ-ka : (a : GA.Atom) → GA.[ a ]₀ ≡ GA.t̂ → GB.[ θ₀ a ]₀ ≡ GB.t̂
   θ-ka a ka = ≡.trans (≡.sym [ a ]₀) (≡.cong θ₀ ka)
 
+  ty₁₀ : ∀ a → (ka : GA.[ a ]₀ ≡ GA.t̂) → θ₀ (GA.ty₁₀ a ka) ≡ GB.ty₁₀ (θ₀ a) (θ-ka a ka)
+  ty₁₀ (GA.ty a) ≡.refl = ≡.cong GB.con (≡.sym (f.ty₁ᴿ a))
+
+  θ⁻-ka : (a : GA.Atom) → GB.[ θ₀ a ]₀ ≡ GB.t̂ → GA.[ a ]₀ ≡ GA.t̂
+  θ⁻-ka (GA.ty a) kθa = refl
+
+  ty₁ : ∀ x → θ (GA.ty₁ x) ≡ GB.ty₁ (θ x)
+  ty₁ x* = mk≡ p q r
+    where
+    p : θ (GA.ty₁ x*) ↓ → GB.ty₁ (θ x*) ↓
+    p (∧i tt* , ∧i x↓ , ∧i kx , tt*) =
+      ∧i ∧i tt* , x↓ , ∧i θ-ka (x* ! x↓) kx , tt*
+    q : GB.ty₁ (θ x*) ↓ → θ (GA.ty₁ x*) ↓
+    q (∧i ∧i tt* , x↓ , ∧i kθx , tt*) =
+      ∧i tt* , ∧i x↓ , ∧i θ⁻-ka (x* ! x↓) kθx , tt*
+    r : ∀ l↓ r↓ → θ (GA.ty₁ x*) ! l↓ ≡ GB.ty₁ (θ x*) ! r↓
+    r (∧i tt* , ∧i x↓ , ∧i kx , tt*)
+      (∧i ∧i tt* , x↓' , ∧i kθx , tt*) = ty₁₀ (x* ! x↓) kx
+
   θ-ka₁ : (γ a : GA.Atom)
     → (kγ : GA.[ γ ]₀ ≡ GA.ĉ)
     → (ka : GA.[ a ]₀ ≡ GA.t̂)
     → GA.ty₁₀ a ka ≡ γ
     → GB.ty₁₀ (θ₀ a) (θ-ka a ka) ≡ θ₀ γ
-  θ-ka₁ γ a kγ ka ka₁ = trans (sym (ty₁₀ a)) (trans (≡.cong θ₀ ka₁) (ty₁₀ γ))
+  θ-ka₁ γ a kγ ka ka₁ = trans (sym (ty₁₀ a ka)) (≡.cong θ₀ ka₁)
 
   θ-▷₀ : (γ a : GA.Atom)
     → (kγ : GA.[ γ ]₀ ≡ GA.ĉ)
@@ -1027,7 +1049,7 @@ G₁ {ℓA} {A} {B} f = record
     → (ka₁ : GA.ty₁₀ a ka ≡ γ)
     → θ₀ (GA.▷₀ γ a kγ ka ka₁)
     ≡ GB.▷₀ (θ₀ γ) (θ₀ a) (θ-kc γ kγ) (θ-ka a ka) (θ-ka₁ γ a kγ ka ka₁)
-  θ-▷₀ (GA.con γ) (GA.ty a) ≡.refl ≡.refl ka₁ = ≡.cong GB.con (f.▷ᴿ γ a (GA.con-inj ka₁) (GB.con-inj (θ-ka₁ _ _ _ _ ka₁)))
+  θ-▷₀ (GA.con γ) (GA.ty a) ≡.refl ≡.refl ka₁ = ≡.cong GB.con (f.▷ᴿ γ a (GA.con-inj ka₁) (GB.con-inj (θ-ka₁ _ _ refl refl ka₁)))
 
   θ-kb : (b : GA.Atom) → GA.[ b ]₀ ≡ GA.t̂ → GB.[ θ₀ b ]₀ ≡ GB.t̂
   θ-kb b kb = ≡.trans (≡.sym [ b ]₀) (≡.cong θ₀ kb)
@@ -1040,137 +1062,219 @@ G₁ {ℓA} {A} {B} f = record
     → GA.ty₁₀ b kb ≡ GA.▷₀ γ a kγ ka ka₁
     → GB.ty₁₀ (θ₀ b) (θ-kb b kb)
       ≡ GB.▷₀ (θ₀ γ) (θ₀ a) (θ-kc γ kγ) (θ-ka a ka) (θ-ka₁ γ a kγ ka ka₁)
-  θ-kb₁ γ a b kγ ka ka₁ kb kb₁ = trans (sym (ty₁₀ b)) (trans (≡.cong θ₀ kb₁) (θ-▷₀ γ a kγ ka ka₁))
+  θ-kb₁ γ a b kγ ka ka₁ kb kb₁ =
+    trans (sym (ty₁₀ b kb)) (trans (≡.cong θ₀ kb₁) (θ-▷₀ γ a kγ ka ka₁))
 
   θ-u₀ : (γ : GA.Atom) (kγ : GA.[ γ ]₀ ≡ GA.ĉ)
     → θ₀ (GA.u₀ γ kγ) ≡ GB.u₀ (θ₀ γ) (θ-kc γ kγ)
-  θ-u₀ (GA.con γ) ≡.refl = ≡.cong GB.ty (f.uᴿ γ)
+  θ-u₀ (GA.con γ) kγ = ≡.cong GB.ty (f.uᴿ γ)
 
-  θ-π₀ : (γ a b : GA.Atom) (kγ : GA.[ γ ]₀ ≡ GA.ĉ) (ka : GA.[ a ]₀ ≡ GA.t̂ γ)
-    (kb : GA.[ b ]₀ ≡ GA.t̂ (GA.▷₀ γ a kγ ka))
-    → θ₀ (GA.π₀ γ a b kγ ka kb)
-    ≡ GB.π₀ (θ₀ γ) (θ₀ a) (θ₀ b) (θ-kc γ kγ) (θ-ka γ a ka) (θ-kb γ a b kγ ka kb)
-  θ-π₀ (GA.con γ) (GA.ty .γ a) (GA.ty .(γ A.▷ a) b) ≡.refl ≡.refl ≡.refl =
-    ≡.cong (GB.ty (f.conᴿ γ)) (f.πᴿ γ a b)
+  θ-π₀ : (γ a b : GA.Atom)
+    → (kγ : GA.[ γ ]₀ ≡ GA.ĉ)
+    → (ka : GA.[ a ]₀ ≡ GA.t̂)
+    → (ka₁ : GA.ty₁₀ a ka ≡ γ)
+    → (kb : GA.[ b ]₀ ≡ GA.t̂)
+    → (kb₁ : GA.ty₁₀ b kb ≡ GA.▷₀ γ a kγ ka ka₁)
+    → θ₀ (GA.π₀ γ a b kγ ka ka₁ kb kb₁)
+    ≡ GB.π₀ (θ₀ γ) (θ₀ a) (θ₀ b)
+         (θ-kc γ kγ) (θ-ka a ka) (θ-ka₁ γ a kγ ka ka₁)
+         (θ-kb b kb) (θ-kb₁ γ a b kγ ka ka₁ kb kb₁)
+  θ-π₀ (GA.con γ) (GA.ty a) (GA.ty b) kγ ka ka₁ kb kb₁ =
+    ≡.cong GB.ty
+      (f.πᴿ γ a b
+        (GA.con-inj ka₁)
+        (GA.con-inj kb₁)
+        (GB.con-inj (θ-ka₁ _ _ kγ ka ka₁))
+        (GB.con-inj (θ-kb₁ _ _ _ kγ ka ka₁ kb kb₁)))
 
-  θ-σ₀ : (γ a b : GA.Atom) (kγ : GA.[ γ ]₀ ≡ GA.ĉ) (ka : GA.[ a ]₀ ≡ GA.t̂ γ)
-    (kb : GA.[ b ]₀ ≡ GA.t̂ (GA.▷₀ γ a kγ ka))
-    → θ₀ (GA.σ₀ γ a b kγ ka kb)
-    ≡ GB.σ₀ (θ₀ γ) (θ₀ a) (θ₀ b) (θ-kc γ kγ) (θ-ka γ a ka) (θ-kb γ a b kγ ka kb)
-  θ-σ₀ (GA.con γ) (GA.ty .γ a) (GA.ty .(γ A.▷ a) b) ≡.refl ≡.refl ≡.refl =
-    ≡.cong (GB.ty (f.conᴿ γ)) (f.σᴿ γ a b)
+  θ-σ₀ : (γ a b : GA.Atom)
+    → (kγ : GA.[ γ ]₀ ≡ GA.ĉ)
+    → (ka : GA.[ a ]₀ ≡ GA.t̂)
+    → (ka₁ : GA.ty₁₀ a ka ≡ γ)
+    → (kb : GA.[ b ]₀ ≡ GA.t̂)
+    → (kb₁ : GA.ty₁₀ b kb ≡ GA.▷₀ γ a kγ ka ka₁)
+    → θ₀ (GA.σ₀ γ a b kγ ka ka₁ kb kb₁)
+    ≡ GB.σ₀ (θ₀ γ) (θ₀ a) (θ₀ b)
+         (θ-kc γ kγ) (θ-ka a ka) (θ-ka₁ γ a kγ ka ka₁)
+         (θ-kb b kb) (θ-kb₁ γ a b kγ ka ka₁ kb kb₁)
+  θ-σ₀ (GA.con γ) (GA.ty a) (GA.ty b) kγ ka ka₁ kb kb₁ =
+    ≡.cong GB.ty
+      (f.σᴿ γ a b
+        (GA.con-inj ka₁)
+        (GA.con-inj kb₁)
+        (GB.con-inj (θ-ka₁ _ _ kγ ka ka₁))
+        (GB.con-inj (θ-kb₁ _ _ _ kγ ka ka₁ kb kb₁)))
 
-  t̂ : ∀ γ → θ (GA.tʰ γ) ≡ GB.tʰ (θ γ)
-  t̂ (P ⊢ x) = GB.mkCT≡ (λ p → p) (λ p → p) λ p q → ≡.refl
+  ĉ : θ GA.cʰ ≡ GB.cʰ
+  ĉ = mk≡↓ (∧i tt* , tt*) tt* ≡.refl
+
+  t̂ : θ GA.tʰ ≡ GB.tʰ
+  t̂ = mk≡↓ (∧i tt* , tt*) tt* ≡.refl
 
   ∙ : θ GA.∙ ≡ GB.∙
-  ∙ = mk≡↓ (liftp tt) (liftp tt) (≡.cong GB.con f.∙ᴿ)
+  ∙ = mk≡↓ (∧i tt* , tt*) tt* (≡.cong GB.con f.∙ᴿ)
 
   ▷ : ∀ (γ : GA.CT) (a : GA.CT)
     → GA.[ γ ] ≡ GA.cʰ
-    → GA.[ a ] ≡ GA.tʰ γ
+    → GA.[ a ] ≡ GA.tʰ
+    → GA.ty₁ a ≡ γ
     → θ (GA.▷ γ a) ≡ GB.▷ (θ γ) (θ a)
-  ▷ γʰ aʰ kγ ka = mk≡↓ pq qq val≡
+  ▷ γʰ aʰ kγ ka ka₁ = mk≡↓ pq qq val≡
     where
+    γ! : GA.Atom
+    γ! = γʰ ! (GA.con↓ γʰ kγ)
+    a! : GA.Atom
+    a! = aʰ ! (GA.ty↓ aʰ ka)
+    kγ! : GA.[ γ! ]₀ ≡ GA.ĉ
+    kγ! = GA.conKind γʰ kγ
+    ka! : GA.[ a! ]₀ ≡ GA.t̂
+    ka! = GA.tyKind aʰ ka
+    ka₁! : GA.ty₁₀ a! ka! ≡ γ!
+    ka₁! = GA.getTy₁-kind γʰ aʰ kγ ka ka₁
     qq : (GB.▷ (θ γʰ) (θ aʰ)) ↓
-    qq = ∧i GA.con↓ γʰ kγ ,
-         ∧i GA.ty↓ γʰ aʰ kγ ka ,
-         ∧i θ-kc (γʰ ! (GA.con↓ γʰ kγ)) (GA.conKind γʰ kγ) ,
-         ∧i θ-ka (γʰ ! (GA.con↓ γʰ kγ)) (aʰ ! (GA.ty↓ γʰ aʰ kγ ka)) (GA.tyKind γʰ aʰ kγ ka) ,
-         liftp tt
+    qq = ∧i ∧i tt* , GA.con↓ γʰ kγ ,
+         ∧i ∧i tt* , GA.ty↓ aʰ ka ,
+         ∧i θ-kc γ! kγ! ,
+         ∧i θ-ka a! ka! ,
+         ∧i θ-ka₁ γ! a! kγ! ka! ka₁! ,
+         tt*
     q : (GB.▷ (θ γʰ) (θ aʰ)) ↓ → (θ (GA.▷ γʰ aʰ)) ↓
-    q _ = ∧i GA.con↓ γʰ kγ ,
-          ∧i GA.ty↓ γʰ aʰ kγ ka ,
-          ∧i GA.conKind γʰ kγ ,
-          ∧i GA.tyKind γʰ aʰ kγ ka ,
-          liftp tt
+    q _ = ∧i tt* ,
+          ∧i GA.con↓ γʰ kγ ,
+          ∧i GA.ty↓ aʰ ka ,
+          ∧i kγ! ,
+          ∧i ka! ,
+          ∧i ka₁! ,
+          tt*
     pq : (θ (GA.▷ γʰ aʰ)) ↓
     pq = q qq
     val≡ : θ (GA.▷ γʰ aʰ) ! pq ≡ GB.▷ (θ γʰ) (θ aʰ) ! qq
-    val≡ = θ-▷₀ (γʰ ! (GA.con↓ γʰ kγ)) (aʰ ! (GA.ty↓ γʰ aʰ kγ ka)) (GA.conKind γʰ kγ) (GA.tyKind γʰ aʰ kγ ka)
+    val≡ = θ-▷₀ γ! a! kγ! ka! ka₁!
 
   u : ∀ (γ : GA.CT) → GA.[ γ ] ≡ GA.cʰ → θ (GA.u γ) ≡ GB.u (θ γ)
   u γʰ kγ = mk≡↓ pq qq val≡
     where
+    γ! : GA.Atom
+    γ! = γʰ ! (GA.con↓ γʰ kγ)
+    kγ! : GA.[ γ! ]₀ ≡ GA.ĉ
+    kγ! = GA.conKind γʰ kγ
     qq : (GB.u (θ γʰ)) ↓
-    qq = ∧i GA.con↓ γʰ kγ , ∧i θ-kc (γʰ ! (GA.con↓ γʰ kγ)) (GA.conKind γʰ kγ) , liftp tt
+    qq = ∧i ∧i tt* , GA.con↓ γʰ kγ ,
+         ∧i θ-kc γ! kγ! ,
+         tt*
     q : (GB.u (θ γʰ)) ↓ → (θ (GA.u γʰ)) ↓
-    q _ = ∧i GA.con↓ γʰ kγ , ∧i GA.conKind γʰ kγ , liftp tt
+    q _ = ∧i tt* ,
+          ∧i GA.con↓ γʰ kγ ,
+          ∧i kγ! ,
+          tt*
     pq : (θ (GA.u γʰ)) ↓
     pq = q qq
     val≡ : θ (GA.u γʰ) ! pq ≡ GB.u (θ γʰ) ! qq
-    val≡ = θ-u₀ (γʰ ! (GA.con↓ γʰ kγ)) (GA.conKind γʰ kγ)
+    val≡ = θ-u₀ γ! kγ!
 
   π : ∀ (γ : GA.CT) (a : GA.CT) (b : GA.CT)
     → GA.[ γ ] ≡ GA.cʰ
-    → GA.[ a ] ≡ GA.tʰ γ
-    → GA.[ b ] ≡ GA.tʰ (GA.▷ γ a)
+    → GA.[ a ] ≡ GA.tʰ
+    → GA.ty₁ a ≡ γ
+    → GA.[ b ] ≡ GA.tʰ
+    → GA.ty₁ b ≡ GA.▷ γ a
     → θ (GA.π γ a b) ≡ GB.π (θ γ) (θ a) (θ b)
-  π γʰ aʰ bʰ kγ ka kb = mk≡↓ pq qq val≡
+  π γʰ aʰ bʰ kγ ka ka₁ kb kb₁ = mk≡↓ pq qq val≡
     where
-    kδ = GA.k▷ γʰ aʰ kγ ka
+    γ! : GA.Atom
+    γ! = γʰ ! (GA.con↓ γʰ kγ)
+    a! : GA.Atom
+    a! = aʰ ! (GA.ty↓ aʰ ka)
+    b! : GA.Atom
+    b! = bʰ ! (GA.ty↓ bʰ kb)
+    kγ! : GA.[ γ! ]₀ ≡ GA.ĉ
+    kγ! = GA.conKind γʰ kγ
+    ka! : GA.[ a! ]₀ ≡ GA.t̂
+    ka! = GA.tyKind aʰ ka
+    ka₁! : GA.ty₁₀ a! ka! ≡ γ!
+    ka₁! = GA.getTy₁-kind γʰ aʰ kγ ka ka₁
+    kb! : GA.[ b! ]₀ ≡ GA.t̂
+    kb! = GA.tyKind bʰ kb
+    kδ = GA.k▷ γʰ aʰ kγ ka ka₁
+    kb₁! : GA.ty₁₀ b! kb! ≡ GA.▷₀ γ! a! kγ! ka! ka₁!
+    kb₁! = GA.getTy₁-kind (GA.▷ γʰ aʰ) bʰ kδ kb kb₁
     qq : (GB.π (θ γʰ) (θ aʰ) (θ bʰ)) ↓
-    qq = ∧i GA.con↓ γʰ kγ ,
-         ∧i GA.ty↓ γʰ aʰ kγ ka ,
-         ∧i GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb ,
-         ∧i θ-kc (γʰ ! (GA.con↓ γʰ kγ))
-                 (GA.conKind γʰ kγ) ,
-         ∧i θ-ka (γʰ ! (GA.con↓ γʰ kγ))
-                 (aʰ ! (GA.ty↓ γʰ aʰ kγ ka))
-                 (GA.tyKind γʰ aʰ kγ ka) ,
-         ∧i θ-kb (γʰ ! (GA.con↓ γʰ kγ))
-                 (aʰ ! (GA.ty↓ γʰ aʰ kγ ka))
-                 (bʰ ! (GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb))
-                 (GA.conKind γʰ kγ)
-                 (GA.tyKind γʰ aʰ kγ ka)
-                 (GA.getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb) ,
-         liftp tt
+    qq = ∧i ∧i tt* , GA.con↓ γʰ kγ ,
+         ∧i ∧i tt* , GA.ty↓ aʰ ka ,
+         ∧i ∧i tt* , GA.ty↓ bʰ kb ,
+         ∧i θ-kc γ! kγ! ,
+         ∧i θ-ka a! ka! ,
+         ∧i θ-ka₁ γ! a! kγ! ka! ka₁! ,
+         ∧i θ-kb b! kb! ,
+         ∧i θ-kb₁ γ! a! b! kγ! ka! ka₁! kb! kb₁! ,
+         tt*
     q : (GB.π (θ γʰ) (θ aʰ) (θ bʰ)) ↓ → (θ (GA.π γʰ aʰ bʰ)) ↓
-    q _ = ∧i GA.con↓ γʰ kγ ,
-          ∧i GA.ty↓ γʰ aʰ kγ ka ,
-          ∧i GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb ,
-          ∧i GA.conKind γʰ kγ ,
-          ∧i GA.tyKind γʰ aʰ kγ ka ,
-          ∧i GA.getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb ,
-          liftp tt
+    q _ = ∧i tt* ,
+          ∧i GA.con↓ γʰ kγ ,
+          ∧i GA.ty↓ aʰ ka ,
+          ∧i GA.ty↓ bʰ kb ,
+          ∧i kγ! ,
+          ∧i ka! ,
+          ∧i ka₁! ,
+          ∧i kb! ,
+          ∧i kb₁! ,
+          tt*
     pq : (θ (GA.π γʰ aʰ bʰ)) ↓
     pq = q qq
     val≡ : θ (GA.π γʰ aʰ bʰ) ! pq ≡ GB.π (θ γʰ) (θ aʰ) (θ bʰ) ! qq
-    val≡ = θ-π₀ (γʰ ! (GA.con↓ γʰ kγ))
-                (aʰ ! (GA.ty↓ γʰ aʰ kγ ka))
-                (bʰ ! (GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb))
-                (GA.conKind γʰ kγ)
-                (GA.tyKind γʰ aʰ kγ ka)
-                (GA.getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb)
+    val≡ = θ-π₀ γ! a! b! kγ! ka! ka₁! kb! kb₁!
 
   σ : ∀ (γ : GA.CT) (a : GA.CT) (b : GA.CT)
     → GA.[ γ ] ≡ GA.cʰ
-    → GA.[ a ] ≡ GA.tʰ γ
-    → GA.[ b ] ≡ GA.tʰ (GA.▷ γ a)
+    → GA.[ a ] ≡ GA.tʰ
+    → GA.ty₁ a ≡ γ
+    → GA.[ b ] ≡ GA.tʰ
+    → GA.ty₁ b ≡ GA.▷ γ a
     → θ (GA.σ γ a b) ≡ GB.σ (θ γ) (θ a) (θ b)
-  σ γʰ aʰ bʰ kγ ka kb = mk≡↓ pq qq val≡
+  σ γʰ aʰ bʰ kγ ka ka₁ kb kb₁ = mk≡↓ pq qq val≡
     where
-    kδ = GA.k▷ γʰ aʰ kγ ka
+    γ! : GA.Atom
+    γ! = γʰ ! (GA.con↓ γʰ kγ)
+    a! : GA.Atom
+    a! = aʰ ! (GA.ty↓ aʰ ka)
+    b! : GA.Atom
+    b! = bʰ ! (GA.ty↓ bʰ kb)
+    kγ! : GA.[ γ! ]₀ ≡ GA.ĉ
+    kγ! = GA.conKind γʰ kγ
+    ka! : GA.[ a! ]₀ ≡ GA.t̂
+    ka! = GA.tyKind aʰ ka
+    ka₁! : GA.ty₁₀ a! ka! ≡ γ!
+    ka₁! = GA.getTy₁-kind γʰ aʰ kγ ka ka₁
+    kb! : GA.[ b! ]₀ ≡ GA.t̂
+    kb! = GA.tyKind bʰ kb
+    kδ = GA.k▷ γʰ aʰ kγ ka ka₁
+    kb₁! : GA.ty₁₀ b! kb! ≡ GA.▷₀ γ! a! kγ! ka! ka₁!
+    kb₁! = GA.getTy₁-kind (GA.▷ γʰ aʰ) bʰ kδ kb kb₁
     qq : (GB.σ (θ γʰ) (θ aʰ) (θ bʰ)) ↓
-    qq = ∧i GA.con↓ γʰ kγ ,
-         ∧i GA.ty↓ γʰ aʰ kγ ka ,
-         ∧i GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb ,
-         ∧i θ-kc (γʰ ! (GA.con↓ γʰ kγ)) (GA.conKind γʰ kγ) ,
-         ∧i θ-ka (γʰ ! (GA.con↓ γʰ kγ)) (aʰ ! (GA.ty↓ γʰ aʰ kγ ka)) (GA.tyKind γʰ aʰ kγ ka) ,
-         ∧i θ-kb (γʰ ! (GA.con↓ γʰ kγ)) (aʰ ! (GA.ty↓ γʰ aʰ kγ ka)) (bʰ ! (GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb)) (GA.conKind γʰ kγ) (GA.tyKind γʰ aʰ kγ ka) (GA.getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb) ,
-         liftp tt
+    qq = ∧i ∧i tt* , GA.con↓ γʰ kγ ,
+         ∧i ∧i tt* , GA.ty↓ aʰ ka ,
+         ∧i ∧i tt* , GA.ty↓ bʰ kb ,
+         ∧i θ-kc γ! kγ! ,
+         ∧i θ-ka a! ka! ,
+         ∧i θ-ka₁ γ! a! kγ! ka! ka₁! ,
+         ∧i θ-kb b! kb! ,
+         ∧i θ-kb₁ γ! a! b! kγ! ka! ka₁! kb! kb₁! ,
+         tt*
     q : (GB.σ (θ γʰ) (θ aʰ) (θ bʰ)) ↓ → (θ (GA.σ γʰ aʰ bʰ)) ↓
-    q _ = ∧i GA.con↓ γʰ kγ ,
-          ∧i GA.ty↓ γʰ aʰ kγ ka ,
-          ∧i GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb ,
-          ∧i GA.conKind γʰ kγ ,
-          ∧i GA.tyKind γʰ aʰ kγ ka ,
-          ∧i GA.getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb ,
-          liftp tt
+    q _ = ∧i tt* ,
+          ∧i GA.con↓ γʰ kγ ,
+          ∧i GA.ty↓ aʰ ka ,
+          ∧i GA.ty↓ bʰ kb ,
+          ∧i kγ! ,
+          ∧i ka! ,
+          ∧i ka₁! ,
+          ∧i kb! ,
+          ∧i kb₁! ,
+          tt*
     pq : (θ (GA.σ γʰ aʰ bʰ)) ↓
     pq = q qq
     val≡ : θ (GA.σ γʰ aʰ bʰ) ! pq ≡ GB.σ (θ γʰ) (θ aʰ) (θ bʰ) ! qq
-    val≡ = θ-σ₀ (γʰ ! (GA.con↓ γʰ kγ)) (aʰ ! (GA.ty↓ γʰ aʰ kγ ka)) (bʰ ! (GA.ty▷↓ γʰ aʰ bʰ kγ ka kδ kb)) (GA.conKind γʰ kγ) (GA.tyKind γʰ aʰ kγ ka) (GA.getTy▷-kind γʰ aʰ bʰ kγ ka kδ kb)
+    val≡ = θ-σ₀ γ! a! b! kγ! ka! ka₁! kb! kb₁!
 
 G : ∀ {ℓA} → Functor (M.Cat ℓA) (W.Cat (lsuc ℓA))
 G = record
@@ -1183,35 +1287,34 @@ G = record
   where
   id-θ₀ : ∀ {ℓA} {A : M.Algebra ℓA} (x : G₀.Atom A) → G₁.θ₀ (M.id {A = A}) x ≡ x
   id-θ₀ (G₀.con _) = ≡.refl
-  id-θ₀ (G₀.ty _ _) = ≡.refl
+  id-θ₀ (G₀.ty _) = ≡.refl
   id-θ₀ G₀.k̂ = ≡.refl
   id-θ₀ G₀.ĉ = ≡.refl
-  id-θ₀ (G₀.t̂ x) = ≡.cong G₀.t̂ (id-θ₀ x)
+  id-θ₀ G₀.t̂ = ≡.refl
 
   id : ∀ {ℓA} {A : M.Algebra ℓA} → G₁ (M.id {A = A}) W.≈ W.id {A = G₀ A}
-  id {ℓA} {A} = W.mk≈ λ { (P ⊢ x) → G₀.mkCT≡ A (λ p → p) (λ p → p) (λ p q → id-θ₀ (x p)) }
+  id {ℓA} {A} = W.mk≈ λ { (P ⊢ x) → G₀.mkCT≡ A (λ p → p .∧e₂) (λ p → ∧i tt* , p)
+    (λ p q → id-θ₀ (x q)) }
 
   comp-θ₀ : ∀ {ℓA} {A B C : M.Algebra ℓA} (f : M.Hom A B) (g : M.Hom B C) (x : G₀.Atom A)
     → G₁.θ₀ (g M.∘ f) x ≡ G₁.θ₀ g (G₁.θ₀ f x)
   comp-θ₀ f g (G₀.con _) = ≡.refl
-  comp-θ₀ f g (G₀.ty _ _) = ≡.refl
+  comp-θ₀ f g (G₀.ty _) = ≡.refl
   comp-θ₀ f g G₀.k̂ = ≡.refl
   comp-θ₀ f g G₀.ĉ = ≡.refl
-  comp-θ₀ f g (G₀.t̂ x) = ≡.cong G₀.t̂ (comp-θ₀ f g x)
+  comp-θ₀ f g G₀.t̂ = ≡.refl
 
   comp : ∀ {ℓA} {A B C : M.Algebra ℓA} (f : M.Hom A B) (g : M.Hom B C)
     → G₁ (g M.∘ f) W.≈ (G₁ g W.∘ G₁ f)
-  comp {ℓA} {A} {B} {C} f g = W.mk≈ λ { (P ⊢ x) → G₀.mkCT≡ C (λ p → p) (λ p → p) λ p q → comp-θ₀ f g (x p) }
+  comp {ℓA} {A} {B} {C} f g = W.mk≈ λ { (P ⊢ x) → G₀.mkCT≡ C (λ p → ∧i tt* , p) (λ p → p .∧e₂) λ p q → comp-θ₀ f g (x (p .∧e₂)) }
 
   resp-θ₀ : ∀ {ℓA} {A B : M.Algebra ℓA} {f g : M.Hom A B} → f M.≈ g → (x : G₀.Atom A)
     → G₁.θ₀ f x ≡ G₁.θ₀ g x
   resp-θ₀ {f = f} {g} p (G₀.con γ) = ≡.cong G₀.con (p .M.con≡ γ)
-  resp-θ₀ {f = f} {g} p (G₀.ty γ a) = ≡.dcong₂ G₀.ty (p .M.con≡ γ) (p .M.ty≡ γ a)
+  resp-θ₀ {f = f} {g} p (G₀.ty a) = ≡.cong G₀.ty (p .M.ty≡ a)
   resp-θ₀ p G₀.k̂ = ≡.refl
   resp-θ₀ p G₀.ĉ = ≡.refl
-  resp-θ₀ p (G₀.t̂ x) = ≡.cong G₀.t̂ (resp-θ₀ p x)
+  resp-θ₀ p G₀.t̂ = ≡.refl
 
   resp : ∀ {ℓA} {A B : M.Algebra ℓA} {f g : M.Hom A B} → f M.≈ g → G₁ f W.≈ G₁ g
-  resp {ℓA} {A} {B} {f} {g} p = W.mk≈ λ { (P ⊢ x) → G₀.mkCT≡ B (λ q → q) (λ q → q) (λ q r → resp-θ₀ p (x q)) }
-
--}
+  resp {ℓA} {A} {B} {f} {g} p = W.mk≈ λ { (P ⊢ x) → G₀.mkCT≡ B (λ q → q) (λ q → q) (λ q r → resp-θ₀ p (x (q .∧e₂))) }

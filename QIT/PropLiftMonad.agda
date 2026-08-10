@@ -41,6 +41,9 @@ module _ {ℓP} where
   _↓ : ∀ {X : Set ℓX} → PropLift ℓP X → Prop ℓP
   (P ⊢ _) ↓ = P
 
+  _↑ : ∀ {X : Set ℓX} → PropLift ℓP X → Prop ℓP
+  (P ⊢ _) ↑ = ¬ P
+
   _!_ : ∀ {X : Set ℓX} → (x* : PropLift ℓP X) → x* ↓ → X
   (P ⊢ x) ! p = x p
 
@@ -49,10 +52,10 @@ module _ {ℓP} where
     (P ⇔ Q) ∧ ∀ p q → f p ≡ g q
 
   PropLift≡ : {X : Set ℓX} {x* y* : PropLift ℓP X}
-    → (p : x* .Cond ≡ y* .Cond)
-    → (q : subst (_↝ X) p (x* .val) ≡ (y* .val))
+    → (p : x* ↓ ≡ y* ↓)
+    → (q : subst (_↝ X) p (x* !_) ≡ (y* !_))
     → x* ≡ y*
-  PropLift≡ ≡.refl ≡.refl = ≡.refl
+  PropLift≡ p q = ≡.dcong₂ _⊢_ p q
 
   ≈→≡ : ∀ {ℓA} {X : Set ℓA} → {x* y* : PropLift ℓP X} → x* ≈ y* → x* ≡ y*
   ≈→≡ {X = X} {P ⊢ f} {Q ⊢ g} (∧i p⇔q , f≡g) = PropLift≡ (propExt p⇔q) (r (propExt p⇔q))
@@ -60,10 +63,20 @@ module _ {ℓP} where
     r : (pq : P ≡ Q) → ≡.subst (λ ○ → ○ → X) pq f ≡ g
     r ≡.refl = funExtp λ p → f≡g p p
 
+  mk≡ : ∀ {ℓA} {X : Set ℓA} → {x* y* : PropLift ℓP X}
+       → (x* ↓ → y* ↓) → (y* ↓ → x* ↓) → (∀ x↓ y↓ → x* ! x↓ ≡ y* ! y↓)
+       → x* ≡ y*
+  mk≡ x↓→y↓ y↓→x↓ x!≡y! = ≈→≡ (∧i ∧i x↓→y↓ , y↓→x↓ , x!≡y!)
+
   mk≡↓ : ∀ {ℓA} {X : Set ℓA} → {x* y* : PropLift ℓP X}
        → (x↓ : x* ↓) → (y↓ : y* ↓) → x* ! x↓ ≡ y* ! y↓
        → x* ≡ y*
   mk≡↓ x↓ y↓ p = ≈→≡ (∧i (∧i (λ _ → y↓) , (λ _ → x↓)) , λ _ _ → p)
+
+  mk≡↑ : ∀ {ℓA} {X : Set ℓA} → {x* y* : PropLift ℓP X}
+       → (x↑ : x* ↑) → (y↑ : y* ↑)
+       → x* ≡ y*
+  mk≡↑ x↑ y↑ = ≈→≡ (∧i (∧i (λ x↓ → ⊥e (x↑ x↓)) , (λ y↓ → ⊥e (y↑ y↓))) , λ x↓ y↓ → ⊥e (x↑ x↓))
 
   ≈refl : ∀ {ℓA} {X : Set ℓA} → (x* : PropLift ℓP X) → x* ≈ x*
   ≈refl (P ⊢ f) = ∧i ∧i (λ z → z) , (λ z → z) , λ _ _ → ≡.refl
@@ -88,6 +101,12 @@ module _ {ℓP} where
     → (qy : y* ↓)
     → x* ! (transp↓⁻ p qy) ≡ y* ! qy
   transp!⁻ ≡.refl qy = ≡.refl
+
+  transp↓! : {X : Set ℓA} → {x* y* : PropLift ℓP X} → (p : x* ≡ y*)
+    → (qx : x* ↓)
+    → y* ↓ ∧ᵖ λ qy
+    → x* ! qx ≡ y* ! qy
+  transp↓! p qx = ∧i transp↓ p qx , transp! p qx
 
   return-inj : {X : Set ℓX} {x y : X} → return x ≡ return y → x ≡ y
   return-inj {ℓX} {X} {x} {y} p =
