@@ -16,12 +16,15 @@
       owner = "cdo256";
       repo = "just-agda";
       ref = "main";
+      inputs.flake-parts.follows = "flake-parts";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     lipics = {
       type = "github";
       owner = "cdo256";
       repo = "lipics-authors";
       ref = "main";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 

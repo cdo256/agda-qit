@@ -14,9 +14,9 @@
         #  agda2-mode = pkgs.emacsPackages.agda2-mode;
         #});
         lipics = inputs.lipics.packages.${system}.default;
-        tex = pkgs.texlive.combine {
-          inherit (pkgs.texlive)
-            scheme-medium
+        tex = pkgs.texliveMedium.withPackages (
+          ps:
+          (with ps; [
             latexmk
             standalone
             pgf
@@ -45,9 +45,9 @@
             footmisc
             mathpartir
             lastpage
-            ;
-          inherit lipics;
-        };
+          ])
+          ++ [ lipics ]
+        );
       };
     };
 }
