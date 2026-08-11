@@ -25,9 +25,7 @@ open import QIT.Functor.Base
 open import QIT.Category.Base
 open import QIT.PropLiftMonad
 
-G₀ : M.Algebra ℓA → W.Algebra (lsuc ℓA)
-G₀ {ℓA} da = wa
-  module G₀ where
+module G₀ {ℓA} (da : M.Algebra ℓA) where
   open ≡
   open ≡.≡-Reasoning
   module MA = M.Algebra da
@@ -139,12 +137,14 @@ G₀ {ℓA} da = wa
   ty-inj : ∀ {a b : MA.Ty} → ty a ≡ ty b → a ≡ b
   ty-inj refl = refl
 
-  []₀≡ĉ→con : ∀ {x} → [ x ]₀ ≡ ĉ
+  []₀≡ĉ→con : ∀ {x}
+    → [ x ]₀ ≡ ĉ
     → ΣP MA.Con λ γ
     → x ≡ con γ
   []₀≡ĉ→con {con γ} p = γ , refl
 
-  []₀≡t̂→ty : ∀ {x} → [ x ]₀ ≡ t̂
+  []₀≡t̂→ty : ∀ {x}
+    → [ x ]₀ ≡ t̂
     → ΣP MA.Ty λ a
     → x ≡ ty a
   []₀≡t̂→ty {ty a} p = a , refl
@@ -180,7 +180,7 @@ G₀ {ℓA} da = wa
     → ΣP MA.Con λ γ
     → x* ≡ return (con γ)
   []≡cʰ→return {x*} p = γ , x*≡returnγ
-    where
+    module []≡cʰ→return where
     p≈ : [ x* ] ≈ cʰ
     p≈ = ≡→≈ p
     x↓ : x* ↓
@@ -196,13 +196,25 @@ G₀ {ℓA} da = wa
     x*≡returnγ : x* ≡ return (con γ)
     x*≡returnγ = mk≡↓ x↓ tt* x≡conγ
 
+  []≡cʰ→Con
+    : ∀ x*
+    → (p : [ x* ] ≡ cʰ)
+    → MA.Con
+  []≡cʰ→Con x* p = []≡cʰ→return {x*} p .fst
+
+  []≡cʰ-beta
+    : ∀ x*
+    → (p : [ x* ] ≡ cʰ)
+    → x* ≡ return (con ([]≡cʰ→Con x* p))
+  []≡cʰ-beta x* p = []≡cʰ→return p .snd
+
   []≡tʰ→return
     : ∀ {x*}
     → [ x* ] ≡ tʰ
     → ΣP MA.Ty λ a
     → x* ≡ return (ty a)
   []≡tʰ→return {x*} p = a , x*≡return
-    where
+    module []≡tʰ→return where
     p≈ : [ x* ] ≈ tʰ
     p≈ = ≡→≈ p
     x↓ : x* ↓
@@ -217,6 +229,18 @@ G₀ {ℓA} da = wa
     x≡ty = []₀≡t̂→ty kx .snd
     x*≡return : x* ≡ return (ty a)
     x*≡return = mk≡↓ x↓ tt* x≡ty
+
+  []≡tʰ→Ty
+    : ∀ x*
+    → (p : [ x* ] ≡ tʰ)
+    → MA.Ty
+  []≡tʰ→Ty x* p = []≡tʰ→return {x*} p .fst
+
+  []≡tʰ-beta
+    : ∀ x*
+    → (p : [ x* ] ≡ tʰ)
+    → x* ≡ return (ty ([]≡tʰ→Ty x* p))
+  []≡tʰ-beta x* p = []≡tʰ→return p .snd
 
   kty₁ : ∀ a* → [ a* ] ≡ tʰ → [ ty₁ a* ] ≡ cʰ
   kty₁ a* ka = mk≡↓ [ty₁a]↓ tt* val≡
@@ -234,6 +258,18 @@ G₀ {ℓA} da = wa
     q = transp↓! (cong ty₁ (w .snd)) ty↓
     val≡ : [ ty₁ a* ] ! [ty₁a]↓ ≡ cʰ ! tt*
     val≡ = trans (cong [_]₀ (q .∧e₂)) refl
+
+  kty₁-a : ∀ a* → [ ty₁ a* ] ≡ cʰ → [ a* ] ≡ tʰ
+  kty₁-a a* kty = mk≡↓ (∧i tt* , a↓) tt* kind
+    where
+    [ty₁a]↓ : [ ty₁ a* ] ↓
+    [ty₁a]↓ = transp↓⁻ kty tt*
+    ty₁a↓ : ty₁ a* ↓
+    ty₁a↓ = []⁻ (ty₁ a*) [ty₁a]↓
+    a↓ : a* ↓
+    a↓ = ty₁⁻ a* ty₁a↓
+    kind : [ a* ! a↓ ]₀ ≡ t̂
+    kind = ty₁a↓ .∧e₂ .∧e₁
 
   Con₀ : (γ : Atom) → [ γ ]₀ ≡ ĉ → MA.Con
   Con₀ γ kγ = ConΣ→Con (γ , kγ)
@@ -468,6 +504,11 @@ G₀ {ℓA} da = wa
   getTy : (aʰ : CT) → (ka : [ aʰ ] ≡ tʰ) → MA.Ty
   getTy aʰ ka = TyΣ→Ty (getTyΣ aʰ ka)
 
+  [[x]]≡kʰ : ∀ xʰ → xʰ ↓ → [ [ xʰ ] ] ≡ kʰ
+  [[x]]≡kʰ xʰ x↓ =
+    mk≡↓ (∧i tt* , ∧i tt* , x↓) tt*
+      ([[x]]₀≡k̂ (xʰ ! x↓))
+
   ∙ : CT
   ∙ = return ∙₀
 
@@ -637,6 +678,15 @@ G₀ {ℓA} da = wa
 
   k∙ : [ ∙ ] ≡ cʰ
   k∙ = mk≡↓ (∧i tt* , tt*) tt* refl
+
+  kk̂ : [ kʰ ] ≡ kʰ
+  kk̂ = mk≡↓ (∧i tt* , tt*) tt* refl
+
+  kĉ : [ cʰ ] ≡ kʰ
+  kĉ = mk≡↓ (∧i tt* , tt*) tt* refl
+
+  kt̂ : [ tʰ ] ≡ kʰ
+  kt̂ = mk≡↓ (∧i tt* , tt*) tt* refl
 
   k▷ : (γʰ aʰ : CT)
     → [ γʰ ] ≡ cʰ
@@ -935,10 +985,15 @@ G₀ {ℓA} da = wa
   wa = record
     { CT = CT
     ; [_] = [_]
+    ; k̂ = kʰ
     ; ĉ = cʰ
     ; t̂ = tʰ
+    ; kk̂ = kk̂
+    ; kĉ = kĉ
+    ; kt̂ = kt̂
     ; ty₁ = ty₁
     ; kty₁ = kty₁
+    ; kty₁-a = kty₁-a
     ; ∙ = ∙
     ; k∙ = k∙
     ; ▷ = ▷
@@ -970,20 +1025,10 @@ G₀ {ℓA} da = wa
     ; σπ = σπ
     }
 
-G₁ : ∀ {ℓA} {A B : M.Algebra ℓA} → M.Hom A B → W.Hom (G₀ A) (G₀ B)
-G₁ {ℓA} {A} {B} f = record
-  { θ = θ
-  ; [_] = [_]
-  ; ĉ = ĉ
-  ; t̂ = t̂
-  ; ty₁ = ty₁
-  ; ∙ = ∙
-  ; ▷ = ▷
-  ; u = u
-  ; π = π
-  ; σ = σ
-  }
-  module G₁ where
+G₀ : M.Algebra ℓA → W.Algebra (lsuc ℓA)
+G₀ da = G₀.wa da
+
+module G₁ {ℓA} {A B : M.Algebra ℓA} (f : M.Hom A B) where
   open ≡
   module A = M.Algebra A
   module B = M.Algebra B
@@ -1104,6 +1149,9 @@ G₁ {ℓA} {A} {B} f = record
         (GA.con-inj kb₁)
         (GB.con-inj (θ-ka₁ _ _ kγ ka ka₁))
         (GB.con-inj (θ-kb₁ _ _ _ kγ ka ka₁ kb kb₁)))
+
+  k̂ : θ GA.kʰ ≡ GB.kʰ
+  k̂ = mk≡↓ (∧i tt* , tt*) tt* ≡.refl
 
   ĉ : θ GA.cʰ ≡ GB.cʰ
   ĉ = mk≡↓ (∧i tt* , tt*) tt* ≡.refl
@@ -1275,6 +1323,21 @@ G₁ {ℓA} {A} {B} f = record
     pq = q qq
     val≡ : θ (GA.σ γʰ aʰ bʰ) ! pq ≡ GB.σ (θ γʰ) (θ aʰ) (θ bʰ) ! qq
     val≡ = θ-σ₀ γ! a! b! kγ! ka! ka₁! kb! kb₁!
+
+G₁ : ∀ {ℓA} {A B : M.Algebra ℓA} → M.Hom A B → W.Hom (G₀ A) (G₀ B)
+G₁ f = record
+  { θ = G₁.θ f
+  ; [_] = G₁.[_] f
+  ; k̂ = G₁.k̂ f
+  ; ĉ = G₁.ĉ f
+  ; t̂ = G₁.t̂ f
+  ; ty₁ = G₁.ty₁ f
+  ; ∙ = G₁.∙ f
+  ; ▷ = G₁.▷ f
+  ; u = G₁.u f
+  ; π = G₁.π f
+  ; σ = G₁.σ f
+  }
 
 G : ∀ {ℓA} → Functor (M.Cat ℓA) (W.Cat (lsuc ℓA))
 G = record

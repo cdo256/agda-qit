@@ -58,6 +58,33 @@ record Algebra ℓA : Set (lsuc ℓA) where
 
 open Algebra public
 
+LiftAlgebra : ∀ {ℓA} ℓB → Algebra ℓA → Algebra (ℓA ⊔ ℓB)
+LiftAlgebra ℓB A = record
+  { Con = Lift ℓB A.Con
+  ; Ty = Lift ℓB A.Ty
+  ; ty₁ = λ (lift a) → lift (A.ty₁ a)
+  ; ∙ = lift A.∙
+  ; ▷ = λ (lift γ) (lift a) a₁ → lift (A.▷ γ a (≡.cong lower a₁))
+  ; u = λ (lift γ) → lift (A.u γ)
+  ; u₁ = λ (lift γ) → ≡.cong lift (A.u₁ γ)
+  ; π = λ (lift γ) (lift a) (lift b) a₁ b₁ →
+      lift (A.π γ a b (≡.cong lower a₁) (≡.cong lower b₁))
+  ; π₁ = λ (lift γ) (lift a) (lift b) a₁ b₁ →
+      ≡.cong lift (A.π₁ γ a b (≡.cong lower a₁) (≡.cong lower b₁))
+  ; σ = λ (lift γ) (lift a) (lift b) a₁ b₁ →
+      lift (A.σ γ a b (≡.cong lower a₁) (≡.cong lower b₁))
+  ; σ₁ = λ (lift γ) (lift a) (lift b) a₁ b₁ →
+      ≡.cong lift (A.σ₁ γ a b (≡.cong lower a₁) (≡.cong lower b₁))
+  ; σ▷ = λ (lift γ) (lift a) (lift b) a₁ b₁ →
+      ≡.cong lift (A.σ▷ γ a b (≡.cong lower a₁) (≡.cong lower b₁))
+  ; σπ = λ (lift γ) (lift a) (lift b) (lift c) a₁ b₁ c₁ →
+      ≡.cong lift
+        (A.σπ γ a b c
+          (≡.cong lower a₁) (≡.cong lower b₁) (≡.cong lower c₁))
+  }
+  where
+  module A = Algebra A
+
 record Hom (A : Algebra ℓA) (B : Algebra ℓB) : Set (lsuc ℓA ⊔ lsuc ℓB) where
   private
     module A = Algebra A
@@ -88,6 +115,30 @@ record Hom (A : Algebra ℓA) (B : Algebra ℓB) : Set (lsuc ℓA ⊔ lsuc ℓB)
       ≡ B.σ (conᴿ γ) (tyᴿ a) (tyᴿ b) a₁' b₁'
 
 open Hom public
+
+Lift⇒ : ∀ {ℓA} ℓB (A : Algebra ℓA) → Hom A (LiftAlgebra ℓB A)
+Lift⇒ ℓB A = record
+  { conᴿ = lift
+  ; tyᴿ = lift
+  ; ty₁ᴿ = λ _ → ≡.refl
+  ; ∙ᴿ = ≡.refl
+  ; ▷ᴿ = λ _ _ _ _ → ≡.refl
+  ; uᴿ = λ _ → ≡.refl
+  ; πᴿ = λ _ _ _ _ _ _ _ → ≡.refl
+  ; σᴿ = λ _ _ _ _ _ _ _ → ≡.refl
+  }
+
+Lift⇐ : ∀ {ℓA} ℓB (A : Algebra ℓA) → Hom (LiftAlgebra ℓB A) A
+Lift⇐ ℓB A = record
+  { conᴿ = lower
+  ; tyᴿ = lower
+  ; ty₁ᴿ = λ { (lift a) → ≡.refl }
+  ; ∙ᴿ = ≡.refl
+  ; ▷ᴿ = λ { (lift γ) (lift a) _ _ → ≡.refl }
+  ; uᴿ = λ { (lift γ) → ≡.refl }
+  ; πᴿ = λ { (lift γ) (lift a) (lift b) _ _ _ _ → ≡.refl }
+  ; σᴿ = λ { (lift γ) (lift a) (lift b) _ _ _ _ → ≡.refl }
+  }
 
 id : ∀ {ℓA} {A} → Hom {ℓA} A A
 id = record
@@ -149,6 +200,14 @@ record _≈_ {A : Algebra ℓA} {B : Algebra ℓB} (f g : Hom A B) : Prop (ℓA 
     ty≡  : ∀ a → f.tyᴿ a ≡ g.tyᴿ a
 
 open _≈_ public
+
+Lift⇒⇐ : ∀ {ℓA} ℓB (A : Algebra ℓA)
+  → (Lift⇒ ℓB A ∘ Lift⇐ ℓB A) ≈ id
+Lift⇒⇐ ℓB A = mk≈ (λ { (lift γ) → ≡.refl }) (λ { (lift a) → ≡.refl })
+
+Lift⇐⇒ : ∀ {ℓA} ℓB (A : Algebra ℓA)
+  → (Lift⇐ ℓB A ∘ Lift⇒ ℓB A) ≈ id
+Lift⇐⇒ ℓB A = mk≈ (λ γ → ≡.refl) (λ a → ≡.refl)
 
 isEquiv≈ : ∀ {A : Algebra ℓA} {B : Algebra ℓB} → IsEquivalence (_≈_ {A = A} {B})
 isEquiv≈ = record

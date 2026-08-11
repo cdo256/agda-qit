@@ -6,4 +6,5 @@ flags:
   --prop
   --rewriting
   --show-irrelevant
+  --lossy-unification
 
