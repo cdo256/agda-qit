@@ -232,8 +232,14 @@ module _ {ℓP} where
     → f* ↓ ∧ᵖ λ _ → x* ↓
   <*>⁻ f* x* app↓ = app↓
 
-  x↓→return : {X : Set ℓX} {x* : PropLift ℓP X}
+  x↓→return : {X : Set ℓX}
     → (x* : PropLift ℓP X)
     → (x↓ : x* ↓)
     → x* ≡ return (x* ! x↓)
   x↓→return x* x↓ = mk≡↓ x↓ tt* ≡.refl
+
+  return→x↓ : {X : Set ℓX} {x : X}
+    → (x* : PropLift ℓP X)
+    → x* ≡ return x
+    → x* ↓
+  return→x↓ x* ≡.refl = tt*

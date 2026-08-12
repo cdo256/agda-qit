@@ -19,12 +19,19 @@ record Algebra ℓX : Set (lsuc ℓX) where
   field
     CT : Set ℓX
     [_] : CT → CT
-    ĉ t̂ : CT
+    k̂ ĉ t̂ : CT
     ty₁ : CT → CT
     kty₁ : ∀ (a : CT)
       → [ a ] ≡ t̂
       → [ ty₁ a ] ≡ ĉ
+    -- TODO: Should be called ty₁-a
+    kty₁-a : ∀ (a : CT)
+      → [ ty₁ a ] ≡ ĉ
+      → [ a ] ≡ t̂
 
+    kk̂ : [ k̂ ] ≡ k̂
+    kĉ : [ ĉ ] ≡ k̂
+    kt̂ : [ t̂ ] ≡ k̂
     ∙ : CT
     k∙ : [ ∙ ] ≡ ĉ
     ▷ : (γ : CT) (a : CT) → CT
@@ -141,6 +148,7 @@ record Hom (A : Algebra ℓA) (B : Algebra ℓB) : Set (ℓA ⊔ ℓB) where
   field
     θ : A.CT → B.CT
     [_] : ∀ (x : A.CT) → θ (A.[ x ]) ≡ B.[ θ x ]
+    k̂ : θ A.k̂ ≡ B.k̂
     ĉ : θ A.ĉ ≡ B.ĉ
     t̂ : θ A.t̂ ≡ B.t̂
     ty₁ : ∀ x → θ (A.ty₁ x) ≡ B.ty₁ (θ x)
@@ -172,6 +180,7 @@ id : ∀ {ℓA} {A : Algebra ℓA} → Hom A A
 id = record
   { θ = λ x → x
   ; [_] = λ _ → ≡.refl
+  ; k̂ = ≡.refl
   ; ĉ = ≡.refl
   ; t̂ = ≡.refl
   ; ty₁ = λ _ → ≡.refl
@@ -186,6 +195,7 @@ _∘_ : ∀ {ℓA ℓB ℓC} {A : Algebra ℓA} {B : Algebra ℓB} {C : Algebra 
 _∘_ {A = A} {B} {C} g f = record
   { θ = λ x → g.θ (f.θ x)
   ; [_] = λ x → ≡.trans (≡.cong g.θ (f.[_] x)) (g.[_] (f.θ x))
+  ; k̂ = ≡.trans (≡.cong g.θ f.k̂) g.k̂
   ; ĉ = ≡.trans (≡.cong g.θ f.ĉ) g.ĉ
   ; t̂ = ≡.trans (≡.cong g.θ f.t̂) g.t̂
   ; ty₁ = λ x → ≡.trans (≡.cong g.θ (f.ty₁ x)) (g.ty₁ (f.θ x))
@@ -277,10 +287,15 @@ LiftAlgebra : ∀ {ℓX} ℓY → Algebra ℓX → Algebra (ℓX ⊔ ℓY)
 LiftAlgebra ℓY A = record
   { CT = Lift ℓY A.CT
   ; [_] = λ (lift x) → lift (A.[ x ])
+  ; k̂ = lift A.k̂
   ; ĉ = lift A.ĉ
   ; t̂ = lift A.t̂
+  ; kk̂ = ↑ A.kk̂
+  ; kĉ = ↑ A.kĉ
+  ; kt̂ = ↑ A.kt̂
   ; ty₁ = λ (lift a) → lift (A.ty₁ a)
   ; kty₁ = λ (lift a) ka → ↑ A.kty₁ a (↓ ka)
+  ; kty₁-a = λ (lift a) ka → ↑ A.kty₁-a a (↓ ka)
   ; ∙ = lift A.∙
   ; k∙ = ↑ A.k∙
   ; ▷ = λ (lift γ) (lift a) → lift (A.▷ γ a)
