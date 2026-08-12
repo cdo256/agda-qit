@@ -553,6 +553,11 @@ module G₀ {ℓA} (da : M.Algebra ℓA) where
     assume ([ γ ]₀ ≡ ĉ) λ kγ →
     return (u₀ γ kγ)
 
+  u≡return : ∀ γ̂
+    → (kγ : [ γ̂ ]₀ ≡ ĉ)
+    → u (return γ̂) ≡ return (u₀ γ̂ kγ)
+  u≡return γ̂ kγ = mk≡↓ (∧i tt* , ∧i kγ , tt*) tt* refl
+
   u⁻-γ : ∀ γʰ → u γʰ ↓ → γʰ ↓
   u⁻-γ γʰ u↓ = u↓ .∧e₁
 
@@ -583,6 +588,20 @@ module G₀ {ℓA} (da : M.Algebra ℓA) where
     assume ([ b ]₀ ≡ t̂) λ kb →
     assume (ty₁₀ b kb ≡ ▷₀ γ a kγ ka ka₁) λ kb₁ →
     return (π₀ γ a b kγ ka ka₁ kb kb₁)
+
+  π≡return : ∀ γ̂ â b̂
+    → (kγ : [ γ̂ ]₀ ≡ ĉ)
+    → (ka : [ â ]₀ ≡ t̂)
+    → (a₁ : ty₁₀ â ka ≡ γ̂)
+    → (kb : [ b̂ ]₀ ≡ t̂)
+    → (b₁ : ty₁₀ b̂ kb ≡ ▷₀ γ̂ â kγ ka a₁)
+    → π (return γ̂) (return â) (return b̂)
+      ≡ return (π₀ γ̂ â b̂ kγ ka a₁ kb b₁)
+  π≡return γ̂ â b̂ kγ ka a₁ kb b₁ =
+    mk≡↓
+      (∧i tt* , ∧i tt* , ∧i tt* ,
+       ∧i kγ , ∧i ka , ∧i a₁ , ∧i kb , ∧i b₁ , tt*)
+      tt* refl
 
   π⁻-γ : ∀ γʰ aʰ bʰ → π γʰ aʰ bʰ ↓ → γʰ ↓
   π⁻-γ γʰ aʰ bʰ π↓ = π↓ .∧e₁
@@ -635,6 +654,20 @@ module G₀ {ℓA} (da : M.Algebra ℓA) where
     assume ([ b ]₀ ≡ t̂) λ kb →
     assume (ty₁₀ b kb ≡ ▷₀ γ a kγ ka ka₁) λ kb₁ →
     return (σ₀ γ a b kγ ka ka₁ kb kb₁)
+
+  σ≡return : ∀ γ̂ â b̂
+    → (kγ : [ γ̂ ]₀ ≡ ĉ)
+    → (ka : [ â ]₀ ≡ t̂)
+    → (a₁ : ty₁₀ â ka ≡ γ̂)
+    → (kb : [ b̂ ]₀ ≡ t̂)
+    → (b₁ : ty₁₀ b̂ kb ≡ ▷₀ γ̂ â kγ ka a₁)
+    → σ (return γ̂) (return â) (return b̂)
+      ≡ return (σ₀ γ̂ â b̂ kγ ka a₁ kb b₁)
+  σ≡return γ̂ â b̂ kγ ka a₁ kb b₁ =
+    mk≡↓
+      (∧i tt* , ∧i tt* , ∧i tt* ,
+       ∧i kγ , ∧i ka , ∧i a₁ , ∧i kb , ∧i b₁ , tt*)
+      tt* refl
 
   σ⁻-γ : ∀ γʰ aʰ bʰ → σ γʰ aʰ bʰ ↓ → γʰ ↓
   σ⁻-γ γʰ aʰ bʰ σ↓ = σ↓ .∧e₁
@@ -839,7 +872,6 @@ module G₀ {ℓA} (da : M.Algebra ℓA) where
   u-γ : (γ : CT) → [ u γ ] ≡ tʰ → [ γ ] ≡ cʰ
   u-γ γ ku' = mk≡↓ ([]↓ γ γ↓) tt* (u⁻-kγ γ u↓)
     where
-    mutual
       [uγ]↓ : [ u γ ] ↓
       [uγ]↓ = transp↓⁻ ku' tt*
       u↓ : u γ ↓
@@ -850,7 +882,6 @@ module G₀ {ℓA} (da : M.Algebra ℓA) where
   π-γ : (γ a b : CT) → [ π γ a b ] ≡ tʰ → [ γ ] ≡ cʰ
   π-γ γ a b kπ' = mk≡↓ ([]↓ γ γ↓) tt* (π⁻-kγ γ a b π↓)
     where
-    mutual
       [πγab]↓ : [ π γ a b ] ↓
       [πγab]↓ = transp↓⁻ kπ' tt*
       π↓ : π γ a b ↓
@@ -861,7 +892,6 @@ module G₀ {ℓA} (da : M.Algebra ℓA) where
   π-a : (γ a b : CT) → [ π γ a b ] ≡ tʰ → [ a ] ≡ tʰ
   π-a γ a b kπ' = mk≡↓ ([]↓ a a↓) tt* (π⁻-ka γ a b π↓)
     where
-    mutual
       [πγab]↓ : [ π γ a b ] ↓
       [πγab]↓ = transp↓⁻ kπ' tt*
       π↓ : π γ a b ↓
@@ -872,7 +902,6 @@ module G₀ {ℓA} (da : M.Algebra ℓA) where
   π-a₁ : (γ a b : CT) → [ π γ a b ] ≡ tʰ → ty₁ a ≡ γ
   π-a₁ γ a b kπ' = mk≡↓ l↓ r↓ (π⁻-ka₁ γ a b π↓)
     where
-    mutual
       [πγab]↓ : [ π γ a b ] ↓
       [πγab]↓ = transp↓⁻ kπ' tt*
       π↓ : π γ a b ↓
@@ -889,7 +918,6 @@ module G₀ {ℓA} (da : M.Algebra ℓA) where
   π-b : (γ a b : CT) → [ π γ a b ] ≡ tʰ → [ b ] ≡ tʰ
   π-b γ a b kπ' = mk≡↓ ([]↓ b b↓) tt* (π⁻-kb γ a b π↓)
     where
-    mutual
       [πγab]↓ : [ π γ a b ] ↓
       [πγab]↓ = transp↓⁻ kπ' tt*
       π↓ : π γ a b ↓
@@ -900,7 +928,6 @@ module G₀ {ℓA} (da : M.Algebra ℓA) where
   π-b₁ : (γ a b : CT) → [ π γ a b ] ≡ tʰ → ty₁ b ≡ ▷ γ a
   π-b₁ γ a b kπ' = mk≡↓ l↓ r↓ (π⁻-kb₁ γ a b π↓)
     where
-    mutual
       [πγab]↓ : [ π γ a b ] ↓
       [πγab]↓ = transp↓⁻ kπ' tt*
       π↓ : π γ a b ↓
@@ -917,7 +944,6 @@ module G₀ {ℓA} (da : M.Algebra ℓA) where
   σ-γ : (γ a b : CT) → [ σ γ a b ] ≡ tʰ → [ γ ] ≡ cʰ
   σ-γ γ a b kσ' = mk≡↓ ([]↓ γ γ↓) tt* (σ⁻-kγ γ a b σ↓)
     where
-    mutual
       [σγab]↓ : [ σ γ a b ] ↓
       [σγab]↓ = transp↓⁻ kσ' tt*
       σ↓ : σ γ a b ↓
@@ -928,7 +954,6 @@ module G₀ {ℓA} (da : M.Algebra ℓA) where
   σ-a : (γ a b : CT) → [ σ γ a b ] ≡ tʰ → [ a ] ≡ tʰ
   σ-a γ a b kσ' = mk≡↓ ([]↓ a a↓) tt* (σ⁻-ka γ a b σ↓)
     where
-    mutual
       [σγab]↓ : [ σ γ a b ] ↓
       [σγab]↓ = transp↓⁻ kσ' tt*
       σ↓ : σ γ a b ↓
@@ -939,7 +964,6 @@ module G₀ {ℓA} (da : M.Algebra ℓA) where
   σ-a₁ : (γ a b : CT) → [ σ γ a b ] ≡ tʰ → ty₁ a ≡ γ
   σ-a₁ γ a b kσ' = mk≡↓ l↓ r↓ (σ⁻-ka₁ γ a b σ↓)
     where
-    mutual
       [σγab]↓ : [ σ γ a b ] ↓
       [σγab]↓ = transp↓⁻ kσ' tt*
       σ↓ : σ γ a b ↓
@@ -956,7 +980,6 @@ module G₀ {ℓA} (da : M.Algebra ℓA) where
   σ-b : (γ a b : CT) → [ σ γ a b ] ≡ tʰ → [ b ] ≡ tʰ
   σ-b γ a b kσ' = mk≡↓ ([]↓ b b↓) tt* (σ⁻-kb γ a b σ↓)
     where
-    mutual
       [σγab]↓ : [ σ γ a b ] ↓
       [σγab]↓ = transp↓⁻ kσ' tt*
       σ↓ : σ γ a b ↓
@@ -967,7 +990,6 @@ module G₀ {ℓA} (da : M.Algebra ℓA) where
   σ-b₁ : (γ a b : CT) → [ σ γ a b ] ≡ tʰ → ty₁ b ≡ ▷ γ a
   σ-b₁ γ a b kσ' = mk≡↓ l↓ r↓ (σ⁻-kb₁ γ a b σ↓)
     where
-    mutual
       [σγab]↓ : [ σ γ a b ] ↓
       [σγab]↓ = transp↓⁻ kσ' tt*
       σ↓ : σ γ a b ↓

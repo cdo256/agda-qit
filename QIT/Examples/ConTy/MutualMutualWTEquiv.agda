@@ -465,174 +465,133 @@ module _ {ℓA}
         θ-con↓ : ∀ {x}
           → I.[ x ] ≡ I.ĉ
           → ι.θ x ↓
-        θ-con↓ {x} p = return→x↓ (ι.θ x) θx≡return 
-          where
-          θx≡return : ι.θ x ≡ return (G₀FI.con (G₀FI.[]≡cʰ→Con (ι.θ x) (θ-con-kind p)))
-          θx≡return = G₀FI.[]≡cʰ-beta (ι.θ x) (θ-con-kind p)
+        θ-con↓ {x} kx = G₀FI.con↓ (ι.θ x) (θ-con-kind kx)
           
         θ-ty↓ : ∀ {x}
           → I.[ x ] ≡ I.t̂
           → ι.θ x ↓
-        θ-ty↓ {x} p = return→x↓ (ι.θ x) θx≡return 
-          where
-          θx≡return : ι.θ x ≡ return (G₀FI.ty (G₀FI.[]≡tʰ→Ty (ι.θ x) (θ-ty-kind p)))
-          θx≡return = G₀FI.[]≡tʰ-beta (ι.θ x) (θ-ty-kind p)
+        θ-ty↓ {x} kx = G₀FI.ty↓ (ι.θ x) (θ-ty-kind kx)
 
-        conBeta'' : ∀ {x}
-          → (h : (θx↓ : ι.θ x ↓)
-               → (I.[ x ] ≡ I.ĉ) ∧ᵖ λ kx
-               → (G₀FI.[]≡cʰ→Con (ι.θ x) (θ-con-kind kx)) ≡ (x , kx))
+        conBeta : ∀ {x}
+          → (ι.θ x ↓ → G₀FI.[ ι.θ x ] ≡ G₀FI.cʰ)
+          → (∀ (kx : I.[ x ] ≡ I.ĉ)
+              → ι.θ x ≡ return (G₀FI.con (x , kx)))
           → Beta x
-        conBeta'' {x} h =
-          mkBeta cβ tβ
+        conBeta {x} isCon cβ = mkBeta cβ tβ
+          where
+          tβ : (kx : I.[ x ] ≡ I.t̂)
+            → ι.θ x ≡ return (G₀FI.ty (x , kx))
+          tβ kx = ⊥e (G₀FI.cʰ≢tʰ
+            (trans (sym (isCon (θ-ty↓ kx))) (θ-ty-kind kx)))
+
+        -- conBeta : ∀ {x}
+        --   → (ι.θ x ↓ → G₀FI.[ ι.θ x ] ≡ G₀FI.cʰ)
+        --   → (∀ (kx : I.[ x ] ≡ I.ĉ)
+        --       → G₀FI.[]≡cʰ→Con (ι.θ x) (θ-con-kind kx) ≡ (x , kx))
+        --   → Beta x
+        -- conBeta {x} isCon conβ = mkBeta cβ tβ
+        --   where
+        --   cβ : (kx : I.[ x ] ≡ I.ĉ)
+        --     → ι.θ x ≡ return (G₀FI.con (x , kx))
+        --   cβ kx =
+        --     trans
+        --       (G₀FI.[]≡cʰ-beta (ι.θ x) (θ-con-kind kx))
+        --       (cong (return ∘ G₀FI.con) (conβ kx))
+        --   tβ : (kx : I.[ x ] ≡ I.t̂)
+        --     → ι.θ x ≡ return (G₀FI.ty (x , kx))
+        --   tβ kx = ⊥e (G₀FI.cʰ≢tʰ
+        --     (trans (sym (isCon (θ-ty↓ kx))) (θ-ty-kind kx)))
+
+        tyBeta : ∀ {x}
+          → (ι.θ x ↓ → G₀FI.[ ι.θ x ] ≡ G₀FI.tʰ)
+          → (∀ (kx : I.[ x ] ≡ I.t̂)
+              → G₀FI.[]≡tʰ→Ty (ι.θ x) (θ-ty-kind kx) ≡ (x , kx))
+          → Beta x
+        tyBeta {x} isTy tyβ = mkBeta cβ tβ
           where
           cβ : (kx : I.[ x ] ≡ I.ĉ)
             → ι.θ x ≡ return (G₀FI.con (x , kx))
-          cβ kx =
-            ι.θ x
-              ≡⟨ G₀FI.[]≡cʰ-beta (ι.θ x) (θ-con-kind kx) ⟩
-            return (G₀FI.con (G₀FI.[]≡cʰ→Con (ι.θ x) (θ-con-kind kx)))
-              ≡⟨ cong (return ∘ G₀FI.con) (h (θ-con↓ kx) .∧e₂) ⟩
-            return (G₀FI.con (x , kx)) ∎
-            
+          cβ kx = ⊥e (G₀FI.cʰ≢tʰ
+            (trans (sym (θ-con-kind kx)) (isTy (θ-con↓ kx))))
           tβ : (kx : I.[ x ] ≡ I.t̂)
             → ι.θ x ≡ return (G₀FI.ty (x , kx))
-          tβ kx = ⊥e (G₀FI.cʰ≢tʰ p)
-            where
-            p : G₀FI.cʰ ≡ G₀FI.tʰ
-            p =
-              G₀FI.cʰ
-                ≡⟨ sym ι.ĉ ⟩
-              ι.θ I.ĉ
-                ≡⟨ cong ι.θ (sym (h (θ-ty↓ kx) .∧e₁)) ⟩
-              ι.θ I.[ x ]
-                ≡⟨ cong ι.θ kx ⟩
-              ι.θ I.t̂
-                ≡⟨ ι.t̂ ⟩
-              G₀FI.tʰ ∎
-
-        conBeta' : ∀ {x}
-          → (conβ : (θx↓ : ι.θ x ↓)
-              → (kx : I.[ x ] ≡ I.ĉ)
-              → (kx' : G₀FI.[ ι.θ x ] ≡ G₀FI.cʰ)
-              → ι.θ x ≡ return (G₀FI.con (x , kx)))
-          → (¬t : (θx↓ : ι.θ x ↓)
-              → G₀FI.[ ι.θ x ] ≢ G₀FI.tʰ)
-          → Beta x
-        conBeta' conβ ¬t =
-          mkBeta
-            (λ kx → conβ {!!} kx (θ-con-kind kx))
-            (λ kx → ⊥e (¬t {!!} (θ-ty-kind kx)))
-
-        conBeta : ∀ {x}
-          → (∀ (kx : I.[ x ] ≡ I.ĉ)
-              → G₀FI.[ ι.θ x ] ≡ G₀FI.cʰ
-              → ι.θ x ≡ return (G₀FI.con (x , kx)))
-          → (G₀FI.[ ι.θ x ] ≢ G₀FI.tʰ)
-          → Beta x
-        conBeta conβ ¬t =
-          mkBeta
-            (λ kx → conβ kx (θ-con-kind kx))
-            (λ kx → ⊥e (¬t (θ-ty-kind kx)))
-
-        tyBeta : ∀ {x}
-          → (G₀FI.[ ι.θ x ] ≢ G₀FI.cʰ)
-          → (∀ (kx : I.[ x ] ≡ I.t̂)
-              → G₀FI.[ ι.θ x ] ≡ G₀FI.tʰ
-              → ι.θ x ≡ return (G₀FI.ty (x , kx)))
-          → Beta x
-        tyBeta ¬c tyβ =
-          mkBeta
-            (λ kx → ⊥e (¬c (θ-con-kind kx)))
-            (λ kx → tyβ kx (θ-ty-kind kx))
+          tβ kx =
+            trans
+              (G₀FI.[]≡tʰ-beta (ι.θ x) (θ-ty-kind kx))
+              (cong (return ∘ G₀FI.ty) (tyβ kx))
 
         absurdBeta : ∀ {x}
-          → (G₀FI.[ ι.θ x ] ≢ G₀FI.cʰ)
-          → (G₀FI.[ ι.θ x ] ≢ G₀FI.tʰ)
+          → (ι.θ x ↓ → G₀FI.[ ι.θ x ] ≡ G₀FI.cʰ → ⊥)
+          → (ι.θ x ↓ → G₀FI.[ ι.θ x ] ≡ G₀FI.tʰ → ⊥)
           → Beta x
         absurdBeta ¬c ¬t =
           mkBeta
-            (λ kx → ⊥e (¬c (θ-con-kind kx)))
-            (λ kx → ⊥e (¬t (θ-ty-kind kx)))
+            (λ kx → ⊥e (¬c (θ-con↓ kx) (θ-con-kind kx)))
+            (λ kx → ⊥e (¬t (θ-ty↓ kx) (θ-ty-kind kx)))
 
         βA : DispAlgebra ℓA'
         module βA = DispAlgebra βA
         βA .CT x = Beta x
         βA .[] x β = absurdBeta ¬c ¬t
           where
-          -- p : ∀ kx → G₀FI.[ G₀FI.[ ι.θ x ] ] ≡ G₀FI.cʰ 
-          -- p kx = 
-          --   G₀FI.[ G₀FI.[ ι.θ x ] ]
-          --     ≡⟨ cong G₀FI.[_] (sym ι.[ x ]) ⟩
-          --   G₀FI.[ ι.θ I.[ x ] ]
-          --     ≡⟨ sym ι.[ I.[ x ] ] ⟩
-          --   ι.θ I.[ I.[ x ] ]
-          --     ≡⟨ cong ι.θ kx ⟩
-          --   ι.θ I.ĉ
-          --     ≡⟨ ι.ĉ ⟩
-          --   G₀FI.cʰ ∎
-          -- [θx]↓ : G₀FI.[ ι.θ x ] ↓
-          -- [θx]↓ = G₀FI.con↓ G₀FI.[ ι.θ x ] p
-          -- θx↓ : ι.θ x ↓
-          -- θx↓ = G₀FI.[]⁻ (ι.θ x) [θx]↓
-          [[x]]≡kʰ : ι.θ x ↓ → G₀FI.[ ι.θ I.[ x ] ] ≡ G₀FI.kʰ
-          [[x]]≡kʰ θx↓ =
+          θx↓ : ι.θ I.[ x ] ↓ → ι.θ x ↓
+          θx↓ θ[x]↓ = G₀FI.[]⁻ (ι.θ x) (transp↓ (ι.[ x ]) θ[x]↓)
+          [[x]]≡kʰ : ι.θ I.[ x ] ↓ → G₀FI.[ ι.θ I.[ x ] ] ≡ G₀FI.kʰ
+          [[x]]≡kʰ θ[x]↓ =
             G₀FI.[ ι.θ I.[ x ] ]
               ≡⟨ cong G₀FI.[_] (ι.[ x ]) ⟩
             G₀FI.[ G₀FI.[ ι.θ x ] ]
-              ≡⟨ G₀FI.[[x]]≡kʰ (ι.θ x) θx↓ ⟩
+              ≡⟨ G₀FI.[[x]]≡kʰ (ι.θ x) (θx↓ θ[x]↓) ⟩
             G₀FI.kʰ ∎
-          ¬c : G₀FI.[ ι.θ I.[ x ] ] ≢ G₀FI.cʰ
-          ¬c k[x] = ⊥e (G₀FI.kʰ≢cʰ (trans (sym (G₀FI.[[x]]≡kʰ (ι.θ x) {!!})) {!!}))
-          ¬t : G₀FI.[ ι.θ I.[ x ] ] ≢ G₀FI.tʰ
-        βA .[] x β .tyβ kx = {!!}
-        βA .ĉ .conβ kx =
-          ⊥e (G₀FI.kʰ≢cʰ (trans (sym G₀FI.kĉ) p))
+          ¬c : ι.θ I.[ x ] ↓ → G₀FI.[ ι.θ I.[ x ] ] ≡ G₀FI.cʰ → ⊥
+          ¬c θ[x]↓ k[x] = G₀FI.kʰ≢cʰ (trans (sym ([[x]]≡kʰ θ[x]↓)) k[x])
+          ¬t : ι.θ I.[ x ] ↓ → G₀FI.[ ι.θ I.[ x ] ] ≡ G₀FI.tʰ → ⊥
+          ¬t θ[x]↓ k[x] = G₀FI.kʰ≢tʰ (trans (sym ([[x]]≡kʰ θ[x]↓)) k[x])
+        βA .ĉ = absurdBeta ¬c ¬t
           where
-          p : G₀FI.[ G₀FI.cʰ ] ≡ G₀FI.cʰ
-          p = 
-            G₀FI.[ G₀FI.cʰ ]
-              ≡⟨ cong G₀FI.[_] (sym ι.ĉ) ⟩
-            G₀FI.[ ι.θ I.ĉ ]
-              ≡⟨ sym ι.[ I.ĉ ] ⟩
-            ι.θ I.[ I.ĉ ]
-              ≡⟨ cong ι.θ kx ⟩
-            ι.θ I.ĉ
-              ≡⟨ ι.ĉ ⟩
-            G₀FI.cʰ ∎
-        βA .ĉ .tyβ = {!!}
+          kind : G₀FI.[ ι.θ I.ĉ ] ≡ G₀FI.kʰ
+          kind = trans (cong G₀FI.[_] ι.ĉ) G₀FI.kĉ
+          ¬c : ι.θ I.ĉ ↓ → G₀FI.[ ι.θ I.ĉ ] ≡ G₀FI.cʰ → ⊥
+          ¬c _ kc = G₀FI.kʰ≢cʰ (trans (sym kind) kc)
+          ¬t : ι.θ I.ĉ ↓ → G₀FI.[ ι.θ I.ĉ ] ≡ G₀FI.tʰ → ⊥
+          ¬t _ kt = G₀FI.kʰ≢tʰ (trans (sym kind) kt)
         βA .t̂ = absurdBeta ¬c ¬t
           where
-          ¬c : G₀FI.[ ι.θ I.t̂ ] ≢ G₀FI.cʰ
-          ¬t : G₀FI.[ ι.θ I.t̂ ] ≢ G₀FI.tʰ
-        βA .k̂ = {!!}
+          kind : G₀FI.[ ι.θ I.t̂ ] ≡ G₀FI.kʰ
+          kind = trans (cong G₀FI.[_] ι.t̂) G₀FI.kt̂
+          ¬c : ι.θ I.t̂ ↓ → G₀FI.[ ι.θ I.t̂ ] ≡ G₀FI.cʰ → ⊥
+          ¬c _ kc = G₀FI.kʰ≢cʰ (trans (sym kind) kc)
+          ¬t : ι.θ I.t̂ ↓ → G₀FI.[ ι.θ I.t̂ ] ≡ G₀FI.tʰ → ⊥
+          ¬t _ kt = G₀FI.kʰ≢tʰ (trans (sym kind) kt)
+        βA .k̂ = absurdBeta ¬c ¬t
+          where
+          kind : G₀FI.[ ι.θ I.k̂ ] ≡ G₀FI.kʰ
+          kind = trans (cong G₀FI.[_] ι.k̂) G₀FI.kk̂
+          ¬c : ι.θ I.k̂ ↓ → G₀FI.[ ι.θ I.k̂ ] ≡ G₀FI.cʰ → ⊥
+          ¬c _ kc = G₀FI.kʰ≢cʰ (trans (sym kind) kc)
+          ¬t : ι.θ I.k̂ ↓ → G₀FI.[ ι.θ I.k̂ ] ≡ G₀FI.tʰ → ⊥
+          ¬t _ kt = G₀FI.kʰ≢tʰ (trans (sym kind) kt)
         βA .kk̂ = isPropBeta* I.kk̂ (βA.[] I.k̂ βA.k̂) βA.k̂
         βA .kĉ = isPropBeta* I.kĉ (βA.[] I.ĉ βA.ĉ) βA.k̂
         βA .kt̂ = isPropBeta* I.kt̂ (βA.[] I.t̂ βA.t̂) βA.k̂
-        βA .ty₁ a aβ .conβ kx =
-          ι.θ (I.ty₁ a)
-            ≡⟨ ι.ty₁ a ⟩
-          G₀FI.ty₁ (ι.θ a)
-            ≡⟨ G₀FI.[]≡cʰ-beta (G₀FI.ty₁ (ι.θ a)) p ⟩
-          return (G₀FI.con (G₀FI.[]≡cʰ→Con (G₀FI.ty₁ (ι.θ a)) p))
-            ≡⟨ cong (λ ○ → return (G₀FI.con ○)) q ⟩
-          return (G₀FI.con (I.ty₁ a , kx)) ∎
+        βA .ty₁ a aβ = {!conBeta isCon cβ!}
           where
-          p : G₀FI.[ G₀FI.ty₁ (ι.θ a) ] ≡ G₀FI.cʰ
-          p =
-            G₀FI.[ G₀FI.ty₁ (ι.θ a) ]
-              ≡⟨ cong G₀FI.[_] (sym (ι.ty₁ a)) ⟩
-            G₀FI.[ ι.θ (I.ty₁ a) ]
-              ≡⟨ sym ι.[ (I.ty₁ a) ] ⟩
-            ι.θ I.[ I.ty₁ a ]
-              ≡⟨ cong ι.θ kx ⟩
-            ι.θ I.ĉ
-              ≡⟨ ι.ĉ ⟩
-            G₀FI.cʰ ∎
-          q : G₀FI.[]≡cʰ→Con (G₀FI.ty₁ (ι.θ a)) p
+          isCon : ι.θ (I.ty₁ a) ↓
+            → G₀FI.[ ι.θ (I.ty₁ a) ] ≡ G₀FI.cʰ
+          isCon θty₁a↓ =
+            trans (cong G₀FI.[_] (ι.ty₁ a)) (G₀FI.kty₁ (ι.θ a) ka)
+            where
+            ty₁a↓ : G₀FI.ty₁ (ι.θ a) ↓
+            ty₁a↓ = transp↓ (ι.ty₁ a) θty₁a↓
+            a↓ : ι.θ a ↓
+            a↓ = G₀FI.ty₁⁻ (ι.θ a) ty₁a↓
+            ka : G₀FI.[ ι.θ a ] ≡ G₀FI.tʰ
+            ka = mk≡↓ (G₀FI.[]↓ (ι.θ a) a↓) tt* (ty₁a↓ .∧e₂ .∧e₁)
+          cβ : ∀ kx
+            → G₀FI.[]≡cʰ→Con (ι.θ (I.ty₁ a)) (θ-con-kind kx)
             ≡ (I.ty₁ a , kx)
-          q =
-            G₀FI.[]≡cʰ→Con (G₀FI.ty₁ (ι.θ a)) p
+          cβ kx =
+            G₀FI.[]≡cʰ→Con (ι.θ (I.ty₁ a)) (θ-con-kind kx)
               ≡⟨ dcongsp G₀FI.[]≡cʰ→Con ty₁β ⟩
             G₀FI.[]≡cʰ→Con (return (G₀FI.con (I.ty₁ a , kx))) kreturn
               ≡⟨ refl ⟩
@@ -642,67 +601,209 @@ module _ {ℓA}
             ka = I.kty₁-a a kx
             kreturn : G₀FI.[ return (G₀FI.con (I.ty₁ a , kx)) ] ≡ G₀FI.cʰ
             kreturn = mk≡↓ (∧i tt* , tt*) tt* refl
-            ty₁β : G₀FI.ty₁ (ι.θ a)
+            ty₁β : ι.θ (I.ty₁ a)
               ≡ return (G₀FI.con (I.ty₁ a , kx))
             ty₁β =
               trans
-                (cong G₀FI.ty₁ (aβ .tyβ ka))
-                (mk≡↓ (∧i tt* , ∧i refl , tt*) tt*
-                  (cong G₀FI.con (ΣP≡ _ _ refl)))
-        βA .ty₁ a aβ .tyβ = {!!}
+                (ι.ty₁ a)
+                (trans
+                  (cong G₀FI.ty₁ (aβ .tyβ ka))
+                  (mk≡↓ (∧i tt* , ∧i refl , tt*) tt*
+                    (cong G₀FI.con (ΣP≡ _ _ refl))))
         βA .kty₁ a aβ ka = refl
         βA .kty₁-a a aβ ka =
           isPropBeta* (I.kty₁-a a ka) (βA.[] a aβ) βA.t̂
-        βA .∙ = conBeta'' cβ
+        βA .∙ = conBeta isCon cβ
           where
-          cβ : ι.θ I.∙ ↓
-            → I.[ I.∙ ] ≡ I.ĉ
-            ∧ᵖ (λ kx → G₀FI.[]≡cʰ→Con (ι.θ I.∙) (θ-con-kind kx) ≡ (I.∙ , kx))
-          cβ θ∙↓ = ∧i I.k∙ , p
+          isCon : ι.θ I.∙ ↓ → G₀FI.[ ι.θ I.∙ ] ≡ G₀FI.cʰ
+          isCon _ = trans (cong G₀FI.[_] ι.∙) G₀FI.k∙
+          cβ : (k∙ : I.[ I.∙ ] ≡ I.ĉ) → ι.θ I.∙ ≡ return (G₀FI.con (I.∙ , k∙))
+          cβ k∙ = ι.∙
+        βA .k∙ = isPropBeta* I.k∙ (βA.[] I.∙ βA.∙) βA.ĉ
+        βA .▷ γ a γβ aβ = conBeta isCon cβ
+          where
+          isCon : ι.θ (I.▷ γ a) ↓ → G₀FI.[ ι.θ (I.▷ γ a) ] ≡ G₀FI.cʰ
+          isCon θ▷↓ =
+            G₀FI.[ ι.θ (I.▷ γ a) ]
+              ≡⟨ cong G₀FI.[_] (ι.▷ γ a kγ ka a₁) ⟩
+            G₀FI.[ G₀FI.▷ (ι.θ γ) (ι.θ a) ]
+              ≡⟨ {!!} ⟩
+            G₀FI.cʰ ∎
             where
-            γ : F₀I.Con
-            γ = G₀FI.[]≡cʰ→Con (ι.θ I.∙) (θ-con-kind I.k∙)
-            γ₀ : I.CT
-            γ₀ = γ .fst
-            kγ : I.[ γ .fst ] ≡ I.ĉ
-            kγ = γ .snd
-            p : G₀FI.[]≡cʰ→Con (ι.θ I.∙) (θ-con-kind I.k∙) ≡ (I.∙ , I.k∙)
-            p =
-              G₀FI.[]≡cʰ→Con (ι.θ I.∙) (θ-con-kind I.k∙)
-                ≡⟨ refl ⟩
-              G₀FI.[]₀≡ĉ→con {G₀FI.con γ} refl .fst
-                ≡⟨ refl ⟩
-              γ₀ , kγ
-                ≡⟨ {!ΣP≡ _ _ ?!} ⟩
-              I.∙ , I.k∙ ∎
-        βA .k∙ = {!!}
-        βA .▷ = {!!}
-        βA .k▷ = {!!}
-        βA .▷-γ = {!!}
-        βA .▷-a = {!!}
-        βA .▷-a₁ = {!!}
-        βA .u = {!!}
-        βA .ku = {!!}
-        βA .u₁ = {!!}
-        βA .u-γ = {!!}
-        βA .π = {!!}
-        βA .kπ = {!!}
-        βA .π₁ = {!!}
-        βA .π-γ = {!!}
-        βA .π-a = {!!}
-        βA .π-a₁ = {!!}
-        βA .π-b = {!!}
-        βA .π-b₁ = {!!}
-        βA .σ = {!!}
-        βA .kσ = {!!}
-        βA .σ₁ = {!!}
-        βA .σ-γ = {!!}
-        βA .σ-a = {!!}
-        βA .σ-a₁ = {!!}
-        βA .σ-b = {!!}
-        βA .σ-b₁ = {!!}
-        βA .σ▷ = {!!}
-        βA .σπ = {!!}
+            θγ↓ : ι.θ γ ≡ return {!!} 
+            θγ↓ = {!!}
+            kγ : I.[ γ ] ≡ I.ĉ
+            kγ = {!!}
+            ka : {!!}
+            ka = {!!}
+            a₁ : {!!}
+            a₁ = {!!}
+          -- cβ : (k▷ : I.[ I.▷ γ a ] ≡ I.ĉ)
+          --   → G₀FI.[]≡cʰ→Con (ι.θ (I.▷ γ a)) (θ-con-kind k▷) ≡ (I.▷ γ a , k▷)
+          -- cβ k▷ =
+          --   ι.θ (I.▷ γ a)
+          --     ≡⟨ ι.▷ γ a kγ ka a₁ ⟩
+          --   G₀FI.▷ (ι.θ γ) (ι.θ a)
+          --     ≡⟨ cong₂ G₀FI.▷ (γβ .conβ kγ) (aβ .tyβ ka) ⟩
+          --   G₀FI.▷ (return (G₀FI.con (γ , kγ)))
+          --           (return (G₀FI.ty (a , ka)))
+          --     ≡⟨ G₀FI.▷≡return
+          --           (G₀FI.con (γ , kγ))
+          --           (G₀FI.ty (a , ka))
+          --           refl refl (cong G₀FI.con (ΣP≡ _ _ a₁)) ⟩
+          --   return (G₀FI.con (I.▷ γ a , k▷)) ∎
+          --   where
+          --   kγ : I.[ γ ] ≡ I.ĉ
+          --   kγ = I.▷-γ γ a k▷
+          --   ka : I.[ a ] ≡ I.t̂
+          --   ka = I.▷-a γ a k▷
+          --   a₁ : I.ty₁ a ≡ γ
+          --   a₁ = I.▷-a₁ γ a k▷
+          cβ : (k▷ : I.[ I.▷ γ a ] ≡ I.ĉ)
+            → ι.θ (I.▷ γ a) ≡ return (G₀FI.con (I.▷ γ a , k▷))
+          cβ k▷ =
+            ι.θ (I.▷ γ a)
+              ≡⟨ ι.▷ γ a kγ ka a₁ ⟩
+            G₀FI.▷ (ι.θ γ) (ι.θ a)
+              ≡⟨ cong₂ G₀FI.▷ (γβ .conβ kγ) (aβ .tyβ ka) ⟩
+            G₀FI.▷ (return (G₀FI.con (γ , kγ)))
+                    (return (G₀FI.ty (a , ka)))
+              ≡⟨ G₀FI.▷≡return
+                    (G₀FI.con (γ , kγ))
+                    (G₀FI.ty (a , ka))
+                    refl refl (cong G₀FI.con (ΣP≡ _ _ a₁)) ⟩
+            return (G₀FI.con (I.▷ γ a , k▷)) ∎
+            where
+            kγ : I.[ γ ] ≡ I.ĉ
+            kγ = I.▷-γ γ a k▷
+            ka : I.[ a ] ≡ I.t̂
+            ka = I.▷-a γ a k▷
+            a₁ : I.ty₁ a ≡ γ
+            a₁ = I.▷-a₁ γ a k▷
+        βA .k▷ γ a γβ aβ kγ ka a₁ =
+          isPropBeta* (I.k▷ γ a kγ ka a₁)
+            (βA.[] (I.▷ γ a) (βA.▷ γ a γβ aβ)) βA.ĉ
+        βA .▷-γ γ a γβ k▷ =
+          isPropBeta* (I.▷-γ γ a k▷) (βA.[] γ γβ) βA.ĉ
+        βA .▷-a γ a aβ k▷ =
+          isPropBeta* (I.▷-a γ a k▷) (βA.[] a aβ) βA.t̂
+        βA .▷-a₁ γ a γβ aβ k▷ =
+          isPropBeta* (I.▷-a₁ γ a k▷) (βA.ty₁ a aβ) γβ
+        βA .u γ γβ = mkBeta {!!} tβ
+          where
+          tβ : (ku : I.[ I.u γ ] ≡ I.t̂)
+            → ι.θ (I.u γ) ≡ return (G₀FI.ty (I.u γ , ku))
+          tβ ku =
+            ι.θ (I.u γ)
+              ≡⟨ ι.u γ kγ ⟩
+            G₀FI.u (ι.θ γ)
+              ≡⟨ cong G₀FI.u (γβ .conβ kγ) ⟩
+            G₀FI.u (return (G₀FI.con (γ , kγ)))
+              ≡⟨ G₀FI.u≡return (G₀FI.con (γ , kγ)) refl ⟩
+            return (G₀FI.ty (I.u γ , ku)) ∎
+            where
+            kγ : I.[ γ ] ≡ I.ĉ
+            kγ = I.u-γ γ ku
+        βA .ku γ γβ kγ =
+          isPropBeta* (I.ku γ kγ) (βA.[] (I.u γ) (βA.u γ γβ)) βA.t̂
+        βA .u₁ γ γβ kγ =
+          isPropBeta* (I.u₁ γ kγ) (βA.ty₁ (I.u γ) (βA.u γ γβ)) γβ
+        βA .u-γ γ γβ ku =
+          isPropBeta* (I.u-γ γ ku) (βA.[] γ γβ) βA.ĉ
+        βA .π γ a b γβ aβ bβ = mkBeta {!!} tβ
+          where
+          tβ : (kπ : I.[ I.π γ a b ] ≡ I.t̂)
+            → ι.θ (I.π γ a b) ≡ return (G₀FI.ty (I.π γ a b , kπ))
+          tβ kπ =
+            ι.θ (I.π γ a b)
+              ≡⟨ ι.π γ a b kγ ka a₁ kb b₁ ⟩
+            G₀FI.π (ι.θ γ) (ι.θ a) (ι.θ b)
+              ≡⟨ cong₃ G₀FI.π (γβ .conβ kγ) (aβ .tyβ ka) (bβ .tyβ kb) ⟩
+            G₀FI.π (return (G₀FI.con (γ , kγ)))
+                    (return (G₀FI.ty (a , ka)))
+                    (return (G₀FI.ty (b , kb)))
+              ≡⟨ G₀FI.π≡return
+                    (G₀FI.con (γ , kγ))
+                    (G₀FI.ty (a , ka))
+                    (G₀FI.ty (b , kb))
+                    refl refl (cong G₀FI.con (ΣP≡ _ _ a₁))
+                    refl (cong G₀FI.con (ΣP≡ _ _ b₁)) ⟩
+            return (G₀FI.ty (I.π γ a b , kπ)) ∎
+            where
+            kγ = I.π-γ γ a b kπ
+            ka = I.π-a γ a b kπ
+            a₁ = I.π-a₁ γ a b kπ
+            kb = I.π-b γ a b kπ
+            b₁ = I.π-b₁ γ a b kπ
+        βA .kπ γ a b γβ aβ bβ kγ ka a₁ kb b₁ =
+          isPropBeta* (I.kπ γ a b kγ ka a₁ kb b₁)
+            (βA.[] (I.π γ a b) (βA.π γ a b γβ aβ bβ)) βA.t̂
+        βA .π₁ γ a b γβ aβ bβ kπ =
+          isPropBeta* (I.π₁ γ a b kπ)
+            (βA.ty₁ (I.π γ a b) (βA.π γ a b γβ aβ bβ)) γβ
+        βA .π-γ γ a b γβ kπ =
+          isPropBeta* (I.π-γ γ a b kπ) (βA.[] γ γβ) βA.ĉ
+        βA .π-a γ a b aβ kπ =
+          isPropBeta* (I.π-a γ a b kπ) (βA.[] a aβ) βA.t̂
+        βA .π-a₁ γ a b γβ aβ kπ =
+          isPropBeta* (I.π-a₁ γ a b kπ) (βA.ty₁ a aβ) γβ
+        βA .π-b γ a b bβ kπ =
+          isPropBeta* (I.π-b γ a b kπ) (βA.[] b bβ) βA.t̂
+        βA .π-b₁ γ a b γβ aβ bβ kπ =
+          isPropBeta* (I.π-b₁ γ a b kπ) (βA.ty₁ b bβ)
+            (βA.▷ γ a γβ aβ)
+        βA .σ γ a b γβ aβ bβ = mkBeta {!!} tβ
+          where
+          tβ : (kσ : I.[ I.σ γ a b ] ≡ I.t̂)
+            → ι.θ (I.σ γ a b) ≡ return (G₀FI.ty (I.σ γ a b , kσ))
+          tβ kσ =
+            ι.θ (I.σ γ a b)
+              ≡⟨ ι.σ γ a b kγ ka a₁ kb b₁ ⟩
+            G₀FI.σ (ι.θ γ) (ι.θ a) (ι.θ b)
+              ≡⟨ cong₃ G₀FI.σ (γβ .conβ kγ) (aβ .tyβ ka) (bβ .tyβ kb) ⟩
+            G₀FI.σ (return (G₀FI.con (γ , kγ)))
+                    (return (G₀FI.ty (a , ka)))
+                    (return (G₀FI.ty (b , kb)))
+              ≡⟨ G₀FI.σ≡return
+                    (G₀FI.con (γ , kγ))
+                    (G₀FI.ty (a , ka))
+                    (G₀FI.ty (b , kb))
+                    refl refl (cong G₀FI.con (ΣP≡ _ _ a₁))
+                    refl (cong G₀FI.con (ΣP≡ _ _ b₁)) ⟩
+            return (G₀FI.ty (I.σ γ a b , kσ)) ∎
+            where
+            kγ = I.σ-γ γ a b kσ
+            ka = I.σ-a γ a b kσ
+            a₁ = I.σ-a₁ γ a b kσ
+            kb = I.σ-b γ a b kσ
+            b₁ = I.σ-b₁ γ a b kσ
+        βA .kσ γ a b γβ aβ bβ kγ ka a₁ kb b₁ =
+          isPropBeta* (I.kσ γ a b kγ ka a₁ kb b₁)
+            (βA.[] (I.σ γ a b) (βA.σ γ a b γβ aβ bβ)) βA.t̂
+        βA .σ₁ γ a b γβ aβ bβ kσ =
+          isPropBeta* (I.σ₁ γ a b kσ)
+            (βA.ty₁ (I.σ γ a b) (βA.σ γ a b γβ aβ bβ)) γβ
+        βA .σ-γ γ a b γβ kσ =
+          isPropBeta* (I.σ-γ γ a b kσ) (βA.[] γ γβ) βA.ĉ
+        βA .σ-a γ a b aβ kσ =
+          isPropBeta* (I.σ-a γ a b kσ) (βA.[] a aβ) βA.t̂
+        βA .σ-a₁ γ a b γβ aβ kσ =
+          isPropBeta* (I.σ-a₁ γ a b kσ) (βA.ty₁ a aβ) γβ
+        βA .σ-b γ a b bβ kσ =
+          isPropBeta* (I.σ-b γ a b kσ) (βA.[] b bβ) βA.t̂
+        βA .σ-b₁ γ a b γβ aβ bβ kσ =
+          isPropBeta* (I.σ-b₁ γ a b kσ) (βA.ty₁ b bβ)
+            (βA.▷ γ a γβ aβ)
+        βA .σ▷ γ a b γβ aβ bβ kγ ka a₁ kb b₁ =
+          isPropBeta* (I.σ▷ γ a b kγ ka a₁ kb b₁)
+            (βA.▷ (I.▷ γ a) b (βA.▷ γ a γβ aβ) bβ)
+            (βA.▷ γ (I.σ γ a b) γβ (βA.σ γ a b γβ aβ bβ))
+        βA .σπ γ a b c γβ aβ bβ cβ kγ ka a₁ kb b₁ kc c₁ =
+          isPropBeta* (I.σπ γ a b c kγ ka a₁ kb b₁ kc c₁)
+            (βA.π γ a (I.π (I.▷ γ a) b c)
+              γβ aβ (βA.π (I.▷ γ a) b c (βA.▷ γ a γβ aβ) bβ cβ))
+            (βA.π γ (I.σ γ a b) c
+              γβ (βA.σ γ a b γβ aβ bβ) cβ)
 {-
         βA .CT = Beta
         βA .[] x β .conβ kx = ⊥e {!G₀FI.[[x]]≢cʰ {ι.θ x} q!}
