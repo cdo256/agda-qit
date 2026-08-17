@@ -1,0 +1,1849 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage[]{natbib}
+\bibliographystyle{plainnat}
+\newcommand{\bigsqcap}{\mathop{\Large\sqcap}\limits}
+\usepackage{stmaryrd}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Constructing quotient inductive types from ordinals},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Constructing quotient inductive types from ordinals}
+\author{\shortstack{Thorsten Altenkirch and Christina O'Donnell\tabularnewline University of Nottingham}}
+\date{}
+
+\begin{document}
+\maketitle
+
+\subsection{Abstract}\label{abstract}
+
+Quotient inductive types extend inductive types with equations between
+constructors, supporting definitions such as multisets, infinitary
+unordered trees, extensional ordinals, and internal syntax. Although
+such types are readily specified, their construction from more
+elementary type formers is subtle: existing constructions of general
+infinitary QW-types use the Weakly Initial Set of Covers axiom to
+establish a cocontinuity property.
+
+We construct a class of infinitary QW-types, including mobiles, finite
+multisets, and the cumulative hierarchy of extensional sets, from
+W-types and quotients relative to an extensional plump ordinal basis,
+without assuming WISC. Our construction applies to depth-preserving
+signatures, whose equations preserve an ordinal-valued rank on terms.
+This rank descends through the quotient and yields a section of the
+canonical map associated with the colimit of the inflationary iteration,
+thereby establishing the required cocontinuity.
+
+More generally, we isolate the existence of such a section as the
+semantic criterion underlying the construction. Depth preservation
+provides a syntactic sufficient condition, while normalising and
+finitary presentations give further instances of the same principle.
+
+\section{1. Introduction}\label{introduction}
+
+Inductive types provide a fundamental method for defining mathematical
+objects in dependent type theory. Their constructors generate the
+elements of a type freely, giving rise to recursion and induction
+principles. Many natural definitions, however, are not free: their
+constructors must additionally satisfy equations. Quotient inductive
+types (QITs) extend inductive types by allowing such equations to be
+specified alongside the constructors
+\citep{altenkirch2016-type-theory-qit}. Examples include finite
+multisets, permutation-invariant infinitary trees, extensional ordinals,
+cumulative hierarchies of extensional sets, and internal representations
+of the syntax of type theory. They can also be understood as the
+set-truncated fragment of higher inductive types.
+
+Although QITs are readily specified, it is not generally clear whether
+they can be constructed from more elementary type formers. In classical
+set theory, an equational inductive type can often be obtained by first
+constructing the corresponding type of raw well-founded trees and then
+quotienting by the equations. Constructively, this procedure need not
+produce the required initial algebra. The difficulty is particularly
+apparent for infinitary signatures: defining the algebra structure on
+the quotient can require the simultaneous choice of representatives for
+an entire family of quotient elements.
+
+Fiore, Pitts and Steenkamp isolate a broad algebraic class of QITs
+called QW-types, and its indexed generalisation, QWI-types. A QW-type is
+the initial algebra for an equational theory whose operations may have
+infinitary arities. They show that QW-types can be constructed from
+W-types and quotients in the presence of the Weakly Initial Set of
+Covers axiom (WISC) \citep{fiore2022-quotient-inductive}. W-types
+originate in Martin-Löf's constructive type theory
+\citep{martin-lof1984-mltt}. WISC appears as a collection principle in
+site-theoretic and realizability settings
+\citep{roberts2012-internal-categories, streicher2005-wisc}. Their
+construction uses \emph{inflationary iteration}
+\citep{pitts2021-inflationary-iteration}: rather than forming a single
+quotient of the type of raw terms, it constructs a diagram of successive
+approximations in which applications of constructors and equations are
+introduced stage by stage. The required QW-type is then obtained as the
+colimit of this diagram.
+
+The central issue in this construction is a cocontinuity property. Let
+\(F\) be the polynomial functor determined by the operations of a
+QW-signature, represented by a container in the sense of Abbott,
+Altenkirch and Ghani \citep{abbott2005-container-derivative}, and let
+\(D\) be the diagram of approximations. There is a canonical map
+
+\[
+\kappa_D :
+\mathrm{colim}_i F (D_i)
+\longrightarrow
+F \left(\mathrm{colim}_i D_i\right).
+\]
+
+To equip the colimit with the required algebra structure, one must lift
+a family of elements of the colimit to some common stage of the diagram.
+For infinitary operations, there need not be an evident stage containing
+representatives of every member of the family. WISC is used by Fiore,
+Pitts and Steenkamp to construct a sufficiently rich notion of size and
+to prove the corresponding cocontinuity result.
+
+The obstruction can be seen concretely in the QW-type of \emph{mobiles}.
+Informally, a mobile is a well-founded countably branching tree whose
+children are unordered. It is generated by an operation
+\(\mathsf{node} : (\mathbb{N} \to M) \to M\) subject to equations
+identifying \(\mathsf{node} (f)\) and \(\mathsf{node} (f \circ \pi)\)
+for every permutation \(\pi\) of \(\mathbb{N}\). To place
+\(\mathsf{node} (f)\) at a stage of an inflationary construction, we
+must find a stage containing all the children \(f (n)\). But elements of
+the colimit are represented by elements at possibly different stages,
+and quotienting removes the particular representatives from which such
+stage information might be recovered. Moreover, two enumerations
+representing the same unordered family need not induce definitionally
+equal sizes when sizes are themselves inductively generated. Thus the
+desired stage assignment must be invariant under the equations of the
+QW-type.
+
+In this paper, we obtain such an invariant stage assignment from an
+\emph{extensional plump ordinal basis}. Plump ordinals provide
+sufficiently large upper bounds for families of smaller ordinals, while
+extensionality ensures that an ordinal is determined by its strict
+predecessors. Consequently, the rank assigned to an infinitary
+constructor can depend extensionally on the ranks of its arguments,
+rather than on a particular enumeration or representation of those
+arguments.
+
+Swan's W-types with reductions provide a related extension of polynomial
+initial algebras and connect them to the small object argument
+\citep{swan2018-w-types-reductions}. His later ZF construction of
+image-preserving higher inductive types similarly obtains
+representative-independent stages without choice
+\citep{swan2022-hits-in-zf}.
+
+We identify a syntactic class of equational theories for which this rank
+is compatible with the quotient. We call these theories
+\emph{depth-preserving}. Roughly, an equation is depth-preserving when
+its two sides assign the same construction depth to every substitution
+instance. The recursively defined rank on raw terms is therefore
+invariant under the generating equations and descends to the quotient.
+
+Our first main result may be stated informally as follows.
+
+\begin{quote}
+\textbf{Theorem.} Let \(\Sigma\) be a depth-preserving QW-signature, and
+suppose that there is an extensional plump ordinal basis closed under
+the arities of \(\Sigma\). Then the QW-type presented by \(\Sigma\) can
+be constructed from W-types and quotients by inflationary iteration,
+without use of WISC.
+\end{quote}
+
+The descended rank assigns to every element of the quotient a canonical
+stage at which it can be represented. Applying this rank to an element
+of \(F \left(\mathrm{colim}_i D_i\right)\) produces a stage containing a
+lift of all its arguments. This defines a map
+
+\[
+\sigma_D :
+F \left(\mathrm{colim}_i D_i\right)
+\longrightarrow
+\mathrm{colim}_i F (D_i)
+\] such that \(\kappa_D \circ \sigma_D = \mathsf{id}\).
+
+Thus \(\sigma_D\) is a section of the canonical map \(\kappa_D\). This
+section supplies precisely the lifting operation required in the
+cocontinuity argument and hence allows the inflationary construction to
+proceed. The class of depth-preserving signatures includes mobiles,
+standard presentations of finite multisets, and the cumulative hierarchy
+of extensional sets.
+
+The semantic criterion is the existence of a coherent section of
+\(\kappa_D\). Depth preservation supplies one syntactic route to such a
+section; normal forms and finitary branching supply others. This
+separates the stage information required by inflationary iteration from
+the particular mechanism used to obtain it.
+
+The remainder of the paper is organised as follows. We first recall
+QW-signatures, their algebras, and the inflationary construction of
+Fiore, Pitts and Steenkamp. We then introduce extensional plump ordinals
+and explain their role as representative-independent construction
+stages. Next, we define depth-preserving signatures and prove that their
+structural ranks descend through the generated equations. We use these
+ranks to construct a section of the canonical colimit map and derive the
+existence of the corresponding QW-types. Finally, we discuss alternative
+sufficient conditions, including normalisation and finitary branching,
+and the prospects for a broader syntactic characterisation of
+sectionability.
+
+\section{2. Motivating examples}\label{motivating-examples}
+
+Three examples delimit the intended class. Their depth-preservation
+proofs are given uniformly in Section 6.4.
+
+\subsection{2.1 Finite multisets}\label{finite-multisets}
+
+For a type \(A\), finite multisets are lists quotiented by permutations,
+generated by \(\mathsf{nil}:M (A)\) and
+\(\mathsf{cons}:A\to M (A)\to M (A)\). Adjacent transpositions impose
+\(\mathsf{cons} (a,\mathsf{cons} (b,x)) = \mathsf{cons} (b,\mathsf{cons} (a,x))\).
+Both sides place \(x\) beneath two constructor layers, so list length
+descends to the quotient. This finitary example does not need ordinal
+lifting, but it isolates the principle that equations must preserve
+enough stage information.
+
+\subsection{2.2 Mobiles}\label{mobiles}
+
+A mobile is a well-founded countably branching tree with unordered
+children. It has a constructor \(\mathsf{node}:(\mathbb{N}\to M)\to M\)
+and equations \(\mathsf{node} (f)=\mathsf{node} (f\circ\pi)\) for
+permutations \(\pi:\mathbb{N}\simeq\mathbb{N}\); an image-based
+presentation identifies any enumerations with the same image.
+Constructing a node requires a common stage for all children, but the
+colimit supplies only pointwise representatives. Moreover, the common
+stage must be independent of their enumeration. An extensional plump
+ordinal resolves both problems: plumpness bounds the family of child
+ranks, and extensionality identifies bounds generated from the same
+image.
+
+\subsection{2.3 The cumulative hierarchy of
+sets}\label{the-cumulative-hierarchy-of-sets}
+
+The cumulative hierarchy \(V\) of the HoTT Book is generated by
+\(\mathsf{set}:(A:\mathcal{U})\to (A\to V)\to V\) and identifies
+\(\mathsf{set} (A,f)\) with \(\mathsf{set} (B,g)\) when \(f\) and \(g\)
+have the same image \citep[sec.~10.5]{hott2013-book}. Since every
+enumerated element occurs immediately below the outer constructor, image
+equality preserves the collection of predecessor ranks. An ordinal basis
+closed under the types in \(\mathcal{U}\) then gives a
+representative-independent stage even for infinitary \(A\). This example
+shows that the method applies to image equations, not only permutations;
+see \citep{eleftheriadis2021-cumulative-hierarchy} for the set-theoretic
+properties of \(V\).
+
+\subsection{2.4 Other examples and
+boundaries}\label{other-examples-and-boundaries}
+
+Reordering, duplication, and extensional reindexing at a fixed
+constructor level are typical depth-preserving operations. The condition
+is sufficient, not necessary: finitary signatures lift finite families
+directly, while normalising signatures may rank canonical normal forms
+even when unit or associativity changes raw depth. Section 8 records
+these established alternatives.
+
+\section{3. QW-types and their construction
+problem}\label{qw-types-and-their-construction-problem}
+
+We now recall the algebraic presentation of QW-types and explain why
+their construction from W-types and quotients is non-trivial. We work in
+a universe \(\mathcal{U}\) of sets equipped with dependent sums,
+dependent products, and W-types \citep{martin-lof1984-mltt}, together
+with effective quotients. The additional extensionality and
+unique-choice assumptions used by the main theorem are stated in Section
+7.
+
+\subsection{3.1 Signatures and
+equations}\label{signatures-and-equations}
+
+A polynomial signature is a pair \(\Sigma = (A,B)\) consisting of a type
+\(A : \mathcal{U}\) of operation symbols and a family
+\(B : A \to \mathcal{U}\) assigning an arity to each operation. An
+element \(a : A\) represents an operation whose arguments are indexed by
+\(B (a)\). No finiteness assumption is made on \(B (a)\).
+
+The signature \(\Sigma\) determines a polynomial endofunctor
+\(S_\Sigma : \mathcal{U} \to \mathcal{U}\), represented by the container
+\((A,B)\) \citep{abbott2005-container-derivative}, and defined by
+\(S_\Sigma (X) = (a:A)\times (B (a) \to X).\)
+
+For a function \(f : X \to Y\), its action is given by
+\(S_\Sigma (f) (a,b) = (a,f \circ b).\)
+
+An \(S_\Sigma\)-algebra is a type \(X : \mathcal{U}\) equipped with a
+structure map \(\alpha : S_\Sigma (X) \to X.\)
+
+Equivalently, \(\alpha\) assigns to each \(a : A\) an operation
+\(\alpha_a : (B (a) \to X) \to X.\)
+
+A morphism from an algebra \((X,\alpha)\) to an algebra \((Y,\beta)\) is
+a function \(h : X \to Y\) satisfying
+\(h (\alpha (a,b)) = \beta (a,h \circ b)\) for every \(a : A\) and
+\(b : B (a) \to X\).
+
+The W-type \(W_\Sigma\) associated with \(\Sigma\) is the initial
+\(S_\Sigma\)-algebra. Its elements may be regarded as closed
+well-founded trees whose nodes are labelled by operations \(a : A\) and
+whose immediate subtrees are indexed by \(B (a)\).
+
+To describe equations, we also require terms containing variables. For
+each type \(X : \mathcal{U}\), let \(T_\Sigma (X)\) be the free
+\(S_\Sigma\)-algebra generated by \(X\). It is inductively generated by
+constructors \(\eta : X \to T_\Sigma (X)\) and
+\(\sigma : S_\Sigma (T_\Sigma (X)) \to T_\Sigma (X).\)
+
+The constructor \(\eta\) inserts a variable, while \(\sigma\) applies an
+operation of the signature to a family of terms. The assignment
+\(T_\Sigma\) is the free monad generated by \(S_\Sigma\).
+
+Given an \(S_\Sigma\)-algebra \((Y,\alpha)\) and a substitution
+\(\rho : X \to Y\), every term \(t : T_\Sigma (X)\) has an
+interpretation \(\llbracket t \rrbracket_{\alpha,\rho} : Y\). This
+interpretation is defined recursively by
+\(\llbracket \eta (x) \rrbracket_{\alpha,\rho} = \rho (x)\) and
+
+\[
+\llbracket \sigma (a,b) \rrbracket_{\alpha,\rho}
+=
+\alpha \left(a,\lambda i.\llbracket b (i) \rrbracket_{\alpha,\rho}\right).
+\]
+
+We also write this interpretation as \(t \mathbin{\gg=} \rho\).
+
+A system of equations over \(\Sigma\) consists of a type
+\(E : \mathcal{U}\) of equation names, a family
+\(V : E \to \mathcal{U}\) of variable contexts, and two families of
+terms \(l,r : (e:E)\to T_\Sigma (V (e)).\)
+
+For each \(e : E\), the terms \(l (e)\) and \(r (e)\) are the two sides
+of the corresponding equation.
+
+An \(S_\Sigma\)-algebra \((X,\alpha)\) satisfies the equation system if,
+for every equation \(e : E\) and every substitution
+\(\rho : V (e) \to X\), we have
+
+\[
+\llbracket l (e) \rrbracket_{\alpha,\rho}
+=
+\llbracket r (e) \rrbracket_{\alpha,\rho}.
+\]
+
+We write this property as \(\mathsf{Sat}_{\Sigma,E} (X,\alpha).\)
+
+A QW-algebra for the presentation \((\Sigma,E,V,l,r)\) is an
+\(S_\Sigma\)-algebra together with a proof that it satisfies all the
+specified equations.
+
+QW-types constitute a set-level fragment of higher inductive types. A
+higher inductive type may have constructors producing points, paths, and
+higher-dimensional paths. A QIT restricts attention to set-truncated
+types and equations between their point constructors. QW-types are the
+algebraic class of QITs presented by possibly infinitary polynomial
+operations and unconditional equations between terms. The subsequent
+construction uses only this algebraic presentation and does not
+otherwise depend on the higher-dimensional interpretation.
+
+\subsection{3.2 QW-types as initial
+algebras}\label{qw-types-as-initial-algebras}
+
+A QW-type for an equational presentation \((\Sigma,E,V,l,r)\) is an
+initial QW-algebra. It consists of a type \(Q\), an algebra structure
+\(\mathsf{intro} : S_\Sigma (Q) \to Q,\) and a proof
+\(\mathsf{equate} : \mathsf{Sat}_{\Sigma,E} (Q,\mathsf{intro}).\)
+
+Initiality states that for every QW-algebra \((X,\alpha,p)\) there is a
+unique algebra morphism \(\mathsf{rec}_{X,\alpha,p} : Q \to X.\)
+
+The morphism preserves the constructors:
+
+\[
+\mathsf{rec}_{X,\alpha,p} (\mathsf{intro} (a,b))
+=
+\alpha (a,\mathsf{rec}_{X,\alpha,p} \circ b).
+\]
+
+Moreover, if \(h : Q \to X\) is any other function satisfying the same
+homomorphism equation, then \(h = \mathsf{rec}_{X,\alpha,p}.\)
+
+This initiality property gives the non-dependent recursion principle of
+the QW-type. Under the usual extensionality assumptions, it also yields
+the expected dependent elimination principle for the associated quotient
+inductive type \citep{fiore2022-quotient-inductive}.
+
+Classically, one might attempt to construct \(Q\) by quotienting the
+W-type \(W_\Sigma\) by the smallest congruence containing all
+substitution instances of the equations. Let
+\(q : W_\Sigma \to W_\Sigma/{\sim}\) denote the resulting quotient map.
+To make the quotient into an \(S_\Sigma\)-algebra, we would need a
+constructor
+
+\[
+\overline{\mathsf{sup}}
+:
+S_\Sigma (W_\Sigma/{\sim})
+\to
+W_\Sigma/{\sim}.
+\]
+
+An input to this constructor consists of an operation \(a : A\) and a
+family \(b : B (a) \to W_\Sigma/{\sim}.\)
+
+The constructor of \(W_\Sigma\) acts only on families of representatives
+\(\widetilde{b} : B (a) \to W_\Sigma.\)
+
+We would therefore like to choose \(\widetilde{b}\) satisfying
+\(q \circ \widetilde{b} = b\) and define
+\(\overline{\mathsf{sup}} (a,b) = q (\mathsf{sup} (a,\widetilde{b})).\)
+
+The congruence ensures that the result is independent of the chosen lift
+once such a lift has been obtained. The problem is that the pointwise
+surjectivity of \(q\) does not construct a lift of the entire family
+\(b\). Such a lift requires a choice principle for families indexed by
+\(B (a)\).
+
+For finitary arities, this obstruction can often be resolved by finite
+choice. For an infinitary arity \(B (a)\), however, the required lifting
+principle may be a genuine additional assumption. In the case of
+mobiles, for example, lifting a family
+\(\mathbb{N} \to W_\Sigma/{\sim}\) through \(q\) has the form of
+countable choice
+\citep{altenkirch2016-type-theory-qit, fiore2022-quotient-inductive}.
+
+Categorically, the problem is that the polynomial functor \(S_\Sigma\)
+need not preserve quotient maps constructively. The quotient map \(q\)
+induces
+\(S_\Sigma (q) : S_\Sigma (W_\Sigma) \to S_\Sigma (W_\Sigma/{\sim}),\)
+but the surjectivity of \(q\) does not imply the surjectivity of
+\(S_\Sigma (q)\) without an appropriate choice principle. Consequently,
+the constructor on \(W_\Sigma\) cannot in general be transported
+directly across the quotient.
+
+Inflationary iteration avoids asking for all representatives at once.
+Instead, it interleaves applications of the polynomial functor with
+quotients and forms the candidate QW-type as a colimit of successive
+approximations. This replaces the lifting problem for a single quotient
+by the problem of showing that \(S_\Sigma\) interacts appropriately with
+the resulting colimit. As Section 4.3 explains, this is the cocontinuity
+problem addressed by both the WISC-based construction and our
+ordinal-rank construction.
+
+\subsection{3.3 Choice strength}\label{choice-strength}
+
+The difficulty above is not merely an artefact of a particular
+construction. General infinitary equational theories can have genuine
+choice-theoretic strength.
+
+Blass constructed an infinitary equational theory whose free algebras
+cannot be proved to exist in ZF set theory without the Axiom of Choice
+\citep{blass1983-free-algebra-coequalizer}. Lumsdaine and Shulman
+reformulated this theory as a higher inductive type and showed that the
+corresponding general existence claim is likewise not provable in ZF
+without choice \citep[sec.~9]{lumsdaine2018-higher-inductive-types}.
+Thus sufficiently general schemas of infinitary higher or quotient
+inductive types are strictly stronger than the unconditional combination
+of ordinary inductive types and quotients in a choice-free setting.
+
+This result does not imply that every infinitary QW-type requires
+choice. The obstruction depends on the interaction between the
+infinitary operations and their equations. Mobiles and the cumulative
+hierarchy, for example, have infinitary constructors, but their
+equations preserve structural depth. Their elements therefore carry
+invariant rank information that is absent from arbitrary infinitary
+presentations.
+
+Fiore, Pitts and Steenkamp show that WISC suffices to construct all
+QW-types, and more generally QWI-types, covered by their schema
+\citep{fiore2022-quotient-inductive}. WISC is substantially weaker than
+the full Axiom of Choice and is valid in many constructive models.
+Nevertheless, the Blass example shows that some additional restriction
+or set-theoretic principle is unavoidable for a completely general
+construction.
+
+Our aim is therefore not to construct every infinitary QW-type without
+choice. Instead, we identify presentations for which the lifting
+required by inflationary iteration can be obtained from intrinsic
+structural information. The semantic condition is the existence of a
+section of the canonical polynomial-colimit map. Depth preservation
+supplies a syntactic condition under which such a section can be
+constructed from an extensional plump ordinal basis.
+
+\section{4. Inflationary iteration}\label{inflationary-iteration}
+
+Fiore, Pitts and Steenkamp construct QW-types by an inflationary
+iteration in which the formation of terms is interleaved with
+quotienting by equations \citep{fiore2022-quotient-inductive}. This
+avoids the direct attempt to lift an entire infinitary family through a
+single quotient map. The construction nevertheless requires a
+sufficiently strong cocontinuity property, which is the point at which
+their argument uses WISC.
+
+Throughout this section, fix a polynomial signature \(\Sigma=(A,B)\) and
+an equation system \((E,V,l,r)\) as in Section 3. We write \(T_\Sigma\)
+for the free monad generated by the polynomial functor \(S_\Sigma\).
+
+\subsection{4.1 Size-indexed
+approximants}\label{size-indexed-approximants}
+
+Let \(\mathsf{Size}\) be a type equipped with a well-founded relation
+\(<\). For \(i:\mathsf{Size}\), write
+\({\downarrow i} = (j:\mathsf{Size})\times (j<i)\) for the type of sizes
+strictly below \(i\). We assume that the size structure has the
+upper-bound and successor-like operations specified in Section 5.2.
+
+A size-indexed approximation consists of a family
+\(D : \mathsf{Size} \to \mathcal{U}\) together with operations
+\(\tau_{j,i} : T_\Sigma (D_j) \to D_i\) whenever \(j<i\). The map
+\(\tau_{j,i}\) interprets a term whose variables lie at stage \(j\) as
+an element constructed at the later stage \(i\).
+
+The stage \(D_i\) is defined by well-founded recursion from the stages
+strictly below \(i\). Before quotienting, its elements are pairs
+\((j,t) : (j:\mathsf{Size})\times (j<i)\times T_\Sigma (D_j).\)
+
+Such a pair records a lower stage \(j<i\) together with a term \(t\)
+whose variables have already been constructed at that stage. The next
+approximation is obtained by quotienting these pairs by a relation
+\(R_i\):
+\(D_i = \left( (j:\mathsf{Size})\times (j<i)\times T_\Sigma (D_j) \right)\big/ R_i.\)
+
+We write the equivalence class of \((j,t)\) as \([j,t]_i : D_i.\)
+
+The relation \(R_i\) is generated by three kinds of identification. The
+first imposes the specified equations. For every \(e:E\), every \(j<i\),
+and every substitution \(\rho:V (e)\to D_j\), it identifies
+\([j,T_\Sigma (\rho) (l (e))]_i = [j,T_\Sigma (\rho) (r (e))]_i.\)
+
+The second identification expresses the unit law for the free monad. A
+term inserted as a variable after already being interpreted at a lower
+stage is identified with the original term. Schematically, for \(k<j<i\)
+and \(t:T_\Sigma (D_k)\), it identifies
+\([j,\eta (\tau_{k,j} (t))]_i = [k,t]_i.\)
+
+The third identification expresses compatibility with the multiplication
+of the free monad. Constructing a term of terms and then interpreting
+its inner terms is identified with the corresponding flattened term.
+Equivalently, applying an operation before or after transporting its
+immediate subterms to a later stage gives the same element of the
+quotient.
+
+These three classes of relations correspond respectively to the
+equations of the presentation, the unit law, and the multiplication law.
+Their inclusion ensures that the colimit will satisfy the specified
+equations and carry an algebra for the free monad \(T_\Sigma\), and
+hence an algebra for \(S_\Sigma\).
+
+For every \(j<i\), the structure operation is defined by
+\(\tau_{j,i} (t) = [j,t]_i.\)
+
+If \(i<j\), the transition map \(\delta_{i,j} : D_i \to D_j\) is
+obtained by inserting an element as a variable:
+\(\delta_{i,j} = \tau_{i,j}\circ\eta.\)
+
+On representatives, this map simply regards a term constructed below
+\(i\) as the same term occurring below the later stage \(j\):
+\(\delta_{i,j} ([k,t]_i) = [k,t]_j.\)
+
+The relations \(R_i\) ensure that these transition maps are well-defined
+and coherent. In particular, whenever \(i<j<k\), we have
+\(\delta_{j,k}\circ\delta_{i,j} = \delta_{i,k}.\)
+
+Thus \((D,\delta)\) forms a diagram indexed by \(\mathsf{Size}\). The
+use of well-founded recursion separates the construction of a stage from
+the quotients being formed at that stage and avoids treating quotient
+formation as a strictly positive operation.
+
+This construction is \emph{inflationary} because a stage contains terms
+formed over all strictly smaller stages rather than only terms formed
+over one immediately preceding stage. At a limit-like size, the
+construction can therefore use everything constructed below that size
+without requiring a separate successor or limit clause.
+
+\subsection{4.2 The colimit
+construction}\label{the-colimit-construction}
+
+The candidate QW-type is the colimit of the diagram of approximants:
+\(Q = \mathrm{colim}_{i:\mathsf{Size}} D_i.\)
+
+Write \(\nu_i : D_i \to Q\) for the canonical colimit maps. These
+satisfy \(\nu_j\circ\delta_{i,j} = \nu_i\) whenever \(i<j\).
+
+Concretely, the colimit can be presented as a quotient of the disjoint
+union of the stages:
+\(Q = \left( (i:\mathsf{Size})\times D_i \right)\big/{\sim},\) where
+\((i,x)\sim (j,y)\) when \(x\) and \(y\) become equal after being
+transported to a sufficiently large common stage. The directedness
+properties of \(\mathsf{Size}\) ensure that such common extensions can
+be found.
+
+The relations imposed at each stage pass to the colimit. In particular,
+whenever a substitution \(\rho:V (e)\to Q\) can be lifted to a common
+stage, the two interpretations of \(l (e)\) and \(r (e)\) are identified
+at a later stage and hence become equal in \(Q\). The unit and
+multiplication relations similarly ensure that the interpretation of
+terms is independent of the stages and representatives used to construct
+them.
+
+To make \(Q\) into an \(S_\Sigma\)-algebra, we require a map
+\(\mathsf{intro} : S_\Sigma (Q) \to Q.\)
+
+At each stage \(D_i\), one can add a new constructor layer at a
+sufficiently later stage. These stagewise operations induce a map
+\(\mu_D : \mathrm{colim}_i S_\Sigma (D_i) \to Q.\)
+
+The map \(\mu_D\) is not yet the desired constructor, because its domain
+consists of operations whose entire family of arguments already lies in
+one stage. An arbitrary element of \(S_\Sigma (Q)\) consists instead of
+an operation whose arguments are given only as elements of the colimit.
+The remaining problem is therefore to lift such a family to a common
+stage.
+
+Once the algebra structure and equation proofs have been constructed,
+the recursor into any other QW-algebra is defined stage by stage by
+well-founded recursion. The compatibility relations make the resulting
+family of maps \(D_i\to X\) into a cocone. The universal property of the
+colimit then produces a map \(Q\to X\), and a second well-founded
+induction establishes its uniqueness. Thus the well-founded size
+structure controls both the formation of the approximants and the
+termination of the recursion defining the universal morphism.
+
+\subsection{4.3 The cocontinuity
+bottleneck}\label{the-cocontinuity-bottleneck}
+
+For any diagram \(D\), functoriality gives a canonical map
+
+\[
+\kappa_D :
+\mathrm{colim}_i S_\Sigma (D_i)
+\longrightarrow
+S_\Sigma \left(\mathrm{colim}_i D_i\right).
+\]
+
+It is induced by the cocone
+\(S_\Sigma (\nu_i) : S_\Sigma (D_i) \to S_\Sigma (Q).\)
+
+An element of the domain of \(\kappa_D\) consists of an operation
+\(a:A\) and a family of arguments \(B (a)\to D_i\) lying in a common
+stage \(i\). An element of its codomain consists of an operation \(a:A\)
+and a family \(b : B (a) \to Q\) whose members may be represented at
+different stages. Surjectivity of \(\kappa_D\) therefore states that
+every such family can be lifted to some common stage.
+
+If \(\kappa_D\) is an isomorphism, the constructor on the colimit is
+obtained as the composite
+
+\[
+S_\Sigma (Q)
+\xrightarrow{\kappa_D^{-1}}
+\mathrm{colim}_i S_\Sigma (D_i)
+\xrightarrow{\mu_D}
+Q.
+\]
+
+For the construction of the algebra structure, a full inverse is
+stronger than necessary. It is enough to have a section
+
+\[
+\sigma_D :
+S_\Sigma (Q)
+\longrightarrow
+\mathrm{colim}_i S_\Sigma (D_i)
+\] satisfying \(\kappa_D\circ\sigma_D = \mathsf{id}_{S_\Sigma (Q)}\).
+
+The constructor can then be defined by
+\(\mathsf{intro} = \mu_D\circ\sigma_D.\)
+
+The equation system introduces an analogous lifting requirement. To
+instantiate an equation \(e:E\) in \(Q\), a substitution
+\(\rho : V (e) \to Q\) must be represented at a common stage. It is
+convenient to package both kinds of lifting into a single polynomial
+functor. Define \(C : A+E \to \mathcal{U}\) by
+\(C (\mathsf{inl} (a)) = B (a)\) and \(C (\mathsf{inr} (e)) = V (e),\)
+and let \(F_{\Sigma,E} (X) = (c:A+E)\times (C (c)\to X).\)
+
+A section of the canonical map
+
+\[
+\kappa_D^{\Sigma,E} :
+\mathrm{colim}_i F_{\Sigma,E} (D_i)
+\longrightarrow
+F_{\Sigma,E} \left(\mathrm{colim}_i D_i\right)
+\] simultaneously supplies common-stage lifts for constructor arguments
+and for substitutions into equations. This is the precise cocontinuity
+property needed by the inflationary construction.
+
+Fiore, Pitts and Steenkamp use WISC to construct a type of sizes
+sufficiently rich for the relevant polynomial functor to preserve all
+size-indexed colimits \citep{fiore2022-quotient-inductive}. For that
+size structure, the canonical map \(\kappa_D^{\Sigma,E}\) is an
+isomorphism for every size-indexed diagram \(D\). Its inverse provides
+all the common-stage lifts required in the construction.
+
+Our argument recovers only the part of this theorem used for the
+particular inflationary diagram. We do not prove that the polynomial
+functor preserves arbitrary size-indexed colimits. Instead, we construct
+directly a section
+
+\[
+\sigma_D^{\Sigma,E} :
+F_{\Sigma,E} (Q)
+\longrightarrow
+\mathrm{colim}_i F_{\Sigma,E} (D_i)
+\] of \(\kappa_D^{\Sigma,E}\) for the diagram of approximants. The
+construction of this section from quotient-invariant ranks is the
+central technical task of the following sections.
+
+\section{5. Extensional plump
+ordinals}\label{extensional-plump-ordinals}
+
+The inflationary construction requires a notion of stage with three
+interacting properties. Stages must support well-founded recursion,
+admit upper bounds for the arities occurring in the QW-presentation, and
+assign equal stages to extensionally equivalent families. Ordinary
+inductively generated size types provide the first two properties but
+not, in general, the third. We therefore replace them with extensional
+plump ordinals.
+
+\subsection{5.1 Constructive ordinal
+notions}\label{constructive-ordinal-notions}
+
+The simplest type-theoretic representation of sizes is a W-type. Given a
+type \(S\) of supremum constructors and a family of arities
+\(P:S\to\mathcal{U}\), consider \(W_{S,P} = \mathsf{W} (s:S).P (s).\)
+
+An element of \(W_{S,P}\) is a well-founded tree \(\mathsf{sup} (s,f)\)
+with \(s:S\) and \(f:P (s)\to W_{S,P}\). By choosing suitable elements
+of \(S\), the W-type can include nullary, binary, and signature-specific
+supremum operations.
+
+The inductive structure of \(W_{S,P}\) supplies a well-founded relation
+suitable for recursion. The plump ordering additionally ensures that
+\(\mathsf{sup} (s,f)\) is a strict upper bound for the family \(f\).
+Fiore, Pitts and Steenkamp use such plump W-types as their size
+structures \citep{fiore2022-quotient-inductive}, following the
+constructive theory of plump ordinals introduced by Taylor
+\citep{taylor1993-intuinistic-sets-ordinals}. Directed variants of the
+plump ordering provide finite joins and related closure properties
+\citep{gratzer2024-universe-grothendieck, gratzer2022-directed-plump-order}.
+
+The equality of a W-type is intensional. Two trees may describe the same
+well-founded order while remaining unequal because they were built using
+different constructors or different enumerations of their immediate
+subtrees. In particular, a family \(f:P (s)\to W_{S,P}\) and a
+reindexing \(f\circ\pi\) generally determine distinct W-trees even when
+\(\pi\) is an equivalence.
+
+An extensional well-founded order instead identifies an ordinal by the
+order type of its predecessors. Writing
+\({\downarrow\alpha} = (\gamma:Z)\times (\gamma<\alpha),\)
+extensionality asserts that ordinals with the same strict lower segment
+are equal. In one standard formulation,
+
+\[
+\left(
+(\gamma:Z)\to
+(\gamma<\alpha\leftrightarrow\gamma<\beta)
+\right)
+\longrightarrow
+\alpha=\beta.
+\]
+
+Extensional well-founded orders provide representative-independent
+ordinal values, but they do not automatically contain upper bounds for
+all the families required by a given infinitary signature. Plumpness
+supplies these upper bounds and ensures that they interact
+constructively with the order. Our size structure combines this closure
+with extensional equality.
+
+\subsection{5.2 Extensional plump ordinal
+bases}\label{extensional-plump-ordinal-bases}
+
+Fix a supremum signature consisting of a type \(S:\mathcal{U}\) and a
+family \(P:S\to\mathcal{U}\). The arities \(P (s)\) are chosen to
+include the constructor arities and equation-variable contexts relevant
+to the QW-presentation. We additionally require enough nullary and
+binary structure to construct a least element and finite upper bounds.
+
+A plump algebra for \((S,P)\) consists first of a type \(Z\) equipped
+with two relations \({<},{\leq}:Z\to Z\to\mathsf{Prop}.\)
+
+The strict relation \(<\) represents strict comparison of stages, while
+\(\leq\) represents non-strict comparison. The algebra has a supremum
+operation \(\mathsf{sup}: (s:S)\times (P (s)\to Z) \to Z.\)
+
+For \(s:S\) and \(f:P (s)\to Z\), we write its value as
+\(\mathsf{sup} (s,f).\)
+
+This operation satisfies two plumpness inequalities. First, if every
+member of the family is strictly below \(\alpha\), then the generated
+supremum is non-strictly below \(\alpha\):
+
+\[
+\left(
+(i:P (s))\to f (i)<\alpha
+\right)
+\longrightarrow
+\mathsf{sup} (s,f)\leq\alpha.
+\]
+
+Second, anything non-strictly below one member of the family is strictly
+below the generated supremum:
+\(\alpha\leq f (i) \longrightarrow \alpha<\mathsf{sup} (s,f).\)
+
+Taking \(\alpha=f (i)\) in the second inequality shows that every member
+is strictly below the generated supremum: \(f (i)<\mathsf{sup} (s,f).\)
+
+Thus \(\mathsf{sup} (s,f)\) is a strict upper bound rather than merely a
+least upper bound in the usual non-strict sense. The first inequality
+expresses its minimality relative to other strict upper bounds.
+
+The relations are required to satisfy the expected composition laws. The
+relation \(\leq\) is reflexive and transitive: \(\alpha\leq\alpha\) and
+
+\[
+\alpha\leq\beta
+\;\land\;
+\beta\leq\gamma
+\longrightarrow
+\alpha\leq\gamma.
+\]
+
+Strict comparison composes with both strict and non-strict comparison:
+\(\alpha<\beta \;\land\; \beta\leq\gamma \longrightarrow \alpha<\gamma\),
+\(\alpha\leq\beta \;\land\; \beta<\gamma \longrightarrow \alpha<\gamma\),
+and
+\(\alpha<\beta \;\land\; \beta<\gamma \longrightarrow \alpha<\gamma\).
+
+Strict comparison also implies non-strict comparison:
+\(\alpha<\beta \longrightarrow \alpha\leq\beta.\)
+
+The algebra contains a binary strict upper-bound operation
+\({-}\mathbin{\vee^Z}{-}:Z\to Z\to Z.\)
+
+It satisfies \(\alpha<\alpha\vee^Z\beta\) and
+\(\beta<\alpha\vee^Z\beta.\)
+
+It is minimal among common strict upper bounds in the sense that
+
+\[
+\alpha<\gamma
+\;\land\;
+\beta<\gamma
+\longrightarrow
+\alpha\vee^Z\beta\leq\gamma.
+\]
+
+We also require the comparison
+\(\beta\vee^Z\alpha \leq \alpha\vee^Z\beta.\)
+
+Applying the same law with \(\alpha\) and \(\beta\) exchanged gives the
+reverse comparison. Antisymmetry will therefore imply that the binary
+bound is commutative.
+
+Finally, the algebra contains a least element \(\bot^Z:Z\) satisfying
+\(\bot^Z\leq\alpha\) for every \(\alpha:Z\). The binary operation and
+least element allow finitely many auxiliary bounds to be combined with
+the signature-specific suprema.
+
+A plump algebra is \emph{extensional} when its non-strict comparison is
+antisymmetric:
+
+\[
+\alpha\leq\beta
+\;\land\;
+\beta\leq\alpha
+\longrightarrow
+\alpha=\beta.
+\]
+
+In the intended construction, \(\alpha\leq\beta\) expresses inclusion,
+or simulation, of the strict predecessor structure of \(\alpha\) by that
+of \(\beta\). Equality of strict lower segments therefore gives
+comparisons in both directions. Antisymmetry then yields the
+extensionality principle
+
+\[
+\left(
+(\gamma:Z)\to
+(\gamma<\alpha\leftrightarrow\gamma<\beta)
+\right)
+\longrightarrow
+\alpha=\beta.
+\]
+
+The Agda implementation records antisymmetry rather than repeating this
+lower-segment formulation because the connection between \(\leq\) and
+predecessor inclusion is established separately.
+
+We write \(\mathsf{ExtPlumpAlg} (S,P)\) for the type of extensional
+plump algebras over \((S,P)\). For every supremum signature \((S,P)\),
+we assume an initial algebra \(Z^e_{S,P} : \mathsf{ExtPlumpAlg} (S,P).\)
+
+Initiality provides the associated recursion and induction principles
+and makes the ordinal structure canonical for the chosen arities. We
+refer to \(Z^e_{S,P}\) as the \emph{extensional plump ordinal basis}
+generated by \((S,P)\).
+
+The assumption used in the main construction can be packaged
+universe-polymorphically as
+
+\[
+\mathsf{ExtensionalPlumpOrdinals}
+=
+(S:\mathcal{U})\to
+(P:S\to\mathcal{U})\to
+\mathsf{ExtPlumpAlg} (S,P),
+\] where each chosen algebra is understood to be initial. In the
+formalisation, universe levels are made explicit so that the
+construction can be instantiated for signatures at different levels.
+
+For a fixed QW-presentation \((\Sigma,E,V,l,r)\), we do not require
+closure under every small type. It is enough to choose \((S,P)\) whose
+arities include the types \(B (a)\) for \(a:A\) and \(V (e)\) for
+\(e:E\), together with nullary and binary arities. This is the sense in
+which the main theorem is relative to a sufficiently closed extensional
+plump ordinal basis.
+
+\subsection{5.3 Extensional supremum
+comparison}\label{extensional-supremum-comparison}
+
+The following lemma packages the plump-order calculation used throughout
+the rank argument.
+
+\begin{quote}
+\textbf{Lemma 5.1 (Extensional supremum comparison).} Let \(f:I\to Z\)
+and \(g:J\to Z\) be families supported by supremum constructors
+\(s_I,s_J:S\). If every \(f (i)\) equals some \(g (j)\), then
+\(\mathsf{sup} (s_I,f)\leq\mathsf{sup} (s_J,g)\). If the two families
+have the same image, their suprema are equal.
+\end{quote}
+
+For each \(i:I\), choose the given \(j:J\) with \(f (i)=g (j)\).
+Reflexivity and the second plumpness inequality give
+\(f (i)=g (j)<\mathsf{sup} (s_J,g)\). The first plumpness inequality
+then yields the stated comparison. Applying the argument in both
+directions and using antisymmetry proves equality. The same proof works
+when image containment is propositionally truncated, because the target
+inequalities are propositions.
+
+In particular, reindexing by an equivalence does not change a supremum:
+\(\mathsf{sup} (s_I,f) = \mathsf{sup} (s_I,f\circ\pi)\) for
+\(\pi:I\simeq I\). This conclusion generally fails for intensional
+W-type sizes: the two expressions can be different trees even when they
+present the same predecessor ranks. Extensionality is therefore what
+allows a plump rank to descend through permutation and image equations.
+
+\section{6. Depth-preserving
+signatures}\label{depth-preserving-signatures}
+
+We now identify the class of QW-presentations for which the ordinal rank
+of a raw term is invariant under the specified equations. The formal
+definition is semantic: an equation must preserve rank under every
+substitution of raw terms for its variables. We subsequently give a
+stronger syntactic condition that makes this property easy to verify in
+examples.
+
+Fix a signature \(\Sigma=(S,P)\) and an equation system \((E,\Xi)\). For
+each \(e:E\), the equation \(\Xi (e)\) consists of a variable type
+\(V_e\) and two expressions \(l_e,r_e:\mathsf{Expr}_\Sigma (V_e).\)
+
+Let \(T\) denote the W-type of closed raw terms over \(\Sigma\). Let
+\(Z\) be an extensional plump ordinal basis for the same arities.
+
+\subsection{6.1 Rank of raw terms}\label{rank-of-raw-terms}
+
+The W-type \(T\) is generated by a constructor
+\(\mathsf{sup}^T: (s:S)\times (P (s)\to T) \to T.\)
+
+The corresponding extensional plump ordinal has a supremum operation
+\(\mathsf{sup}^Z: (s:S)\times (P (s)\to Z) \to Z.\)
+
+Initiality of the W-type gives a rank function \(\iota^Z:T\to Z\)
+defined recursively by
+
+\[
+\iota^Z \left(\mathsf{sup}^T (s,f)\right)
+=
+\mathsf{sup}^Z \left(s,\lambda i.\iota^Z (f (i))\right).
+\]
+
+Thus the rank of a raw term is obtained by replacing every term
+constructor with the corresponding ordinal supremum constructor. The
+plumpness inequalities ensure that every immediate subterm has rank
+strictly below the rank of the whole term.
+
+Open expressions are generated by variables and constructor
+applications: \(\mathsf{var}^E:V\to\mathsf{Expr}_\Sigma (V)\) and
+
+\[
+\mathsf{sup}^E:
+(s:S)\times (P (s)\to\mathsf{Expr}_\Sigma (V))
+\to
+\mathsf{Expr}_\Sigma (V).
+\]
+
+There is an auxiliary rank
+\(\mathsf{exprToZ}: \mathsf{Expr}_\Sigma (V)\to Z\) which treats every
+variable as having bottom rank:
+\(\mathsf{exprToZ} (\mathsf{var}^E (v)) = \bot^Z\) and
+
+\[
+\mathsf{exprToZ} \left(\mathsf{sup}^E (s,f)\right)
+=
+\mathsf{sup}^Z \left(s,\lambda i.\mathsf{exprToZ} (f (i))\right).
+\]
+
+This auxiliary function measures the constructor depth already present
+in an open expression. It does not by itself express depth preservation,
+because substituting a non-trivial raw term for a variable may affect
+the two sides differently.
+
+Given a substitution \(\rho:V\to T,\) the interpretation of an
+expression as a raw term is defined recursively by
+\(\mathsf{assign}_T (\rho,\mathsf{var}^E (v)) = \rho (v)\) and
+
+\[
+\mathsf{assign}_T \left(\rho,\mathsf{sup}^E (s,f)\right)
+=
+\mathsf{sup}^T \left(s,\lambda i.\mathsf{assign}_T (\rho,f (i))\right).
+\]
+
+Equivalently, one may define the rank of an open expression relative to
+a rank valuation \(r:V\to Z.\)
+
+Write this rank as \(\mathsf{rank}_r: \mathsf{Expr}_\Sigma (V)\to Z.\)
+
+It is given by \(\mathsf{rank}_r (\mathsf{var}^E (v)) = r (v)\) and
+
+\[
+\mathsf{rank}_r \left(\mathsf{sup}^E (s,f)\right)
+=
+\mathsf{sup}^Z \left(s,\lambda i.\mathsf{rank}_r (f (i))\right).
+\]
+
+The rank of a substituted expression is then
+
+\[
+\iota^Z (\mathsf{assign}_T (\rho,e))
+=
+\mathsf{rank}_{\iota^Z\circ\rho} (e).
+\]
+
+The function \(\mathsf{exprToZ}\) is the special case in which every
+variable is assigned \(\bot^Z\).
+
+\subsection{6.2 Depth preservation}\label{depth-preservation}
+
+For \(\alpha,\beta:Z\), write \(\alpha\leq\!\geq\beta\) for mutual
+comparison: \((\alpha\leq\beta)\times (\beta\leq\alpha).\)
+
+Because \(Z\) is extensional, mutual comparison implies equality:
+\(\alpha\leq\!\geq\beta \longrightarrow \alpha=\beta.\)
+
+An equation \(e:E\) is \emph{depth-preserving} when, for every
+substitution \(\rho:V_e\to T\), its two sides have mutually comparable
+ranks:
+
+\[
+\iota^Z (\mathsf{assign}_T (\rho,l_e))
+\leq\!\geq
+\iota^Z (\mathsf{assign}_T (\rho,r_e)).
+\]
+
+A QW-signature is depth-preserving when every one of its equations is
+depth-preserving:
+
+\[
+\mathsf{DepthPreserving} (\Sigma,E,\Xi)
+=
+(e:E)\to
+(\rho:V_e\to T)\to
+\left(
+\iota^Z (\mathsf{assign}_T (\rho,l_e))
+\leq\!\geq
+\iota^Z (\mathsf{assign}_T (\rho,r_e))
+\right).
+\]
+
+By antisymmetry, this condition yields the equality
+
+\[
+\iota^Z (\mathsf{assign}_T (\rho,l_e))
+=
+\iota^Z (\mathsf{assign}_T (\rho,r_e)).
+\]
+
+This is the formal definition used in the construction. It is semantic
+because it quantifies over substitutions by arbitrary raw terms and
+compares their interpretations in the rank algebra \(Z\). It is
+nevertheless a property of the syntactic presentation and can often be
+established by a structural analysis of the two sides.
+
+A simple sufficient syntactic condition is that the two sides have the
+same outer constructor depth and use every recursive variable at the
+same collection of depths. More precisely, for every variable \(v:V_e\),
+the constructor contexts from the root to the occurrences of \(v\) on
+the left and right must determine extensionally equal ordinal
+operations. The two expressions must also have extensionally equal
+closed constructor structure after all variables are assigned bottom
+rank.
+
+For signatures whose ordinal supremum depends only on the collection of
+predecessor ranks, this condition can be expressed more simply. It is
+enough that the two sides have the same overall depth and that, for each
+variable, the collection of depths at which it occurs is the same on
+both sides. Reordering or extensionally reindexing occurrences is
+permitted. The number and order of occurrences need not be
+definitionally equal when the extensional supremum identifies the
+resulting predecessor collections.
+
+This syntactic criterion is stronger than the semantic definition. There
+may be equations whose ranks agree for algebraic reasons even though
+their variable occurrences do not match in this direct way. The semantic
+formulation is therefore the appropriate general definition, while
+occurrence-depth matching is a convenient proof principle for examples.
+
+\subsection{6.3 Descent through the
+quotient}\label{descent-through-the-quotient}
+
+Let \(\approx\) be the congruence on \(T\) generated by all substitution
+instances of the equations. Thus, for every \(e:E\) and
+\(\rho:V_e\to T\), it contains
+\(\mathsf{assign}_T (\rho,l_e) \approx \mathsf{assign}_T (\rho,r_e).\)
+
+It is closed under reflexivity, symmetry, transitivity, and applications
+of the constructors of \(\Sigma\).
+
+Suppose that the signature is depth-preserving. For every generating
+equation, depth preservation and antisymmetry give
+
+\[
+\iota^Z (\mathsf{assign}_T (\rho,l_e))
+=
+\iota^Z (\mathsf{assign}_T (\rho,r_e)).
+\]
+
+The rank function also respects the equivalence closure of the relation.
+The reflexive, symmetric, and transitive cases follow immediately from
+the corresponding properties of equality.
+
+For the congruence case, suppose that \(f,g:P (s)\to T\) satisfy
+\(f (i)\approx g (i)\) for every \(i:P (s)\). By induction on the
+derivations of these relations, we have
+\(\iota^Z (f (i)) = \iota^Z (g (i))\) for every \(i:P (s)\). Function
+extensionality gives
+\((\lambda i.\iota^Z (f (i))) = (\lambda i.\iota^Z (g (i))),\) and hence
+
+\[
+\mathsf{sup}^Z (s,\lambda i.\iota^Z (f (i)))
+=
+\mathsf{sup}^Z (s,\lambda i.\iota^Z (g (i))).
+\]
+
+By the recursive definition of \(\iota^Z\), this is precisely
+\(\iota^Z (\mathsf{sup}^T (s,f)) = \iota^Z (\mathsf{sup}^T (s,g)).\)
+
+It follows by induction on the generated congruence that
+\(t\approx u \longrightarrow \iota^Z (t)=\iota^Z (u).\)
+
+Let \(q:T\to T/{\approx}\) be the quotient map. The quotient elimination
+principle therefore defines a rank function
+\(\overline{\iota}^Z:T/{\approx}\to Z\) satisfying
+\(\overline{\iota}^Z (q (t)) = \iota^Z (t).\)
+
+This rank is independent of the representative chosen for an equivalence
+class. It is the canonical stage assignment that is unavailable when one
+quotients raw terms without a depth-preservation argument.
+
+The inflationary construction uses quotients at every stage rather than
+only the single quotient \(T/{\approx}\). The same proof applies
+stagewise. The equation relations preserve rank by depth preservation,
+while the unit and multiplication relations preserve rank by the algebra
+laws for the recursive interpretation. Consequently, each approximant
+\(D_i\) inherits a rank function compatible with the transition maps.
+These compatible functions induce a rank \(\mathsf{rank}_Q:Q\to Z\) on
+the colimit of the approximants.
+
+\subsection{6.4 Examples}\label{examples}
+
+For mobiles, a substitution \(\rho:\mathbb{N}\to T\) turns a permutation
+equation into suprema of \(\iota^Z\circ\rho\) and
+\(\iota^Z\circ\rho\circ\pi\). These families have the same image, so
+Lemma 5.1 makes their ranks equal. The same argument proves depth
+preservation for the image-based presentation.
+
+For the cumulative hierarchy, an equation is induced by \(f:A\to X\) and
+\(g:B\to X\) with the same image. After any substitution
+\(\rho:X\to T\), the families \(\iota^Z\circ\rho\circ f\) and
+\(\iota^Z\circ\rho\circ g\) again have the same image. Lemma 5.1
+therefore identifies the two ranks, even though their indexing types
+differ.
+
+For finite multisets, the adjacent-transposition equation places its
+sole recursive variable beneath two unary constructors on both sides.
+The occurrence-depth criterion of Section 6.2 applies directly, so the
+presentation is depth-preserving.
+
+Associativity and unit are non-examples:
+\((x\star y)\star z=x\star (y\star z)\) changes the depths of \(x\) and
+\(z\), while \(e\star x=x\) changes the depth of \(x\). Their finitary
+QW-types remain constructible by Section 8.2; depth preservation is
+sufficient for the rank construction, not necessary for existence.
+
+\section{7. Cocontinuity from canonical
+ranks}\label{cocontinuity-from-canonical-ranks}
+
+We now prove the central technical result. For the diagram of
+rank-bounded approximants, exact-rank lifting constructs a section of
+the canonical map from the colimit of the polynomial functor to the
+polynomial functor of the colimit.
+
+The formal proof is carried out in extensional dependent type theory
+with path elimination, function extensionality, propositional
+extensionality, unique choice, and set quotients. We assume a signature
+\(\Sigma=(S,P)\), an equation system \((E,\Xi)\), a proof that the
+signature is depth-preserving, and an extensional plump ordinal basis
+\(Z\) for \((S,P)\). No instance of WISC or of general choice is used in
+this argument.
+
+\subsection{7.1 The canonical colimit
+map}\label{the-canonical-colimit-map}
+
+Let \(T\) be the W-type of raw terms over \(\Sigma\), and let
+\(\iota^Z:T\to Z\) be its ordinal-valued rank. For each \(\alpha:Z\),
+define the type of raw terms bounded by \(\alpha\) by
+\(S_0 (\alpha) = (t:T)\times\bigl(\iota^Z (t)\leq\alpha\bigr).\)
+
+The equation system generates a setoid \(\widetilde{S} (\alpha)\) on
+\(S_0 (\alpha)\). Its equivalence relation contains the specified
+equations and is closed under constructor congruence, reflexivity,
+symmetry, and transitivity. Write \(\widetilde{S}/ (\alpha)\) for the
+set quotient of this setoid.
+
+Whenever \(\alpha\leq\beta\), a bounded term at stage \(\alpha\) is also
+bounded at stage \(\beta\). This gives a weakening map
+
+\[
+\mathsf{weaken}_{\alpha,\beta}:
+\widetilde{S}/ (\alpha)
+\to
+\widetilde{S}/ (\beta).
+\]
+
+These maps are functorial, so the assignment
+\(\alpha\longmapsto\widetilde{S}/ (\alpha)\) defines a diagram
+\(\widetilde{D}/:(Z,\leq)\to\mathsf{Set}.\)
+
+Its colimit is written
+\(D^*/ = \mathrm{colim}_{\alpha:Z} \widetilde{S}/ (\alpha).\)
+
+A representative of an element of this colimit is a pair
+\((\alpha,\widehat{t})\) with \(\widehat{t}:\widetilde{S}/ (\alpha)\).
+We write its equivalence class as \([\alpha,\widehat{t}]_D:D^*/.\)
+
+The colimit relation identifies elements equal at the same stage and
+elements related by weakening to a larger stage. It is then closed under
+symmetry and transitivity.
+
+Let \(F\) be the polynomial functor associated with the container
+\((S,P)\): \(F (X) = (s:S)\times (P (s)\to X).\)
+
+Applying \(F\) pointwise to the diagram gives another diagram
+\(F\widetilde{D}/:(Z,\leq)\to\mathsf{Set}.\)
+
+Its colimit is written
+\(FD^*/ = \mathrm{colim}_{\alpha:Z} F (\widetilde{S}/ (\alpha)).\)
+
+An element of \(FD^*/\) is represented by a stage \(\alpha:Z\), a
+constructor \(s:S\), and a family
+\(\widehat{f}:P (s)\to\widetilde{S}/ (\alpha).\)
+
+We write this representative as \([\alpha,s,\widehat{f}]_{FD}.\)
+
+The colimit cocone for \(\widetilde{D}/\) induces the canonical map
+\(\varphi: FD^*/ \longrightarrow F (D^*/).\)
+
+On representatives, it is defined by
+
+\[
+\varphi ([\alpha,s,\widehat{f}]_{FD})
+=
+\left(
+s,\lambda i.[\alpha,\widehat{f} (i)]_D
+\right).
+\]
+
+Thus \(\varphi\) forgets the common stage \(\alpha\) and maps each
+argument into the colimit. Functoriality of weakening ensures that this
+definition respects the colimit relation.
+
+For the stage construction used here, the equation relation has already
+been imposed inside each quotient \(\widetilde{S}/ (\alpha)\).
+Consequently, the cocontinuity problem concerns the underlying
+polynomial functor \(F\) alone. No additional polynomial containing the
+equation-variable contexts is required in the formal theorem.
+
+The required result is a section
+\(\sigma_D: F (D^*/) \longrightarrow FD^*/.\)
+
+We must prove \(\varphi\circ\sigma_D = \mathsf{id}_{F (D^*/)}\), which
+is precisely the common-stage lifting needed to define constructors on
+the colimit.
+
+\subsection{7.2 Exact-rank lifting}\label{exact-rank-lifting}
+
+We first construct a canonical rank on every stage quotient. Define
+\(\mathsf{rank}_0: S_0 (\alpha)\to Z\) by
+\(\mathsf{rank}_0 (t,p) = \iota^Z (t).\)
+
+Depth preservation implies that equivalent bounded terms have equal
+ranks. The constructor-congruence case follows recursively from
+congruence of \(\mathsf{sup}^Z\). For a generating equation, depth
+preservation gives mutual comparison of the two ranks, and
+extensionality turns this into equality.
+
+The quotient recursion principle therefore yields
+\(\mathsf{rank}_\alpha: \widetilde{S}/ (\alpha)\to Z.\)
+
+For a represented bounded term, it satisfies
+\(\mathsf{rank}_\alpha ([(t,p)]) = \iota^Z (t).\)
+
+The bound carried by the representative gives
+\(\mathsf{rank}_\alpha (\widehat{t}) \leq \alpha\) for every
+\(\widehat{t}:\widetilde{S}/ (\alpha)\). Moreover, weakening does not
+change rank:
+\(\mathsf{rank}_\beta (\mathsf{weaken}_{\alpha,\beta} (\widehat{t})) = \mathsf{rank}_\alpha (\widehat{t})\)
+whenever \(\alpha\leq\beta\).
+
+These stagewise ranks respect the colimit relation. They therefore
+induce a canonical colimit rank \(\mathsf{rank}_C: D^*/\to Z\)
+satisfying
+
+\[
+\mathsf{rank}_C ([\alpha,\widehat{t}]_D)
+=
+\mathsf{rank}_\alpha (\widehat{t}).
+\]
+
+The crucial strengthening is that every colimit element can be
+represented at exactly its canonical rank. The rank descent and the
+dependent transport needed for this statement are collected in one
+lemma.
+
+\begin{quote}
+\textbf{Lemma 7.1 (Canonical exact-rank lifting).} There are functions
+\[
+\mathsf{rank}_C:D^*/\to Z
+\] and \[
+\mathsf{lift}_C:
+(x:D^*/)\to\widetilde{S}/ (\mathsf{rank}_C (x))
+\] such that \([\mathsf{rank}_C (x),\mathsf{lift}_C (x)]_D=x\). They are
+invariant under the stage equations and compatible with weakening.
+\end{quote}
+
+To prove the lemma, first define the lift on a bounded raw term. For a
+bounded raw term \((t,p):S_0 (\alpha),\) define its exact-rank
+representative by
+
+\[
+\mathsf{lift}_0 (t,p)
+=
+\left(
+t,
+\mathsf{refl}_{\leq} (\iota^Z (t))
+\right)
+:
+S_0 (\iota^Z (t)).
+\]
+
+Depth preservation makes equivalent raw terms have equal ranks. After
+transport along that equality, proof irrelevance for order witnesses
+makes their exact-rank representatives equal. Quotient recursion
+therefore gives
+
+\[
+\mathsf{lift}_{\approx} (\widehat{t})
+:
+\widetilde{S}/ (\mathsf{rank}_\alpha (\widehat{t})).
+\]
+
+Compatibility with weakening lets this operation descend through the
+colimit relation, proving Lemma 7.1. No representative is chosen: the
+target stage is determined intrinsically by the quotient-invariant rank.
+
+We now define the section of the canonical colimit map. Let
+\((s,f):F (D^*/),\) so that \(f:P (s)\to D^*/.\)
+
+Lift each argument canonically: \(\mu (i)=\mathsf{rank}_C (f (i))\) and
+\(\widehat{g} (i)=\mathsf{lift}_C (f (i))\), where
+\(\widehat{g} (i):\widetilde{S}/ (\mu (i))\).
+
+Use the plump supremum to define a common stage
+\(\alpha = \mathsf{sup}^Z (s,\mu).\)
+
+For every \(i:P (s)\), the plumpness inequalities give
+\(\mu (i)<\alpha\) and hence \(\mu (i)\leq\alpha.\)
+
+We may therefore weaken each exact-rank representative to stage
+\(\alpha\):
+
+\[
+\widehat{x} (i)
+=
+\mathsf{weaken}_{\mu (i),\alpha} (\widehat{g} (i))
+:
+\widetilde{S}/ (\alpha).
+\]
+
+The family \(\widehat{x}\) lies entirely at the common stage \(\alpha\).
+We define \(\sigma_D (s,f) = [\alpha,s,\widehat{x}]_{FD}.\)
+
+This construction contains no arbitrary representative choices. The
+ranks, exact-rank representatives, and common supremum stage are all
+canonical.
+
+\subsection{7.3 The section theorem}\label{the-section-theorem}
+
+Let \((s,f):F (D^*/)\). By definition,
+
+\[
+\varphi (\sigma_D (s,f))
+=
+\left(
+s,
+\lambda i.[\alpha,\widehat{x} (i)]_D
+\right).
+\]
+
+For each \(i:P (s)\), the element \(\widehat{x} (i)\) is the weakening
+to \(\alpha\) of the exact-rank representative \(\widehat{g} (i)\). The
+colimit relation therefore gives
+\([\alpha,\widehat{x} (i)]_D = [\mu (i),\widehat{g} (i)]_D.\)
+
+The exact-rank lifting theorem gives
+\([\mu (i),\widehat{g} (i)]_D = f (i).\)
+
+Combining these equalities pointwise and applying function
+extensionality yields \(\varphi (\sigma_D (s,f)) = (s,f).\)
+
+Hence \(\varphi\circ\sigma_D = \mathsf{id}_{F (D^*/)}.\)
+
+This proves the required theorem.
+
+\begin{quote}
+\textbf{Theorem 7.2 (Cocontinuity from depth preservation).} Let
+\(\Sigma=(S,P)\) be a QW-signature with a depth-preserving equation
+system. Assume an extensional plump ordinal basis \(Z\) supporting the
+arities \(P (s)\). For the diagram \(\widetilde{D}/\) of rank-bounded
+quotient approximants, the canonical map \[
+\varphi:
+\mathrm{colim}_{\alpha:Z} F (\widetilde{D}/ (\alpha))
+\longrightarrow
+F \left(
+\mathrm{colim}_{\alpha:Z} \widetilde{D}/ (\alpha)
+\right)
+\] admits the section \(\sigma_D\) constructed above.
+\end{quote}
+
+The three hypotheses have distinct roles in the proof. Depth
+preservation ensures that the raw rank is invariant under the generating
+equations. Extensionality turns mutual ordinal comparison into equality,
+allowing the rank and exact-rank lift to descend through the stage
+quotients. Plumpness places all arguments of a constructor below the
+common supremum stage.
+
+\subsection{7.4 Cocontinuity and
+existence}\label{cocontinuity-and-existence}
+
+Theorem 7.2 is weaker than the WISC-based preservation theorem of Fiore,
+Pitts and Steenkamp: it constructs a section only for the diagram
+arising in the QW-construction, rather than an isomorphism for every
+diagram indexed by the chosen sizes
+\citep{fiore2022-quotient-inductive}. That restricted result is
+sufficient.
+
+Let \(Q = D^*/ = \mathrm{colim}_{\alpha:Z} \widetilde{S}/ (\alpha).\)
+
+The stage construction provides a map
+\(\mu: \mathrm{colim}_{\alpha:Z} F (\widetilde{S}/ (\alpha)) \to Q\)
+which adds one constructor layer. Using the section \(\sigma_D\) of the
+canonical map, define
+\(\mathsf{intro} = \mu\circ\sigma_D : F (Q)\to Q.\)
+
+Because the specified equations have already been imposed in the stage
+quotients, this algebra satisfies the equation system. The compatibility
+of the stage relations ensures that the resulting interpretation is
+independent of all stage representatives.
+
+Given any other algebra \((X,a)\) satisfying the equations, define maps
+\(r_\alpha: \widetilde{S}/ (\alpha)\to X\) by well-founded recursion on
+\(\alpha\). The equation-satisfaction hypothesis for \(X\) makes each
+\(r_\alpha\) well-defined on the stage quotient. The recursion equations
+imply compatibility with weakening:
+\(r_\beta\circ\mathsf{weaken}_{\alpha,\beta} = r_\alpha\) whenever
+\(\alpha\leq\beta\). The colimit universal property therefore induces a
+homomorphism \(r:Q\to X.\)
+
+Well-founded induction on ranks shows that any algebra homomorphism
+\(Q\to X\) agrees with the stagewise maps \(r_\alpha\). It follows that
+\(r\) is unique. Hence \((Q,\mathsf{intro})\) is initial among algebras
+satisfying the equation system.
+
+Combining the cocontinuity theorem with the inflationary construction
+yields the main result.
+
+\begin{quote}
+\textbf{Theorem 7.3 (Existence of depth-preserving QW-types).} Work in
+extensional dependent type theory with W-types, set quotients, path
+elimination, function extensionality, propositional extensionality, and
+unique choice. Let \(\Sigma=(S,P)\) be a polynomial signature, and let
+\((E,\Xi)\) be a depth-preserving system of equations over \(\Sigma\).
+Suppose that there exists an initial extensional plump ordinal algebra
+for \((S,P)\). Then the QW-type presented by \((\Sigma,E,\Xi)\) can be
+constructed from W-types and set quotients.
+\end{quote}
+
+Equivalently, every depth-preserving QW-signature whose constructor
+arities are supported by an extensional plump ordinal basis has an
+initial QW-algebra. The construction does not assume WISC or any general
+choice principle beyond the existence of the specified ordinal basis.
+
+\section{8. Beyond depth preservation}\label{beyond-depth-preservation}
+
+The proof of Section 7 suggests a criterion more general than depth
+preservation.
+
+\begin{quote}
+Inflationary iteration succeeds whenever the canonical map associated
+with the relevant colimit admits a coherent section.
+\end{quote}
+
+For a diagram \(D:I\to\mathsf{Set}\) and a polynomial functor \(F\),
+this canonical map is
+
+\[
+\kappa_D:
+\mathrm{colim}_i F (D_i)
+\longrightarrow
+F \left(\mathrm{colim}_i D_i\right).
+\]
+
+A section
+
+\[
+\sigma_D:
+F \left(\mathrm{colim}_i D_i\right)
+\longrightarrow
+\mathrm{colim}_i F (D_i)
+\] satisfying \(\kappa_D\circ\sigma_D = \mathsf{id}\) assigns a
+common-stage representative to every constructor application over the
+colimit. Composing \(\sigma_D\) with the stagewise constructor gives an
+algebra structure on the colimit.
+
+The section must also be coherent with the transition maps, the stage
+quotients, and the equations of the presentation. These coherence
+properties are needed to define the universal morphism and prove that it
+is an algebra homomorphism. The exact-rank construction of Section 7
+verifies this coherence directly; a two-sided inverse to \(\kappa_D\) is
+unnecessary.
+
+Depth preservation is one mechanism for constructing this section. It
+produces a canonical quotient-invariant rank, an exact-rank
+representative, and a common stage obtained by applying the plump
+supremum. Other mechanisms can provide the same data without preserving
+the original structural depth.
+
+\subsection{8.1 Normalising signatures}\label{normalising-signatures}
+
+Suppose that raw terms admit a normalisation operation
+\(\mathsf{nf}:T\to T.\)
+
+For normalisation to yield a rank on the quotient, it must at least be
+sound with respect to the equations: \(t\approx\mathsf{nf} (t).\)
+
+It must also be invariant under the generated equivalence relation:
+\(t\approx u \longrightarrow \mathsf{nf} (t)=\mathsf{nf} (u).\)
+
+A stronger and more familiar condition is completeness:
+
+\[
+t\approx u
+\quad\Longleftrightarrow\quad
+\mathsf{nf} (t)=\mathsf{nf} (u).
+\]
+
+Idempotence is also desirable:
+\(\mathsf{nf} (\mathsf{nf} (t)) = \mathsf{nf} (t).\)
+
+Under these assumptions, define the rank of an equivalence class by
+\(\mathsf{rank} ([t]) = \iota^Z (\mathsf{nf} (t)).\)
+
+Invariance of normal forms makes this definition independent of the
+representative \(t\). The term \(\mathsf{nf} (t)\) then provides a
+preferred representative of the equivalence class at the stage
+determined by its rank.
+
+For use in the inflationary diagram, normalisation must additionally
+commute with weakening. If \(t\) is represented at stage \(\alpha\) and
+weakened to stage \(\beta\), normalising before or after weakening must
+produce equivalent stage elements. This compatibility allows the
+preferred representatives to descend through the colimit relation.
+
+Given these properties, the construction of Section 7 can be repeated
+with normal-form rank in place of structural rank. Each colimit element
+is represented by its normal form at the rank of that normal form. The
+ranks of the arguments of a constructor determine a common stage, and
+the resulting family defines a section of \(\kappa_D\).
+
+Normalisation can therefore handle equations that change syntactic
+depth. Associativity and unit equations are typical examples for which
+raw structural rank is not invariant but canonical normal forms may
+still exist. The essential condition is not that the original equations
+preserve rank, but that every equivalence class has a coherently chosen
+representative whose rank is stable.
+
+This argument does not require equations to be characterised exactly by
+normalisation if a weaker result suffices. It is enough that equivalent
+terms normalise to terms with equal ranks and that the normalised terms
+represent the original equivalence classes. Equality of normal forms is
+a convenient strong hypothesis because it supplies both properties
+simultaneously.
+
+\subsection{8.2 Finitary signatures}\label{finitary-signatures}
+
+Finitary signatures admit a more direct argument. If every constructor
+has only finitely many arguments, then a family of colimit elements
+occurring in one constructor application can be lifted to a common stage
+using finite directedness. No extensional plump ordinal rank is needed
+to make this lift.
+
+Constructively, the relevant notion is \emph{mere finiteness}. For a set
+\(A\), define
+
+\[
+\mathsf{isFinite}^{\mathsf{p}} (A)
+=
+\exists n:\mathbb{N}.\,
+\left\lVert
+\mathsf{Fin} (n)\cong A
+\right\rVert.
+\]
+
+The existential and the equivalence are propositionally truncated. Thus
+mere finiteness does not include a chosen cardinality or a chosen
+enumeration of \(A\).
+
+We also consider the type
+
+\[
+\mathsf{isFinite}' (A)
+=
+(n:\mathbb{N})\times
+\left\lVert
+\mathsf{Fin} (n)\cong A
+\right\rVert.
+\]
+
+Although this type contains a natural number, that number is unique
+whenever it exists. If \(\mathsf{Fin} (m)\cong A\) and
+\(\mathsf{Fin} (n)\cong A\), the induced injections give \(m\leq n\) and
+\(n\leq m\), so antisymmetry of the natural-number order gives \(m=n\).
+This finite argument does not invoke the unrestricted
+Cantor--Schröder--Bernstein theorem, which implies excluded middle
+constructively \citep{pradic2019-cantor-bernstein}.
+
+Consequently,
+\((n:\mathbb{N})\times \left\lVert \mathsf{Fin} (n)\cong A \right\rVert\)
+is a proposition. Unique choice therefore gives
+\(\mathsf{isFinite}^{\mathsf{p}} (A) \longrightarrow \mathsf{isFinite}' (A)\).
+
+This extracts the unique cardinality of \(A\), but it does not extract a
+particular equivalence \(\mathsf{Fin} (n)\cong A\) from its truncation.
+For most of the cocontinuity argument, no such choice of enumeration is
+needed. The desired common-stage property is itself a proposition, so
+the truncated equivalence can be eliminated while proving it.
+
+Let \(D:I\to\mathsf{Set}\) be a filtered diagram and suppose that \(A\)
+is merely finite. Given a function \(f:A\to\mathrm{colim}_i D_i,\) mere
+finiteness reduces the problem propositionally to a family indexed by
+\(\mathsf{Fin} (n)\). Finite directedness then gives a stage \(i\) and a
+function \(\widehat{f}:A\to D_i\) such that
+\(\nu_i\circ\widehat{f} = f.\)
+
+It follows that the canonical map
+\(\mathrm{colim}_i (A\to D_i) \longrightarrow (A\to\mathrm{colim}_i D_i)\)
+is surjective. Filteredness similarly proves injectivity by moving two
+finite families to a common stage. Unique choice then turns this
+bijection into an isomorphism.
+
+Therefore, if every constructor arity \(P (s)\) is merely finite, the
+polynomial functor \(F (X) = (s:S)\times (P (s)\to X)\) preserves
+filtered colimits. For presentations whose construction also requires
+common-stage substitutions into equations, the corresponding variable
+contexts must likewise satisfy the relevant finiteness condition. The
+inflationary construction can then use a simple filtered size diagram,
+such as a natural-number-indexed diagram with finite upper bounds,
+rather than an extensional plump ordinal basis.
+
+These two variants establish the relevant alternatives directly. In both
+cases the essential datum remains a coherent common-stage lift:
+normalisation provides canonical representatives, while finiteness makes
+every required family small enough for filteredness.
+
+\section{9. Related work}\label{related-work}
+
+Fiore, Pitts and Steenkamp introduced QW-types and their indexed
+generalisation, QWI-types, as initial algebras for possibly infinitary
+equational theories
+\citep{fiore2020-infinitary-qiit, fiore2022-quotient-inductive}. Their
+construction interleaves term formation with quotienting and obtains the
+initial algebra as the colimit of a size-indexed inflationary iteration.
+WISC is used to construct a plump size type sufficiently large that the
+relevant polynomial functors preserve all diagrams indexed by those
+sizes. Its use as a collection principle is studied in site-theoretic
+and realizability settings
+\citep{roberts2012-internal-categories, streicher2005-wisc}. Our
+construction uses the same general inflationary framework but replaces
+this uniform cocontinuity theorem with a direct proof for the particular
+diagram of approximants. For depth-preserving signatures, extensional
+ranks provide canonical representatives and an explicit section of the
+canonical polynomial-colimit map. The result is relative to an
+extensional plump ordinal basis but does not otherwise use WISC.
+
+The restriction to a subclass of infinitary presentations is necessary
+in view of known choice obstructions. Blass exhibited an infinitary
+equational theory whose free algebras cannot be proved to exist in ZF
+without the Axiom of Choice \citep{blass1983-free-algebra-coequalizer}.
+Lumsdaine and Shulman express this theory as a higher inductive type,
+showing that a sufficiently general existence principle for infinitary
+higher inductive types has corresponding choice-theoretic strength
+\citep[sec.~9]{lumsdaine2018-higher-inductive-types}. Our result does
+not circumvent this obstruction. Instead, depth preservation identifies
+structural information absent from arbitrary infinitary equational
+theories and thereby isolates a class for which the necessary lifting
+can be performed canonically.
+
+Swan first introduced W-types with reductions as initial algebras for
+pointed polynomial endofunctors and used them in constructions related
+to the small object argument \citep{swan2018-w-types-reductions}. He
+later defines \emph{image-preserving QW-types}, whose equations identify
+constructor applications only when the corresponding families of
+variables have the same image \citep{swan2022-hits-in-zf}. He constructs
+these QW-types in classical ZF without the Axiom of Choice or an
+assumption of large regular cardinals. The construction proceeds by
+transfinite recursion through the class of ordinals and assigns to an
+element the least ordinal stage through which the image of its
+constructor arguments factors. This minimum rank is well-defined because
+image-preserving equations preserve the relevant family of predecessors.
+The argument uses classical properties of ordinals, including the fact
+that a set of ordinals is order-isomorphic to an ordinal, and does not
+directly extend to intuitionistic set theory. Our extensional plump
+ordinal rank plays a role analogous to Swan's least-stage rank, but it
+is formulated internally and constructively relative to the assumed
+ordinal basis. Depth preservation also permits nested equations whose
+two sides preserve rank without necessarily being image-preserving in
+Swan's direct sense.
+
+The original construction of infinitary QW-types by Fiore, Pitts and
+Steenkamp used Abel-style sized types to express inflationary fixed
+points and justify recursive definitions
+\citep{abel2012-inflationary, fiore2020-infinitary-qiit}. Sized types
+provide a syntactic approximation to transfinite iteration, with size
+indices ensuring that recursive calls occur at smaller stages. The later
+QWI development replaced this formulation with semantic size objects
+constructed using WISC after logical unsoundness was discovered in the
+relevant implementation of Agda sized types
+\citep{fiore2022-quotient-inductive}. Our construction retains explicit
+ordinal indices but makes ranks extensional so that they descend through
+the quotient equations.
+
+Several constructions apply specifically to finitary QITs and QIITs. Van
+der Weide constructs finitary set-truncated higher inductive types from
+quotients, using the preservation properties available for finite
+arities \citep{van-der-weide2019-set-truncated-hits}. Dybjer and
+Moeneclaey give a syntactic scheme for finitary higher inductive types
+and interpret it in the groupoid model
+\citep{dyber2018-finitary-hit-groupoid}. Kaposi, Kovács and Altenkirch
+introduce a theory of signatures for finitary QIITs and construct
+initial algebras and dependent eliminators for the QIITs described by
+that theory, relative to the availability of the theory-of-signatures
+syntax itself \citep{kaposi2019-constructing-qiit}. These finitary
+results avoid the infinitary common-stage problem because finite
+families can be lifted through filtered colimits using finite
+directedness. Section 8.2 explains how mere finiteness of the arities
+suffices constructively.
+
+The present paper treats non-indexed QW-types. A separate line of work
+studies reductions of QIITs, including internal syntax such as the
+\(\mathsf{Con}\)--\(\mathsf{Ty}\) example, to simpler equational
+presentations. We do not claim such an extension here, although
+combining a QIIT reduction with the cocontinuity criteria developed in
+this paper is a natural direction for future work.
+
+\section{10. Conclusion}\label{conclusion}
+
+For depth-preserving QW-signatures, an extensional plump ordinal rank
+descends through the stage quotients and the colimit. Canonical
+exact-rank lifting then represents every colimit element at its
+intrinsic rank. Applying this lift pointwise and taking a plump supremum
+constructs the section \[
+\sigma_D:F \left(\mathrm{colim}_\alpha D_\alpha\right)
+\longrightarrow
+\mathrm{colim}_\alpha F (D_\alpha)
+\] required by inflationary iteration. This yields the corresponding
+initial QW-algebra from W-types and quotients, relative to the ordinal
+basis and without a further use of WISC.
+
+The construction isolates coherent sectionability, rather than depth
+preservation itself, as the semantic condition. Normalising signatures
+can obtain canonical lifts from normal forms, while finitary signatures
+obtain common stages from finite directedness. Extending these methods
+to indexed or conditional presentations and determining the exact
+relationship between extensional plump ordinal bases and collection
+principles remain open.
+
+\bibliography{public/master.bib}
+
+\end{document}
