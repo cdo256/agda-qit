@@ -2,6 +2,7 @@ open import QIT.Prelude
 
 module Everything ⦃ a!c* : A!C ⦄ ⦃ fe* : FunExt ⦄ ⦃ pathElim* : PathElim ⦄ where
 
+
 -- Base
 import QIT.Prelude.Universe
 import QIT.Prelude.Truncation
@@ -138,7 +139,7 @@ import QIT.Examples.Mobile.Base
 import QIT.Examples.Mobile.Cocontinuity
 -- import QIT.Examples.CauchyReals
 import QIT.Examples.ConTy.Direct
-import QIT.Examples.ConTy.DirectToWeaklyTaggedLarge
+-- import QIT.Examples.ConTy.DirectToWeaklyTaggedLarge
 import QIT.Examples.ConTy.WeaklyTaggedToDirect
 -- import QIT.Examples.ConTy.DirectToWeaklyTagged2
 -- import QIT.Examples.ConTy.DirectWeaklyTaggedEquiv
