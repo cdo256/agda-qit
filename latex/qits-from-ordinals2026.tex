@@ -753,7 +753,10 @@ notions}\label{constructive-ordinal-notions}
 
 The simplest type-theoretic representation of sizes is a W-type. Given a
 signature \(\Sigma=(A,B)\) of supremum constructors, consider
-\(W_\Sigma = \mathsf{W} (a:A).B (a).\)
+
+\[
+W_\Sigma = \mathsf{W} (a:A).B (a).
+\]
 
 An element of \(W_\Sigma\) is a well-founded tree \(\mathsf{sup} (a,f)\)
 with \(a:A\) and \(f:B (a)\to W_\Sigma\). By choosing suitable elements
@@ -779,7 +782,11 @@ reindexing \(f\circ\pi\) generally determine distinct W-trees even when
 
 An extensional well-founded order instead identifies an ordinal by the
 order type of its predecessors. Writing
-\({\downarrow\alpha} = (\gamma:Z)\times (\gamma<\alpha),\)
+
+\[
+{\downarrow\alpha} = (\gamma:Z)\times (\gamma<\alpha),
+\]
+
 extensionality asserts that ordinals with the same strict lower segment
 are equal. In one standard formulation,
 
@@ -802,18 +809,26 @@ with extensional equality.
 \subsection{5.2 Extensional plump ordinal
 bases}\label{extensional-plump-ordinal-bases}
 
-Fix a supremum signature \(\Sigma=(A,B)\), consisting of a type
+Fix a supremum signature \(\Sigma=(A,B)\). It consists of a type
 \(A:\mathcal{U}\) and a family \(B:A\to\mathcal{U}\). The arities \(B (a)\) are chosen to
 include the constructor arities and equation-variable contexts relevant
 to the QW-presentation. We additionally require enough nullary and
 binary structure to construct a least element and finite upper bounds.
 
 A plump algebra for \(\Sigma=(A,B)\) consists first of a type \(Z\) equipped
-with two relations \({<},{\leq}:Z\to Z\to\mathsf{Prop}.\)
+with two relations
+
+\[
+{<},{\leq}:Z\to Z\to\mathsf{Prop}.
+\]
 
 The strict relation \(<\) represents strict comparison of stages, while
 \(\leq\) represents non-strict comparison. The algebra has a supremum
-operation \(\mathsf{sup}: (a:A)\times (B (a)\to Z) \to Z.\)
+operation
+
+\[
+\mathsf{sup}: (a:A)\times (B (a)\to Z) \to Z.
+\]
 
 For \(a:A\) and \(f:B (a)\to Z\), we write its value as
 \(\mathsf{sup} (a,f).\)
@@ -832,7 +847,10 @@ supremum is non-strictly below \(\alpha\):
 
 Second, anything non-strictly below one member of the family is strictly
 below the generated supremum:
-\(\alpha\leq f (\xi) \longrightarrow \alpha<\mathsf{sup} (a,f).\)
+
+\[
+\alpha\leq f (\xi) \longrightarrow \alpha<\mathsf{sup} (a,f).
+\]
 
 Taking \(\alpha=f (\xi)\) in the second inequality shows that every member
 is strictly below the generated supremum: \(f (\xi)<\mathsf{sup} (a,f).\)
@@ -862,10 +880,18 @@ Strict comparison also implies non-strict comparison:
 \(\alpha<\beta \longrightarrow \alpha\leq\beta.\)
 
 The algebra contains a binary strict upper-bound operation
-\({-}\mathbin{\vee^Z}{-}:Z\to Z\to Z.\)
 
-It satisfies \(\alpha<\alpha\vee^Z\beta\) and
-\(\beta<\alpha\vee^Z\beta.\)
+\[
+{-}\mathbin{\vee^Z}{-}:Z\to Z\to Z.
+\]
+
+It satisfies
+
+\[
+\alpha<\alpha\vee^Z\beta
+\qquad\text{and}\qquad
+\beta<\alpha\vee^Z\beta.
+\]
 
 It is minimal among common strict upper bounds in the sense that
 
@@ -920,9 +946,12 @@ lower-segment formulation because the connection between \(\leq\) and
 predecessor inclusion is established separately.
 
 We write \(\mathsf{ExtPlumpAlg} (\Sigma)\) for the type of extensional
-plump algebras over \(\Sigma=(A,B)\). We require an initial algebra
-\(Z^e_\Sigma : \mathsf{ExtPlumpAlg} (\Sigma)\) for extensional plump
-ordinals.
+plump algebras over \(\Sigma=(A,B)\). We require an initial algebra for
+extensional plump ordinals:
+
+\[
+Z^e_\Sigma : \mathsf{ExtPlumpAlg} (\Sigma).
+\]
 
 Initiality provides the associated recursion and induction principles
 and makes the ordinal structure canonical for the chosen arities. We
