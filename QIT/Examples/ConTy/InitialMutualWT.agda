@@ -336,7 +336,7 @@ data Tag : Set where
   # : Tag
 
 CT→Tag : I.CT → Tag
-CT→Tag = run Tag {!A!}
+CT→Tag = run Tag A
   where
   open ≡
   open Algebra renaming ([_] to [])
@@ -364,13 +364,69 @@ CT→Tag = run Tag {!A!}
   DA .▷ _ _ = #
   DA .k▷ []ĉ []t̂ refl refl refl = refl
   DA .▷-γ []ĉ []t̂ refl = refl
+  DA .▷-γ _ _ ()
   DA .▷-a []ĉ []t̂ refl = refl
+  DA .▷-a _ _ ()
   DA .▷-a₁ []ĉ []t̂ refl = refl
+  DA .▷-a₁ _ _ ()
   DA .u []ĉ = []t̂
   DA .u _ = #
   DA .ku []ĉ refl = refl
   DA .u₁ []ĉ refl = refl
   DA .u-γ []ĉ refl = refl
+  DA .π []ĉ []t̂ []t̂ = []t̂
+  DA .π _ _ _ = #
+  DA .kπ []ĉ []t̂ []t̂ refl refl refl refl refl = refl
+  DA .π₁ []ĉ []t̂ []t̂ refl = refl
+  DA .π₁ []ĉ []t̂ k̂₀ ()
+  DA .π₁ []ĉ []t̂ ĉ₀ ()
+  DA .π₁ []ĉ []t̂ t̂₀ ()
+  DA .π₁ []ĉ []t̂ []ĉ ()
+  DA .π₁ []ĉ []t̂ # ()
+  DA .π₁ []ĉ k̂₀ _ ()
+  DA .π₁ []ĉ ĉ₀ _ ()
+  DA .π₁ []ĉ t̂₀ _ ()
+  DA .π₁ []ĉ []ĉ _ ()
+  DA .π₁ []ĉ # _ ()
+  DA .π₁ k̂₀ y z ()
+  DA .π₁ ĉ₀ y z ()
+  DA .π₁ t̂₀ y z ()
+  DA .π₁ []t̂ y z ()
+  DA .π₁ # y z ()
+  DA .π-γ []ĉ []t̂ []t̂ refl = refl
+  DA .π-γ []ĉ []t̂ _ _ = refl
+  DA .π-a []ĉ []t̂ []t̂ _ = refl
+  DA .π-a []ĉ []t̂ _ _ = refl
+  DA .π-a₁ []ĉ []t̂ []t̂ refl = refl
+  DA .π-a₁ []ĉ []t̂ _ _ = refl
+  DA .π-b []ĉ []t̂ []t̂ refl = refl
+  DA .π-b []ĉ []t̂ k̂₀ ()
+  DA .π-b []ĉ []t̂ ĉ₀ ()
+  DA .π-b []ĉ []t̂ t̂₀ ()
+  DA .π-b []ĉ []t̂ []ĉ ()
+  DA .π-b []ĉ []t̂ # ()
+  DA .π-b₁ []ĉ []t̂ []t̂ refl = refl
+  DA .π-b₁ _ _ _ ()
+  DA .σ []ĉ []t̂ []t̂ = []t̂
+  DA .σ _ _ _ = #
+  DA .kσ []ĉ []t̂ []t̂ refl refl refl refl refl = refl
+  DA .σ₁ []ĉ []t̂ []t̂ refl = refl
+  DA .σ₁ _ _ _ ()
+  DA .σ-γ []ĉ []t̂ []t̂ refl = refl
+  DA .σ-γ _ _ _ ()
+  DA .σ-a []ĉ []t̂ []t̂ refl = refl
+  DA .σ-a _ _ _ ()
+  DA .σ-a₁ []ĉ []t̂ []t̂ refl = refl
+  DA .σ-a₁ _ _ _ ()
+  DA .σ-b []ĉ []t̂ []t̂ refl = refl
+  DA .σ-b _ _ _ ()
+  DA .σ-b₁ []ĉ []t̂ []t̂ refl = refl
+  DA .σ-b₁ _ _ _ ()
+  DA .σ▷ []ĉ []t̂ []t̂ refl refl refl refl refl = refl
+  DA .σπ []ĉ []t̂ []t̂ []t̂ refl refl refl refl refl refl refl = refl
+
+  A : AlgebraWithMotive Tag
+  A = record { DA = DA ; motive = refl }
 {-
   DA .π = {!!}
   DA .kπ = {!!}
