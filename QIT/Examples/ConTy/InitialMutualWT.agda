@@ -330,7 +330,284 @@ elim₂ {ℓM} M A x y = m₂
   m₂ : M x y
   m₂ = runD (M x) m₁ y
 
+data Tag : Set where
+  k̂₀ ĉ₀ t̂₀ : Tag
+  []ĉ []t̂ : Tag
+  # : Tag
+
+CT→Tag : I.CT → Tag
+CT→Tag = run Tag {!A!}
+  where
+  open ≡
+  open Algebra renaming ([_] to [])
+  DA : Algebra ℓ0
+  DA .CT = Tag
+  DA .[] k̂₀ = k̂₀
+  DA .[] ĉ₀ = k̂₀
+  DA .[] t̂₀ = k̂₀
+  DA .[] []ĉ = ĉ₀
+  DA .[] []t̂ = t̂₀
+  DA .[] # = #
+  DA .k̂ = k̂₀
+  DA .ĉ = ĉ₀
+  DA .t̂ = t̂₀
+  DA .ty₁ []t̂ = []ĉ
+  DA .ty₁ _ = #
+  DA .kty₁ []t̂ refl = refl
+  DA .kty₁-a []t̂ refl = refl
+  DA .kk̂ = refl
+  DA .kĉ = refl
+  DA .kt̂ = refl
+  DA .∙ = []ĉ
+  DA .k∙ = refl
+  DA .▷ []ĉ []t̂ = []ĉ
+  DA .▷ _ _ = #
+  DA .k▷ []ĉ []t̂ refl refl refl = refl
+  DA .▷-γ []ĉ []t̂ refl = refl
+  DA .▷-a []ĉ []t̂ refl = refl
+  DA .▷-a₁ []ĉ []t̂ refl = refl
+  DA .u []ĉ = []t̂
+  DA .u _ = #
+  DA .ku []ĉ refl = refl
+  DA .u₁ []ĉ refl = refl
+  DA .u-γ []ĉ refl = refl
 {-
+  DA .π = {!!}
+  DA .kπ = {!!}
+  DA .π₁ = {!!}
+  DA .π-γ = {!!}
+  DA .π-a = {!!}
+  DA .π-a₁ = {!!}
+  DA .π-b = {!!}
+  DA .π-b₁ = {!!}
+  DA .σ = {!!}
+  DA .kσ = {!!}
+  DA .σ₁ = {!!}
+  DA .σ-γ = {!!}
+  DA .σ-a = {!!}
+  DA .σ-a₁ = {!!}
+  DA .σ-b = {!!}
+  DA .σ-b₁ = {!!}
+  DA .σ▷ = {!!}
+  DA .σπ = {!!}
+{-
+  DA = record
+    { CT = Tag
+    ; [_] = λ _ → []k̂
+    ; k̂ = []k̂
+    ; ĉ = []k̂
+    ; t̂ = []k̂
+    ; ty₁ = λ _ → []ĉ
+    ; kty₁ = {!λ _ _ → refl!}
+    ; kty₁-a = {!!}
+    ; kk̂ = {!!}
+    ; kĉ = {!!}
+    ; kt̂ = {!!}
+    ; ∙ = {!!}
+    ; k∙ = {!!}
+    ; ▷ = {!!}
+    ; k▷ = {!!}
+    ; ▷-γ = {!!}
+    ; ▷-a = {!!}
+    ; ▷-a₁ = {!!}
+    ; u = {!!}
+    ; ku = {!!}
+    ; u₁ = {!!}
+    ; u-γ = {!!}
+    ; π = {!!}
+    ; kπ = {!!}
+    ; π₁ = {!!}
+    ; π-γ = {!!}
+    ; π-a = {!!}
+    ; π-a₁ = {!!}
+    ; π-b = {!!}
+    ; π-b₁ = {!!}
+    ; σ = {!!}
+    ; kσ = {!!}
+    ; σ₁ = {!!}
+    ; σ-γ = {!!}
+    ; σ-a = {!!}
+    ; σ-a₁ = {!!}
+    ; σ-b = {!!}
+    ; σ-b₁ = {!!}
+    ; σ▷ = {!!}
+    ; σπ = {!!}
+    }
+-}
+  A : AlgebraWithMotive Tag
+  A = record { DA = DA ; motive = {!!} }
+
+record NoConf (x : I.CT) : Set ℓI where
+  field
+    ĉ≢k̂ : x ≡ I.ĉ → x ≡ I.k̂ → ⊥
+    t̂≢k̂ : x ≡ I.t̂ → x ≡ I.k̂ → ⊥
+    ĉ≢t̂ : x ≡ I.ĉ → x ≡ I.t̂ → ⊥
+    []ĉ≢k̂ : I.[ x ] ≡ I.ĉ → I.[ x ] ≡ I.k̂ → ⊥
+    []t̂≢k̂ : I.[ x ] ≡ I.t̂ → I.[ x ] ≡ I.k̂ → ⊥
+    []ĉ≢t̂ : I.[ x ] ≡ I.ĉ → I.[ x ] ≡ I.t̂ → ⊥
+
+noConf : ∀ x → NoConf x
+noConf = runD NoConf {!!}
+  where
+  open DispAlgebra
+  open NoConf
+  DA : DispAlgebra _
+  DA .CT = NoConf
+  DA .[] x ncx = record
+    { ĉ≢k̂ = ncx .[]ĉ≢k̂
+    ; t̂≢k̂ = ncx .[]t̂≢k̂
+    ; ĉ≢t̂ = ncx .[]ĉ≢t̂
+    ; []ĉ≢k̂ = {!!}
+    ; []t̂≢k̂ = {!!}
+    ; []ĉ≢t̂ = {!!}
+    }
+  DA .k̂ .ĉ≢k̂ = {!!}
+  DA .k̂ .t̂≢k̂ = {!!}
+  DA .k̂ .ĉ≢t̂ = {!!}
+  DA .k̂ .[]ĉ≢k̂ = {!!}
+  DA .k̂ .[]t̂≢k̂ = {!!}
+  DA .k̂ .[]ĉ≢t̂ = {!!}
+  DA .ĉ = {!!}
+  DA .t̂ = {!!}
+  DA .kk̂ = {!!}
+  DA .kĉ = {!!}
+  DA .kt̂ = {!!}
+  DA .ty₁ = {!!}
+  DA .kty₁ = {!!}
+  DA .kty₁-a = {!!}
+  DA .∙ = {!!}
+  DA .k∙ = {!!}
+  DA .▷ = {!!}
+  DA .k▷ = {!!}
+  DA .▷-γ = {!!}
+  DA .▷-a = {!!}
+  DA .▷-a₁ = {!!}
+  DA .u = {!!}
+  DA .ku = {!!}
+  DA .u₁ = {!!}
+  DA .u-γ = {!!}
+  DA .π = {!!}
+  DA .kπ = {!!}
+  DA .π₁ = {!!}
+  DA .π-γ = {!!}
+  DA .π-a = {!!}
+  DA .π-a₁ = {!!}
+  DA .π-b = {!!}
+  DA .π-b₁ = {!!}
+  DA .σ = {!!}
+  DA .kσ = {!!}
+  DA .σ₁ = {!!}
+  DA .σ-γ = {!!}
+  DA .σ-a = {!!}
+  DA .σ-a₁ = {!!}
+  DA .σ-b = {!!}
+  DA .σ-b₁ = {!!}
+  DA .σ▷ = {!!}
+  DA .σπ = {!!}
+
+ĉ≢t̂ : ∀ x → x ≡ I.ĉ → x ≡ I.t̂ → ⊥ˢ
+ĉ≢t̂ = runD M A
+  where
+  M : I.CT → Set _ 
+  M x = x ≡ I.ĉ → x ≡ I.t̂ → ⊥ˢ
+  open DispAlgebra
+  DA : DispAlgebra _
+  DA .CT x = M x
+  DA .[] x mx [x]≡ĉ [x]≡t̂ = {!!}
+  DA .k̂ k̂≡ĉ k̂≡t̂ = {!!}
+  DA .ĉ = {!!}
+  DA .t̂ = {!!}
+  DA .kk̂ = {!!}
+  DA .kĉ = {!!}
+  DA .kt̂ = {!!}
+  DA .ty₁ = {!!}
+  DA .kty₁ = {!!}
+  DA .kty₁-a = {!!}
+  DA .∙ = {!!}
+  DA .k∙ = {!!}
+  DA .▷ = {!!}
+  DA .k▷ = {!!}
+  DA .▷-γ = {!!}
+  DA .▷-a = {!!}
+  DA .▷-a₁ = {!!}
+  DA .u = {!!}
+  DA .ku = {!!}
+  DA .u₁ = {!!}
+  DA .u-γ = {!!}
+  DA .π = {!!}
+  DA .kπ = {!!}
+  DA .π₁ = {!!}
+  DA .π-γ = {!!}
+  DA .π-a = {!!}
+  DA .π-a₁ = {!!}
+  DA .π-b = {!!}
+  DA .π-b₁ = {!!}
+  DA .σ = {!!}
+  DA .kσ = {!!}
+  DA .σ₁ = {!!}
+  DA .σ-γ = {!!}
+  DA .σ-a = {!!}
+  DA .σ-a₁ = {!!}
+  DA .σ-b = {!!}
+  DA .σ-b₁ = {!!}
+  DA .σ▷ = {!!}
+  DA .σπ = {!!}
+  A : DispAlgebraWithMotive M
+  A = {!!}
+
+▷≢ty : ∀ γ a → I.[ I.▷ γ a ] ≡ I.t̂ → ⊥ˢ
+▷≢ty = elim₂ M A
+  where
+  M : (γ : I.CT) → (a : I.CT) → Set _
+  M γ a = I.[ I.▷ γ a ] ≡ I.t̂ → ⊥ˢ
+  DA : DispAlgebra _
+  DA = record
+    { CT = λ γ → DispAlgebraWithMotive (λ a → M γ a)
+    ; [] = λ γ mγ → record { DA = {!!} ; motive = {!!} }
+    ; k̂ = {!!}
+    ; ĉ = {!!}
+    ; t̂ = {!!}
+    ; kk̂ = {!!}
+    ; kĉ = {!!}
+    ; kt̂ = {!!}
+    ; ty₁ = {!!}
+    ; kty₁ = {!!}
+    ; kty₁-a = {!!}
+    ; ∙ = {!!}
+    ; k∙ = {!!}
+    ; ▷ = {!!}
+    ; k▷ = {!!}
+    ; ▷-γ = {!!}
+    ; ▷-a = {!!}
+    ; ▷-a₁ = {!!}
+    ; u = {!!}
+    ; ku = {!!}
+    ; u₁ = {!!}
+    ; u-γ = {!!}
+    ; π = {!!}
+    ; kπ = {!!}
+    ; π₁ = {!!}
+    ; π-γ = {!!}
+    ; π-a = {!!}
+    ; π-a₁ = {!!}
+    ; π-b = {!!}
+    ; π-b₁ = {!!}
+    ; σ = {!!}
+    ; kσ = {!!}
+    ; σ₁ = {!!}
+    ; σ-γ = {!!}
+    ; σ-a = {!!}
+    ; σ-a₁ = {!!}
+    ; σ-b = {!!}
+    ; σ-b₁ = {!!}
+    ; σ▷ = {!!}
+    ; σπ = {!!}
+    }
+  A : DispAlgebraWithMotive (λ x → DispAlgebraWithMotive (λ y → M x y))
+  A .DispAlgebraWithMotive.DA = {!!}
+  A .DispAlgebraWithMotive.motive = {!!}
+
+
 module Code where
   open Algebra renaming ([_] to [])
   A : Algebra (lsuc (lsuc ℓI))
