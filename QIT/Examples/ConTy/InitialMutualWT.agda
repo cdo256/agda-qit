@@ -1,5 +1,6 @@
 open import QIT.Prelude
 open import QIT.Prop
+open import QIT.Maybe
 open import QIT.Examples.ConTy.MutualWeaklyTagged as W
 open import QIT.Relation.Binary using (IsEquivalence)
 open import QIT.Setoid
@@ -331,26 +332,167 @@ elim₂ {ℓM} M A x y = m₂
   m₂ = runD (M x) m₁ y
 
 data Tag : Set where
-  k̂₀ ĉ₀ t̂₀ : Tag
-  []ĉ []t̂ : Tag
-  # : Tag
+  k₀ c₀ t₀ : Tag
 
-CT→Tag : I.CT → Tag
-CT→Tag = run Tag A
+_≟ᵗ_ : (x y : Tag) → Decᵖ (x ≡ y)
+k₀ ≟ᵗ k₀ = yes ≡.refl
+k₀ ≟ᵗ c₀ = no λ ()
+k₀ ≟ᵗ t₀ = no λ ()
+c₀ ≟ᵗ k₀ = no λ ()
+c₀ ≟ᵗ c₀ = yes ≡.refl
+c₀ ≟ᵗ t₀ = no λ ()
+t₀ ≟ᵗ k₀ = no λ ()
+t₀ ≟ᵗ c₀ = no λ ()
+t₀ ≟ᵗ t₀ = yes ≡.refl
+
+data Class₀ : Set where
+  []k̂₀ : Tag → Class₀
+  []ĉ₀ []t̂₀ : Class₀
+
+[]k̂₀-inj : ∀ {x y} → []k̂₀ x ≡ []k̂₀ y → x ≡ y
+[]k̂₀-inj ≡.refl = ≡.refl
+
+_≟ᶜ_ : (x y : Class₀) → Decᵖ (x ≡ y)
+[]k̂₀ x ≟ᶜ []k̂₀ y with x ≟ᵗ y
+... | yes p = yes (≡.cong []k̂₀ p)
+... | no p = no (λ q → p ([]k̂₀-inj q))
+[]k̂₀ _ ≟ᶜ []ĉ₀ = no λ ()
+[]k̂₀ _ ≟ᶜ []t̂₀ = no λ ()
+[]ĉ₀ ≟ᶜ []k̂₀ _ = no λ ()
+[]ĉ₀ ≟ᶜ []ĉ₀ = yes ≡.refl
+[]ĉ₀ ≟ᶜ []t̂₀ = no λ ()
+[]t̂₀ ≟ᶜ []k̂₀ _ = no λ ()
+[]t̂₀ ≟ᶜ []ĉ₀ = no λ ()
+[]t̂₀ ≟ᶜ []t̂₀ = yes ≡.refl
+
+pattern # = nothing
+
+pattern []k̂ x = just ([]k̂₀ x)
+pattern []ĉ = just []ĉ₀
+pattern []t̂ = just []t̂₀
+
+Class = Maybe Class₀
+
+Tag→CT : Tag → I.CT
+Tag→CT k₀ = I.k̂
+Tag→CT c₀ = I.ĉ
+Tag→CT t₀ = I.t̂
+
+Class₀→Tag₀ : Class₀ → Tag
+Class₀→Tag₀ ([]k̂₀ _) = k₀
+Class₀→Tag₀ []ĉ₀ = c₀
+Class₀→Tag₀ []t̂₀ = t₀
+
+Class→Tag : Class → Maybe Tag
+Class→Tag = map Class₀→Tag₀ 
+
+Class₀→CT : (g : Class₀) → I.CT
+Class₀→CT g = Tag→CT (Class₀→Tag₀ g)
+
+require[] : ∀ {X : Set} → Class₀ → X → (Class → X)
+require[] a x b = {!!}
+
+require[]' : ∀ {X : Set} → Class₀ → Maybe X → (Class → Maybe X)
+require[]' a x b = {!!}
+
+class▷ : Class → Class → Class
+-- class▷ = require[] []ĉ₀ (require[] []t̂₀ (just []ĉ₀)) 
+class▷ x y = x >>= (λ x → ifᵖ x ≟ᶜ []ĉ₀ then f y else nothing)
   where
+  f : Class → Class
+  f = _>>= λ y → ifᵖ y ≟ᶜ []t̂₀ then just []ĉ₀ else nothing 
+--- require[]' []ĉ₀ {!!}
+
+{-
+CT→Class : I.CT → Class
+CT→Class = run Class A
+  module CT→Class where
   open ≡
   open Algebra renaming ([_] to [])
+
+  class[] : Class → Class
+  class[] ([]k̂ k₀) = ([]k̂ k₀)
+  class[] ([]k̂ c₀) = ([]k̂ k₀)
+  class[] ([]k̂ t₀) = ([]k̂ k₀)
+  class[] []ĉ = ([]k̂ c₀)
+  class[] []t̂ = ([]k̂ t₀)
+  class[] # = #
+
+  class▷ : Class → Class → Class
+  class▷ []ĉ []t̂ = []ĉ
+  class▷ _ _ = #
+
+  classTy : Class → Class → Class → Class
+  classTy []ĉ []t̂ []t̂ = []t̂
+  classTy _ _ _ = #
+
+  data Valid▷ : Class → Class → Prop where
+    valid▷ : Valid▷ []ĉ []t̂
+
+  inferValid▷ : ∀ γ a
+    → class[] (class▷ γ a) ≡ ([]k̂ c₀)
+    → Valid▷ γ a
+  inferValid▷ []ĉ []t̂ refl = valid▷
+  inferValid▷ ([]k̂ k₀) _ ()
+  inferValid▷ ([]k̂ c₀) _ ()
+  inferValid▷ ([]k̂ t₀) _ ()
+  inferValid▷ []t̂ _ ()
+  inferValid▷ # _ ()
+  inferValid▷ []ĉ ([]k̂ k₀) ()
+  inferValid▷ []ĉ ([]k̂ c₀) ()
+  inferValid▷ []ĉ ([]k̂ t₀) ()
+  inferValid▷ []ĉ []ĉ ()
+  inferValid▷ []ĉ # ()
+
+  data ValidTy : Class → Class → Class → Prop where
+    validTy : ValidTy []ĉ []t̂ []t̂
+
+  inferValidπ : ∀ γ a b
+    → class[] (classTy γ a b) ≡ ([]k̂ t₀)
+    → ValidTy γ a b
+  inferValidπ []ĉ []t̂ []t̂ refl = validTy
+  inferValidπ ([]k̂ k₀) _ _ ()
+  inferValidπ ([]k̂ c₀) _ _ ()
+  inferValidπ ([]k̂ t₀) _ _ ()
+  inferValidπ []t̂ _ _ ()
+  inferValidπ # _ _ ()
+  inferValidπ []ĉ ([]k̂ k₀) _ ()
+  inferValidπ []ĉ ([]k̂ c₀) _ ()
+  inferValidπ []ĉ ([]k̂ t₀) _ ()
+  inferValidπ []ĉ []ĉ _ ()
+  inferValidπ []ĉ # _ ()
+  inferValidπ []ĉ []t̂ ([]k̂ k₀) ()
+  inferValidπ []ĉ []t̂ ([]k̂ c₀) ()
+  inferValidπ []ĉ []t̂ ([]k̂ t₀) ()
+  inferValidπ []ĉ []t̂ []ĉ ()
+  inferValidπ []ĉ []t̂ # ()
+
+  inferValidσ : ∀ γ a b
+    → class[] (classTy γ a b) ≡ ([]k̂ t₀)
+    → ValidTy γ a b
+  inferValidσ []ĉ []t̂ []t̂ refl = validTy
+  inferValidσ ([]k̂ k₀) _ _ ()
+  inferValidσ ([]k̂ c₀) _ _ ()
+  inferValidσ ([]k̂ t₀) _ _ ()
+  inferValidσ []t̂ _ _ ()
+  inferValidσ # _ _ ()
+  inferValidσ []ĉ ([]k̂ k₀) _ ()
+  inferValidσ []ĉ ([]k̂ c₀) _ ()
+  inferValidσ []ĉ ([]k̂ t₀) _ ()
+  inferValidσ []ĉ []ĉ _ ()
+  inferValidσ []ĉ # _ ()
+  inferValidσ []ĉ []t̂ ([]k̂ k₀) ()
+  inferValidσ []ĉ []t̂ ([]k̂ c₀) ()
+  inferValidσ []ĉ []t̂ ([]k̂ t₀) ()
+  inferValidσ []ĉ []t̂ []ĉ ()
+  inferValidσ []ĉ []t̂ # ()
+
   DA : Algebra ℓ0
-  DA .CT = Tag
-  DA .[] k̂₀ = k̂₀
-  DA .[] ĉ₀ = k̂₀
-  DA .[] t̂₀ = k̂₀
-  DA .[] []ĉ = ĉ₀
-  DA .[] []t̂ = t̂₀
-  DA .[] # = #
-  DA .k̂ = k̂₀
-  DA .ĉ = ĉ₀
-  DA .t̂ = t̂₀
+  DA .CT = Class
+  DA .[] = class[]
+  DA .k̂ = ([]k̂ k₀)
+  DA .ĉ = ([]k̂ c₀)
+  DA .t̂ = ([]k̂ t₀)
   DA .ty₁ []t̂ = []ĉ
   DA .ty₁ _ = #
   DA .kty₁ []t̂ refl = refl
@@ -360,487 +502,117 @@ CT→Tag = run Tag A
   DA .kt̂ = refl
   DA .∙ = []ĉ
   DA .k∙ = refl
-  DA .▷ []ĉ []t̂ = []ĉ
-  DA .▷ _ _ = #
+  DA .▷ = class▷
   DA .k▷ []ĉ []t̂ refl refl refl = refl
-  DA .▷-γ []ĉ []t̂ refl = refl
-  DA .▷-γ _ _ ()
-  DA .▷-a []ĉ []t̂ refl = refl
-  DA .▷-a _ _ ()
-  DA .▷-a₁ []ĉ []t̂ refl = refl
-  DA .▷-a₁ _ _ ()
+  DA .▷-γ γ a k with inferValid▷ γ a k
+  ... | valid▷ = refl
+  DA .▷-a γ a k with inferValid▷ γ a k
+  ... | valid▷ = refl
+  DA .▷-a₁ γ a k with inferValid▷ γ a k
+  ... | valid▷ = refl
   DA .u []ĉ = []t̂
   DA .u _ = #
   DA .ku []ĉ refl = refl
   DA .u₁ []ĉ refl = refl
   DA .u-γ []ĉ refl = refl
-  DA .π []ĉ []t̂ []t̂ = []t̂
-  DA .π _ _ _ = #
+  DA .π = classTy
   DA .kπ []ĉ []t̂ []t̂ refl refl refl refl refl = refl
   DA .π₁ []ĉ []t̂ []t̂ refl = refl
-  DA .π₁ []ĉ []t̂ k̂₀ ()
-  DA .π₁ []ĉ []t̂ ĉ₀ ()
-  DA .π₁ []ĉ []t̂ t̂₀ ()
+  DA .π₁ []ĉ []t̂ ([]k̂ k₀) ()
+  DA .π₁ []ĉ []t̂ ([]k̂ c₀) ()
+  DA .π₁ []ĉ []t̂ ([]k̂ t₀) ()
   DA .π₁ []ĉ []t̂ []ĉ ()
   DA .π₁ []ĉ []t̂ # ()
-  DA .π₁ []ĉ k̂₀ _ ()
-  DA .π₁ []ĉ ĉ₀ _ ()
-  DA .π₁ []ĉ t̂₀ _ ()
+  DA .π₁ []ĉ ([]k̂ k₀) _ ()
+  DA .π₁ []ĉ ([]k̂ c₀) _ ()
+  DA .π₁ []ĉ ([]k̂ t₀) _ ()
   DA .π₁ []ĉ []ĉ _ ()
   DA .π₁ []ĉ # _ ()
-  DA .π₁ k̂₀ y z ()
-  DA .π₁ ĉ₀ y z ()
-  DA .π₁ t̂₀ y z ()
+  DA .π₁ ([]k̂ k₀) y z ()
+  DA .π₁ ([]k̂ c₀) y z ()
+  DA .π₁ ([]k̂ t₀) y z ()
   DA .π₁ []t̂ y z ()
   DA .π₁ # y z ()
-  DA .π-γ []ĉ []t̂ []t̂ refl = refl
-  DA .π-γ []ĉ []t̂ _ _ = refl
-  DA .π-a []ĉ []t̂ []t̂ _ = refl
-  DA .π-a []ĉ []t̂ _ _ = refl
-  DA .π-a₁ []ĉ []t̂ []t̂ refl = refl
-  DA .π-a₁ []ĉ []t̂ _ _ = refl
-  DA .π-b []ĉ []t̂ []t̂ refl = refl
-  DA .π-b []ĉ []t̂ k̂₀ ()
-  DA .π-b []ĉ []t̂ ĉ₀ ()
-  DA .π-b []ĉ []t̂ t̂₀ ()
-  DA .π-b []ĉ []t̂ []ĉ ()
-  DA .π-b []ĉ []t̂ # ()
-  DA .π-b₁ []ĉ []t̂ []t̂ refl = refl
-  DA .π-b₁ _ _ _ ()
-  DA .σ []ĉ []t̂ []t̂ = []t̂
-  DA .σ _ _ _ = #
+  DA .π-γ γ a b k with inferValidπ γ a b k
+  ... | validTy = refl
+  DA .π-a γ a b k with inferValidπ γ a b k
+  ... | validTy = refl
+  DA .π-a₁ γ a b k with inferValidπ γ a b k
+  ... | validTy = refl
+  DA .π-b γ a b k with inferValidπ γ a b k
+  ... | validTy = refl
+  DA .π-b₁ γ a b k with inferValidπ γ a b k
+  ... | validTy = refl
+  DA .σ = classTy
   DA .kσ []ĉ []t̂ []t̂ refl refl refl refl refl = refl
-  DA .σ₁ []ĉ []t̂ []t̂ refl = refl
-  DA .σ₁ _ _ _ ()
-  DA .σ-γ []ĉ []t̂ []t̂ refl = refl
-  DA .σ-γ _ _ _ ()
-  DA .σ-a []ĉ []t̂ []t̂ refl = refl
-  DA .σ-a _ _ _ ()
-  DA .σ-a₁ []ĉ []t̂ []t̂ refl = refl
-  DA .σ-a₁ _ _ _ ()
-  DA .σ-b []ĉ []t̂ []t̂ refl = refl
-  DA .σ-b _ _ _ ()
-  DA .σ-b₁ []ĉ []t̂ []t̂ refl = refl
-  DA .σ-b₁ _ _ _ ()
+  DA .σ₁ γ a b k with inferValidσ γ a b k
+  ... | validTy = refl
+  DA .σ-γ γ a b k with inferValidσ γ a b k
+  ... | validTy = refl
+  DA .σ-a γ a b k with inferValidσ γ a b k
+  ... | validTy = refl
+  DA .σ-a₁ γ a b k with inferValidσ γ a b k
+  ... | validTy = refl
+  DA .σ-b γ a b k with inferValidσ γ a b k
+  ... | validTy = refl
+  DA .σ-b₁ γ a b k with inferValidσ γ a b k
+  ... | validTy = refl
   DA .σ▷ []ĉ []t̂ []t̂ refl refl refl refl refl = refl
   DA .σπ []ĉ []t̂ []t̂ []t̂ refl refl refl refl refl refl refl = refl
 
-  A : AlgebraWithMotive Tag
+  A : AlgebraWithMotive Class
   A = record { DA = DA ; motive = refl }
-{-
-  DA .π = {!!}
-  DA .kπ = {!!}
-  DA .π₁ = {!!}
-  DA .π-γ = {!!}
-  DA .π-a = {!!}
-  DA .π-a₁ = {!!}
-  DA .π-b = {!!}
-  DA .π-b₁ = {!!}
-  DA .σ = {!!}
-  DA .kσ = {!!}
-  DA .σ₁ = {!!}
-  DA .σ-γ = {!!}
-  DA .σ-a = {!!}
-  DA .σ-a₁ = {!!}
-  DA .σ-b = {!!}
-  DA .σ-b₁ = {!!}
-  DA .σ▷ = {!!}
-  DA .σπ = {!!}
-{-
-  DA = record
-    { CT = Tag
-    ; [_] = λ _ → []k̂
-    ; k̂ = []k̂
-    ; ĉ = []k̂
-    ; t̂ = []k̂
-    ; ty₁ = λ _ → []ĉ
-    ; kty₁ = {!λ _ _ → refl!}
-    ; kty₁-a = {!!}
-    ; kk̂ = {!!}
-    ; kĉ = {!!}
-    ; kt̂ = {!!}
-    ; ∙ = {!!}
-    ; k∙ = {!!}
-    ; ▷ = {!!}
-    ; k▷ = {!!}
-    ; ▷-γ = {!!}
-    ; ▷-a = {!!}
-    ; ▷-a₁ = {!!}
-    ; u = {!!}
-    ; ku = {!!}
-    ; u₁ = {!!}
-    ; u-γ = {!!}
-    ; π = {!!}
-    ; kπ = {!!}
-    ; π₁ = {!!}
-    ; π-γ = {!!}
-    ; π-a = {!!}
-    ; π-a₁ = {!!}
-    ; π-b = {!!}
-    ; π-b₁ = {!!}
-    ; σ = {!!}
-    ; kσ = {!!}
-    ; σ₁ = {!!}
-    ; σ-γ = {!!}
-    ; σ-a = {!!}
-    ; σ-a₁ = {!!}
-    ; σ-b = {!!}
-    ; σ-b₁ = {!!}
-    ; σ▷ = {!!}
-    ; σπ = {!!}
-    }
--}
-  A : AlgebraWithMotive Tag
-  A = record { DA = DA ; motive = {!!} }
 
-record NoConf (x : I.CT) : Set ℓI where
-  field
-    ĉ≢k̂ : x ≡ I.ĉ → x ≡ I.k̂ → ⊥
-    t̂≢k̂ : x ≡ I.t̂ → x ≡ I.k̂ → ⊥
-    ĉ≢t̂ : x ≡ I.ĉ → x ≡ I.t̂ → ⊥
-    []ĉ≢k̂ : I.[ x ] ≡ I.ĉ → I.[ x ] ≡ I.k̂ → ⊥
-    []t̂≢k̂ : I.[ x ] ≡ I.t̂ → I.[ x ] ≡ I.k̂ → ⊥
-    []ĉ≢t̂ : I.[ x ] ≡ I.ĉ → I.[ x ] ≡ I.t̂ → ⊥
+class[]-correct : ∀ g s
+  → CT→Class.class[] g ≡ []k̂ s
+  → Class→Tag g ≡ just s
+class[]-correct ([]k̂ k₀) k₀ ≡.refl = ≡.refl
+class[]-correct ([]k̂ c₀) k₀ ≡.refl = ≡.refl
+class[]-correct ([]k̂ t₀) k₀ ≡.refl = ≡.refl
+class[]-correct []ĉ c₀ ≡.refl = ≡.refl
+class[]-correct []t̂ t₀ ≡.refl = ≡.refl
+class[]-correct # k₀ ()
+class[]-correct # c₀ ()
+class[]-correct # t₀ ()
 
-noConf : ∀ x → NoConf x
-noConf = runD NoConf {!!}
+classified-valid : ∀ {g s} → Class→Tag g ≡ just s → g ≢ #
+classified-valid {([]k̂ k₀)} p ()
+classified-valid {([]k̂ c₀)} p ()
+classified-valid {([]k̂ t₀)} p ()
+classified-valid {[]ĉ} p ()
+classified-valid {[]t̂} p ()
+classified-valid {#} ()
+
+classified-correct : ∀ {g s}
+  → (p : Class→Tag g ≡ just s)
+  → Class₀→CT g (classified-valid p) ≡ Tag→CT s
+classified-correct {([]k̂ k₀)} {k₀} ≡.refl = ≡.refl
+classified-correct {([]k̂ c₀)} {k₀} ≡.refl = ≡.refl
+classified-correct {([]k̂ t₀)} {k₀} ≡.refl = ≡.refl
+classified-correct {[]ĉ} {c₀} ≡.refl = ≡.refl
+classified-correct {[]t̂} {t₀} ≡.refl = ≡.refl
+classified-correct {#} ()
+
+module CT→Class-rec = Hom (rec CT→Class.DA)
+
+CT→Class-Tag : ∀ s → CT→Class (Tag→CT s) ≡ []k̂ s
+CT→Class-Tag k₀ = CT→Class-rec.k̂
+CT→Class-Tag c₀ = CT→Class-rec.ĉ
+CT→Class-Tag t₀ = CT→Class-rec.t̂
+
+CT→Tag-correct : ∀ x s
+  → I.[ x ] ≡ Tag→CT s
+  → Class→Tag (CT→Class x) ≡ just s
+CT→Tag-correct x s kx = class[]-correct (CT→Class x) s p
   where
-  open DispAlgebra
-  open NoConf
-  DA : DispAlgebra _
-  DA .CT = NoConf
-  DA .[] x ncx = record
-    { ĉ≢k̂ = ncx .[]ĉ≢k̂
-    ; t̂≢k̂ = ncx .[]t̂≢k̂
-    ; ĉ≢t̂ = ncx .[]ĉ≢t̂
-    ; []ĉ≢k̂ = {!!}
-    ; []t̂≢k̂ = {!!}
-    ; []ĉ≢t̂ = {!!}
-    }
-  DA .k̂ .ĉ≢k̂ = {!!}
-  DA .k̂ .t̂≢k̂ = {!!}
-  DA .k̂ .ĉ≢t̂ = {!!}
-  DA .k̂ .[]ĉ≢k̂ = {!!}
-  DA .k̂ .[]t̂≢k̂ = {!!}
-  DA .k̂ .[]ĉ≢t̂ = {!!}
-  DA .ĉ = {!!}
-  DA .t̂ = {!!}
-  DA .kk̂ = {!!}
-  DA .kĉ = {!!}
-  DA .kt̂ = {!!}
-  DA .ty₁ = {!!}
-  DA .kty₁ = {!!}
-  DA .kty₁-a = {!!}
-  DA .∙ = {!!}
-  DA .k∙ = {!!}
-  DA .▷ = {!!}
-  DA .k▷ = {!!}
-  DA .▷-γ = {!!}
-  DA .▷-a = {!!}
-  DA .▷-a₁ = {!!}
-  DA .u = {!!}
-  DA .ku = {!!}
-  DA .u₁ = {!!}
-  DA .u-γ = {!!}
-  DA .π = {!!}
-  DA .kπ = {!!}
-  DA .π₁ = {!!}
-  DA .π-γ = {!!}
-  DA .π-a = {!!}
-  DA .π-a₁ = {!!}
-  DA .π-b = {!!}
-  DA .π-b₁ = {!!}
-  DA .σ = {!!}
-  DA .kσ = {!!}
-  DA .σ₁ = {!!}
-  DA .σ-γ = {!!}
-  DA .σ-a = {!!}
-  DA .σ-a₁ = {!!}
-  DA .σ-b = {!!}
-  DA .σ-b₁ = {!!}
-  DA .σ▷ = {!!}
-  DA .σπ = {!!}
+  open ≡
+  p : CT→Class.class[] (CT→Class x) ≡ []k̂ s
+  p = trans (sym (CT→Class-rec.[ x ]))
+      (trans (cong CT→Class kx) (CT→Class-Tag s))
 
-ĉ≢t̂ : ∀ x → x ≡ I.ĉ → x ≡ I.t̂ → ⊥ˢ
-ĉ≢t̂ = runD M A
-  where
-  M : I.CT → Set _ 
-  M x = x ≡ I.ĉ → x ≡ I.t̂ → ⊥ˢ
-  open DispAlgebra
-  DA : DispAlgebra _
-  DA .CT x = M x
-  DA .[] x mx [x]≡ĉ [x]≡t̂ = {!!}
-  DA .k̂ k̂≡ĉ k̂≡t̂ = {!!}
-  DA .ĉ = {!!}
-  DA .t̂ = {!!}
-  DA .kk̂ = {!!}
-  DA .kĉ = {!!}
-  DA .kt̂ = {!!}
-  DA .ty₁ = {!!}
-  DA .kty₁ = {!!}
-  DA .kty₁-a = {!!}
-  DA .∙ = {!!}
-  DA .k∙ = {!!}
-  DA .▷ = {!!}
-  DA .k▷ = {!!}
-  DA .▷-γ = {!!}
-  DA .▷-a = {!!}
-  DA .▷-a₁ = {!!}
-  DA .u = {!!}
-  DA .ku = {!!}
-  DA .u₁ = {!!}
-  DA .u-γ = {!!}
-  DA .π = {!!}
-  DA .kπ = {!!}
-  DA .π₁ = {!!}
-  DA .π-γ = {!!}
-  DA .π-a = {!!}
-  DA .π-a₁ = {!!}
-  DA .π-b = {!!}
-  DA .π-b₁ = {!!}
-  DA .σ = {!!}
-  DA .kσ = {!!}
-  DA .σ₁ = {!!}
-  DA .σ-γ = {!!}
-  DA .σ-a = {!!}
-  DA .σ-a₁ = {!!}
-  DA .σ-b = {!!}
-  DA .σ-b₁ = {!!}
-  DA .σ▷ = {!!}
-  DA .σπ = {!!}
-  A : DispAlgebraWithMotive M
-  A = {!!}
-
-▷≢ty : ∀ γ a → I.[ I.▷ γ a ] ≡ I.t̂ → ⊥ˢ
-▷≢ty = elim₂ M A
-  where
-  M : (γ : I.CT) → (a : I.CT) → Set _
-  M γ a = I.[ I.▷ γ a ] ≡ I.t̂ → ⊥ˢ
-  DA : DispAlgebra _
-  DA = record
-    { CT = λ γ → DispAlgebraWithMotive (λ a → M γ a)
-    ; [] = λ γ mγ → record { DA = {!!} ; motive = {!!} }
-    ; k̂ = {!!}
-    ; ĉ = {!!}
-    ; t̂ = {!!}
-    ; kk̂ = {!!}
-    ; kĉ = {!!}
-    ; kt̂ = {!!}
-    ; ty₁ = {!!}
-    ; kty₁ = {!!}
-    ; kty₁-a = {!!}
-    ; ∙ = {!!}
-    ; k∙ = {!!}
-    ; ▷ = {!!}
-    ; k▷ = {!!}
-    ; ▷-γ = {!!}
-    ; ▷-a = {!!}
-    ; ▷-a₁ = {!!}
-    ; u = {!!}
-    ; ku = {!!}
-    ; u₁ = {!!}
-    ; u-γ = {!!}
-    ; π = {!!}
-    ; kπ = {!!}
-    ; π₁ = {!!}
-    ; π-γ = {!!}
-    ; π-a = {!!}
-    ; π-a₁ = {!!}
-    ; π-b = {!!}
-    ; π-b₁ = {!!}
-    ; σ = {!!}
-    ; kσ = {!!}
-    ; σ₁ = {!!}
-    ; σ-γ = {!!}
-    ; σ-a = {!!}
-    ; σ-a₁ = {!!}
-    ; σ-b = {!!}
-    ; σ-b₁ = {!!}
-    ; σ▷ = {!!}
-    ; σπ = {!!}
-    }
-  A : DispAlgebraWithMotive (λ x → DispAlgebraWithMotive (λ y → M x y))
-  A .DispAlgebraWithMotive.DA = {!!}
-  A .DispAlgebraWithMotive.motive = {!!}
-
-
-module Code where
-  open Algebra renaming ([_] to [])
-  A : Algebra (lsuc (lsuc ℓI))
-  A .CT = Algebra (lsuc ℓI)
-  A .[] x .CT = Prop ℓI
-  A .[] x .[] y = {!!}
-  A .[] x .k̂ = {!!}
-  A .[] x .ĉ = {!!}
-  A .[] x .t̂ = {!!}
-  A .[] x .ty₁ = {!!}
-  A .[] x .kty₁ = {!!}
-  A .[] x .kk̂ = {!!}
-  A .[] x .kĉ = {!!}
-  A .[] x .kt̂ = {!!}
-  A .[] x .∙ = {!!}
-  A .[] x .k∙ = {!!}
-  A .[] x .▷ = {!!}
-  A .[] x .k▷ = {!!}
-  A .[] x .▷-γ = {!!}
-  A .[] x .▷-a = {!!}
-  A .[] x .▷-a₁ = {!!}
-  A .[] x .u = {!!}
-  A .[] x .ku = {!!}
-  A .[] x .u₁ = {!!}
-  A .[] x .u-γ = {!!}
-  A .[] x .π = {!!}
-  A .[] x .kπ = {!!}
-  A .[] x .π₁ = {!!}
-  A .[] x .π-γ = {!!}
-  A .[] x .π-a = {!!}
-  A .[] x .π-a₁ = {!!}
-  A .[] x .π-b = {!!}
-  A .[] x .π-b₁ = {!!}
-  A .[] x .σ = {!!}
-  A .[] x .kσ = {!!}
-  A .[] x .σ₁ = {!!}
-  A .[] x .σ-γ = {!!}
-  A .[] x .σ-a = {!!}
-  A .[] x .σ-a₁ = {!!}
-  A .[] x .σ-b = {!!}
-  A .[] x .σ-b₁ = {!!}
-  A .[] x .σ▷ = {!!}
-  A .[] x .σπ = {!!}
-  A .k̂ = {!!}
-  A .ĉ = {!!}
-  A .t̂ = {!!}
-  A .ty₁ = {!!}
-  A .kty₁ = {!!}
-  A .kk̂ = {!!}
-  A .kĉ = {!!}
-  A .kt̂ = {!!}
-  A .∙ = {!!}
-  A .k∙ = {!!}
-  A .▷ = {!!}
-  A .k▷ = {!!}
-  A .▷-γ = {!!}
-  A .▷-a = {!!}
-  A .▷-a₁ = {!!}
-  A .u = {!!}
-  A .ku = {!!}
-  A .u₁ = {!!}
-  A .u-γ = {!!}
-  A .π = {!!}
-  A .kπ = {!!}
-  A .π₁ = {!!}
-  A .π-γ = {!!}
-  A .π-a = {!!}
-  A .π-a₁ = {!!}
-  A .π-b = {!!}
-  A .π-b₁ = {!!}
-  A .σ = {!!}
-  A .kσ = {!!}
-  A .σ₁ = {!!}
-  A .σ-γ = {!!}
-  A .σ-a = {!!}
-  A .σ-a₁ = {!!}
-  A .σ-b = {!!}
-  A .σ-b₁ = {!!}
-  A .σ▷ = {!!}
-  A .σπ = {!!}
-  ρ = rec₂ {!!} {!!} {!!}
-
-module Code2 where
-  M : I.CT → Set ℓI
-  M x = PropLift ?
-  open DispAlgebraWithMotive
-  open DispAlgebra
-  A : DispAlgebra ℓI
-  A .CT = M
-  A .[] x m pk pc = {!!}
-  A .k̂ = {!!}
-  A .ĉ = {!!}
-  A .t̂ = {!!}
-  A .kk̂ = {!!}
-  A .kĉ = {!!}
-  A .kt̂ = {!!}
-  A .ty₁ = {!!}
-  A .kty₁ = {!!}
-  A .∙ = {!!}
-  A .k∙ = {!!}
-  A .▷ = {!!}
-  A .k▷ = {!!}
-  A .▷-γ = {!!}
-  A .▷-a = {!!}
-  A .▷-a₁ = {!!}
-  A .u = {!!}
-  A .ku = {!!}
-  A .u₁ = {!!}
-  A .u-γ = {!!}
-  A .π = {!!}
-  A .kπ = {!!}
-  A .π₁ = {!!}
-  A .π-γ = {!!}
-  A .π-a = {!!}
-  A .π-a₁ = {!!}
-  A .π-b = {!!}
-  A .π-b₁ = {!!}
-  A .σ = {!!}
-  A .kσ = {!!}
-  A .σ₁ = {!!}
-  A .σ-γ = {!!}
-  A .σ-a = {!!}
-  A .σ-a₁ = {!!}
-  A .σ-b = {!!}
-  A .σ-b₁ = {!!}
-  A .σ▷ = {!!}
-  A .σπ = {!!}
-{-
-  v = elim₂ M A {!!} {!!}
--}
-
-k≢c : I.k̂ ≢ I.ĉ
-k≢c p = {!!}
-  where
-  M : I.CT → Set ℓI
-  M x = x ≡ I.k̂ → x ≡ I.ĉ → ⊥ˢ
-  open DispAlgebraWithMotive
-  open DispAlgebra
-  A : DispAlgebra ℓI
-  A .CT = M
-  A .[] x m pk pc = {!!}
-  A .k̂ = {!!}
-  A .ĉ = {!!}
-  A .t̂ = {!!}
-  A .kk̂ = {!!}
-  A .kĉ = {!!}
-  A .kt̂ = {!!}
-  A .ty₁ = {!!}
-  A .kty₁ = {!!}
-  A .∙ = {!!}
-  A .k∙ = {!!}
-  A .▷ = {!!}
-  A .k▷ = {!!}
-  A .▷-γ = {!!}
-  A .▷-a = {!!}
-  A .▷-a₁ = {!!}
-  A .u = {!!}
-  A .ku = {!!}
-  A .u₁ = {!!}
-  A .u-γ = {!!}
-  A .π = {!!}
-  A .kπ = {!!}
-  A .π₁ = {!!}
-  A .π-γ = {!!}
-  A .π-a = {!!}
-  A .π-a₁ = {!!}
-  A .π-b = {!!}
-  A .π-b₁ = {!!}
-  A .σ = {!!}
-  A .kσ = {!!}
-  A .σ₁ = {!!}
-  A .σ-γ = {!!}
-  A .σ-a = {!!}
-  A .σ-a₁ = {!!}
-  A .σ-b = {!!}
-  A .σ-b₁ = {!!}
-  A .σ▷ = {!!}
-  A .σπ = {!!}
-  v = elim₂ M A {!!} {!!}
+CT→Class-correct : ∀ x s (kx : I.[ x ] ≡ Tag→CT s)
+  → let p = CT→Tag-correct x s kx
+    in Box (Class→CT (CT→Class x) (classified-valid p) ≡ I.[ x ])
+CT→Class-correct x s kx = box
+  (≡.trans (classified-correct (CT→Tag-correct x s kx)) (≡.sym kx))
 -}
