@@ -16,7 +16,7 @@ open import QIT.Examples.ConTy.MutualWTToMutual
 open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Types
-open import QIT.Maybe
+open import QIT.Maybe using (Maybe; nothing; just; just-inj; just≢nothing)
 open import QIT.Setoid hiding (≡→≈)
 open import QIT.Category.Morphism
 open import QIT.Category.Initial
@@ -422,7 +422,253 @@ module _ {ℓA}
       εFI = ε FI
       module εFI = ε FI
       module εFI₀ = D.Hom εFI
-      open DispAlgebra
+      module Classβ where
+        open PropDispAlgebra
+        module C = W.Algebra CT→Class.DA
+        module C-rec = W.Hom (recᵂ CT→Class.DA)
+
+        classθ : ∀ x → C-rec.θ x ≡ CT→Class x
+        classθ x = refl
+
+        ty₁-arg↓ : ∀ a → ι.θ (I.ty₁ a) ↓ → ι.θ a ↓
+        ty₁-arg↓ a ty₁a↓ =
+          G₀FI.ty₁⁻ (ι.θ a) (transp↓ (ι.ty₁ a) ty₁a↓)
+
+        ty₁-arg-kind : ∀ a (ty₁a↓ : ι.θ (I.ty₁ a) ↓)
+          → G₀FI.[ ι.θ a ] ≡ G₀FI.tʰ
+        ty₁-arg-kind a ty₁a↓ =
+          mk≡↓ (G₀FI.[]↓ (ι.θ a) a↓) tt* (ty₁θa↓ .∧e₂ .∧e₁)
+          where
+          ty₁θa↓ : G₀FI.ty₁ (ι.θ a) ↓
+          ty₁θa↓ = transp↓ (ι.ty₁ a) ty₁a↓
+          a↓ : ι.θ a ↓
+          a↓ = G₀FI.ty₁⁻ (ι.θ a) ty₁θa↓
+
+        Classβ : I.CT → Prop _
+        Classβ x = ι.θ x ↓
+          → just I.[ x ]
+          ≡ Class→CT (CT→Class x)
+
+        βA : PropDispAlgebra ℓA'
+        module βA = PropDispAlgebra βA
+        βA .CT = Classβ
+        βA .[] x xβ [θx]↓ =
+          just I.[ I.[ x ] ]
+            ≡⟨ refl ⟩
+          QIT.Maybe.map I.[_] (just I.[ x ])
+            ≡⟨ cong (QIT.Maybe.map I.[_]) (xβ θx↓) ⟩
+          QIT.Maybe.map I.[_] (Class→CT (CT→Class x))
+            ≡⟨ class[]β (CT→Class x) ⟩
+          Class→CT (C.[ CT→Class x ])
+            ≡⟨ cong Class→CT (sym (C-rec.[ x ])) ⟩
+          Class→CT (CT→Class I.[ x ]) ∎
+          where
+          θx↓ : ι.θ x ↓
+          θx↓ = G₀FI.[]⁻ (ι.θ x) (transp↓ (ι.[ x ]) [θx]↓)
+
+          class[]β : ∀ c
+            → QIT.Maybe.map I.[_] (Class→CT c) ≡ Class→CT (C.[ c ])
+          class[]β # = refl
+          class[]β ([]k̂ k₀) = cong just I.kk̂
+          class[]β ([]k̂ c₀) = cong just I.kk̂
+          class[]β ([]k̂ t₀) = cong just I.kk̂
+          class[]β []ĉ = cong just I.kĉ
+          class[]β []t̂ = cong just I.kt̂
+        βA .k̂ k↓ =
+          just I.[ I.k̂ ]
+            ≡⟨ cong just I.kk̂ ⟩
+          just I.k̂
+            ≡⟨ refl ⟩
+          Class→CT ([]k̂ k₀)
+            ≡⟨ cong Class→CT (sym C-rec.k̂) ⟩
+          Class→CT (CT→Class I.k̂) ∎
+        βA .ĉ c↓ =
+          just I.[ I.ĉ ]
+            ≡⟨ cong just I.kĉ ⟩
+          just I.k̂
+            ≡⟨ refl ⟩
+          Class→CT ([]k̂ c₀)
+            ≡⟨ cong Class→CT (sym C-rec.ĉ) ⟩
+          Class→CT (CT→Class I.ĉ) ∎
+        βA .t̂ t↓ =
+          just I.[ I.t̂ ]
+            ≡⟨ cong just I.kt̂ ⟩
+          just I.k̂
+            ≡⟨ refl ⟩
+          Class→CT ([]k̂ t₀)
+            ≡⟨ cong Class→CT (sym C-rec.t̂) ⟩
+          Class→CT (CT→Class I.t̂) ∎
+        βA .ty₁ a aβ ty₁a↓ with inspect (CT→Class a)
+        ... | # , q = ⊥e (just≢nothing p)
+          where
+          p : just I.[ a ] ≡ Class→CT #
+          p = trans (aβ (ty₁-arg↓ a ty₁a↓)) (cong Class→CT (sym q))
+        ... | []k̂ k₀ , q = ⊥e (G₀FI.kʰ≢tʰ (trans (sym kind) (ty₁-arg-kind a ty₁a↓)))
+          where
+          p : just I.[ a ] ≡ Class→CT ([]k̂ k₀)
+          p = trans (aβ (ty₁-arg↓ a ty₁a↓)) (cong Class→CT (sym q))
+          source : I.[ a ] ≡ I.k̂
+          source = just-inj p
+          kind : G₀FI.[ ι.θ a ] ≡ G₀FI.kʰ
+          kind = trans (sym (ι.[ a ])) (trans (cong ι.θ source) ι.k̂)
+        ... | []k̂ c₀ , q = ⊥e (G₀FI.kʰ≢tʰ (trans (sym kind) (ty₁-arg-kind a ty₁a↓)))
+          where
+          p : just I.[ a ] ≡ Class→CT ([]k̂ c₀)
+          p = trans (aβ (ty₁-arg↓ a ty₁a↓)) (cong Class→CT (sym q))
+          source : I.[ a ] ≡ I.k̂
+          source = just-inj p
+          kind : G₀FI.[ ι.θ a ] ≡ G₀FI.kʰ
+          kind = trans (sym (ι.[ a ])) (trans (cong ι.θ source) ι.k̂)
+        ... | []k̂ t₀ , q = ⊥e (G₀FI.kʰ≢tʰ (trans (sym kind) (ty₁-arg-kind a ty₁a↓)))
+          where
+          p : just I.[ a ] ≡ Class→CT ([]k̂ t₀)
+          p = trans (aβ (ty₁-arg↓ a ty₁a↓)) (cong Class→CT (sym q))
+          source : I.[ a ] ≡ I.k̂
+          source = just-inj p
+          kind : G₀FI.[ ι.θ a ] ≡ G₀FI.kʰ
+          kind = trans (sym (ι.[ a ])) (trans (cong ι.θ source) ι.k̂)
+        ... | []ĉ , q = ⊥e (G₀FI.cʰ≢tʰ (trans (sym kind) (ty₁-arg-kind a ty₁a↓)))
+          where
+          p : just I.[ a ] ≡ Class→CT []ĉ
+          p = trans (aβ (ty₁-arg↓ a ty₁a↓)) (cong Class→CT (sym q))
+          source : I.[ a ] ≡ I.ĉ
+          source = just-inj p
+          kind : G₀FI.[ ι.θ a ] ≡ G₀FI.cʰ
+          kind = trans (sym (ι.[ a ])) (trans (cong ι.θ source) ι.ĉ)
+        ... | []t̂ , q =
+          just I.[ I.ty₁ a ]
+            ≡⟨ cong just (I.kty₁ a source) ⟩
+          just I.ĉ
+            ≡⟨ refl ⟩
+          Class→CT []ĉ
+            ≡⟨ cong Class→CT (sym (cong C.ty₁ θ≡)) ⟩
+          Class→CT (C.ty₁ (C-rec.θ a))
+            ≡⟨ cong Class→CT (sym (C-rec.ty₁ a)) ⟩
+          Class→CT (CT→Class (I.ty₁ a)) ∎
+          where
+          p : just I.[ a ] ≡ Class→CT []t̂
+          p = trans (aβ (ty₁-arg↓ a ty₁a↓)) (cong Class→CT (sym q))
+          source : I.[ a ] ≡ I.t̂
+          source = just-inj p
+          θ≡ : C-rec.θ a ≡ []t̂
+          θ≡ = trans (classθ a) (sym q)
+        βA .∙ ∙↓ =
+          just I.[ I.∙ ]
+            ≡⟨ cong just I.k∙ ⟩
+          just I.ĉ
+            ≡⟨ refl ⟩
+          Class→CT []ĉ
+            ≡⟨ cong Class→CT (sym C-rec.∙) ⟩
+          Class→CT (CT→Class I.∙) ∎
+        βA .▷ γ a γβ aβ θ▷↓ =
+          just I.[ I.▷ γ a ]
+            ≡⟨ cong just (I.k▷ γ a kγ ka a₁) ⟩
+          just I.ĉ
+            ≡⟨ {!!} ⟩
+          Class→CT (CT→Class (I.▷ γ a)) ∎
+          where
+          θγ↓ : ι.θ γ ↓
+          θγ↓ = {!!}
+          kγ : I.[ γ ] ≡ I.ĉ
+          kγ = {!!}
+          ka : I.[ a ] ≡ I.t̂
+          a₁ : I.ty₁ a ≡ γ
+          v : ι.θ (I.▷ γ a) ≡ G₀FI.▷ (ι.θ γ) (ι.θ a)
+          v = ι.▷ γ a kγ ka a₁ 
+        βA .u = {!!}
+        βA .π = {!!}
+        βA .σ = {!!}
+{-
+        βA .[] x xβ .classβ [θx]↓ =
+          just I.[ I.[ x ] ]
+            ≡⟨ refl ⟩
+          QIT.Maybe.map I.[_] (just I.[ x ])
+            ≡⟨ cong (QIT.Maybe.map I.[_]) (xβ .classβ θx↓) ⟩
+          QIT.Maybe.map I.[_] (Class→CT (CT→Class x))
+            ≡⟨ class[]β (CT→Class x) ⟩
+          Class→CT (C.[ CT→Class x ])
+            ≡⟨ cong Class→CT (sym (C-rec.[ x ])) ⟩
+          Class→CT (CT→Class I.[ x ]) ∎
+          where
+          θx↓ : ι.θ x ↓
+          θx↓ = G₀FI.[]⁻ (ι.θ x) (transp↓ (ι.[ x ]) [θx]↓)
+
+          class[]β : ∀ c
+            → QIT.Maybe.map I.[_] (Class→CT c) ≡ Class→CT (C.[ c ])
+          class[]β # = refl
+          class[]β ([]k̂ k₀) = cong just I.kk̂
+          class[]β ([]k̂ c₀) = cong just I.kk̂
+          class[]β ([]k̂ t₀) = cong just I.kk̂
+          class[]β []ĉ = cong just I.kĉ
+          class[]β []t̂ = cong just I.kt̂
+        βA .k̂ .classβ k↓ =
+          just I.[ I.k̂ ]
+            ≡⟨ cong just I.kk̂ ⟩
+          just I.k̂
+            ≡⟨ refl ⟩
+          Class→CT ([]k̂ k₀)
+            ≡⟨ cong Class→CT (sym C-rec.k̂) ⟩
+          Class→CT (CT→Class I.k̂) ∎
+        βA .ĉ .classβ c↓ =
+          just I.[ I.ĉ ]
+            ≡⟨ cong just I.kĉ ⟩
+          just I.k̂
+            ≡⟨ refl ⟩
+          Class→CT ([]k̂ c₀)
+            ≡⟨ cong Class→CT (sym C-rec.ĉ) ⟩
+          Class→CT (CT→Class I.ĉ) ∎
+        βA .t̂ .classβ t↓ =
+          just I.[ I.t̂ ]
+            ≡⟨ cong just I.kt̂ ⟩
+          just I.k̂
+            ≡⟨ refl ⟩
+          Class→CT ([]k̂ t₀)
+            ≡⟨ cong Class→CT (sym C-rec.t̂) ⟩
+          Class→CT (CT→Class I.t̂) ∎
+        βA .kk̂ = isPropBeta* I.kk̂ (βA.[] I.k̂ βA.k̂) βA.k̂
+        βA .kĉ = isPropBeta* I.kĉ (βA.[] I.ĉ βA.ĉ) βA.k̂
+        βA .kt̂ = isPropBeta* I.kt̂ (βA.[] I.t̂ βA.t̂) βA.k̂
+        βA .ty₁ a x = {!!}
+        βA .kty₁ _ _ _ = isPropBeta* _ _ _
+        βA .kty₁-a _ _ _ = isPropBeta* _ _ _
+        βA .∙ .classβ ∙↓ =
+          just I.[ I.∙ ]
+            ≡⟨ cong just I.k∙ ⟩
+          just I.ĉ
+            ≡⟨ refl ⟩
+          Class→CT []ĉ
+            ≡⟨ cong Class→CT (sym C-rec.∙) ⟩
+          Class→CT (CT→Class I.∙) ∎
+        βA .k∙ = isPropBeta* I.k∙ (βA.[] I.∙ βA.∙) βA.ĉ
+        βA .▷ = {!!}
+        βA .k▷ _ _ _ _ _ _ _ = isPropBeta* _ _ _
+        βA .▷-γ _ _ _ _ = isPropBeta* _ _ _
+        βA .▷-a _ _ _ _ = isPropBeta* _ _ _
+        βA .▷-a₁ _ _ _ _ _ = isPropBeta* _ _ _
+        βA .u = {!!}
+        βA .ku = {!isPropBeta*!}
+        βA .u₁ = {!isPropBeta*!}
+        βA .u-γ = {!isPropBeta*!}
+        βA .π = {!!}
+        βA .kπ = {!isPropBeta*!}
+        βA .π₁ = {!isPropBeta*!}
+        βA .π-γ = {!isPropBeta*!}
+        βA .π-a = {!isPropBeta*!}
+        βA .π-a₁ = {!isPropBeta*!}
+        βA .π-b = {!isPropBeta*!}
+        βA .π-b₁ = {!isPropBeta*!}
+        βA .σ = {!!}
+        βA .kσ = {!isPropBeta*!}
+        βA .σ₁ = {!isPropBeta*!}
+        βA .σ-γ = {!isPropBeta*!}
+        βA .σ-a = {!isPropBeta*!}
+        βA .σ-a₁ = {!isPropBeta*!}
+        βA .σ-b = {!isPropBeta*!}
+        βA .σ-b₁ = {!isPropBeta*!}
+        βA .σ▷ = {!isPropBeta*!}
+        βA .σπ = {!isPropBeta*!}
+
+
       module Beta where
         record Beta (x : I.CT) : Set _ where
           constructor mkBeta
@@ -433,6 +679,8 @@ module _ {ℓA}
 
             tyβ : (kx : I.[ x ] ≡ I.t̂)
               → ι.θ x ≡ return (G₀.ty (x , kx))
+
+            classβ : ι.θ x ↓ → just I.[ x ] ≡ Class→CT (CT→Class x)
 
         open Beta
 
@@ -842,7 +1090,6 @@ module _ {ℓA}
             (βA.π γ (I.σ γ a b) c
               γβ (βA.σ γ a b γβ aβ bβ) cβ)
 
-{-
         βA .CT = Beta
         βA .[] x β .conβ kx = ⊥e {!G₀FI.[[x]]≢cʰ {ι.θ x} q!}
           where
@@ -1685,7 +1932,6 @@ module _ {ℓA}
       ε A D.∘ F₁ (recᵂ (G₀ A)) ∎
       where
       open ≈.≈syntax {S = D.HomSetoid FI A}
--}
 
       con≡₀' : (γ : I.CT) (kγ : I.[ γ ] ≡ I.ĉ)
         → (kδ : G₀FI.[ return (G₀FI.con (γ , kγ)) ] ≡ G₀FI.cʰ)
@@ -1717,3 +1963,4 @@ module _ {ℓA}
         s : ι.θ (εFI.conᴿ (return (G₀FI.con (δ , kδ)) , kγ'') .fst)
           ≡ return (G₀FI.con (δ , kδ))
         s = con≡₀' δ kδ kγ''
+-}

@@ -4,6 +4,7 @@ open import QIT.Maybe
 open import QIT.Examples.ConTy.MutualWeaklyTagged as W
 open import QIT.Relation.Binary using (IsEquivalence)
 open import QIT.Setoid
+import QIT.Set.Base as Set
 
 module QIT.Examples.ConTy.InitialMutualWT {ℓI}
   ⦃ pathElim* : PathElim ⦄
@@ -386,115 +387,29 @@ Class₀→Tag₀ []t̂₀ = t₀
 Class→Tag : Class → Maybe Tag
 Class→Tag = map Class₀→Tag₀ 
 
-Class₀→CT : (g : Class₀) → I.CT
+Class₀→CT : Class₀ → I.CT
 Class₀→CT g = Tag→CT (Class₀→Tag₀ g)
 
-require[] : ∀ {X : Set} → Class₀ → X → (Class → X)
-require[] a x b = {!!}
+Class→CT : Class → Maybe I.CT
+Class→CT = map Class₀→CT
 
-require[]' : ∀ {X : Set} → Class₀ → Maybe X → (Class → Maybe X)
-require[]' a x b = {!!}
+require[] : ∀ {X : Set} → Class₀ → X → (Class → Maybe X)
+require[] a x b =
+  b >>= λ b₀ → ifᵖ b₀ ≟ᶜ a then just x else nothing
 
-class▷ : Class → Class → Class
--- class▷ = require[] []ĉ₀ (require[] []t̂₀ (just []ĉ₀)) 
-class▷ x y = x >>= (λ x → ifᵖ x ≟ᶜ []ĉ₀ then f y else nothing)
-  where
-  f : Class → Class
-  f = _>>= λ y → ifᵖ y ≟ᶜ []t̂₀ then just []ĉ₀ else nothing 
---- require[]' []ĉ₀ {!!}
-
-{-
 CT→Class : I.CT → Class
 CT→Class = run Class A
   module CT→Class where
   open ≡
   open Algebra renaming ([_] to [])
 
-  class[] : Class → Class
-  class[] ([]k̂ k₀) = ([]k̂ k₀)
-  class[] ([]k̂ c₀) = ([]k̂ k₀)
-  class[] ([]k̂ t₀) = ([]k̂ k₀)
-  class[] []ĉ = ([]k̂ c₀)
-  class[] []t̂ = ([]k̂ t₀)
-  class[] # = #
-
-  class▷ : Class → Class → Class
-  class▷ []ĉ []t̂ = []ĉ
-  class▷ _ _ = #
-
-  classTy : Class → Class → Class → Class
-  classTy []ĉ []t̂ []t̂ = []t̂
-  classTy _ _ _ = #
-
-  data Valid▷ : Class → Class → Prop where
-    valid▷ : Valid▷ []ĉ []t̂
-
-  inferValid▷ : ∀ γ a
-    → class[] (class▷ γ a) ≡ ([]k̂ c₀)
-    → Valid▷ γ a
-  inferValid▷ []ĉ []t̂ refl = valid▷
-  inferValid▷ ([]k̂ k₀) _ ()
-  inferValid▷ ([]k̂ c₀) _ ()
-  inferValid▷ ([]k̂ t₀) _ ()
-  inferValid▷ []t̂ _ ()
-  inferValid▷ # _ ()
-  inferValid▷ []ĉ ([]k̂ k₀) ()
-  inferValid▷ []ĉ ([]k̂ c₀) ()
-  inferValid▷ []ĉ ([]k̂ t₀) ()
-  inferValid▷ []ĉ []ĉ ()
-  inferValid▷ []ĉ # ()
-
-  data ValidTy : Class → Class → Class → Prop where
-    validTy : ValidTy []ĉ []t̂ []t̂
-
-  inferValidπ : ∀ γ a b
-    → class[] (classTy γ a b) ≡ ([]k̂ t₀)
-    → ValidTy γ a b
-  inferValidπ []ĉ []t̂ []t̂ refl = validTy
-  inferValidπ ([]k̂ k₀) _ _ ()
-  inferValidπ ([]k̂ c₀) _ _ ()
-  inferValidπ ([]k̂ t₀) _ _ ()
-  inferValidπ []t̂ _ _ ()
-  inferValidπ # _ _ ()
-  inferValidπ []ĉ ([]k̂ k₀) _ ()
-  inferValidπ []ĉ ([]k̂ c₀) _ ()
-  inferValidπ []ĉ ([]k̂ t₀) _ ()
-  inferValidπ []ĉ []ĉ _ ()
-  inferValidπ []ĉ # _ ()
-  inferValidπ []ĉ []t̂ ([]k̂ k₀) ()
-  inferValidπ []ĉ []t̂ ([]k̂ c₀) ()
-  inferValidπ []ĉ []t̂ ([]k̂ t₀) ()
-  inferValidπ []ĉ []t̂ []ĉ ()
-  inferValidπ []ĉ []t̂ # ()
-
-  inferValidσ : ∀ γ a b
-    → class[] (classTy γ a b) ≡ ([]k̂ t₀)
-    → ValidTy γ a b
-  inferValidσ []ĉ []t̂ []t̂ refl = validTy
-  inferValidσ ([]k̂ k₀) _ _ ()
-  inferValidσ ([]k̂ c₀) _ _ ()
-  inferValidσ ([]k̂ t₀) _ _ ()
-  inferValidσ []t̂ _ _ ()
-  inferValidσ # _ _ ()
-  inferValidσ []ĉ ([]k̂ k₀) _ ()
-  inferValidσ []ĉ ([]k̂ c₀) _ ()
-  inferValidσ []ĉ ([]k̂ t₀) _ ()
-  inferValidσ []ĉ []ĉ _ ()
-  inferValidσ []ĉ # _ ()
-  inferValidσ []ĉ []t̂ ([]k̂ k₀) ()
-  inferValidσ []ĉ []t̂ ([]k̂ c₀) ()
-  inferValidσ []ĉ []t̂ ([]k̂ t₀) ()
-  inferValidσ []ĉ []t̂ []ĉ ()
-  inferValidσ []ĉ []t̂ # ()
-
   DA : Algebra ℓ0
   DA .CT = Class
-  DA .[] = class[]
-  DA .k̂ = ([]k̂ k₀)
-  DA .ĉ = ([]k̂ c₀)
-  DA .t̂ = ([]k̂ t₀)
-  DA .ty₁ []t̂ = []ĉ
-  DA .ty₁ _ = #
+  DA .[] = map []k̂₀ Set.∘ map Class₀→Tag₀
+  DA .k̂ = []k̂ k₀
+  DA .ĉ = []k̂ c₀
+  DA .t̂ = []k̂ t₀
+  DA .ty₁ = require[] []t̂₀ []ĉ₀
   DA .kty₁ []t̂ refl = refl
   DA .kty₁-a []t̂ refl = refl
   DA .kk̂ = refl
@@ -502,67 +417,38 @@ CT→Class = run Class A
   DA .kt̂ = refl
   DA .∙ = []ĉ
   DA .k∙ = refl
-  DA .▷ = class▷
+  DA .▷ = flatten2 (require[] []ĉ₀ (require[] []t̂₀ []ĉ₀))
   DA .k▷ []ĉ []t̂ refl refl refl = refl
-  DA .▷-γ γ a k with inferValid▷ γ a k
-  ... | valid▷ = refl
-  DA .▷-a γ a k with inferValid▷ γ a k
-  ... | valid▷ = refl
-  DA .▷-a₁ γ a k with inferValid▷ γ a k
-  ... | valid▷ = refl
-  DA .u []ĉ = []t̂
-  DA .u _ = #
+  DA .▷-γ []ĉ []t̂ refl = refl
+  DA .▷-a []ĉ []t̂ refl = refl
+  DA .▷-a₁ []ĉ []t̂ refl = refl
+  DA .u = require[] []ĉ₀ []t̂₀
   DA .ku []ĉ refl = refl
   DA .u₁ []ĉ refl = refl
   DA .u-γ []ĉ refl = refl
-  DA .π = classTy
+  DA .π = flatten3 (require[] []ĉ₀ (require[] []t̂₀ (require[] []t̂₀ []t̂₀)))
   DA .kπ []ĉ []t̂ []t̂ refl refl refl refl refl = refl
   DA .π₁ []ĉ []t̂ []t̂ refl = refl
-  DA .π₁ []ĉ []t̂ ([]k̂ k₀) ()
-  DA .π₁ []ĉ []t̂ ([]k̂ c₀) ()
-  DA .π₁ []ĉ []t̂ ([]k̂ t₀) ()
-  DA .π₁ []ĉ []t̂ []ĉ ()
-  DA .π₁ []ĉ []t̂ # ()
-  DA .π₁ []ĉ ([]k̂ k₀) _ ()
-  DA .π₁ []ĉ ([]k̂ c₀) _ ()
-  DA .π₁ []ĉ ([]k̂ t₀) _ ()
-  DA .π₁ []ĉ []ĉ _ ()
-  DA .π₁ []ĉ # _ ()
-  DA .π₁ ([]k̂ k₀) y z ()
-  DA .π₁ ([]k̂ c₀) y z ()
-  DA .π₁ ([]k̂ t₀) y z ()
-  DA .π₁ []t̂ y z ()
-  DA .π₁ # y z ()
-  DA .π-γ γ a b k with inferValidπ γ a b k
-  ... | validTy = refl
-  DA .π-a γ a b k with inferValidπ γ a b k
-  ... | validTy = refl
-  DA .π-a₁ γ a b k with inferValidπ γ a b k
-  ... | validTy = refl
-  DA .π-b γ a b k with inferValidπ γ a b k
-  ... | validTy = refl
-  DA .π-b₁ γ a b k with inferValidπ γ a b k
-  ... | validTy = refl
-  DA .σ = classTy
+  DA .π-γ []ĉ []t̂ []t̂ refl = refl
+  DA .π-a []ĉ []t̂ []t̂ refl = refl
+  DA .π-a₁ []ĉ []t̂ []t̂ refl = refl
+  DA .π-b []ĉ []t̂ []t̂ refl = refl
+  DA .π-b₁ []ĉ []t̂ []t̂ refl = refl
+  DA .σ = flatten3 (require[] []ĉ₀ (require[] []t̂₀ (require[] []t̂₀ []t̂₀)))
   DA .kσ []ĉ []t̂ []t̂ refl refl refl refl refl = refl
-  DA .σ₁ γ a b k with inferValidσ γ a b k
-  ... | validTy = refl
-  DA .σ-γ γ a b k with inferValidσ γ a b k
-  ... | validTy = refl
-  DA .σ-a γ a b k with inferValidσ γ a b k
-  ... | validTy = refl
-  DA .σ-a₁ γ a b k with inferValidσ γ a b k
-  ... | validTy = refl
-  DA .σ-b γ a b k with inferValidσ γ a b k
-  ... | validTy = refl
-  DA .σ-b₁ γ a b k with inferValidσ γ a b k
-  ... | validTy = refl
+  DA .σ₁ []ĉ []t̂ []t̂ refl = refl
+  DA .σ-γ []ĉ []t̂ []t̂ refl = refl
+  DA .σ-a []ĉ []t̂ []t̂ refl = refl
+  DA .σ-a₁ []ĉ []t̂ []t̂ refl = refl
+  DA .σ-b []ĉ []t̂ []t̂ refl = refl
+  DA .σ-b₁ []ĉ []t̂ []t̂ refl = refl
   DA .σ▷ []ĉ []t̂ []t̂ refl refl refl refl refl = refl
   DA .σπ []ĉ []t̂ []t̂ []t̂ refl refl refl refl refl refl refl = refl
 
   A : AlgebraWithMotive Class
   A = record { DA = DA ; motive = refl }
 
+{-
 class[]-correct : ∀ g s
   → CT→Class.class[] g ≡ []k̂ s
   → Class→Tag g ≡ just s
@@ -616,3 +502,66 @@ CT→Class-correct : ∀ x s (kx : I.[ x ] ≡ Tag→CT s)
 CT→Class-correct x s kx = box
   (≡.trans (classified-correct (CT→Tag-correct x s kx)) (≡.sym kx))
 -}
+
+record PropDispAlgebra ℓX : Set (lsuc (ℓI ⊔ ℓX)) where
+  no-eta-equality
+  field
+    CT : I.CT → Prop ℓX
+    [] : ∀ x → CT x → CT (I.[ x ])
+    k̂ : CT I.k̂
+    ĉ : CT I.ĉ
+    t̂ : CT I.t̂
+    ty₁ : ∀ a → CT a → CT (I.ty₁ a)
+
+    ∙ : CT I.∙
+    ▷ : ∀ γ a → CT γ → CT a → CT (I.▷ γ a)
+    u : ∀ γ → CT γ → CT (I.u γ)
+    π : ∀ γ a b → CT γ → CT a → CT b → CT (I.π γ a b)
+    σ : ∀ γ a b → CT γ → CT a → CT b → CT (I.σ γ a b)
+
+PropDispAlgebra→DispAlgebra : ∀ {ℓX} → PropDispAlgebra ℓX → DispAlgebra ℓX
+PropDispAlgebra→DispAlgebra PA = record
+  { CT = λ x → Box (CT x)
+  ; [] = λ x (box xᴰ) → box ([] x xᴰ)
+  ; k̂ = box k̂
+  ; ĉ = box ĉ
+  ; t̂ = box t̂
+  ; kk̂ = refl
+  ; kĉ = refl
+  ; kt̂ = refl
+  ; ty₁ = λ a (box aᴰ) → box (ty₁ a aᴰ)
+  ; kty₁ = λ _ _ _ → isPropBox _ _
+  ; kty₁-a = λ _ _ _ → isPropBox _ _
+  ; ∙ = box ∙
+  ; k∙ = isPropBox _ _
+  ; ▷ = λ γ a (box γᴰ) (box aᴰ) → box (▷ γ a γᴰ aᴰ)
+  ; k▷ = λ _ _ _ _ _ _ _ → isPropBox _ _
+  ; ▷-γ = λ _ _ _ _ → isPropBox _ _
+  ; ▷-a = λ _ _ _ _ → isPropBox _ _
+  ; ▷-a₁ = λ _ _ _ _ _ → isPropBox _ _
+  ; u = λ γ (box γᴰ) → box (u γ γᴰ)
+  ; ku = λ _ _ _ → isPropBox _ _
+  ; u₁ = λ _ _ _ → isPropBox _ _
+  ; u-γ = λ _ _ _ → isPropBox _ _
+  ; π = λ γ a b (box γᴰ) (box aᴰ) (box bᴰ) → box (π γ a b γᴰ aᴰ bᴰ)
+  ; kπ = λ _ _ _ _ _ _ _ _ _ _ _ → isPropBox _ _
+  ; π₁ = λ _ _ _ _ _ _ _ → isPropBox _ _
+  ; π-γ = λ _ _ _ _ _ → isPropBox _ _
+  ; π-a = λ _ _ _ _ _ → isPropBox _ _
+  ; π-a₁ = λ _ _ _ _ _ _ → isPropBox _ _
+  ; π-b = λ _ _ _ _ _ → isPropBox _ _
+  ; π-b₁ = λ _ _ _ _ _ _ _ → isPropBox _ _
+  ; σ = λ γ a b (box γᴰ) (box aᴰ) (box bᴰ) → box (σ γ a b γᴰ aᴰ bᴰ)
+  ; kσ = λ _ _ _ _ _ _ _ _ _ _ _ → isPropBox _ _
+  ; σ₁ = λ _ _ _ _ _ _ _ → isPropBox _ _
+  ; σ-γ = λ _ _ _ _ _ → isPropBox _ _
+  ; σ-a = λ _ _ _ _ _ → isPropBox _ _
+  ; σ-a₁ = λ _ _ _ _ _ _ → isPropBox _ _
+  ; σ-b = λ _ _ _ _ _ → isPropBox _ _
+  ; σ-b₁ = λ _ _ _ _ _ _ _ → isPropBox _ _
+  ; σ▷ = λ _ _ _ _ _ _ _ _ _ _ _ → isPropBox _ _
+  ; σπ = λ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ → isPropBox _ _
+  }
+  where
+  open PropDispAlgebra PA
+  open ≡
