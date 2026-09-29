@@ -63,12 +63,12 @@ record ExtensionalPlumpAlgebra
     antisym : ∀ {α β} → α ≤ β → β ≤ α → α ≡ β
 
 
-record ExtensionalPlumpHom
+record PlumpHom
   {ℓS ℓP} {S : Set ℓS} {P : S → Set ℓP}
-  (A B : ExtensionalPlumpAlgebra S P)
+  (A B : PlumpAlgebra S P)
   : Set (lsuc ℓS ⊔ lsuc ℓP) where
-  module A = ExtensionalPlumpAlgebra A
-  module B = ExtensionalPlumpAlgebra B
+  module A = PlumpAlgebra A
+  module B = PlumpAlgebra B
   field
     Z : A.Z → B.Z
     sup : (s : S)
@@ -77,13 +77,13 @@ record ExtensionalPlumpHom
     _<_ : ∀ {α β} → α A.< β → Z α B.< Z β
     _≤_ : ∀ {α β} → α A.≤ β → Z α B.≤ Z β
 
-record _≈ᵉᵖ_
+record _≈ᵖ_
   {ℓS ℓP} {S : Set ℓS} {P : S → Set ℓP}
-  {A B : ExtensionalPlumpAlgebra S P}
-  (f g : ExtensionalPlumpHom A B)
+  {A B : PlumpAlgebra S P}
+  (f g : PlumpHom A B)
   : Set (lsuc ℓS ⊔ lsuc ℓP) where
-  module f = ExtensionalPlumpHom f
-  module g = ExtensionalPlumpHom g
+  module f = PlumpHom f
+  module g = PlumpHom g
   field
     Z : ∀ α → f.Z α ≡ g.Z α
 
@@ -94,11 +94,13 @@ record InitialExtensionalPlumpOrdinals
     Zᴬe : ExtensionalPlumpAlgebra S P
     recZᴬ
       : (Zᴬ' : ExtensionalPlumpAlgebra S P)
-      → ExtensionalPlumpHom Zᴬe Zᴬ'
+      → PlumpHom (ExtensionalPlumpAlgebra.Zᴬ Zᴬe)
+                 (ExtensionalPlumpAlgebra.Zᴬ Zᴬ')
     rec!Zᴬ
       : (Zᴬ' : ExtensionalPlumpAlgebra S P)
-      → (f : ExtensionalPlumpHom Zᴬe Zᴬ')
-      → f ≈ᵉᵖ recZᴬ Zᴬ'
+      → (f : PlumpHom (ExtensionalPlumpAlgebra.Zᴬ Zᴬe)
+                       (ExtensionalPlumpAlgebra.Zᴬ Zᴬ'))
+      → f ≈ᵖ recZᴬ Zᴬ'
   open ExtensionalPlumpAlgebra Zᴬe
 
   open import QIT.Relation.Binary
@@ -137,25 +139,28 @@ record InitialExtensionalPlumpOrdinals
   qext : ∀ {α β} → (∀ γ → γ < α → γ < β) → α ≤ β  
   qext {α} {β} = u
     where
-    r : ExtensionalPlumpHom Zᴬe (Ae β)
+    r : PlumpHom (ExtensionalPlumpAlgebra.Zᴬ Zᴬe)
+                 (ExtensionalPlumpAlgebra.Zᴬ (Ae β))
     r = recZᴬ (Ae β)
-    module r = ExtensionalPlumpHom r
-    ι : ExtensionalPlumpHom Zᴬe Zᴬe
+    module r = PlumpHom r
+    ι : PlumpHom (ExtensionalPlumpAlgebra.Zᴬ Zᴬe)
+                 (ExtensionalPlumpAlgebra.Zᴬ Zᴬe)
     ι = record
       { Z = λ α → α
       ; sup = λ s f → ≡.refl
       ; _<_ = λ p → p
       ; _≤_ = λ p → p
       }
-    k : ExtensionalPlumpHom Zᴬe Zᴬe
+    k : PlumpHom (ExtensionalPlumpAlgebra.Zᴬ Zᴬe)
+                 (ExtensionalPlumpAlgebra.Zᴬ Zᴬe)
     k = record
       { Z = λ α → r.Z α .fst
       ; sup = λ s f → ≡.cong fst (r.sup s f)
       ; _<_ = r._<_
       ; _≤_ = r._≤_
       }
-    module uk = _≈ᵉᵖ_ (rec!Zᴬ Zᴬe k)
-    module ui = _≈ᵉᵖ_ (rec!Zᴬ Zᴬe ι)
+    module uk = _≈ᵖ_ (rec!Zᴬ Zᴬe k)
+    module ui = _≈ᵖ_ (rec!Zᴬ Zᴬe ι)
     q : r.Z α .fst ≡ α
     q = ≡.trans
       (uk.Z α)
