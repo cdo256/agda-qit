@@ -1,8 +1,10 @@
 open import QIT.Prelude
 open import QIT.Prop
+open import QIT.Maybe
 open import QIT.Examples.ConTy.MutualWeaklyTagged as W
 open import QIT.Relation.Binary using (IsEquivalence)
 open import QIT.Setoid
+import QIT.Set.Base as Set
 
 module QIT.Examples.ConTy.InitialMutualWT {ℓI}
   ⦃ pathElim* : PathElim ⦄
@@ -330,184 +332,236 @@ elim₂ {ℓM} M A x y = m₂
   m₂ : M x y
   m₂ = runD (M x) m₁ y
 
-{-
-module Code where
+data Tag : Set where
+  k₀ c₀ t₀ : Tag
+
+_≟ᵗ_ : (x y : Tag) → Decᵖ (x ≡ y)
+k₀ ≟ᵗ k₀ = yes ≡.refl
+k₀ ≟ᵗ c₀ = no λ ()
+k₀ ≟ᵗ t₀ = no λ ()
+c₀ ≟ᵗ k₀ = no λ ()
+c₀ ≟ᵗ c₀ = yes ≡.refl
+c₀ ≟ᵗ t₀ = no λ ()
+t₀ ≟ᵗ k₀ = no λ ()
+t₀ ≟ᵗ c₀ = no λ ()
+t₀ ≟ᵗ t₀ = yes ≡.refl
+
+data Class₀ : Set where
+  []k̂₀ : Tag → Class₀
+  []ĉ₀ []t̂₀ : Class₀
+
+[]k̂₀-inj : ∀ {x y} → []k̂₀ x ≡ []k̂₀ y → x ≡ y
+[]k̂₀-inj ≡.refl = ≡.refl
+
+_≟ᶜ_ : (x y : Class₀) → Decᵖ (x ≡ y)
+[]k̂₀ x ≟ᶜ []k̂₀ y with x ≟ᵗ y
+... | yes p = yes (≡.cong []k̂₀ p)
+... | no p = no (λ q → p ([]k̂₀-inj q))
+[]k̂₀ _ ≟ᶜ []ĉ₀ = no λ ()
+[]k̂₀ _ ≟ᶜ []t̂₀ = no λ ()
+[]ĉ₀ ≟ᶜ []k̂₀ _ = no λ ()
+[]ĉ₀ ≟ᶜ []ĉ₀ = yes ≡.refl
+[]ĉ₀ ≟ᶜ []t̂₀ = no λ ()
+[]t̂₀ ≟ᶜ []k̂₀ _ = no λ ()
+[]t̂₀ ≟ᶜ []ĉ₀ = no λ ()
+[]t̂₀ ≟ᶜ []t̂₀ = yes ≡.refl
+
+pattern # = nothing
+
+pattern []k̂ x = just ([]k̂₀ x)
+pattern []ĉ = just []ĉ₀
+pattern []t̂ = just []t̂₀
+
+Class = Maybe Class₀
+
+Tag→CT : Tag → I.CT
+Tag→CT k₀ = I.k̂
+Tag→CT c₀ = I.ĉ
+Tag→CT t₀ = I.t̂
+
+Class₀→Tag₀ : Class₀ → Tag
+Class₀→Tag₀ ([]k̂₀ _) = k₀
+Class₀→Tag₀ []ĉ₀ = c₀
+Class₀→Tag₀ []t̂₀ = t₀
+
+Class→Tag : Class → Maybe Tag
+Class→Tag = map Class₀→Tag₀ 
+
+Class₀→CT : Class₀ → I.CT
+Class₀→CT g = Tag→CT (Class₀→Tag₀ g)
+
+Class→CT : Class → Maybe I.CT
+Class→CT = map Class₀→CT
+
+require[] : ∀ {X : Set} → Class₀ → X → (Class → Maybe X)
+require[] a x b =
+  b >>= λ b₀ → ifᵖ b₀ ≟ᶜ a then just x else nothing
+
+CT→Class : I.CT → Class
+CT→Class = run Class A
+  module CT→Class where
+  open ≡
   open Algebra renaming ([_] to [])
-  A : Algebra (lsuc (lsuc ℓI))
-  A .CT = Algebra (lsuc ℓI)
-  A .[] x .CT = Prop ℓI
-  A .[] x .[] y = {!!}
-  A .[] x .k̂ = {!!}
-  A .[] x .ĉ = {!!}
-  A .[] x .t̂ = {!!}
-  A .[] x .ty₁ = {!!}
-  A .[] x .kty₁ = {!!}
-  A .[] x .kk̂ = {!!}
-  A .[] x .kĉ = {!!}
-  A .[] x .kt̂ = {!!}
-  A .[] x .∙ = {!!}
-  A .[] x .k∙ = {!!}
-  A .[] x .▷ = {!!}
-  A .[] x .k▷ = {!!}
-  A .[] x .▷-γ = {!!}
-  A .[] x .▷-a = {!!}
-  A .[] x .▷-a₁ = {!!}
-  A .[] x .u = {!!}
-  A .[] x .ku = {!!}
-  A .[] x .u₁ = {!!}
-  A .[] x .u-γ = {!!}
-  A .[] x .π = {!!}
-  A .[] x .kπ = {!!}
-  A .[] x .π₁ = {!!}
-  A .[] x .π-γ = {!!}
-  A .[] x .π-a = {!!}
-  A .[] x .π-a₁ = {!!}
-  A .[] x .π-b = {!!}
-  A .[] x .π-b₁ = {!!}
-  A .[] x .σ = {!!}
-  A .[] x .kσ = {!!}
-  A .[] x .σ₁ = {!!}
-  A .[] x .σ-γ = {!!}
-  A .[] x .σ-a = {!!}
-  A .[] x .σ-a₁ = {!!}
-  A .[] x .σ-b = {!!}
-  A .[] x .σ-b₁ = {!!}
-  A .[] x .σ▷ = {!!}
-  A .[] x .σπ = {!!}
-  A .k̂ = {!!}
-  A .ĉ = {!!}
-  A .t̂ = {!!}
-  A .ty₁ = {!!}
-  A .kty₁ = {!!}
-  A .kk̂ = {!!}
-  A .kĉ = {!!}
-  A .kt̂ = {!!}
-  A .∙ = {!!}
-  A .k∙ = {!!}
-  A .▷ = {!!}
-  A .k▷ = {!!}
-  A .▷-γ = {!!}
-  A .▷-a = {!!}
-  A .▷-a₁ = {!!}
-  A .u = {!!}
-  A .ku = {!!}
-  A .u₁ = {!!}
-  A .u-γ = {!!}
-  A .π = {!!}
-  A .kπ = {!!}
-  A .π₁ = {!!}
-  A .π-γ = {!!}
-  A .π-a = {!!}
-  A .π-a₁ = {!!}
-  A .π-b = {!!}
-  A .π-b₁ = {!!}
-  A .σ = {!!}
-  A .kσ = {!!}
-  A .σ₁ = {!!}
-  A .σ-γ = {!!}
-  A .σ-a = {!!}
-  A .σ-a₁ = {!!}
-  A .σ-b = {!!}
-  A .σ-b₁ = {!!}
-  A .σ▷ = {!!}
-  A .σπ = {!!}
-  ρ = rec₂ {!!} {!!} {!!}
 
-module Code2 where
-  M : I.CT → Set ℓI
-  M x = PropLift ?
-  open DispAlgebraWithMotive
-  open DispAlgebra
-  A : DispAlgebra ℓI
-  A .CT = M
-  A .[] x m pk pc = {!!}
-  A .k̂ = {!!}
-  A .ĉ = {!!}
-  A .t̂ = {!!}
-  A .kk̂ = {!!}
-  A .kĉ = {!!}
-  A .kt̂ = {!!}
-  A .ty₁ = {!!}
-  A .kty₁ = {!!}
-  A .∙ = {!!}
-  A .k∙ = {!!}
-  A .▷ = {!!}
-  A .k▷ = {!!}
-  A .▷-γ = {!!}
-  A .▷-a = {!!}
-  A .▷-a₁ = {!!}
-  A .u = {!!}
-  A .ku = {!!}
-  A .u₁ = {!!}
-  A .u-γ = {!!}
-  A .π = {!!}
-  A .kπ = {!!}
-  A .π₁ = {!!}
-  A .π-γ = {!!}
-  A .π-a = {!!}
-  A .π-a₁ = {!!}
-  A .π-b = {!!}
-  A .π-b₁ = {!!}
-  A .σ = {!!}
-  A .kσ = {!!}
-  A .σ₁ = {!!}
-  A .σ-γ = {!!}
-  A .σ-a = {!!}
-  A .σ-a₁ = {!!}
-  A .σ-b = {!!}
-  A .σ-b₁ = {!!}
-  A .σ▷ = {!!}
-  A .σπ = {!!}
+  DA : Algebra ℓ0
+  DA .CT = Class
+  DA .[] = map []k̂₀ Set.∘ map Class₀→Tag₀
+  DA .k̂ = []k̂ k₀
+  DA .ĉ = []k̂ c₀
+  DA .t̂ = []k̂ t₀
+  DA .ty₁ = require[] []t̂₀ []ĉ₀
+  DA .kty₁ []t̂ refl = refl
+  DA .kty₁-a []t̂ refl = refl
+  DA .kk̂ = refl
+  DA .kĉ = refl
+  DA .kt̂ = refl
+  DA .∙ = []ĉ
+  DA .k∙ = refl
+  DA .▷ = flatten2 (require[] []ĉ₀ (require[] []t̂₀ []ĉ₀))
+  DA .k▷ []ĉ []t̂ refl refl refl = refl
+  DA .▷-γ []ĉ []t̂ refl = refl
+  DA .▷-a []ĉ []t̂ refl = refl
+  DA .▷-a₁ []ĉ []t̂ refl = refl
+  DA .u = require[] []ĉ₀ []t̂₀
+  DA .ku []ĉ refl = refl
+  DA .u₁ []ĉ refl = refl
+  DA .u-γ []ĉ refl = refl
+  DA .π = flatten3 (require[] []ĉ₀ (require[] []t̂₀ (require[] []t̂₀ []t̂₀)))
+  DA .kπ []ĉ []t̂ []t̂ refl refl refl refl refl = refl
+  DA .π₁ []ĉ []t̂ []t̂ refl = refl
+  DA .π-γ []ĉ []t̂ []t̂ refl = refl
+  DA .π-a []ĉ []t̂ []t̂ refl = refl
+  DA .π-a₁ []ĉ []t̂ []t̂ refl = refl
+  DA .π-b []ĉ []t̂ []t̂ refl = refl
+  DA .π-b₁ []ĉ []t̂ []t̂ refl = refl
+  DA .σ = flatten3 (require[] []ĉ₀ (require[] []t̂₀ (require[] []t̂₀ []t̂₀)))
+  DA .kσ []ĉ []t̂ []t̂ refl refl refl refl refl = refl
+  DA .σ₁ []ĉ []t̂ []t̂ refl = refl
+  DA .σ-γ []ĉ []t̂ []t̂ refl = refl
+  DA .σ-a []ĉ []t̂ []t̂ refl = refl
+  DA .σ-a₁ []ĉ []t̂ []t̂ refl = refl
+  DA .σ-b []ĉ []t̂ []t̂ refl = refl
+  DA .σ-b₁ []ĉ []t̂ []t̂ refl = refl
+  DA .σ▷ []ĉ []t̂ []t̂ refl refl refl refl refl = refl
+  DA .σπ []ĉ []t̂ []t̂ []t̂ refl refl refl refl refl refl refl = refl
+
+  A : AlgebraWithMotive Class
+  A = record { DA = DA ; motive = refl }
+
 {-
-  v = elim₂ M A {!!} {!!}
+class[]-correct : ∀ g s
+  → CT→Class.class[] g ≡ []k̂ s
+  → Class→Tag g ≡ just s
+class[]-correct ([]k̂ k₀) k₀ ≡.refl = ≡.refl
+class[]-correct ([]k̂ c₀) k₀ ≡.refl = ≡.refl
+class[]-correct ([]k̂ t₀) k₀ ≡.refl = ≡.refl
+class[]-correct []ĉ c₀ ≡.refl = ≡.refl
+class[]-correct []t̂ t₀ ≡.refl = ≡.refl
+class[]-correct # k₀ ()
+class[]-correct # c₀ ()
+class[]-correct # t₀ ()
+
+classified-valid : ∀ {g s} → Class→Tag g ≡ just s → g ≢ #
+classified-valid {([]k̂ k₀)} p ()
+classified-valid {([]k̂ c₀)} p ()
+classified-valid {([]k̂ t₀)} p ()
+classified-valid {[]ĉ} p ()
+classified-valid {[]t̂} p ()
+classified-valid {#} ()
+
+classified-correct : ∀ {g s}
+  → (p : Class→Tag g ≡ just s)
+  → Class₀→CT g (classified-valid p) ≡ Tag→CT s
+classified-correct {([]k̂ k₀)} {k₀} ≡.refl = ≡.refl
+classified-correct {([]k̂ c₀)} {k₀} ≡.refl = ≡.refl
+classified-correct {([]k̂ t₀)} {k₀} ≡.refl = ≡.refl
+classified-correct {[]ĉ} {c₀} ≡.refl = ≡.refl
+classified-correct {[]t̂} {t₀} ≡.refl = ≡.refl
+classified-correct {#} ()
+
+module CT→Class-rec = Hom (rec CT→Class.DA)
+
+CT→Class-Tag : ∀ s → CT→Class (Tag→CT s) ≡ []k̂ s
+CT→Class-Tag k₀ = CT→Class-rec.k̂
+CT→Class-Tag c₀ = CT→Class-rec.ĉ
+CT→Class-Tag t₀ = CT→Class-rec.t̂
+
+CT→Tag-correct : ∀ x s
+  → I.[ x ] ≡ Tag→CT s
+  → Class→Tag (CT→Class x) ≡ just s
+CT→Tag-correct x s kx = class[]-correct (CT→Class x) s p
+  where
+  open ≡
+  p : CT→Class.class[] (CT→Class x) ≡ []k̂ s
+  p = trans (sym (CT→Class-rec.[ x ]))
+      (trans (cong CT→Class kx) (CT→Class-Tag s))
+
+CT→Class-correct : ∀ x s (kx : I.[ x ] ≡ Tag→CT s)
+  → let p = CT→Tag-correct x s kx
+    in Box (Class→CT (CT→Class x) (classified-valid p) ≡ I.[ x ])
+CT→Class-correct x s kx = box
+  (≡.trans (classified-correct (CT→Tag-correct x s kx)) (≡.sym kx))
 -}
 
-k≢c : I.k̂ ≢ I.ĉ
-k≢c p = {!!}
+record PropDispAlgebra ℓX : Set (lsuc (ℓI ⊔ ℓX)) where
+  no-eta-equality
+  field
+    CT : I.CT → Prop ℓX
+    [] : ∀ x → CT x → CT (I.[ x ])
+    k̂ : CT I.k̂
+    ĉ : CT I.ĉ
+    t̂ : CT I.t̂
+    ty₁ : ∀ a → CT a → CT (I.ty₁ a)
+
+    ∙ : CT I.∙
+    ▷ : ∀ γ a → CT γ → CT a → CT (I.▷ γ a)
+    u : ∀ γ → CT γ → CT (I.u γ)
+    π : ∀ γ a b → CT γ → CT a → CT b → CT (I.π γ a b)
+    σ : ∀ γ a b → CT γ → CT a → CT b → CT (I.σ γ a b)
+
+PropDispAlgebra→DispAlgebra : ∀ {ℓX} → PropDispAlgebra ℓX → DispAlgebra ℓX
+PropDispAlgebra→DispAlgebra PA = record
+  { CT = λ x → Box (CT x)
+  ; [] = λ x (box xᴰ) → box ([] x xᴰ)
+  ; k̂ = box k̂
+  ; ĉ = box ĉ
+  ; t̂ = box t̂
+  ; kk̂ = refl
+  ; kĉ = refl
+  ; kt̂ = refl
+  ; ty₁ = λ a (box aᴰ) → box (ty₁ a aᴰ)
+  ; kty₁ = λ _ _ _ → isPropBox _ _
+  ; kty₁-a = λ _ _ _ → isPropBox _ _
+  ; ∙ = box ∙
+  ; k∙ = isPropBox _ _
+  ; ▷ = λ γ a (box γᴰ) (box aᴰ) → box (▷ γ a γᴰ aᴰ)
+  ; k▷ = λ _ _ _ _ _ _ _ → isPropBox _ _
+  ; ▷-γ = λ _ _ _ _ → isPropBox _ _
+  ; ▷-a = λ _ _ _ _ → isPropBox _ _
+  ; ▷-a₁ = λ _ _ _ _ _ → isPropBox _ _
+  ; u = λ γ (box γᴰ) → box (u γ γᴰ)
+  ; ku = λ _ _ _ → isPropBox _ _
+  ; u₁ = λ _ _ _ → isPropBox _ _
+  ; u-γ = λ _ _ _ → isPropBox _ _
+  ; π = λ γ a b (box γᴰ) (box aᴰ) (box bᴰ) → box (π γ a b γᴰ aᴰ bᴰ)
+  ; kπ = λ _ _ _ _ _ _ _ _ _ _ _ → isPropBox _ _
+  ; π₁ = λ _ _ _ _ _ _ _ → isPropBox _ _
+  ; π-γ = λ _ _ _ _ _ → isPropBox _ _
+  ; π-a = λ _ _ _ _ _ → isPropBox _ _
+  ; π-a₁ = λ _ _ _ _ _ _ → isPropBox _ _
+  ; π-b = λ _ _ _ _ _ → isPropBox _ _
+  ; π-b₁ = λ _ _ _ _ _ _ _ → isPropBox _ _
+  ; σ = λ γ a b (box γᴰ) (box aᴰ) (box bᴰ) → box (σ γ a b γᴰ aᴰ bᴰ)
+  ; kσ = λ _ _ _ _ _ _ _ _ _ _ _ → isPropBox _ _
+  ; σ₁ = λ _ _ _ _ _ _ _ → isPropBox _ _
+  ; σ-γ = λ _ _ _ _ _ → isPropBox _ _
+  ; σ-a = λ _ _ _ _ _ → isPropBox _ _
+  ; σ-a₁ = λ _ _ _ _ _ _ → isPropBox _ _
+  ; σ-b = λ _ _ _ _ _ → isPropBox _ _
+  ; σ-b₁ = λ _ _ _ _ _ _ _ → isPropBox _ _
+  ; σ▷ = λ _ _ _ _ _ _ _ _ _ _ _ → isPropBox _ _
+  ; σπ = λ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ → isPropBox _ _
+  }
   where
-  M : I.CT → Set ℓI
-  M x = x ≡ I.k̂ → x ≡ I.ĉ → ⊥ˢ
-  open DispAlgebraWithMotive
-  open DispAlgebra
-  A : DispAlgebra ℓI
-  A .CT = M
-  A .[] x m pk pc = {!!}
-  A .k̂ = {!!}
-  A .ĉ = {!!}
-  A .t̂ = {!!}
-  A .kk̂ = {!!}
-  A .kĉ = {!!}
-  A .kt̂ = {!!}
-  A .ty₁ = {!!}
-  A .kty₁ = {!!}
-  A .∙ = {!!}
-  A .k∙ = {!!}
-  A .▷ = {!!}
-  A .k▷ = {!!}
-  A .▷-γ = {!!}
-  A .▷-a = {!!}
-  A .▷-a₁ = {!!}
-  A .u = {!!}
-  A .ku = {!!}
-  A .u₁ = {!!}
-  A .u-γ = {!!}
-  A .π = {!!}
-  A .kπ = {!!}
-  A .π₁ = {!!}
-  A .π-γ = {!!}
-  A .π-a = {!!}
-  A .π-a₁ = {!!}
-  A .π-b = {!!}
-  A .π-b₁ = {!!}
-  A .σ = {!!}
-  A .kσ = {!!}
-  A .σ₁ = {!!}
-  A .σ-γ = {!!}
-  A .σ-a = {!!}
-  A .σ-a₁ = {!!}
-  A .σ-b = {!!}
-  A .σ-b₁ = {!!}
-  A .σ▷ = {!!}
-  A .σπ = {!!}
-  v = elim₂ M A {!!} {!!}
--}
+  open PropDispAlgebra PA
+  open ≡
