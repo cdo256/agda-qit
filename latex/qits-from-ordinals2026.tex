@@ -79,13 +79,9 @@ yields an inverse to the canonical map associated with the colimit of
 the inflationary iteration for the diagram used in the construction,
 thereby establishing the required cocontinuity.
 
-Initiality is obtained by applying Fiore--Pitts--Steenkamp Theorem 6.4
-after comparing their Section 6 inflationary diagram with our
-uniform-fixed-point rank-bounded diagram.
-
 More generally, a coherent section is enough to define the algebra
-structure on the colimit, while the initiality theorem of Fiore, Pitts
-and Steenkamp requires the canonical map to be invertible. In the
+structure on the colimit, while the initiality result requires the
+canonical map to be invertible. In the
 present construction, depth preservation provides the two-sided result;
 normalising and finitary presentations give further routes to the same
 common-stage data.
@@ -122,9 +118,9 @@ an entire family of quotient elements.
 Fiore, Pitts and Steenkamp isolate a broad algebraic class of QITs
 called QW-types, and its indexed generalisation, QWI-types. A QW-type is
 the initial algebra for an equational theory whose operations may have
-infinitary arities. Their Theorem 5.7 proves the required WISC-based
-cocontinuity result, and their Theorem 6.4 derives initiality from that
-cocontinuity \citep{fiore2022-quotient-inductive}. W-types
+infinitary arities. They show that QW-types can be constructed from
+W-types and quotients in the presence of the Weakly Initial Set of
+Covers axiom (WISC) \citep{fiore2022-quotient-inductive}. W-types
 originate in Martin-Löf's constructive type theory
 \citep{martin-lof1984-mltt}. WISC appears as a collection principle in
 site-theoretic and realizability settings
@@ -154,8 +150,7 @@ a family of elements of the colimit to some common stage of the diagram.
 For infinitary operations, there need not be an evident stage containing
 representatives of every member of the family. WISC is used by Fiore,
 Pitts and Steenkamp to construct a sufficiently rich notion of size and
-to prove the corresponding cocontinuity result (Theorem 5.7 of
-\citep{fiore2022-quotient-inductive}).
+to prove the corresponding cocontinuity result.
 
 The obstruction can be seen concretely in the QW-type of \emph{mobiles}.
 Informally, a mobile is a well-founded countably branching tree whose
@@ -204,11 +199,9 @@ Our first main result may be stated informally as follows.
 \begin{quote}
 \textbf{Theorem.} Let \(\Sigma\) be a depth-preserving QW-signature, and
 suppose that there is an extensional plump ordinal basis closed under
-the arities of \(\Sigma\). If the resulting uniform-fixed-point
-rank-bounded diagram satisfies the comparison hypotheses needed by
-Fiore--Pitts--Steenkamp Theorem 6.4, then the QW-type presented by
-\(\Sigma\) can be constructed from W-types and quotients by inflationary
-iteration, without use of WISC.
+the arities of \(\Sigma\). Then the QW-type presented by \(\Sigma\) can
+be constructed from W-types and quotients by inflationary iteration,
+without use of WISC.
 \end{quote}
 
 The descended rank assigns to every element of the quotient a canonical
@@ -226,8 +219,8 @@ S \left(\mathrm{colim}_\alpha D_\alpha\right)
 Thus \(\sigma_D\) is a section of the canonical map \(\kappa_D\). This
 section supplies precisely the lifting operation required to define the
 constructor on the colimit. For the full QW-type result, however, the
-Fiore--Pitts--Steenkamp Theorem 6.4 requires the cocontinuity map
-\(\kappa_D\) to be invertible. Section 7 proves the companion composite as well, so the
+initiality theorem of Fiore, Pitts and Steenkamp requires \(\kappa_D\) to
+be invertible. Section 7 proves the companion composite as well, so the
 rank construction establishes the required isomorphism for the
 inflationary diagram. The class of depth-preserving signatures includes
 mobiles, finite multisets (as lists), and the cumulative hierarchy
@@ -235,7 +228,7 @@ of extensional sets.
 
 The semantic criterion for defining the colimit algebra is the existence
 of a coherent section of \(\kappa_D\); the criterion for applying the
-Fiore--Pitts--Steenkamp Theorem 6.4 is coherent invertibility.
+Fiore--Pitts--Steenkamp initiality theorem is coherent invertibility.
 Depth preservation supplies both in the present setting. This separates
 the stage information required by inflationary iteration from the
 particular mechanism used to obtain it.
@@ -619,14 +612,6 @@ use of well-founded recursion separates the construction of a stage from
 the quotients being formed at that stage and avoids treating quotient
 formation as a strictly positive operation.
 
-This is the generic stage-bounded presentation used in the
-Fiore--Pitts--Steenkamp construction. In Sections 5.6--5.10 of
-\citep{fiore2022-quotient-inductive}, cocontinuity is first proved for
-generic size-indexed diagrams and then specialised to polynomial
-endofunctors. The rank-bounded diagram used for the direct argument in
-Section 7 has a different, uniform quotient relation and must not be
-identified with this presentation without an explicit comparison.
-
 This construction is \emph{inflationary} because a stage contains terms
 formed over all strictly smaller stages rather than only terms formed
 over one immediately preceding stage. At a limit-like size, the
@@ -727,7 +712,7 @@ S_\Sigma (Q)
 The constructor can then be defined by
 \(\mathsf{intro} = \mu_D\circ\sigma_D.\)
 This observation concerns only the definition of the algebra structure.
-To apply the initiality theorem of Fiore, Pitts and Steenkamp, we must
+To apply the initiality result, we must
 also establish the converse composite and hence invertibility of
 \(\kappa_D\).
 
@@ -753,8 +738,7 @@ initiality result additionally uses invertibility.
 
 Fiore, Pitts and Steenkamp use WISC to construct a type of sizes
 sufficiently rich for the relevant polynomial functor to preserve all
-size-indexed colimits (Theorem 5.7 of
-\citep{fiore2022-quotient-inductive}). For that
+size-indexed colimits \citep{fiore2022-quotient-inductive}. For that
 size structure, the canonical map \(\kappa_D^{\Sigma,E}\) is an
 isomorphism for every size-indexed diagram \(D\). Its inverse provides
 all the common-stage lifts required in the construction.
@@ -767,8 +751,8 @@ polynomial functor preserves arbitrary size-indexed colimits. Its inverse
 is constructed from exact-rank representatives, and the two composites
 are proved using weakening. If equation contexts are instead lifted
 externally using \(S_{\Sigma,E}\), the same argument must establish both
-composites for \(\kappa_D^{\Sigma,E}\) before Theorem 6.4 of
-\citep{fiore2022-quotient-inductive} can be applied.
+composites for \(\kappa_D^{\Sigma,E}\) before the initiality theorem can
+be applied.
 
 \section{Extensional plump
 ordinals}\label{extensional-plump-ordinals}
@@ -1286,19 +1270,11 @@ Let \(T\) be the W-type of raw terms over \(\Sigma\), and let
 define the type of raw terms bounded by \(\alpha\) by
 \(S_0 (\alpha) = (t:T)\times\bigl(\iota^Z (t)\leq\alpha\bigr).\)
 
-Let \(\approx_T\) be the single equivalence-and-congruence closure on
-the raw terms \(T\) generated by all substitution instances of the
-equations. For each \(\alpha\), define the setoid
-\(\widetilde{S} (\alpha)\) on \(S_0 (\alpha)\) by restricting
-\(\approx_T\) to bounded terms:
-\[
-(t,p)\;\approx_\alpha\;(u,q)\quad\Longleftrightarrow\quad t\approx_T u.
-\]
-Write \(\widetilde{S}/ (\alpha)\) for the set quotient of this setoid.
-The relation is therefore held fixed across stages; only the carrier of
-bounded terms changes. In this sense every stage is already a fixed point
-of the quotienting operation, rather than a quotient by a new
-stage-bounded congruence closure.
+The equation system generates a setoid \(\widetilde{S} (\alpha)\) on
+\(S_0 (\alpha)\). Its equivalence relation contains the specified
+equations and is closed under constructor congruence, reflexivity,
+symmetry, and transitivity. Write \(\widetilde{S}/ (\alpha)\) for the
+set quotient of this setoid.
 
 Whenever \(\alpha\leq\beta\), a bounded term at stage \(\alpha\) is also
 bounded at stage \(\beta\). This gives a weakening map
@@ -1357,8 +1333,8 @@ Thus \(\varphi\) forgets the common stage \(\alpha\) and maps each
 argument into the colimit. Functoriality of weakening ensures that this
 definition respects the colimit relation.
 
-For the stage construction used here, the uniform equation relation has
-already been imposed inside each quotient \(\widetilde{S}/ (\alpha)\).
+For the stage construction used here, the equation relation has already
+been imposed inside each quotient \(\widetilde{S}/ (\alpha)\).
 Consequently, the cocontinuity problem concerns the underlying
 polynomial functor \(S\) alone. No additional polynomial containing the
 equation-variable contexts is required in the formal theorem.
@@ -1540,16 +1516,12 @@ common supremum stage.
 \subsection{Cocontinuity and
 existence}\label{cocontinuity-and-existence}
 
-Theorem 7.2 is weaker than Fiore--Pitts--Steenkamp Theorem 5.7 in scope,
-but not in the type of conclusion: it proves invertibility only for the
-uniform-fixed-point rank-bounded diagram, rather than an isomorphism for
-every diagram indexed by the chosen sizes
-\citep{fiore2022-quotient-inductive}. The isomorphism supplies the
-cocontinuity input for Theorem 6.4, but an additional comparison is
-needed because Theorem 6.4 is stated for the inflationary diagram defined
-in their Section 6. The present diagram uses a uniform
-equivalence-and-congruence closure at every stage rather than the
-stage-bounded relation used in the generic presentation of Section 4.
+Theorem 7.2 is weaker than the WISC-based preservation theorem of Fiore,
+Pitts and Steenkamp in scope, but not in the type of conclusion: it proves
+invertibility only for the diagram arising in the QW-construction, rather
+than an isomorphism for every diagram indexed by the chosen sizes
+\citep{fiore2022-quotient-inductive}. That restricted result is exactly
+what is needed to invoke their initiality theorem.
 
 Let \(Q = \mathrm{colim}\,D = \mathrm{colim}_{\alpha:Z} \widetilde{S}/ (\alpha).\)
 
@@ -1567,11 +1539,9 @@ independent of all stage representatives.
 The remaining hypotheses of the initiality theorem are supplied by the
 stage construction: the quotients impose the equations, the weakening
 maps form the required cocone, and the rank recursion gives the required
-well-founded stage maps. Once the comparison with the Section 6 diagram
-has been established, Fiore--Pitts--Steenkamp Theorem 6.4 applied to the
-isomorphism of Theorem 7.2 yields an initial QW-algebra
-\citep{fiore2022-quotient-inductive}. We use their initiality result here
-rather than reproving it.
+well-founded stage maps. Applying the initiality result to the isomorphism
+of Theorem 7.2 yields an initial QW-algebra. We use that result here rather
+than reproving it.
 
 Combining that theorem with the inflationary construction yields the main
 result.
@@ -1583,9 +1553,7 @@ elimination, function extensionality, propositional extensionality, and
 unique choice. Let \(\Sigma=(A,B)\) be a polynomial signature, and let
 \((E,\Xi)\) be a depth-preserving system of equations over \(\Sigma\).
 Suppose that there exists an initial extensional plump ordinal algebra
-for \(\Sigma\), and that the uniform-fixed-point rank-bounded diagram
-satisfies the comparison hypotheses needed to apply Fiore--Pitts--Steenkamp
-Theorem 6.4. Then the QW-type presented by \((\Sigma,E,\Xi)\) can be
+for \(\Sigma\). Then the QW-type presented by \((\Sigma,E,\Xi)\) can be
 constructed from W-types and set quotients.
 \end{quote}
 
@@ -1601,8 +1569,8 @@ preservation.
 
 \begin{quote}
 A coherent section of the canonical map is sufficient to define the
-colimit algebra. To obtain initiality by Fiore--Pitts--Steenkamp
-Theorem 6.4, the canonical map must instead be coherently invertible.
+colimit algebra. To obtain initiality, the canonical map must instead be
+coherently invertible.
 \end{quote}
 
 For a diagram \(D:I\to\mathsf{Set}\) and a polynomial functor \(S\),
@@ -1679,9 +1647,9 @@ preferred representatives to descend through the colimit relation.
 Given these properties, the constructor-lifting part of Section 7 can be
 repeated with normal-form rank in place of structural rank. Each colimit
 element is represented by its normal form at the rank of that normal
-form. The ranks of the arguments of a constructor determine a common
+  form. The ranks of the arguments of a constructor determine a common
 stage, and the resulting family defines a section of \(\kappa_D\). To
-obtain initiality via Fiore--Pitts--Steenkamp, one must additionally
+obtain initiality, one must additionally
 prove the corresponding reverse composite.
 
 Normalisation can therefore handle equations that change syntactic
@@ -1880,10 +1848,9 @@ constructs one half of the isomorphism \[
 \longrightarrow
 \mathrm{colim}_\alpha S (D_\alpha)
 \] required by inflationary iteration. The reverse composite follows from
-the compatibility of exact-rank lifting with weakening, so the
-Fiore--Pitts--Steenkamp Theorem 6.4 yields the corresponding initial
-QW-algebra from W-types and quotients, relative to the ordinal basis and
-without a further use of WISC \citep{fiore2022-quotient-inductive}.
+the compatibility of exact-rank lifting with weakening, so the corresponding
+initiality result yields the initial QW-algebra from W-types and quotients,
+relative to the ordinal basis and without a further use of WISC.
 
 The construction isolates coherent common-stage lifting, rather than
 depth preservation itself, as the semantic condition. A section suffices
