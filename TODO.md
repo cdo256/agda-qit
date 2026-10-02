@@ -15,9 +15,12 @@
 
 ## Main theorem and structure
 
-- [ ] State precisely which Fiore--Pitts--Steenkamp 2022 theorem
+- [x] State precisely which Fiore--Pitts--Steenkamp 2022 theorem
       supplies initiality. The formal development proves cocontinuity,
       not the full initiality result.
+- [ ] State and prove the comparison/transfer lemma from the
+      uniform-fixed-point rank-bounded diagram to the inflationary diagram
+      required by Fiore--Pitts--Steenkamp Theorem 6.4.
 - [ ] Give an explicit instantiation of that theorem, including its
       assumptions on W-types, quotients, extensionality, unique
       choice, sizes, and equation presentations.
@@ -75,6 +78,6 @@
       isomorphism; the initiality step is imported from
       Fiore--Pitts--Steenkamp rather than formalised in this
       repository.
-- [ ] Mention the stronger two-sided cocontinuity isomorphism present
+- [x] Mention the stronger two-sided cocontinuity isomorphism present
       in `QIT/QW/Cocontinuity/FromDepthPreservation.agda` if it is
       used to meet the cited theorem's hypotheses.
