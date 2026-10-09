@@ -1,5 +1,6 @@
 OUT := out/latex
 export BIBINPUTS := latex:
+export BSTINPUTS := $(CURDIR)/latex:
 export TEXINPUTS := latex:
 
 # Find all .tex files in latex directory, excluding preambles
