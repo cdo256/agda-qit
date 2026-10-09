@@ -18,19 +18,21 @@
 - [x] State precisely which Fiore--Pitts--Steenkamp 2022 theorem
       supplies initiality. The formal development proves cocontinuity,
       not the full initiality result.
-- [ ] State and prove the comparison/transfer lemma from the
-      uniform-fixed-point rank-bounded diagram to the inflationary diagram
-      required by Fiore--Pitts--Steenkamp Theorem 6.4.
-- [ ] Give an explicit instantiation of that theorem, including its
-      assumptions on W-types, quotients, extensionality, unique
-      choice, sizes, and equation presentations.
-- [ ] Decide whether Section 7.4 is an application of the cited
-      initiality theorem or a self-contained proof. The current prose
-      at lines 1515--1527 is not enough as a proof of initiality.
-- [ ] Relate the two stage constructions. Section 4.1 uses quotients
-      of terms over earlier approximants with unit and multiplication
-      relations; Section 7 uses quotients of rank-bounded raw
-      terms. Prove they agree or present only one construction.
+- [x] Apply the general Fiore--Pitts--Steenkamp initiality theorem
+      directly to the rank-bounded diagram. Its general-diagram
+      hypotheses are supplied by the plump-order properties and
+      well-founded recursion; no transfer lemma from Section 4 is needed.
+- [x] State the initiality and well-founded-recursion requirements for the
+      extensional plump ordinal basis.
+- [x] Treat Section 7.4 as an application of the cited initiality result,
+      rather than as a self-contained proof of initiality.
+- [x] Explain that the Section 4 expository diagram need not be identified
+      with the rank-bounded diagram used for the direct cocontinuity proof.
+- [x] Make clear in the citation discussion that Fiore--Pitts--Steenkamp's
+      general theorem, not a theorem for the Section 7 diagram specifically,
+      supplies the imported initiality result.
+- [x] Record that the two stage diagrams are intentionally different and
+      require no equivalence for the imported general initiality theorem.
 - [ ] Resolve the equation-context issue. Section 4.3 includes
       equation-variable contexts in the lifting polynomial, while
       Section 7 drops them. Explain how arbitrary equation
@@ -39,17 +41,16 @@
 - [ ] Define the category and morphisms for an initial extensional
       plump ordinal basis, or state the basis assumptions directly and
       prove well-foundedness separately.
-- [ ] Add well-foundedness to the ordinal-basis assumptions used for
+- [x] Add well-foundedness to the ordinal-basis assumptions used for
       recursion and induction.
-- [ ] Make the semantic sectionability criterion precise rather than
-      treating a coherent section as an almost tautological
-      restatement of common-stage lifting.
+- [x] Replace sectionability by coherent factorisation through the
+      canonical map as the semantic criterion.
 - [ ] Either prove the normalisation and finitary variants or clearly
       label Section 8 as outlook.
 
 ## Technical corrections
 
-- [ ] Add a leaf/nullary constructor to the mobile signature. A
+- [x] Add a leaf/nullary constructor to the mobile signature. A
       signature with only `node : (N -> M) -> M` has an empty W-type.
 - [ ] Justify the claim that antisymmetry gives extensionality from
       equal predecessor segments. This requires a proved connection
@@ -65,11 +66,11 @@
 - [x] Remove the draft footnotes `wording?` and `metaphor basis?` from
       the abstract.
 - [x] Fix the typo `generateb` in the introduction.
-- [ ] Fix the Taylor citation key/year mismatch: the cited paper is
+- [x] Fix the Taylor citation key/year mismatch: the cited paper is
       the 1996 paper, not a 1993 publication.
-- [ ] Split or otherwise reformat the overfull `DepthPreserving`
+- [x] Split or otherwise reformat the overfull `DepthPreserving`
       display around lines 1115--1124.
-- [ ] Audit the bibliography after switching to the LNCS bibliography
+- [x] Audit the bibliography after switching to the LNCS bibliography
       style.
 
 ## Formalisation scope
