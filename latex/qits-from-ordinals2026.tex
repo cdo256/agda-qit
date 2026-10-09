@@ -1012,27 +1012,28 @@ operation
 For \(a:A\) and \(f:B (a)\to Z\), we write its value as
 \(\mathsf{sup} (a,f).\)
 
-This operation satisfies two plumpness inequalities. First, if every
-member of the family is strictly below \(\alpha\), then the generated
+For a family \(\xi:B (a)\to Z\), this operation satisfies two plumpness
+inequalities. First, if every member of the family is strictly below
+\(\alpha\), then the generated
 supremum is non-strictly below \(\alpha\):
 
 \[
 \left(
-(\xi:B (a))\to f (\xi)<\alpha
+(i:B (a))\to \xi (i)<\alpha
 \right)
 \longrightarrow
-\mathsf{sup} (a,f)\leq\alpha.
+\mathsf{sup} (a,\xi)\leq\alpha.
 \]
 
 Second, anything non-strictly below one member of the family is strictly
 below the generated supremum:
 
 \[
-\alpha\leq f (\xi) \longrightarrow \alpha<\mathsf{sup} (a,f).
+\alpha\leq \xi (i) \longrightarrow \alpha<\mathsf{sup} (a,\xi).
 \]
 
-Taking \(\alpha=f (\xi)\) in the second inequality shows that every member
-is strictly below the generated supremum: \(f (\xi)<\mathsf{sup} (a,f).\)
+Taking \(\alpha=\xi (i)\) in the second inequality shows that every member
+is strictly below the generated supremum: \(\xi (i)<\mathsf{sup} (a,\xi).\)
 
 Thus \(\mathsf{sup} (a,f)\) is a strict upper bound rather than merely a
 least upper bound in the usual non-strict sense. The first inequality
@@ -1182,16 +1183,16 @@ The following lemma packages the plump-order calculation used throughout
 the rank argument.
 
 \begin{quote}
-\textbf{Lemma 5.1 (Extensional supremum comparison).} Let \(f:I\to Z\)
-and \(g:J\to Z\) be families supported by supremum constructors
-\(a,b:A\). If every \(f (\xi)\) equals some \(g (\eta)\), then
-\(\mathsf{sup} (a,f)\leq\mathsf{sup} (b,g)\). If the two families
+\textbf{Lemma 5.1 (Extensional supremum comparison).} Let \(\xi:I\to Z\)
+and \(\zeta:J\to Z\) be families supported by supremum constructors
+\(a,b:A\). If every \(\xi (i)\) equals some \(\zeta (j)\), then
+\(\mathsf{sup} (a,\xi)\leq\mathsf{sup} (b,\zeta)\). If the two families
 have the same image, their suprema are equal.
 \end{quote}
 
-For each \(\xi:I\), choose the given \(\eta:J\) with \(f (\xi)=g (\eta)\).
+For each \(i:I\), choose the given \(j:J\) with \(\xi (i)=\zeta (j)\).
 Reflexivity and the second plumpness inequality give
-\(f (\xi)=g (\eta)<\mathsf{sup} (b,g)\). The first plumpness inequality
+\(\xi (i)=\zeta (j)<\mathsf{sup} (b,\zeta)\). The first plumpness inequality
 then yields the stated comparison. Applying the argument in both
 directions and using antisymmetry proves equality. The same proof works
 when image containment is propositionally truncated, because the target
@@ -1200,7 +1201,7 @@ inequalities are propositions.
 In particular, reindexing by an isomorphism does not change a supremum:
 
 \[
-\mathsf{sup} (a,f) = \mathsf{sup} (a,f\circ\pi)
+\mathsf{sup} (a,\xi) = \mathsf{sup} (a,\xi\circ\pi)
 \qquad (\pi:I\cong I).
 \]
 
@@ -1246,7 +1247,7 @@ defined recursively by
 \[
 \iota^Z \left(\mathsf{sup}^T (a,f)\right)
 =
-\mathsf{sup}^Z \left(a,\lambda \xi.\iota^Z (f (\xi))\right).
+\mathsf{sup}^Z \left(a,\lambda i.\iota^Z (f (i))\right).
 \]
 
 Thus the rank of a raw term is obtained by replacing every term
@@ -1283,7 +1284,7 @@ and
 \[
 \mathsf{assign}_T \left(\rho,\mathsf{sup}^E (a,f)\right)
 =
-\mathsf{sup}^T \left(a,\lambda \xi.\mathsf{assign}_T (\rho,f (\xi))\right).
+\mathsf{sup}^T \left(a,\lambda i.\mathsf{assign}_T (\rho,f (i))\right).
 \]
 
 Equivalently, one may define the rank of an open term relative to
@@ -1306,7 +1307,7 @@ and
 \[
 \mathsf{rank}_r \left(\mathsf{sup}^E (a,f)\right)
 =
-\mathsf{sup}^Z \left(a,\lambda \xi.\mathsf{rank}_r (f (\xi))\right).
+\mathsf{sup}^Z \left(a,\lambda i.\mathsf{rank}_r (f (i))\right).
 \]
 
 The rank of a substituted expression is then
@@ -1393,16 +1394,16 @@ The reflexive, symmetric, and transitive cases follow immediately from
 the corresponding properties of equality.
 
 For the congruence case, suppose that \(f,g:B (a)\to T\) satisfy
-\(f (\xi)\approx g (\xi)\) for every \(\xi:B (a)\). By induction on the
+\(f (i)\approx g (i)\) for every \(i:B (a)\). By induction on the
 derivations of these relations, we have
-\(\iota^Z (f (\xi)) = \iota^Z (g (\xi))\) for every \(\xi:B (a)\). Function
+\(\iota^Z (f (i)) = \iota^Z (g (i))\) for every \(i:B (a)\). Function
 extensionality gives
-\((\lambda \xi.\iota^Z (f (\xi))) = (\lambda \xi.\iota^Z (g (\xi))),\) and hence
+\((\lambda i.\iota^Z (f (i))) = (\lambda i.\iota^Z (g (i))),\) and hence
 
 \[
-\mathsf{sup}^Z (a,\lambda \xi.\iota^Z (f (\xi)))
+\mathsf{sup}^Z (a,\lambda i.\iota^Z (f (i)))
 =
-\mathsf{sup}^Z (a,\lambda \xi.\iota^Z (g (\xi))).
+\mathsf{sup}^Z (a,\lambda i.\iota^Z (g (i))).
 \]
 
 By the recursive definition of \(\iota^Z\), this is precisely
@@ -1557,7 +1558,7 @@ On representatives, it is defined by
 \varphi ([\alpha,a,\widehat{f}]_{SD})
 =
 \left(
-a,\lambda \xi.[\alpha,\widehat{f} (\xi)]_D
+a,\lambda i.[\alpha,\widehat{f} (i)]_D
 \right).
 \]
 
@@ -1692,12 +1693,12 @@ f:B (a)\to\mathrm{colim}\,D.
 Lift each argument canonically:
 
 \[
-\mu (\xi)=\mathsf{rank}_C (f (\xi)),
+\mu (i)=\mathsf{rank}_C (f (i)),
 \qquad
-\widehat{g} (\xi)=\mathsf{lift}_C (f (\xi)),
+\widehat{g} (i)=\mathsf{lift}_C (f (i)),
 \]
 
-where \(\widehat{g} (\xi):\widetilde{S}/ (\mu (\xi))\).
+where \(\widehat{g} (i):\widetilde{S}/ (\mu (i))\).
 
 Use the plump supremum to define a common stage
 
@@ -1705,16 +1706,16 @@ Use the plump supremum to define a common stage
 \alpha = \mathsf{sup}^Z (a,\mu).
 \]
 
-For every \(\xi:B (a)\), the plumpness inequalities give
-\(\mu (\xi)<\alpha\) and hence \(\mu (\xi)\leq\alpha.\)
+For every \(i:B (a)\), the plumpness inequalities give
+\(\mu (i)<\alpha\) and hence \(\mu (i)\leq\alpha.\)
 
 We may therefore weaken each exact-rank representative to stage
 \(\alpha\):
 
 \[
-\widehat{x} (\xi)
+\widehat{x} (i)
 =
-\mathsf{weaken}_{\mu (\xi),\alpha} (\widehat{g} (\xi))
+\mathsf{weaken}_{\mu (i),\alpha} (\widehat{g} (i))
 :
 \widetilde{S}/ (\alpha).
 \]
@@ -1739,17 +1740,17 @@ Let \((a,f):S (\mathrm{colim}\,D)\). By definition,
 =
 \left(
  a,
- \lambda \xi.[\alpha,\widehat{x} (\xi)]_D
+  \lambda i.[\alpha,\widehat{x} (i)]_D
 \right).
 \]
 
-For each \(\xi:B (a)\), the element \(\widehat{x} (\xi)\) is the weakening
-to \(\alpha\) of the exact-rank representative \(\widehat{g} (\xi)\). The
+For each \(i:B (a)\), the element \(\widehat{x} (i)\) is the weakening
+to \(\alpha\) of the exact-rank representative \(\widehat{g} (i)\). The
 colimit relation therefore gives
-\([\alpha,\widehat{x} (\xi)]_D = [\mu (\xi),\widehat{g} (\xi)]_D.\)
+\([\alpha,\widehat{x} (i)]_D = [\mu (i),\widehat{g} (i)]_D.\)
 
 The exact-rank lifting theorem gives
-\([\mu (\xi),\widehat{g} (\xi)]_D = f (\xi).\)
+\([\mu (i),\widehat{g} (i)]_D = f (i).\)
 
 Combining these equalities pointwise and applying function
 extensionality yields \(\varphi (\sigma_D (a,f)) = (a,f).\)
