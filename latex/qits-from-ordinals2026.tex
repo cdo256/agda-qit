@@ -1,3 +1,4 @@
+%%TODO: Authors appearance in headers.
 % Options for packages loaded elsewhere
 \PassOptionsToPackage{unicode}{hyperref}
 \PassOptionsToPackage{hyphens}{url}
@@ -82,8 +83,8 @@ thereby establishing the required cocontinuity.
 More generally, a coherent section is enough to define the algebra
 structure on the colimit, while the initiality result requires the
 canonical map to be invertible. In the
-present construction, depth preservation provides the two-sided result;
-normalising and finitary presentations give further routes to the same
+present construction, depth preservation provides that
+normalising gives further routes to the same
 common-stage data.
 
 \end{abstract}
@@ -238,12 +239,15 @@ QW-signatures, their algebras, and the inflationary construction of
 Fiore, Pitts and Steenkamp. We then introduce extensional plump ordinals
 and explain their role as representative-independent construction
 stages. Next, we define depth-preserving signatures and prove that their
-structural ranks descend through the generated equations. We use these
+structural ranks descend through the generated equations. Finally we use these
 ranks to construct an isomorphism of the canonical colimit map and apply
-the initiality theorem for the corresponding QW-types. Finally, we discuss
-alternative sufficient conditions, including normalisation and finitary branching,
-and the prospects for a broader syntactic characterisation of
-sectionability.
+the initiality theorem for the corresponding QW-types.
+
+%%TODO: Drop?
+% Finally, we discuss
+% alternative sufficient conditions, including normalisation and finitary branching,
+% and the prospects for a broader syntactic characterisation of
+% sectionability.
 
 \section{Motivating examples}\label{motivating-examples}
 
@@ -275,6 +279,8 @@ ordinal resolves both problems: plumpness bounds the family of child
 ranks, and extensionality identifies bounds generated from the same
 image.
 
+%%TODO: Diagram
+
 \subsection{The cumulative hierarchy of
 sets}\label{the-cumulative-hierarchy-of-sets}
 
@@ -290,6 +296,8 @@ shows that the method applies to image equations, not only permutations;
 see \citep{eleftheriadis2021-cumulative-hierarchy} for the set-theoretic
 properties of \(V\).
 
+%%TODO: Diagram
+
 \subsection{Other examples and
 boundaries}\label{other-examples-and-boundaries}
 
@@ -303,6 +311,7 @@ these established alternatives.
 \section{QW-types and their construction
 problem}\label{qw-types-and-their-construction-problem}
 
+%%TODO: Mention topos theory?
 We now recall the algebraic presentation of QW-types and explain why
 their construction from W-types and quotients is non-trivial. We work in
 a universe \(\mathcal{U}\) of sets equipped with dependent sums,
@@ -320,6 +329,7 @@ A polynomial signature is a pair \(\Sigma = (A,B)\) consisting of a type
 element \(a : A\) represents an operation whose arguments are indexed by
 \(B (a)\). No finiteness assumption is made on \(B (a)\).
 
+%%TODO: Right paper?
 The signature \(\Sigma\) determines a polynomial endofunctor
 \(S_\Sigma : \mathcal{U} \to \mathcal{U}\), represented by the container
 \((A,B)\) \citep{abbott2005-container-derivative}, and defined by
@@ -328,6 +338,7 @@ The signature \(\Sigma\) determines a polynomial endofunctor
 For a function \(f : X \to Y\), its action is given by
 \(S_\Sigma (f) (a,b) = (a,f \circ b).\)
 
+%%TODO: Perhaps using alpha/beta here is confusing due to later uses?
 An \(S_\Sigma\)-algebra is a type \(X : \mathcal{U}\) equipped with a
 structure map \(\alpha : S_\Sigma (X) \to X.\)
 
@@ -358,6 +369,7 @@ Given an \(S_\Sigma\)-algebra \((Y,\alpha)\) and a substitution
 \(\rho : X \to Y\), every term \(t : T_\Sigma (X)\) has an
 interpretation \(\llbracket t \rrbracket_{\alpha,\rho} : Y\). This
 interpretation is defined recursively by
+%%TODO: Unnecessary parens?
 \(\llbracket \eta (x) \rrbracket_{\alpha,\rho} = \rho (x)\) and
 
 \[
@@ -446,6 +458,7 @@ W_\Sigma/{\sim}.
 An input to this constructor consists of an operation \(a : A\) and a
 family \(b : B (a) \to W_\Sigma/{\sim}.\)
 
+%% This could be clarified.
 The constructor of \(W_\Sigma\) acts only on families of representatives
 \(\widetilde{b} : B (a) \to W_\Sigma.\)
 
@@ -459,6 +472,7 @@ surjectivity of \(q\) does not construct a lift of the entire family
 \(b\). Such a lift requires a choice principle for families indexed by
 \(B (a)\).
 
+%%This has not been proven to my satisfaction yet.
 For finitary arities, this obstruction can often be resolved by finite
 choice. For an infinitary arity \(B (a)\), however, the required lifting
 principle may be a genuine additional assumption. In the case of
@@ -471,14 +485,17 @@ Categorically, the problem is that the polynomial functor \(S_\Sigma\)
 need not preserve quotient maps constructively. The quotient map \(q\)
 induces
 \(S_\Sigma (q) : S_\Sigma (W_\Sigma) \to S_\Sigma (W_\Sigma/{\sim}),\)
-but the surjectivity of \(q\) does not imply the surjectivity of
+but the surjectivity of \(q\) does not imply the constructive
+surjectivity of
 \(S_\Sigma (q)\) without an appropriate choice principle. Consequently,
 the constructor on \(W_\Sigma\) cannot in general be transported
 directly across the quotient.
 
-Inflationary iteration avoids asking for all representatives at once.
+Inflationary iteration \citep{pitts2021-inflationary-iteration} avoids
+asking for all representatives at once.
 Instead, it interleaves applications of the polynomial functor with
 quotients and forms the candidate QW-type as a colimit of successive
+%%TODO: What is a more canonical name for 'lifting problem'?
 approximations. This replaces the lifting problem for a single quotient
 by the problem of showing that \(S_\Sigma\) interacts appropriately with
 the resulting colimit. As Section 4.3 explains, this is the cocontinuity
@@ -515,7 +532,7 @@ QW-types, and more generally QWI-types, covered by their schema
 the full Axiom of Choice and is valid in many constructive models.
 Nevertheless, the Blass example shows that some additional restriction
 or set-theoretic principle is unavoidable for a completely general
-construction.
+construction. %TODO: citation
 
 Our aim is therefore not to construct every infinitary QW-type without
 choice. Instead, we identify presentations for which the lifting
@@ -548,7 +565,8 @@ Let \(\mathsf{Size}\) be a type equipped with a well-founded relation
 \(\alpha:\mathsf{Size}\), write
 \({\downarrow \alpha} = (\beta:\mathsf{Size})\times (\beta<\alpha)\) for the type of sizes
 strictly below \(\alpha\). We assume that the size structure has the
-upper-bound and successor-like operations specified in Section 5.2.
+upper-bound and successor-like operations specified in Section
+5.2. %TODO: Specify paper?
 
 A size-indexed approximation consists of a family
 \(D : \mathsf{Size} \to \mathcal{U}\) together with operations
@@ -568,6 +586,7 @@ approximation is obtained by quotienting these pairs by a relation
 
 We write the equivalence class of \((\beta,t)\) as \([\beta,t]_\alpha : D_\alpha.\)
 
+% TODO: My approach was different. Note this and compare.
 The relation \(R_\alpha\) is generated by three kinds of identification. The
 first imposes the specified equations. For every \(e:E\), every \(\beta<\alpha\),
 and every substitution \(\rho:V (e)\to D_\beta\), it identifies
@@ -586,6 +605,7 @@ Equivalently, applying an operation before or after transporting its
 immediate subterms to a later stage gives the same element of the
 quotient.
 
+%Update, see above.
 These three classes of relations correspond respectively to the
 equations of the presentation, the unit law, and the multiplication law.
 Their inclusion ensures that the colimit will satisfy the specified
