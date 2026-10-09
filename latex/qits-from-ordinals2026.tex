@@ -226,12 +226,13 @@ inflationary diagram. The class of depth-preserving signatures includes
 mobiles, finite multisets (as lists), and the cumulative hierarchy
 of extensional sets.
 
-The semantic criterion for defining the colimit algebra is the existence
-of a coherent section of \(\kappa_D\); the criterion for applying the
-Fiore--Pitts--Steenkamp initiality theorem is coherent invertibility.
-Depth preservation supplies both in the present setting. This separates
-the stage information required by inflationary iteration from the
-particular mechanism used to obtain it.
+The semantic criterion is coherent factorisation of the stagewise
+constructor through \(\kappa_D\). An inverse to \(\kappa_D\) is a
+sufficient way to obtain this factorisation; a section alone is
+sufficient only when it is compatible with the stagewise constructor.
+Depth preservation supplies the stronger result in the present setting.
+This separates the stage information required by inflationary iteration
+from the particular mechanism used to obtain it.
 
 The remainder of the paper is organised as follows. We first recall
 QW-signatures, their algebras, and the inflationary construction of
@@ -594,10 +595,11 @@ construction. %TODO: citation
 Our aim is therefore not to construct every infinitary QW-type without
 choice. Instead, we identify presentations for which the lifting
 required by inflationary iteration can be obtained from intrinsic
-structural information. The semantic condition is the existence of a
-section of the canonical polynomial-colimit map. Depth preservation
-supplies a syntactic condition under which such a section can be
-constructed from an extensional plump ordinal basis.
+structural information. The semantic condition is coherent factorisation
+of the stagewise constructor through the canonical polynomial-colimit map.
+Depth preservation supplies a syntactic condition under which the
+required factorisation can be constructed from an extensional plump
+ordinal basis.
 
 \section{Inflationary iteration}\label{inflationary-iteration}
 
@@ -849,9 +851,22 @@ The constructor can then be defined by
 \mathsf{intro} = \mu_D\circ\sigma_D.
 \]
 This observation concerns only the definition of the algebra structure.
-To apply the initiality result, we must
-also establish the converse composite and hence invertibility of
-\(\kappa_D\).
+For it to agree with the stagewise constructor \(\mu_D\), however, we
+also need
+
+\[
+\mathsf{intro}\circ\kappa_D=\mu_D.
+\]
+
+With \(\mathsf{intro}=\mu_D\circ\sigma_D\), this is the compatibility
+condition
+
+\[
+\mu_D\circ\sigma_D\circ\kappa_D=\mu_D.
+\]
+
+Invertibility of \(\kappa_D\) guarantees this condition; a section alone
+does not.
 
 %TODO: Is this too involved of a description?
 The equation system introduces an analogous lifting requirement. To
@@ -886,9 +901,9 @@ A section of the canonical map
 \longrightarrow
 S_{\Sigma,E} \left(\mathrm{colim}_\alpha D_\alpha\right)
 \] simultaneously supplies common-stage lifts for constructor arguments
-and for substitutions into equations. This is the section part of the
-cocontinuity property needed by the inflationary construction; the full
-initiality result additionally uses invertibility.
+and for substitutions into equations. This is the lifting part of the
+cocontinuity property; the stagewise constructor must additionally
+factor through this map for the inflationary initiality argument.
 
 Fiore, Pitts and Steenkamp use WISC to construct a type of sizes
 sufficiently rich for the relevant polynomial functor to preserve all
@@ -1573,11 +1588,14 @@ The section needed to define the colimit constructor is
 \sigma_D: S (\mathrm{colim}\,D) \longrightarrow \mathrm{colim}(S\circ D).
 \]
 
-We must prove \(\varphi\circ\sigma_D = \mathsf{id}_{S (\mathrm{colim}\,D)}\), which
+The equation \(\varphi\circ\sigma_D = \mathsf{id}_{S (\mathrm{colim}\,D)}\)
 is precisely the common-stage lifting needed to define constructors on
-the colimit. Since the final existence result invokes the initiality
-theorem of Fiore, Pitts and Steenkamp, Section 7 also establishes the
-converse composite \(\sigma_D\circ\varphi=\mathsf{id}\).
+the colimit. The resulting candidate algebra map is obtained by
+composing \(\sigma_D\) with the stagewise constructor. For the initiality
+argument, it must additionally satisfy the factorisation equation
+\(\mathsf{intro}\circ\varphi=\mu\). Section 7 establishes the converse
+composite \(\sigma_D\circ\varphi=\mathsf{id}\), which guarantees this
+factorisation.
 
 \subsection{Exact-rank lifting}\label{exact-rank-lifting}
 
@@ -1802,11 +1820,18 @@ The stage construction provides a map
 \mu: \mathrm{colim}(S\circ D) \to Q
 \]
 
-which adds one constructor layer. Using the section \(\sigma_D\) of the
+which adds one constructor layer. Using the inverse \(\sigma_D\) of the
 canonical map, define
 
 \[
 \mathsf{intro} = \mu\circ\sigma_D : S (Q)\to Q.
+\]
+
+Because \(\sigma_D\) is the inverse of \(\varphi\), this definition also
+satisfies
+
+\[
+\mathsf{intro}\circ\varphi=\mu.
 \]
 
 Because the specified equations have already been imposed in the stage
@@ -1846,9 +1871,10 @@ The proof of Section 7 suggests a criterion more general than depth
 preservation.
 
 \begin{quote}
-A coherent section of the canonical map is sufficient to define the
-colimit algebra. To obtain initiality, the canonical map must instead be
-coherently invertible.
+The general semantic requirement is that the stagewise constructor
+factors coherently through the canonical map. An inverse to the map is a
+sufficient condition; a section is sufficient only when it also satisfies
+the corresponding constructor-compatibility equation.
 \end{quote}
 
 For a diagram \(D:I\to\mathsf{Set}\) and a polynomial functor \(S\),
@@ -1870,8 +1896,12 @@ S \left(\mathrm{colim}_\alpha D_\alpha\right)
 \mathrm{colim}_\alpha S (D_\alpha)
 \] satisfying \(\kappa_D\circ\sigma_D = \mathsf{id}\) assigns a
 common-stage representative to every constructor application over the
-colimit. Composing \(\sigma_D\) with the stagewise constructor gives an
-algebra structure on the colimit.
+colimit. Composing \(\sigma_D\) with the stagewise constructor gives a
+candidate algebra structure on the colimit. For the construction to
+respect the stagewise constructor, it must additionally satisfy
+\(\mathsf{intro}\circ\kappa_D=\mu\); equivalently, for
+\(\mathsf{intro}=\mu\circ\sigma_D\), one needs
+\(\mu\circ\sigma_D\circ\kappa_D=\mu\).
 
 The section must also be coherent with the transition maps, the stage
 quotients, and the equations of the presentation. These coherence
@@ -1931,10 +1961,11 @@ preferred representatives to descend through the colimit relation.
 Given these properties, the constructor-lifting part of Section 7 can be
 repeated with normal-form rank in place of structural rank. Each colimit
 element is represented by its normal form at the rank of that normal
-  form. The ranks of the arguments of a constructor determine a common
+form. The ranks of the arguments of a constructor determine a common
 stage, and the resulting family defines a section of \(\kappa_D\). To
-obtain initiality, one must additionally
-prove the corresponding reverse composite.
+obtain initiality, one must additionally prove the corresponding
+constructor-compatibility equation; the reverse composite is a sufficient
+way to obtain it.
 
 Normalisation can therefore handle equations that change syntactic
 depth. Associativity and unit equations are typical examples for which
@@ -2146,14 +2177,16 @@ constructs one half of the isomorphism \[
 \longrightarrow
 \mathrm{colim}_\alpha S (D_\alpha)
 \] required by inflationary iteration. The reverse composite follows from
-the compatibility of exact-rank lifting with weakening, so the corresponding
+the compatibility of exact-rank lifting with weakening and gives the
+required factorisation of the stagewise constructor, so the corresponding
 initiality result yields the initial QW-algebra from W-types and quotients,
 relative to the ordinal basis and without a further use of WISC.
 
-The construction isolates coherent common-stage lifting, rather than
-depth preservation itself, as the semantic condition. A section suffices
-for the colimit algebra, while coherent invertibility is needed for the
-full initiality result obtained here. Normalising signatures can obtain
+The construction isolates coherent constructor factorisation, rather than
+depth preservation itself, as the semantic condition. A section supplies
+common-stage lifts, but it must be compatible with the stagewise
+constructor; coherent invertibility is a sufficient way to guarantee this.
+Normalising signatures can obtain
 canonical lifts from normal forms, while finitary signatures obtain common stages from finite directedness. Extending these methods
 to indexed or conditional presentations and determining the exact
 relationship between extensional plump ordinal bases and collection
