@@ -1481,27 +1481,27 @@ Let \(T\) be the W-type of raw terms over \(\Sigma\), and let
 define the type of raw terms bounded by \(\alpha\) by
 
 \[
-S_0 (\alpha) = (t:T)\times\bigl(\iota^Z (t)\leq\alpha\bigr).
+T_{\leq\alpha} = (t:T)\times\bigl(\iota^Z (t)\leq\alpha\bigr).
 \]
 
-The equation system generates a setoid \(\widetilde{S} (\alpha)\) on
-\(S_0 (\alpha)\). Its equivalence relation contains the specified
+The equation system generates a setoid \(\mathcal{T}_\alpha\) on
+\(T_{\leq\alpha}\). Its equivalence relation contains the specified
 equations and is closed under constructor congruence, reflexivity,
-symmetry, and transitivity. Write \(\widetilde{S}/ (\alpha)\) for the
-set quotient of this setoid.
+symmetry, and transitivity. Write \(Q_\alpha\) for the quotient of this
+setoid.
 
 Whenever \(\alpha\leq\beta\), a bounded term at stage \(\alpha\) is also
 bounded at stage \(\beta\). This gives a weakening map
 
 \[
 \mathsf{weaken}_{\alpha,\beta}:
-\widetilde{S}/ (\alpha)
+Q_\alpha
 \to
-\widetilde{S}/ (\beta).
+Q_\beta.
 \]
 
 These maps are functorial, so the assignment
-\(\alpha\longmapsto\widetilde{S}/ (\alpha)\) defines the diagram
+\(\alpha\longmapsto Q_\alpha\) defines the diagram
 
 \[
 D:(Z,\leq)\to\mathsf{Set}.
@@ -1510,11 +1510,11 @@ D:(Z,\leq)\to\mathsf{Set}.
 Its colimit is
 
 \[
-\mathrm{colim}\,D = \mathrm{colim}_{\alpha:Z} \widetilde{S}/ (\alpha).
+\mathrm{colim}\,D = \mathrm{colim}_{\alpha:Z} Q_\alpha.
 \]
 
 A representative of an element of this colimit is a pair
-\((\alpha,\widehat{t})\) with \(\widehat{t}:\widetilde{S}/ (\alpha)\).
+\((\alpha,\widehat{t})\) with \(\widehat{t}:Q_\alpha\).
 We write its equivalence class as \([\alpha,\widehat{t}]_D:\mathrm{colim}\,D.\)
 
 The colimit relation identifies elements equal at the same stage and
@@ -1537,12 +1537,14 @@ S\circ D:(Z,\leq)\to\mathsf{Set}.
 Its colimit is
 
 \[
-\mathrm{colim}(S\circ D) = \mathrm{colim}_{\alpha:Z} S (\widetilde{S}/ (\alpha)).
+\mathrm{colim}(S\circ D) = \mathrm{colim}_{\alpha:Z} S (Q_\alpha).
 \]
 
 An element of \(\mathrm{colim}(S\circ D)\) is represented by a stage
 \(\alpha:Z\), a constructor \(a:A\), and a family
-\(\widehat{f}:B (a)\to\widetilde{S}/ (\alpha).\)
+\[
+\widehat{f}:B (a)\to Q_\alpha.
+\]
 
 We write this representative as \([\alpha,a,\widehat{f}]_{SD}.\)
 
@@ -1567,7 +1569,7 @@ argument into the colimit. Functoriality of weakening ensures that this
 definition respects the colimit relation.
 
 For the stage construction used here, the equation relation has already
-been imposed inside each quotient \(\widetilde{S}/ (\alpha)\).
+been imposed inside each quotient \(Q_\alpha\).
 Consequently, the cocontinuity problem concerns the underlying
 polynomial functor \(S\) alone. No additional polynomial containing the
 equation-variable contexts is required in the formal theorem.
@@ -1589,7 +1591,7 @@ converse composite \(\sigma_D\circ\varphi=\mathsf{id}\).
 We first construct a canonical rank on every stage quotient. Define
 
 \[
-\mathsf{rank}_0: S_0 (\alpha)\to Z,
+\mathsf{rank}_0: T_{\leq\alpha}\to Z,
 \qquad
 \mathsf{rank}_0 (t,p) = \iota^Z (t).
 \]
@@ -1602,7 +1604,7 @@ preservation gives equality of the two ranks.
 The quotient recursion principle therefore yields
 
 \[
-\mathsf{rank}_\alpha: \widetilde{S}/ (\alpha)\to Z.
+\mathsf{rank}_\alpha: Q_\alpha\to Z.
 \]
 
 For a represented bounded term, it satisfies
@@ -1613,7 +1615,7 @@ For a represented bounded term, it satisfies
 
 The bound carried by the representative gives
 \(\mathsf{rank}_\alpha (\widehat{t}) \leq \alpha\) for every
-\(\widehat{t}:\widetilde{S}/ (\alpha)\). Moreover, weakening does not
+\(\widehat{t}:Q_\alpha\). Moreover, weakening does not
 change rank:
 
 \[
@@ -1648,13 +1650,13 @@ lemma.
 \mathsf{rank}_C:\mathrm{colim}\,D\to Z
 \] and \[
 \mathsf{lift}_C:
-(x:\mathrm{colim}\,D)\to\widetilde{S}/ (\mathsf{rank}_C (x))
+(x:\mathrm{colim}\,D)\to Q_{\mathsf{rank}_C (x)}
 \] such that \([\mathsf{rank}_C (x),\mathsf{lift}_C (x)]_D=x\). They are
 invariant under the stage equations and compatible with weakening.
 \end{quote}
 
 To prove the lemma, first define the lift on a bounded raw term. For a
-bounded raw term \((t,p):S_0 (\alpha),\) define its exact-rank
+bounded raw term \((t,p):T_{\leq\alpha},\) define its exact-rank
 representative by
 
 \[
@@ -1665,7 +1667,7 @@ t,
 \mathsf{refl}_{\leq} (\iota^Z (t))
 \right)
 :
-S_0 (\iota^Z (t)).
+T_{\leq\iota^Z (t)}.
 \]
 
 Depth preservation makes equivalent raw terms have equal ranks. After
@@ -1676,7 +1678,7 @@ therefore gives
 \[
 \mathsf{lift}_{\approx} (\widehat{t})
 :
-\widetilde{S}/ (\mathsf{rank}_\alpha (\widehat{t})).
+Q_{\mathsf{rank}_\alpha (\widehat{t})}.
 \]
 
 Compatibility with weakening lets this operation descend through the
@@ -1698,7 +1700,7 @@ Lift each argument canonically:
 \widehat{g} (i)=\mathsf{lift}_C (f (i)),
 \]
 
-where \(\widehat{g} (i):\widetilde{S}/ (\mu (i))\).
+where \(\widehat{g} (i):Q_{\mu (i)}\).
 
 Use the plump supremum to define a common stage
 
@@ -1717,7 +1719,7 @@ We may therefore weaken each exact-rank representative to stage
 =
 \mathsf{weaken}_{\mu (i),\alpha} (\widehat{g} (i))
 :
-\widetilde{S}/ (\alpha).
+Q_\alpha.
 \]
 
 The family \(\widehat{x}\) lies entirely at the common stage \(\alpha\).
@@ -1798,7 +1800,7 @@ what is needed to invoke their initiality theorem.
 Let
 
 \[
-Q = \mathrm{colim}\,D = \mathrm{colim}_{\alpha:Z} \widetilde{S}/ (\alpha).
+Q = \mathrm{colim}\,D = \mathrm{colim}_{\alpha:Z} Q_\alpha.
 \]
 
 The stage construction provides a map
