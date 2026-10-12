@@ -60,6 +60,18 @@
 \begin{document}
 \maketitle
 
+% TODO: Move related work to the top of the paper.
+% TODO: Explain the theory-of-signatures route to QIT presentations.
+% TODO: Relate extensional plump ordinals to the basic ordinal examples.
+% TODO: Explain how future work could bridge the remaining reduction gap.
+% TODO: Identify reusable combinators for deriving QITs.
+% TODO: Relate this construction to the theory of signatures.
+% TODO: Express extensional plump ordinals as a QIIT, if useful.
+% TODO: Cite Van den Berg's work on ordinals and relate it to these ordinals.
+% TODO: Keep the paper centred on one main theorem.
+% TODO: Rephrase the semantic criterion as the syntactic criterion is developed.
+% TODO: Put the formalisation front and centre.
+
 \begin{abstract}
 
 Quotient inductive types extend inductive types with equations between
@@ -84,6 +96,8 @@ thereby establishing the required cocontinuity.
 \end{abstract}
 
 \section{Introduction}\label{introduction}
+
+% TODO: Keep the introduction within two pages.
 
 Inductive types provide a fundamental method for defining mathematical
 objects in dependent type theory. Their constructors generate the
@@ -240,6 +254,8 @@ permutation equations preserve the collection of child ranks. In the
 cumulative hierarchy, image equations preserve the collection of
 predecessor ranks. The detailed rank checks appear in Section 4.
 
+% TODO: Add a compact diagram or schematic for the motivating examples.
+
 The remainder of the paper is organised as follows. We first recall
 QW-signatures, their algebras, and the inflationary construction of
 Fiore, Pitts and Steenkamp. We then introduce extensional plump ordinals
@@ -250,6 +266,8 @@ ranks to construct an isomorphism of the canonical colimit map and apply
 the initiality theorem for the corresponding QW-types.
 
 \section{Background and related work}\label{background-and-related-work}
+
+% TODO: Compress this background section to roughly two pages.
 
 \subsection{QW-types and their construction problem}
 \label{qw-types-and-their-construction-problem}
@@ -265,12 +283,15 @@ unique-choice assumptions used by the main theorem are stated in Section
 \subsection{Signatures and
 equations}\label{signatures-and-equations}
 
+% TODO: Check whether the theory-of-toposes background belongs here.
+
 A polynomial signature is a pair \(\Sigma = (A,B)\) consisting of a type
 \(A : \mathcal{U}\) of operation symbols and a family
 \(B : A \to \mathcal{U}\) assigning an arity to each operation. An
 element \(a : A\) represents an operation whose arguments are indexed by
 \(B (a)\). No finiteness assumption is made on \(B (a)\).
 
+% TODO: Verify that this is the best reference for the container formalism.
 The signature \(\Sigma\) determines a polynomial endofunctor
 \(S_\Sigma : \mathcal{U} \to \mathcal{U}\), represented by the container
 \((A,B)\) \citep{abbott2005-container-derivative}, and defined by
@@ -285,6 +306,7 @@ For a function \(f : X \to Y\), its action is given by
 S_\Sigma (f) (a,b) = (a,f \circ b).
 \]
 
+% TODO: Check whether alpha/beta notation is confusing with ordinal stages.
 An \(S_\Sigma\)-algebra is a type \(X : \mathcal{U}\) equipped with a
 structure map
 
@@ -327,6 +349,7 @@ operation of the signature to a family of terms. The assignment
 Given an \(S_\Sigma\)-algebra \((Y,\alpha)\) and a substitution
 \(\rho : X \to Y\), every term \(t : T_\Sigma (X)\) has an
 interpretation \(\llbracket t \rrbracket_{\alpha,\rho} : Y\). This
+% TODO: Check whether the parentheses in the interpretation equations are necessary.
 interpretation is defined recursively by
 \[
 \llbracket \eta (x) \rrbracket_{\alpha,\rho} = \rho (x)
@@ -538,6 +561,9 @@ ordinal basis.
 
 \subsection{Inflationary iteration}\label{inflationary-iteration}
 
+% TODO: Compress this subsection to the cocontinuity problem and the role of WISC.
+
+% TODO: State the exact upstream theorem used for initiality.
 Fiore, Pitts and Steenkamp construct QW-types by an inflationary
 iteration in which the formation of terms is interleaved with
 quotienting by equations \citep{fiore2022-quotient-inductive,
@@ -563,7 +589,7 @@ Let \(\mathsf{Size}\) be a type equipped with a well-founded relation
 
 for the type of sizes strictly below \(\alpha\). We assume that the size structure has the
 upper-bound and successor-like operations specified in Section
-5.2.
+5.2. % TODO: Define or cite these operations.
 
 A size-indexed approximation consists of a family
 \(D : \mathsf{Size} \to \mathcal{U}\) together with operations
@@ -583,6 +609,7 @@ strictly below \(\alpha\). Before quotienting, its elements are pairs
 (\beta,t) : (\beta:\mathsf{Size})\times (\beta<\alpha)\times T_\Sigma (D_\beta).
 \]
 
+% TODO: Compare this expository stage presentation with the rank-bounded diagram.
 Such a pair records a lower stage \(\beta<\alpha\) together with a term \(t\)
 whose variables have already been constructed at that stage. The next
 approximation is obtained by quotienting these pairs by a relation
@@ -1414,6 +1441,7 @@ the canonical map from the colimit of the polynomial functor to the
 polynomial functor of the colimit. Its section component supplies the
 common-stage lift.
 
+% TODO: Put the formalisation and its exact assumptions front and centre.
 The formal proof is carried out in type theory
 with propositions, function extensionality, propositional
 extensionality, unique choice, and set quotients. We assume a signature
@@ -1763,6 +1791,7 @@ equations. Extensionality ensures that these rank equalities descend
 through the stage quotients. Plumpness places all arguments of a constructor below the
 common supremum stage.
 
+% TODO: Check all theorem and section numbering after compression.
 \subsection{Cocontinuity and
 existence}\label{cocontinuity-and-existence}
 
