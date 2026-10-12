@@ -154,26 +154,12 @@ record Hom (A : Algebra ℓA) (B : Algebra ℓB) : Set (ℓA ⊔ ℓB) where
     ty₁ : ∀ x → θ (A.ty₁ x) ≡ B.ty₁ (θ x)
     ∙ : θ A.∙ ≡ B.∙
     ▷ : ∀ (γ : A.CT) (a : A.CT)
-      → A.[ γ ] ≡ A.ĉ
-      → A.[ a ] ≡ A.t̂
-      → A.ty₁ a ≡ γ
       → θ (A.▷ γ a) ≡ B.▷ (θ γ) (θ a)
     u : ∀ (γ : A.CT)
-      → A.[ γ ] ≡ A.ĉ
       → θ (A.u γ) ≡ B.u (θ γ)
     π : ∀ (γ : A.CT) (a : A.CT) (b : A.CT)
-      → A.[ γ ] ≡ A.ĉ
-      → A.[ a ] ≡ A.t̂
-      → A.ty₁ a ≡ γ
-      → A.[ b ] ≡ A.t̂
-      → A.ty₁ b ≡ A.▷ γ a
       → θ (A.π γ a b) ≡ B.π (θ γ) (θ a) (θ b)
     σ : ∀ (γ : A.CT) (a : A.CT) (b : A.CT)
-      → A.[ γ ] ≡ A.ĉ
-      → A.[ a ] ≡ A.t̂
-      → A.ty₁ a ≡ γ
-      → A.[ b ] ≡ A.t̂
-      → A.ty₁ b ≡ A.▷ γ a
       → θ (A.σ γ a b) ≡ B.σ (θ γ) (θ a) (θ b)
 
 id : ∀ {ℓA} {A : Algebra ℓA} → Hom A A
@@ -185,10 +171,10 @@ id = record
   ; t̂ = ≡.refl
   ; ty₁ = λ _ → ≡.refl
   ; ∙ = ≡.refl
-  ; ▷ = λ _ _ _ _ _ → ≡.refl
-  ; u = λ _ _ → ≡.refl
-  ; π = λ _ _ _ _ _ _ _ _ → ≡.refl
-  ; σ = λ _ _ _ _ _ _ _ _ → ≡.refl
+  ; ▷ = λ _ _ → ≡.refl
+  ; u = λ _ → ≡.refl
+  ; π = λ _ _ _ → ≡.refl
+  ; σ = λ _ _ _ → ≡.refl
   }
 
 _∘_ : ∀ {ℓA ℓB ℓC} {A : Algebra ℓA} {B : Algebra ℓB} {C : Algebra ℓC} → Hom B C → Hom A B → Hom A C
@@ -200,10 +186,10 @@ _∘_ {A = A} {B} {C} g f = record
   ; t̂ = ≡.trans (≡.cong g.θ f.t̂) g.t̂
   ; ty₁ = λ x → ≡.trans (≡.cong g.θ (f.ty₁ x)) (g.ty₁ (f.θ x))
   ; ∙ = ≡.trans (≡.cong g.θ f.∙) g.∙
-  ; ▷ = λ x a kx ka ka₁ → ≡.trans (≡.cong g.θ (f.▷ x a kx ka ka₁)) (g.▷ (f.θ x) (f.θ a) (kx' x kx) (ka' a ka) (ka₁' a x ka₁))
-  ; u = λ x kx → ≡.trans (≡.cong g.θ (f.u x kx)) (g.u (f.θ x) (kx' x kx))
-  ; π = λ x a b kx ka ka₁ kb kb₁ → ≡.trans (≡.cong g.θ (f.π x a b kx ka ka₁ kb kb₁)) (g.π (f.θ x) (f.θ a) (f.θ b) (kx' x kx) (ka' a ka) (ka₁' a x ka₁) (kb' b kb) (kb₁' x a b kx ka ka₁ kb₁))
-  ; σ = λ x a b kx ka ka₁ kb kb₁ → ≡.trans (≡.cong g.θ (f.σ x a b kx ka ka₁ kb kb₁)) (g.σ (f.θ x) (f.θ a) (f.θ b) (kx' x kx) (ka' a ka) (ka₁' a x ka₁) (kb' b kb) (kb₁' x a b kx ka ka₁ kb₁))
+  ; ▷ = λ x a → ≡.trans (≡.cong g.θ (f.▷ x a)) (g.▷ (f.θ x) (f.θ a))
+  ; u = λ x → ≡.trans (≡.cong g.θ (f.u x)) (g.u (f.θ x))
+  ; π = λ x a b → ≡.trans (≡.cong g.θ (f.π x a b)) (g.π (f.θ x) (f.θ a) (f.θ b))
+  ; σ = λ x a b → ≡.trans (≡.cong g.θ (f.σ x a b)) (g.σ (f.θ x) (f.θ a) (f.θ b))
   }
   where
   module A = Algebra A
@@ -211,29 +197,6 @@ _∘_ {A = A} {B} {C} g f = record
   module C = Algebra C
   module f = Hom f
   module g = Hom g
-
-  kx' : ∀ x → A.[ x ] ≡ A.ĉ → B.[ f.θ x ] ≡ B.ĉ
-  kx' x kx = ≡.trans (≡.sym (f.[_] x)) (≡.trans (≡.cong f.θ kx) f.ĉ)
-
-  ka' : ∀ a → A.[ a ] ≡ A.t̂ → B.[ f.θ a ] ≡ B.t̂
-  ka' a ka = ≡.trans (≡.sym (f.[_] a)) (≡.trans (≡.cong f.θ ka) f.t̂)
-
-  ka₁' : ∀ a x → A.ty₁ a ≡ x → B.ty₁ (f.θ a) ≡ f.θ x
-  ka₁' a x ka₁ = ≡.trans (≡.sym (f.ty₁ a)) (≡.cong f.θ ka₁)
-
-  kb' : ∀ b → A.[ b ] ≡ A.t̂ → B.[ f.θ b ] ≡ B.t̂
-  kb' b kb = ≡.trans (≡.sym (f.[_] b)) (≡.trans (≡.cong f.θ kb) f.t̂)
-
-  kb₁' : ∀ x a b
-    → A.[ x ] ≡ A.ĉ
-    → A.[ a ] ≡ A.t̂
-    → A.ty₁ a ≡ x
-    → A.ty₁ b ≡ A.▷ x a
-    → B.ty₁ (f.θ b) ≡ B.▷ (f.θ x) (f.θ a)
-  kb₁' x a b kx ka ka₁ kb₁ =
-    ≡.trans
-      (≡.trans (≡.sym (f.ty₁ b)) (≡.cong f.θ kb₁))
-      (f.▷ x a kx ka ka₁)
 
 record _≈_ {ℓA ℓB} {A : Algebra ℓA} {B : Algebra ℓB} (f g : Hom A B) : Prop (ℓA ⊔ ℓB) where
   constructor mk≈
