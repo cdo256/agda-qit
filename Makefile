@@ -16,7 +16,7 @@ pdf: $(PDF_FILES)
 
 $(OUT)/%.pdf: latex/%.tex $(BIB_FILES)
 	@mkdir -p $(OUT)
-	latexmk -pdf -output-directory=$(OUT) -interaction=nonstopmode $<
+	latexmk -xelatex -output-directory=$(OUT) -interaction=nonstopmode $<
 
 build:
 	agda Everything.agda
