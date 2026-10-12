@@ -1,3 +1,4 @@
+{-# OPTIONS --type-in-type #-}
 open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Setoid
@@ -17,7 +18,7 @@ module QIT.QW.Algebra
   where
 
 open Sig sig
-open import QIT.Container.StrictFunctor S P (ℓS ⊔ ℓP ⊔ ℓV) using (F)
+open import QIT.Container.StrictFunctor S P (ℓS ⊔ ℓP ⊔ ℓV ⊔ ℓE) using (F)
 open import QIT.QW.Equation S P ℓV
 open import QIT.Functor.Base
 open import QIT.Algebra.Base F as AlgBase hiding (Hom; IsInitial)
