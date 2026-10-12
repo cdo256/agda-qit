@@ -269,6 +269,79 @@ the initiality theorem for the corresponding QW-types.
 
 % TODO: Compress this background section to roughly two pages.
 
+\subsection{QW-types and inflationary iteration}
+\label{qw-types-and-inflationary-iteration}
+
+We recall only the ingredients needed for the new construction. A
+polynomial signature is a pair \(\Sigma=(A,B)\), with operation symbols
+\(a:A\) and arities \(B(a)\). It determines
+
+\[
+S(X)=(a:A)\times(B(a)\to X).
+\]
+
+A system of equations consists of variables and pairs of terms over the
+signature. A QW-type is an initial \(S\)-algebra satisfying those
+equations. We use the formalism of Fiore, Pitts and Steenkamp
+\citep{fiore2020-infinitary-qiit,fiore2022-quotient-inductive}; the
+details of free monads and algebra morphisms are not repeated here.
+
+The difficulty is already visible for mobiles. Quotienting the W-type of
+ordered countably branching trees by permutation equations does not
+directly produce an algebra: an input family
+\(\mathbb{N}\to W/{\sim}\) must be lifted simultaneously to a family of
+representatives. Pointwise surjectivity does not provide this lift
+constructively. Blass's example shows that this is a genuine
+choice-theoretic obstruction, not merely a weakness of that particular
+quotient construction \citep{blass1983-free-algebra-coequalizer}.
+
+Fiore, Pitts and Steenkamp avoid the direct quotient by inflationary
+iteration \citep{fiore2022-quotient-inductive,
+pitts2022-inflationary-iteration}. Approximants are formed from earlier
+stages while equations are imposed during the construction, and the
+candidate QW-type is their colimit. For a diagram \(D_\alpha\), write
+
+\[
+Q=\operatorname{colim}_\alpha D_\alpha.
+\]
+
+The constructor is assembled from the stagewise map
+
+\[
+\mu:A_D=\operatorname{colim}_\alpha S(D_\alpha)\longrightarrow Q
+\]
+
+and the canonical map
+
+\[
+\kappa_D:A_D\longrightarrow S(Q).
+\]
+
+If \(\kappa_D\) is invertible, the algebra structure is
+\(\mathsf{intro}=\mu\circ\kappa_D^{-1}\), and the usual initiality
+argument applies. Their WISC-based construction proves the required
+cocontinuity for the relevant general size-indexed diagrams
+\citep{fiore2022-quotient-inductive}.
+
+Our contribution is different. We do not prove preservation for arbitrary
+size-indexed diagrams. Instead, for the rank-bounded diagram used below,
+we construct the inverse of \(\kappa_D\) directly from canonical ordinal
+ranks. The diagram is presented using raw bounded terms
+\(T_{\leq\alpha}\), setoid stages \(\mathcal{T}_\alpha\), and quotient
+stages \(Q_\alpha\). The equation relation is uniform across stages; only
+the bounded carrier changes. The direct rank argument therefore supplies
+the cocontinuity input needed for the imported initiality result without
+using WISC.
+
+The paper's formal development proves this particular cocontinuity
+isomorphism. Initiality is then obtained from the general result of
+Fiore, Pitts and Steenkamp. Other related approaches include
+image-preserving QW-types and finitary QIT constructions
+\citep{swan2022-hits-in-zf,van-der-weide2019-set-truncated-hits,
+kaposi2019-constructing-qiit}.
+
+\iffalse
+
 \subsection{QW-types and their construction problem}
 \label{qw-types-and-their-construction-problem}
 
@@ -881,6 +954,8 @@ are proved using weakening. If equation contexts are instead lifted
 externally using \(S_{\Sigma,E}\), the same argument must establish both
 composites for \(\kappa_D^{\Sigma,E}\) before the initiality theorem can
 be applied.
+
+\fi
 
 \section{Extensional plump
 ordinals}\label{extensional-plump-ordinals}
