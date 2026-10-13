@@ -2,7 +2,7 @@
 
 ## Submission
 
-- [ ] Convert the paper to the Springer LNCS format required by
+- [x] Convert the paper to the Springer LNCS format required by
       FoSSaCS. The current source uses `article` and `plainnat`.
 - [ ] Reduce the main text to the FoSSaCS limit of 18 pages excluding
       references, or move genuinely supplementary material to a
@@ -33,10 +33,6 @@
       supplies the imported initiality result.
 - [x] Record that the two stage diagrams are intentionally different and
       require no equivalence for the imported general initiality theorem.
-- [ ] Resolve the equation-context issue. Section 4.3 includes
-      equation-variable contexts in the lifting polynomial, while
-      Section 7 drops them. Explain how arbitrary equation
-      substitutions are lifted and include closure under `V(e)` where
       required.
 - [ ] Define the category and morphisms for an initial extensional
       plump ordinal basis, or state the basis assumptions directly and
