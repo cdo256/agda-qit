@@ -103,11 +103,12 @@ of the syntax of type theory. They can also be understood as the
 set-truncated fragment of higher inductive
 types.\citep{altenkirch2016-type-theory-qit}
 
-The aim of this programme is to work toward having simple combinators
-that build up toward being able to construct all QITs from components.
-Theory of Signatures create one such sufficient combinator using a CwF
-like
-construction as a universal QIIT, but its full construction is rather complicated, and it's not clear whether theres a simpler set of combinator that might be sufficient for a large class of infinitary QITs.\citep{kaposi2019-constructing-qiit,kovacs2020-infinitary-qiit}
+The broader aim is to identify simple combinators from which useful
+classes of QITs can be constructed. The theory of signatures gives one
+such route via a CwF-like universal QIIT, but its full construction is
+substantial; it remains unclear whether simpler combinators suffice for a
+large class of infinitary QITs
+\citep{kaposi2019-constructing-qiit,kovacs2020-infinitary-qiit}.
 
 Consider for instance the Mobile: A permutation-invariant infinitary
 branching tree.
@@ -416,23 +417,26 @@ We therefore assume a well-founded, extensional plump order with upper bounds,
 finite joins, and a least element; the complete structure is given below.
 
 \begin{quote}
-\textbf{Lemma (quasi-extensionality of the plump order).}
+\textbf{Lemma (extensionality of the plump order).}
 For \(\alpha,\beta:Z\), define
+{\small
 \[
-\alpha\sqsubseteq\beta
-  := (\gamma:Z)\to(\gamma<\alpha\to\gamma<\beta),
-\qquad
-\alpha\sqsupseteq\beta
-  := (\gamma:Z)\to(\alpha<\gamma\to\beta<\gamma).
+\alpha\sqsubseteq\beta := (\gamma:Z)\to(\gamma<\alpha\to\gamma<\beta),
 \]
+}
 Then
+{\small
 \[
 \alpha\sqsubseteq\beta\to\alpha\leq\beta,
-\qquad
-\alpha\leq\beta\to\alpha\sqsubseteq\beta,
-\qquad
-\alpha\leq\beta\to\beta\sqsupseteq\alpha.
 \]
+}
+Hence, by antisymmetry
+{\small
+\[
+((\gamma:Z)\to(\gamma<\alpha\iff\gamma<\beta))→\alpha=\beta
+\]
+}
+
 Consequently, mutual \(\leq\) is equivalent to mutual
 \(\sqsubseteq\). Hence antisymmetry implies equality whenever the strict
 predecessor segments are mutually included.
@@ -440,8 +444,7 @@ predecessor segments are mutually included.
 
 The first implication follows by exposing the supremum and applying
 \(\mathsf{sup}\leq\) to each child, using \(\mathsf{<sup}\) and reflexivity.
-The second and third are respectively the \(\leq<\) and \(\mathsf{<\leq}\)
-composition laws. The final claim follows by applying the first implication
+The second claim follows by applying the first implication
 in both directions and then antisymmetry.
 
 
@@ -479,14 +482,21 @@ data _≤_ where
         → ((i : P' s) → ξ i < α) → sup s ξ ≤ α
 data _<_ where
   <sup : (s : S') (ξ : P' s → Z) (i : P' s)
-        → (α : Z) → α ≤ ξ i → α < sup s f
+        → (α : Z) → α ≤ ξ i → α < sup s ξ
 \end{Verbatim}
 \caption{The extensional plump ordinal basis}
 \end{listing}
 
-Where \(S\prime\) and \(P\prime\) are obtained by freely extending the S and P with a
-nullary operator and binary operator, which are required by the
-cocontinuity proof, similar to the approach taken in the FPS construction \cite{fiore2022-quotient-inductive}.
+Here \(S'\) and \(P'\) are obtained by freely extending \(S\) and \(P\)
+with nullary and binary operations, as in the size construction of Fiore,
+Pitts and Steenkamp \citep{fiore2022-quotient-inductive}.
+
+A morphism of plump algebras is a function on carriers preserving
+\(\mathsf{sup}\), \(<\), and \(\leq\). The basis is initial when every
+extensional plump algebra admits such a morphism from it, unique up to
+pointwise equality. This is the notion implemented by
+\texttt{PlumpHom} and \texttt{InitialExtensionalPlumpOrdinals} in the
+formalisation.
 
 % I think this lemma is too in the weeds to be interesting.
 \subsection{Extensional supremum
@@ -786,8 +796,8 @@ signature is depth-preserving, and an extensional plump ordinal basis
 \(Z\) for \(\Sigma\). The accompanying Agda development proves the
 cocontinuity isomorphism for this diagram; the initiality step is imported
 from Fiore, Pitts and Steenkamp.
-No instance of WISC or of general choice is used in
-this argument.
+No instance of WISC, or of choice beyond the stated unique-choice
+principle, is used in this argument.
 
 \subsection{The canonical colimit
 map}\label{the-canonical-colimit-map}
@@ -1123,7 +1133,8 @@ than the WISC-based preservation theorem of Fiore,
 Pitts and Steenkamp in scope, but not in the type of conclusion: it proves
 invertibility only for the diagram arising in the QW-construction, rather
 than an isomorphism for every diagram indexed by the chosen sizes
-\citep{fiore2022-quotient-inductive}. Their initiality theorem is stated
+\citep{fiore2022-quotient-inductive}. Their initiality theorem
+(Theorem 6.4) is stated
 for general size-indexed diagrams satisfying the required stage laws, so
 it applies directly to the rank-bounded diagram here. The general plump
 ordering and well-founded recursion assumptions supply the corresponding
@@ -1250,6 +1261,9 @@ stagewise constructor; coherent invertibility is a sufficient way to
 guarantee this.  Extending this method to indexed or conditional
 presentations and determining the exact relationship between
 extensional plump ordinal bases and collection principles remain open.
+Another direction is to identify simpler signature combinators or QIIT
+reductions that bring a wider class of presentations within the
+depth-preserving construction.
 
 \bibliography{master.bib}
 
