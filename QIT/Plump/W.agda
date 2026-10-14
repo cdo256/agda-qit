@@ -287,6 +287,7 @@ Zᴬ = record
   ; ∨ᶻ≤ = λ p q → sup≤ ⊎.[ (λ _ → p) , (λ _ → q) ]ᵖ
   ; ⊥ᶻ = ⊥ᶻ
   ; ⊥ᶻ≤ = sup≤ λ ()
+  ; iswf< = iswf<
   }
 
 open import QIT.Plump.Size
