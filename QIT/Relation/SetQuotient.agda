@@ -25,12 +25,14 @@ record SetQuotientElimStr {ℓA ℓR}
   field
     quot-elim : (B : Q → Set ℓB)
       → (f : ∀ a → B [ a ])
-      → (eq : (x y : A) → (r : R x y) → subst B (quot-rel x y r) (f x) ≡ f y)
+      → (eq : (x y : A) → (r : R x y)
+        → subst B (quot-rel x y r) (f x) ≡ f y)
       → ∀ q → B q
 
     quot-elim-beta : (B : Q → Set ℓB)
       → (f : ∀ a → B [ a ])
-      → (eq : (x y : A) → (r : R x y) → subst B (quot-rel x y r) (f x) ≡ f y)
+      → (eq : (x y : A) → (r : R x y)
+        → subst B (quot-rel x y r) (f x) ≡ f y)
       → (x : A)
       → quot-elim B f eq [ x ] ≡ f x
 

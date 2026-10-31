@@ -33,6 +33,13 @@ data Expr (V : Set ℓV) : Set (ℓS ⊔ ℓP ⊔ ℓV) where
 ιᴱ : {V : Set ℓV} → W S P → Expr V
 ιᴱ (sup (s , f)) = supᴱ s λ i → ιᴱ (f i)
 
+ExprMap
+  : {V U : Set ℓV}
+  → (f : V → U)
+  →  Expr V → Expr U
+ExprMap f (varᴱ v) = varᴱ (f v)
+ExprMap f (supᴱ s g) = supᴱ s λ i → ExprMap f (g i)
+
 ExprAlg : (V : Set ℓV) → Algebra
 ExprAlg V = record
   { X = Expr V

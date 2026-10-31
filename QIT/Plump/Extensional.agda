@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 open import QIT.Prelude
 open import QIT.Prop hiding (⊥; _∨_)
 open import QIT.Container.Base using (⟦_◁_⟧) renaming (sup to supᵂ)

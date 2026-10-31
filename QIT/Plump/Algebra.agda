@@ -6,10 +6,10 @@ open import QIT.Relation.Subset
 
 module QIT.Plump.Algebra
   ⦃ pathElim* : PathElim ⦄       
+  {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP)
   where
 
 record PlumpAlgebra
-  {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP)
   : Set (lsuc ℓS ⊔ lsuc ℓP) where
 
   infix 4 _≤_ _<_
@@ -52,10 +52,9 @@ record PlumpAlgebra
     iswf< : WellFounded _<_
 
 record ExtensionalPlumpAlgebra
-  {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP)
   : Set (lsuc ℓS ⊔ lsuc ℓP) where
   field
-    Zᴬ : PlumpAlgebra S P
+    Zᴬ : PlumpAlgebra
 
   open PlumpAlgebra Zᴬ public
 
@@ -64,8 +63,7 @@ record ExtensionalPlumpAlgebra
 
 
 record PlumpHom
-  {ℓS ℓP} {S : Set ℓS} {P : S → Set ℓP}
-  (A B : PlumpAlgebra S P)
+  (A B : PlumpAlgebra)
   : Set (lsuc ℓS ⊔ lsuc ℓP) where
   module A = PlumpAlgebra A
   module B = PlumpAlgebra B
@@ -78,8 +76,7 @@ record PlumpHom
     _≤_ : ∀ {α β} → α A.≤ β → Z α B.≤ Z β
 
 record _≈ᵖ_
-  {ℓS ℓP} {S : Set ℓS} {P : S → Set ℓP}
-  {A B : PlumpAlgebra S P}
+  {A B : PlumpAlgebra}
   (f g : PlumpHom A B)
   : Set (lsuc ℓS ⊔ lsuc ℓP) where
   module f = PlumpHom f
@@ -88,25 +85,24 @@ record _≈ᵖ_
     Z : ∀ α → f.Z α ≡ g.Z α
 
 record InitialExtensionalPlumpOrdinals
-  {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP)
   : Set (lsuc ℓS ⊔ lsuc ℓP) where
   field
-    Zᴬe : ExtensionalPlumpAlgebra S P
+    Zᴬe : ExtensionalPlumpAlgebra
     recZᴬ
-      : (Zᴬ' : ExtensionalPlumpAlgebra S P)
+      : (Zᴬ' : ExtensionalPlumpAlgebra)
       → PlumpHom (ExtensionalPlumpAlgebra.Zᴬ Zᴬe)
-                 (ExtensionalPlumpAlgebra.Zᴬ Zᴬ')
+                (ExtensionalPlumpAlgebra.Zᴬ Zᴬ')
     rec!Zᴬ
-      : (Zᴬ' : ExtensionalPlumpAlgebra S P)
+      : (Zᴬ' : ExtensionalPlumpAlgebra)
       → (f : PlumpHom (ExtensionalPlumpAlgebra.Zᴬ Zᴬe)
-                       (ExtensionalPlumpAlgebra.Zᴬ Zᴬ'))
+                      (ExtensionalPlumpAlgebra.Zᴬ Zᴬ'))
       → f ≈ᵖ recZᴬ Zᴬ'
   open ExtensionalPlumpAlgebra Zᴬe
 
   open import QIT.Relation.Binary
 
   private
-    A : (δ : Z) → PlumpAlgebra S P
+    A : (δ : Z) → PlumpAlgebra
     A δ = record
       { Z = ΣP Z (λ α → (∀ γ → γ < α → γ < δ) → α ≤ δ)
       ; sup = λ (s , f)
@@ -132,7 +128,7 @@ record InitialExtensionalPlumpOrdinals
       ; iswf< = wfProj _<_ fst (ExtensionalPlumpAlgebra.iswf< Zᴬe)
       }
 
-    Ae : (δ : Z) → ExtensionalPlumpAlgebra S P
+    Ae : (δ : Z) → ExtensionalPlumpAlgebra
     Ae δ = record { Zᴬ = A δ ; antisym = λ p q → ΣP≡ _ _ (antisym p q) }
 
   -- Quasi-extensionality
@@ -140,11 +136,11 @@ record InitialExtensionalPlumpOrdinals
   qext {α} {β} = u
     where
     r : PlumpHom (ExtensionalPlumpAlgebra.Zᴬ Zᴬe)
-                 (ExtensionalPlumpAlgebra.Zᴬ (Ae β))
+                (ExtensionalPlumpAlgebra.Zᴬ (Ae β))
     r = recZᴬ (Ae β)
     module r = PlumpHom r
     ι : PlumpHom (ExtensionalPlumpAlgebra.Zᴬ Zᴬe)
-                 (ExtensionalPlumpAlgebra.Zᴬ Zᴬe)
+                (ExtensionalPlumpAlgebra.Zᴬ Zᴬe)
     ι = record
       { Z = λ α → α
       ; sup = λ s f → ≡.refl
@@ -152,7 +148,7 @@ record InitialExtensionalPlumpOrdinals
       ; _≤_ = λ p → p
       }
     k : PlumpHom (ExtensionalPlumpAlgebra.Zᴬ Zᴬe)
-                 (ExtensionalPlumpAlgebra.Zᴬ Zᴬe)
+                (ExtensionalPlumpAlgebra.Zᴬ Zᴬe)
     k = record
       { Z = λ α → r.Z α .fst
       ; sup = λ s f → ≡.cong fst (r.sup s f)
@@ -167,13 +163,15 @@ record InitialExtensionalPlumpOrdinals
       (≡.sym (ui.Z α))
     u : ((γ : Z) → γ < α → γ < β) → α ≤ β
     u = substp (λ α → ((γ : Z) → γ < α → γ < β) → α ≤ β) q (r.Z α .snd)
-      
+
   ext : ∀ {α β} → (∀ γ → γ < α ⇔ γ < β) → α ≡ β  
   ext p =
     antisym (qext (λ γ → p γ .∧e₁))
             (qext (λ γ → p γ .∧e₂))
 
+{-
 record ExtensionalPlumpOrdinals : Setω where
-  field
-    Zᴬe : ∀ {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP)
-        → InitialExtensionalPlumpOrdinals S P
+field
+  Zᴬe : ∀ {ℓS ℓP} (S : Set ℓS) (P : S → Set ℓP)
+      → InitialExtensionalPlumpOrdinals S P
+-}

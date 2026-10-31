@@ -87,10 +87,10 @@ _<↓≤_ : ∀ {α} (β γ : ↓≤ α) → Prop _
 (β , _) <↓≤ (γ , _) = β < γ
 
 ↓_ : Z → Set _
-↓_ = ↓≤_
+↓_ = ↓<_
 
 inc↓ : ∀ {α β} → α ≤ β → ↓ α → ↓ β
-inc↓ p γ = γ .fst , ≤≤ p (γ .snd)
+inc↓ p γ = γ .fst , ≤< p (γ .snd)
 
 open import QIT.Category.Preorder Z ≤p
 open import QIT.Category.Equivalence

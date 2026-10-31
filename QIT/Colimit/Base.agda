@@ -42,7 +42,8 @@ module QIT.Colimit.Base
   data _≈ˡ_ : Colim₀ → Colim₀ → Prop (ℓ≤ ⊔ ℓI ⊔ ℓD ⊔ ℓD') where
     ≈lstage : ∀ i → {x x' : P̂ i} → x ≡ x'
             → (i , x) ≈ˡ (i , x')
-    ≈lstep  : ∀ {i j} (p : i ≤ j) (x : P̂ i) → (i , x) ≈ˡ (j , Pf p x)
+    ≈lstep  : ∀ {i j} (p : i ≤ j) (x : P̂ i)
+      → (i , x) ≈ˡ (j , Pf p x)
     ≈lsym   : ∀ {s t} → s ≈ˡ t → t ≈ˡ s
     ≈ltrans : ∀ {s t u} → s ≈ˡ t → t ≈ˡ u → s ≈ˡ u
 
