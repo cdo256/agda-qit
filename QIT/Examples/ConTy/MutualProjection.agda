@@ -10,6 +10,7 @@ open import QIT.Relation.Binary using (IsEquivalence)
 open import QIT.Category.Base
 open import QIT.Relation.Subset
 open import QIT.Setoid
+open import QIT.Functor.Base
 
 infixr 9 _∘_
 infix  4 _≈_
@@ -209,6 +210,12 @@ Lift⇐⇒ : ∀ {ℓA} ℓB (A : Algebra ℓA)
   → (Lift⇐ ℓB A ∘ Lift⇒ ℓB A) ≈ id
 Lift⇐⇒ ℓB A = mk≈ (λ γ → ≡.refl) (λ a → ≡.refl)
 
+LiftHom : ∀ {ℓA ℓB} ℓC {A : Algebra ℓA} {B : Algebra ℓB}
+  → Hom A B
+  → Hom (LiftAlgebra (ℓA ⊔ ℓB ⊔ ℓC) A) (LiftAlgebra (ℓA ⊔ ℓB ⊔ ℓC) B)
+LiftHom {ℓA} {ℓB} ℓC {A} {B} f =
+  Lift⇒ (ℓA ⊔ ℓB ⊔ ℓC) B ∘ f ∘ Lift⇐ (ℓA ⊔ ℓB ⊔ ℓC) A
+
 isEquiv≈ : ∀ {A : Algebra ℓA} {B : Algebra ℓB} → IsEquivalence (_≈_ {A = A} {B})
 isEquiv≈ = record
   { refl = mk≈ (λ _ → ≡.refl) (λ _ → ≡.refl)
@@ -244,4 +251,15 @@ Cat ℓA = record
   ; identity² = mk≈ (λ _ → ≡.refl) (λ _ → ≡.refl)
   ; equiv     = isEquiv≈
   ; ∘-resp-≈  = ∘-resp-≈
+  }
+
+LiftFunctor : ∀ ℓA ℓB → Functor (Cat ℓA) (Cat (ℓA ⊔ ℓB))
+LiftFunctor ℓA ℓB = record
+  { ob = LiftAlgebra (ℓA ⊔ ℓB)
+  ; hom = LiftHom (ℓA ⊔ ℓB)
+  ; id = mk≈ (λ _ → ≡.refl) (λ _ → ≡.refl)
+  ; comp = λ _ _ → mk≈ (λ _ → ≡.refl) (λ _ → ≡.refl)
+  ; resp = λ p → mk≈
+      (λ { (lift γ) → ≡.cong lift (p .con≡ γ) })
+      (λ { (lift a) → ≡.cong lift (p .ty≡ a) })
   }

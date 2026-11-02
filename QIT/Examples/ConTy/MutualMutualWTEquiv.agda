@@ -152,6 +152,51 @@ open import QIT.PropLiftMonad
        (G.getTy₁-kind (G.▷ γ a) b (G.k▷ γ a kγ ka (cong fst a₁)) kb
          (cong fst b₁))
 
+ε-natural : ∀ {ℓA ℓB} {A : D.Algebra ℓA} {B : D.Algebra ℓB}
+  → (f : D.Hom A B)
+  → (f D.∘ ε A) D.≈ (ε B D.∘ F₁ (G₁ f))
+ε-natural {A = A} {B} f = D.mk≈ con≡ ty≡
+  where
+  module A = D.Algebra A
+  module B = D.Algebra B
+  module f = D.Hom f
+  module GA = G₀ A
+  module GB = G₀ B
+  module Gf = G₁ f
+  module FGA = D.Algebra (F₀ (G₀ A))
+
+  con₀ : (γ : GA.Atom) (kγ : GA.[ γ ]₀ ≡ GA.ĉ)
+    → f.conᴿ (GA.Con₀ γ kγ)
+    ≡ GB.Con₀ (Gf.θ₀ γ) (Gf.θ-kc γ kγ)
+  con₀ γ kγ = GB.con-inj
+    (≡.trans
+      (≡.cong Gf.θ₀ (GA.con-Con₀ γ kγ))
+      (≡.sym (GB.con-Con₀ (Gf.θ₀ γ) (Gf.θ-kc γ kγ))))
+
+  ty-Ty₀A : (a : GA.Atom) (ka : GA.[ a ]₀ ≡ GA.t̂)
+    → GA.ty (GA.Ty₀ a ka) ≡ a
+  ty-Ty₀A (G₀.ty a) ≡.refl = ≡.refl
+
+  ty-Ty₀B : (a : GB.Atom) (ka : GB.[ a ]₀ ≡ GB.t̂)
+    → GB.ty (GB.Ty₀ a ka) ≡ a
+  ty-Ty₀B (G₀.ty a) ≡.refl = ≡.refl
+
+  ty₀ : (a : GA.Atom) (ka : GA.[ a ]₀ ≡ GA.t̂)
+    → f.tyᴿ (GA.Ty₀ a ka)
+    ≡ GB.Ty₀ (Gf.θ₀ a) (Gf.θ-ka a ka)
+  ty₀ a ka = GB.ty-inj
+    (≡.trans
+      (≡.cong Gf.θ₀ (ty-Ty₀A a ka))
+      (≡.sym (ty-Ty₀B (Gf.θ₀ a) (Gf.θ-ka a ka))))
+
+  con≡ : ∀ γ → (f D.∘ ε A) .D.conᴿ γ
+    ≡ (ε B D.∘ F₁ (G₁ f)) .D.conᴿ γ
+  con≡ (γ , kγ) = con₀ (GA.getConAtom γ kγ) (GA.conKind γ kγ)
+
+  ty≡ : ∀ a → (f D.∘ ε A) .D.tyᴿ a
+    ≡ (ε B D.∘ F₁ (G₁ f)) .D.tyᴿ a
+  ty≡ (a , ka) = ty₀ (GA.getTyAtom a ka) (GA.tyKind a ka)
+
 ε⁻ : ∀ {ℓA} (A : D.Algebra ℓA) → D.Hom A (F₀ (G₀ A))
 ε⁻ A = record
   { conᴿ = conᴿ
@@ -325,6 +370,21 @@ isIso-ε' {ℓA} A = record
   linv = ε⁻ε A
   rinv : (ε' A D.∘ ε⁻' A) D.≈ D.id
   rinv = D.Lift⇒⇐ (lsuc ℓA) A
+
+ε-natural' : ∀ {ℓA} {A B : D.Algebra ℓA} (f : D.Hom A B)
+  → (D.LiftHom (lsuc ℓA) f D.∘ ε' A)
+  D.≈ (ε' B D.∘ F₁ (G₁ f))
+ε-natural' f = D.mk≈
+  (λ γ → ≡.cong lift (D.con≡ (ε-natural f) γ))
+  (λ a → ≡.cong lift (D.ty≡ (ε-natural f) a))
+
+ε-nat : ∀ {ℓA}
+  → NatIso (F (lsuc ℓA) ∘ꟳ G) (D.LiftFunctor ℓA (lsuc ℓA))
+ε-nat = record
+  { ob = ε'
+  ; hom = ε-natural'
+  ; isIso = isIso-ε'
+  }
 
 module _ {ℓA}
   (I : W.Algebra ℓA)
