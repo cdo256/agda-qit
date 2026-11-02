@@ -709,6 +709,55 @@ module G₀ {ℓA} (da : M.Algebra ℓA) where
            (σ⁻-ka₁ γʰ aʰ bʰ σ↓)
   σ⁻-kb₁ γʰ aʰ bʰ σ↓ = σ↓ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁
 
+  ▷-observable : ∀ γʰ aʰ → ([ ▷ γʰ aʰ ] ≡ cʰ ∨ [ ▷ γʰ aʰ ] ≡ tʰ) → [ ▷ γʰ aʰ ] ≡ cʰ
+  ▷-observable γʰ aʰ (∨i₁ k▷') = k▷'
+  ▷-observable γʰ aʰ (∨i₂ k▷') = ⊥e (cʰ≢tʰ (trans (sym kc) k▷'))
+    where
+    ▷↓ : ▷ γʰ aʰ ↓
+    ▷↓ = []⁻ (▷ γʰ aʰ) (transp↓⁻ k▷' tt*)
+    kc : [ ▷ γʰ aʰ ] ≡ cʰ
+    kc = mk≡↓ (∧i tt* , ▷↓) tt*
+      (k▷₀ (γʰ ! (▷⁻-γ γʰ aʰ ▷↓)) (aʰ ! (▷⁻-a γʰ aʰ ▷↓))
+        (▷⁻-kγ γʰ aʰ ▷↓) (▷⁻-ka γʰ aʰ ▷↓) (▷⁻-ka₁ γʰ aʰ ▷↓))
+
+  u-observable : ∀ γʰ → ([ u γʰ ] ≡ cʰ ∨ [ u γʰ ] ≡ tʰ) → [ u γʰ ] ≡ tʰ
+  u-observable γʰ (∨i₂ ku') = ku'
+  u-observable γʰ (∨i₁ ku') = ⊥e (cʰ≢tʰ (trans (sym ku') kt))
+    where
+    u↓ : u γʰ ↓
+    u↓ = []⁻ (u γʰ) (transp↓⁻ ku' tt*)
+    kt : [ u γʰ ] ≡ tʰ
+    kt = mk≡↓ (∧i tt* , u↓) tt*
+      (ku₀ (γʰ ! (u⁻-γ γʰ u↓)) (u⁻-kγ γʰ u↓))
+
+  π-observable : ∀ γʰ aʰ bʰ → ([ π γʰ aʰ bʰ ] ≡ cʰ ∨ [ π γʰ aʰ bʰ ] ≡ tʰ) → [ π γʰ aʰ bʰ ] ≡ tʰ
+  π-observable γʰ aʰ bʰ (∨i₂ kπ') = kπ'
+  π-observable γʰ aʰ bʰ (∨i₁ kπ') = ⊥e (cʰ≢tʰ (trans (sym kπ') kt))
+    where
+    π↓ : π γʰ aʰ bʰ ↓
+    π↓ = []⁻ (π γʰ aʰ bʰ) (transp↓⁻ kπ' tt*)
+    kt : [ π γʰ aʰ bʰ ] ≡ tʰ
+    kt = mk≡↓ (∧i tt* , π↓) tt*
+      (kπ₀ (γʰ ! (π⁻-γ γʰ aʰ bʰ π↓))
+        (aʰ ! (π⁻-a γʰ aʰ bʰ π↓)) (bʰ ! (π⁻-b γʰ aʰ bʰ π↓))
+        (π⁻-kγ γʰ aʰ bʰ π↓) (π⁻-ka γʰ aʰ bʰ π↓)
+        (π⁻-ka₁ γʰ aʰ bʰ π↓) (π⁻-kb γʰ aʰ bʰ π↓)
+        (π⁻-kb₁ γʰ aʰ bʰ π↓))
+
+  σ-observable : ∀ γʰ aʰ bʰ → ([ σ γʰ aʰ bʰ ] ≡ cʰ ∨ [ σ γʰ aʰ bʰ ] ≡ tʰ) → [ σ γʰ aʰ bʰ ] ≡ tʰ
+  σ-observable γʰ aʰ bʰ (∨i₂ kσ') = kσ'
+  σ-observable γʰ aʰ bʰ (∨i₁ kσ') = ⊥e (cʰ≢tʰ (trans (sym kσ') kt))
+    where
+    σ↓ : σ γʰ aʰ bʰ ↓
+    σ↓ = []⁻ (σ γʰ aʰ bʰ) (transp↓⁻ kσ' tt*)
+    kt : [ σ γʰ aʰ bʰ ] ≡ tʰ
+    kt = mk≡↓ (∧i tt* , σ↓) tt*
+      (kσ₀ (γʰ ! (σ⁻-γ γʰ aʰ bʰ σ↓))
+        (aʰ ! (σ⁻-a γʰ aʰ bʰ σ↓)) (bʰ ! (σ⁻-b γʰ aʰ bʰ σ↓))
+        (σ⁻-kγ γʰ aʰ bʰ σ↓) (σ⁻-ka γʰ aʰ bʰ σ↓)
+        (σ⁻-ka₁ γʰ aʰ bʰ σ↓) (σ⁻-kb γʰ aʰ bʰ σ↓)
+        (σ⁻-kb₁ γʰ aʰ bʰ σ↓))
+
   k∙ : [ ∙ ] ≡ cʰ
   k∙ = mk≡↓ (∧i tt* , tt*) tt* refl
 
@@ -1185,12 +1234,14 @@ module G₁ {ℓA} {A B : M.Algebra ℓA} (f : M.Hom A B) where
   ∙ = mk≡↓ (∧i tt* , tt*) tt* (≡.cong GB.con f.∙ᴿ)
 
   ▷ : ∀ (γ : GA.CT) (a : GA.CT)
-    → GA.[ γ ] ≡ GA.cʰ
-    → GA.[ a ] ≡ GA.tʰ
-    → GA.ty₁ a ≡ γ
+    → W.Observable (G₀ A) (GA.▷ γ a)
     → θ (GA.▷ γ a) ≡ GB.▷ (θ γ) (θ a)
-  ▷ γʰ aʰ kγ ka ka₁ = mk≡↓ pq qq val≡
+  ▷ γʰ aʰ observable = mk≡↓ pq qq val≡
     where
+    k▷' = GA.▷-observable γʰ aʰ observable
+    kγ = GA.▷-γ γʰ aʰ k▷'
+    ka = GA.▷-a γʰ aʰ k▷'
+    ka₁ = GA.▷-a₁ γʰ aʰ k▷'
     γ! : GA.Atom
     γ! = γʰ ! (GA.con↓ γʰ kγ)
     a! : GA.Atom
@@ -1221,9 +1272,11 @@ module G₁ {ℓA} {A B : M.Algebra ℓA} (f : M.Hom A B) where
     val≡ : θ (GA.▷ γʰ aʰ) ! pq ≡ GB.▷ (θ γʰ) (θ aʰ) ! qq
     val≡ = θ-▷₀ γ! a! kγ! ka! ka₁!
 
-  u : ∀ (γ : GA.CT) → GA.[ γ ] ≡ GA.cʰ → θ (GA.u γ) ≡ GB.u (θ γ)
-  u γʰ kγ = mk≡↓ pq qq val≡
+  u : ∀ (γ : GA.CT) → W.Observable (G₀ A) (GA.u γ) → θ (GA.u γ) ≡ GB.u (θ γ)
+  u γʰ observable = mk≡↓ pq qq val≡
     where
+    ku' = GA.u-observable γʰ observable
+    kγ = GA.u-γ γʰ ku'
     γ! : GA.Atom
     γ! = γʰ ! (GA.con↓ γʰ kγ)
     kγ! : GA.[ γ! ]₀ ≡ GA.ĉ
@@ -1243,14 +1296,16 @@ module G₁ {ℓA} {A B : M.Algebra ℓA} (f : M.Hom A B) where
     val≡ = θ-u₀ γ! kγ!
 
   π : ∀ (γ : GA.CT) (a : GA.CT) (b : GA.CT)
-    → GA.[ γ ] ≡ GA.cʰ
-    → GA.[ a ] ≡ GA.tʰ
-    → GA.ty₁ a ≡ γ
-    → GA.[ b ] ≡ GA.tʰ
-    → GA.ty₁ b ≡ GA.▷ γ a
+    → W.Observable (G₀ A) (GA.π γ a b)
     → θ (GA.π γ a b) ≡ GB.π (θ γ) (θ a) (θ b)
-  π γʰ aʰ bʰ kγ ka ka₁ kb kb₁ = mk≡↓ pq qq val≡
+  π γʰ aʰ bʰ observable = mk≡↓ pq qq val≡
     where
+    kπ' = GA.π-observable γʰ aʰ bʰ observable
+    kγ = GA.π-γ γʰ aʰ bʰ kπ'
+    ka = GA.π-a γʰ aʰ bʰ kπ'
+    ka₁ = GA.π-a₁ γʰ aʰ bʰ kπ'
+    kb = GA.π-b γʰ aʰ bʰ kπ'
+    kb₁ = GA.π-b₁ γʰ aʰ bʰ kπ'
     γ! : GA.Atom
     γ! = γʰ ! (GA.con↓ γʰ kγ)
     a! : GA.Atom
@@ -1295,14 +1350,16 @@ module G₁ {ℓA} {A B : M.Algebra ℓA} (f : M.Hom A B) where
     val≡ = θ-π₀ γ! a! b! kγ! ka! ka₁! kb! kb₁!
 
   σ : ∀ (γ : GA.CT) (a : GA.CT) (b : GA.CT)
-    → GA.[ γ ] ≡ GA.cʰ
-    → GA.[ a ] ≡ GA.tʰ
-    → GA.ty₁ a ≡ γ
-    → GA.[ b ] ≡ GA.tʰ
-    → GA.ty₁ b ≡ GA.▷ γ a
+    → W.Observable (G₀ A) (GA.σ γ a b)
     → θ (GA.σ γ a b) ≡ GB.σ (θ γ) (θ a) (θ b)
-  σ γʰ aʰ bʰ kγ ka ka₁ kb kb₁ = mk≡↓ pq qq val≡
+  σ γʰ aʰ bʰ observable = mk≡↓ pq qq val≡
     where
+    kσ' = GA.σ-observable γʰ aʰ bʰ observable
+    kγ = GA.σ-γ γʰ aʰ bʰ kσ'
+    ka = GA.σ-a γʰ aʰ bʰ kσ'
+    ka₁ = GA.σ-a₁ γʰ aʰ bʰ kσ'
+    kb = GA.σ-b γʰ aʰ bʰ kσ'
+    kb₁ = GA.σ-b₁ γʰ aʰ bʰ kσ'
     γ! : GA.Atom
     γ! = γʰ ! (GA.con↓ γʰ kγ)
     a! : GA.Atom

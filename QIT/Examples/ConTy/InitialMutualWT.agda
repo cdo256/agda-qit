@@ -244,10 +244,10 @@ projHom D = record
   ; t̂ = ≡.refl
   ; ty₁ = λ _ → ≡.refl
   ; ∙ = ≡.refl
-  ; ▷ = λ _ _ _ _ _ → ≡.refl
+  ; ▷ = λ _ _ _ → ≡.refl
   ; u = λ _ _ → ≡.refl
-  ; π = λ _ _ _ _ _ _ _ _ → ≡.refl
-  ; σ = λ _ _ _ _ _ _ _ _ → ≡.refl
+  ; π = λ _ _ _ _ → ≡.refl
+  ; σ = λ _ _ _ _ → ≡.refl
   }
 
 elimHom₀ : ∀ {ℓX} (D : DispAlgebra ℓX) → Hom I (ΣAlg D)

@@ -139,10 +139,10 @@ F₁ {A = A} {B} f = record
     → (a₁' : F₀.ty₁ B (tyᴿ a) ≡ conᴿ γ)
     → conᴿ (F₀.▷ A γ a a₁) ≡ F₀.▷ B (conᴿ γ) (tyᴿ a) a₁'
   ▷ᴿ (γ , kγ) (a , ka) a₁ a₁' =
-    ΣP≡ _ _ (f.▷ γ a kγ ka (≡.cong fst a₁))
+    ΣP≡ _ _ (f.▷ γ a (∨i₁ (A.k▷ γ a kγ ka (≡.cong fst a₁))))
 
   uᴿ : (γ : F₀.Con A) → tyᴿ (F₀.u A γ) ≡ F₀.u B (conᴿ γ)
-  uᴿ (γ , kγ) = ΣP≡ _ _ (f.u γ kγ)
+  uᴿ (γ , kγ) = ΣP≡ _ _ (f.u γ (∨i₂ (A.ku γ kγ)))
 
   πᴿ : ∀ γ a b
     → (a₁ : F₀.ty₁ A a ≡ γ)
@@ -153,7 +153,7 @@ F₁ {A = A} {B} f = record
     ≡ F₀.π B (conᴿ γ) (tyᴿ a) (tyᴿ b) a₁' b₁'
   πᴿ (γ , kγ) (a , ka) (b , kb) a₁ b₁ a₁' b₁' =
     ΣP≡ _ _
-      (f.π γ a b kγ ka (≡.cong fst a₁) kb (≡.cong fst b₁))
+      (f.π γ a b (∨i₂ (A.kπ γ a b kγ ka (≡.cong fst a₁) kb (≡.cong fst b₁))))
 
   σᴿ : ∀ γ a b
     → (a₁ : F₀.ty₁ A a ≡ γ)
@@ -164,7 +164,7 @@ F₁ {A = A} {B} f = record
     ≡ F₀.σ B (conᴿ γ) (tyᴿ a) (tyᴿ b) a₁' b₁'
   σᴿ (γ , kγ) (a , ka) (b , kb) a₁ b₁ a₁' b₁' =
     ΣP≡ _ _
-      (f.σ γ a b kγ ka (≡.cong fst a₁) kb (≡.cong fst b₁))
+      (f.σ γ a b (∨i₂ (A.kσ γ a b kγ ka (≡.cong fst a₁) kb (≡.cong fst b₁))))
 
 F : ∀ ℓA → Functor (W.Cat ℓA) (M.Cat ℓA) 
 F ℓA = record

@@ -581,27 +581,49 @@ module _ {ℓA}
         (λ kx → ⊥e (¬t (θ-ty↓ kx) (θ-ty-kind kx)))
 
     ▷≢t : ∀ γ a → I.[ I.▷ γ a ] ≡ I.t̂ → ⊥
-    ▷≢t γ a p = {!!}
+    ▷≢t γ a p = G₀FI.cʰ≢tʰ (trans (sym kc) q)
       where
       open ≡-Reasoning
       q : G₀FI.[ G₀FI.▷ (ι.θ γ) (ι.θ a) ] ≡ G₀FI.tʰ
       q =
         G₀FI.[ G₀FI.▷ (ι.θ γ) (ι.θ a) ]
-          ≡⟨ cong G₀FI.[_] (sym (ι.▷ γ a {!!} {!!} {!!})) ⟩
+          ≡⟨ cong G₀FI.[_] (sym (ι.▷ γ a (∨i₂ p))) ⟩
         G₀FI.[ ι.θ (I.▷ γ a) ]
-          ≡⟨ {!!} ⟩
+          ≡⟨ sym (ι.[ I.▷ γ a ]) ⟩
         ι.θ I.[ I.▷ γ a ]
-          ≡⟨ {!!} ⟩
+          ≡⟨ cong ι.θ p ⟩
+        ι.θ I.t̂
+          ≡⟨ ι.t̂ ⟩
         G₀FI.tʰ ∎
+      kc : G₀FI.[ G₀FI.▷ (ι.θ γ) (ι.θ a) ] ≡ G₀FI.cʰ
+      kc = G₀FI.▷-observable (ι.θ γ) (ι.θ a) (∨i₂ q)
 
     u≢c : ∀ γ → I.[ I.u γ ] ≡ I.ĉ → ⊥
-    u≢c = {!!}
+    u≢c γ p = G₀FI.cʰ≢tʰ (trans (sym q) kt)
+      where
+      q : G₀FI.[ G₀FI.u (ι.θ γ) ] ≡ G₀FI.cʰ
+      q = trans (cong G₀FI.[_] (sym (ι.u γ (∨i₁ p))))
+        (trans (sym (ι.[ I.u γ ])) (trans (cong ι.θ p) ι.ĉ))
+      kt : G₀FI.[ G₀FI.u (ι.θ γ) ] ≡ G₀FI.tʰ
+      kt = G₀FI.u-observable (ι.θ γ) (∨i₁ q)
 
     π≢c : ∀ γ a b → I.[ I.π γ a b ] ≡ I.ĉ → ⊥
-    π≢c = {!!}
+    π≢c γ a b p = G₀FI.cʰ≢tʰ (trans (sym q) kt)
+      where
+      q : G₀FI.[ G₀FI.π (ι.θ γ) (ι.θ a) (ι.θ b) ] ≡ G₀FI.cʰ
+      q = trans (cong G₀FI.[_] (sym (ι.π γ a b (∨i₁ p))))
+        (trans (sym (ι.[ I.π γ a b ])) (trans (cong ι.θ p) ι.ĉ))
+      kt : G₀FI.[ G₀FI.π (ι.θ γ) (ι.θ a) (ι.θ b) ] ≡ G₀FI.tʰ
+      kt = G₀FI.π-observable (ι.θ γ) (ι.θ a) (ι.θ b) (∨i₁ q)
 
     σ≢c : ∀ γ a b → I.[ I.σ γ a b ] ≡ I.ĉ → ⊥
-    σ≢c = {!!}
+    σ≢c γ a b p = G₀FI.cʰ≢tʰ (trans (sym q) kt)
+      where
+      q : G₀FI.[ G₀FI.σ (ι.θ γ) (ι.θ a) (ι.θ b) ] ≡ G₀FI.cʰ
+      q = trans (cong G₀FI.[_] (sym (ι.σ γ a b (∨i₁ p))))
+        (trans (sym (ι.[ I.σ γ a b ])) (trans (cong ι.θ p) ι.ĉ))
+      kt : G₀FI.[ G₀FI.σ (ι.θ γ) (ι.θ a) (ι.θ b) ] ≡ G₀FI.tʰ
+      kt = G₀FI.σ-observable (ι.θ γ) (ι.θ a) (ι.θ b) (∨i₁ q)
 
     βP : PropDispAlgebra Beta
     βP .PropDispAlgebra.isPropM _ _ = refl
@@ -657,7 +679,7 @@ module _ {ℓA}
     βP .PropDispAlgebra.▷ γ a γβ aβ = mkBeta cβ λ k → ⊥e (▷≢t γ a k)
         where
         cβ : ∀ k▷ → ι.θ (I.▷ γ a) ≡ return (G₀FI.con (I.▷ γ a , k▷))
-        cβ k▷ = trans (ι.▷ γ a kγ ka a₁)
+        cβ k▷ = trans (ι.▷ γ a (∨i₁ k▷))
           (trans (cong₂ G₀FI.▷ (γβ .conβ kγ) (aβ .tyβ ka))
             (G₀FI.▷≡return (G₀FI.con (γ , kγ)) (G₀FI.ty (a , ka))
               refl refl (cong G₀FI.con (ΣP≡ _ _ a₁))))
@@ -668,14 +690,14 @@ module _ {ℓA}
     βP .PropDispAlgebra.u γ γβ = mkBeta (λ k → ⊥e (u≢c γ k)) tβ
         where
         tβ : ∀ ku → ι.θ (I.u γ) ≡ return (G₀FI.ty (I.u γ , ku))
-        tβ ku = trans (ι.u γ kγ)
+        tβ ku = trans (ι.u γ (∨i₂ ku))
           (trans (cong G₀FI.u (γβ .conβ kγ))
             (G₀FI.u≡return (G₀FI.con (γ , kγ)) refl))
           where kγ = I.u-γ γ ku
     βP .PropDispAlgebra.π γ a b γβ aβ bβ = mkBeta (λ k → ⊥e (π≢c γ a b k)) tβ
         where
         tβ : ∀ kπ → ι.θ (I.π γ a b) ≡ return (G₀FI.ty (I.π γ a b , kπ))
-        tβ kπ = trans (ι.π γ a b kγ ka a₁ kb b₁)
+        tβ kπ = trans (ι.π γ a b (∨i₂ kπ))
           (trans (cong₃ G₀FI.π (γβ .conβ kγ) (aβ .tyβ ka) (bβ .tyβ kb))
             (G₀FI.π≡return (G₀FI.con (γ , kγ)) (G₀FI.ty (a , ka))
               (G₀FI.ty (b , kb)) refl refl (cong G₀FI.con (ΣP≡ _ _ a₁))
@@ -689,7 +711,7 @@ module _ {ℓA}
     βP .PropDispAlgebra.σ γ a b γβ aβ bβ = mkBeta (λ k → ⊥e (σ≢c γ a b k)) tβ
         where
         tβ : ∀ kσ → ι.θ (I.σ γ a b) ≡ return (G₀FI.ty (I.σ γ a b , kσ))
-        tβ kσ = trans (ι.σ γ a b kγ ka a₁ kb b₁)
+        tβ kσ = trans (ι.σ γ a b (∨i₂ kσ))
           (trans (cong₃ G₀FI.σ (γβ .conβ kγ) (aβ .tyβ ka) (bβ .tyβ kb))
             (G₀FI.σ≡return (G₀FI.con (γ , kγ)) (G₀FI.ty (a , ka))
               (G₀FI.ty (b , kb)) refl refl (cong G₀FI.con (ΣP≡ _ _ a₁))

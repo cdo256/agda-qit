@@ -5,6 +5,7 @@ module QIT.Examples.ConTy.MutualWeaklyTagged
   where
 
 open import QIT.Prop
+open import QIT.Logic
 open import QIT.Relation.Subset
 open import QIT.Relation.Base
 open import QIT.Relation.Nullary
@@ -140,6 +141,10 @@ record AlgebraWithMotive  (M : Set ℓA) : Set (lsuc ℓA) where
   field
     motive : CT ≡ M
 
+Observable : (A : Algebra ℓA) → Algebra.CT A → Prop ℓA
+Observable A x = (A.[ x ] ≡ A.ĉ) ∨ (A.[ x ] ≡ A.t̂)
+  where module A = Algebra A
+
 record Hom (A : Algebra ℓA) (B : Algebra ℓB) : Set (ℓA ⊔ ℓB) where
   no-eta-equality
   private
@@ -154,26 +159,16 @@ record Hom (A : Algebra ℓA) (B : Algebra ℓB) : Set (ℓA ⊔ ℓB) where
     ty₁ : ∀ x → θ (A.ty₁ x) ≡ B.ty₁ (θ x)
     ∙ : θ A.∙ ≡ B.∙
     ▷ : ∀ (γ : A.CT) (a : A.CT)
-      → A.[ γ ] ≡ A.ĉ
-      → A.[ a ] ≡ A.t̂
-      → A.ty₁ a ≡ γ
+      → Observable A (A.▷ γ a)
       → θ (A.▷ γ a) ≡ B.▷ (θ γ) (θ a)
     u : ∀ (γ : A.CT)
-      → A.[ γ ] ≡ A.ĉ
+      → Observable A (A.u γ)
       → θ (A.u γ) ≡ B.u (θ γ)
     π : ∀ (γ : A.CT) (a : A.CT) (b : A.CT)
-      → A.[ γ ] ≡ A.ĉ
-      → A.[ a ] ≡ A.t̂
-      → A.ty₁ a ≡ γ
-      → A.[ b ] ≡ A.t̂
-      → A.ty₁ b ≡ A.▷ γ a
+      → Observable A (A.π γ a b)
       → θ (A.π γ a b) ≡ B.π (θ γ) (θ a) (θ b)
     σ : ∀ (γ : A.CT) (a : A.CT) (b : A.CT)
-      → A.[ γ ] ≡ A.ĉ
-      → A.[ a ] ≡ A.t̂
-      → A.ty₁ a ≡ γ
-      → A.[ b ] ≡ A.t̂
-      → A.ty₁ b ≡ A.▷ γ a
+      → Observable A (A.σ γ a b)
       → θ (A.σ γ a b) ≡ B.σ (θ γ) (θ a) (θ b)
 
 id : ∀ {ℓA} {A : Algebra ℓA} → Hom A A
@@ -185,10 +180,10 @@ id = record
   ; t̂ = ≡.refl
   ; ty₁ = λ _ → ≡.refl
   ; ∙ = ≡.refl
-  ; ▷ = λ _ _ _ _ _ → ≡.refl
+  ; ▷ = λ _ _ _ → ≡.refl
   ; u = λ _ _ → ≡.refl
-  ; π = λ _ _ _ _ _ _ _ _ → ≡.refl
-  ; σ = λ _ _ _ _ _ _ _ _ → ≡.refl
+  ; π = λ _ _ _ _ → ≡.refl
+  ; σ = λ _ _ _ _ → ≡.refl
   }
 
 con-tag : ∀ {ℓA ℓB} {A : Algebra ℓA} {B : Algebra ℓB}
@@ -213,31 +208,15 @@ ty-tag {A = A} {B} h x kx =
   module B = Algebra B
   module h = Hom h
 
-ty₁-tag : ∀ {ℓA ℓB} {A : Algebra ℓA} {B : Algebra ℓB}
-  → (h : Hom A B) → ∀ a x
-  → Algebra.ty₁ A a ≡ x
-  → Algebra.ty₁ B (Hom.θ h a) ≡ Hom.θ h x
-ty₁-tag {A = A} {B} h a x ka₁ =
-  ≡.trans (≡.sym (h.ty₁ a)) (≡.cong h.θ ka₁)
-  where
-  module A = Algebra A
-  module B = Algebra B
-  module h = Hom h
+observable-tag : ∀ {ℓA ℓB} {A : Algebra ℓA} {B : Algebra ℓB}
+  → (h : Hom A B) → ∀ x → Observable A x → Observable B (Hom.θ h x)
+observable-tag h x (∨i₁ kx) = ∨i₁ (con-tag h x kx)
+observable-tag h x (∨i₂ kx) = ∨i₂ (ty-tag h x kx)
 
-ext-tag : ∀ {ℓA ℓB} {A : Algebra ℓA} {B : Algebra ℓB}
-  → (h : Hom A B) → ∀ x a b
-  → (kx : Algebra.[_] A x ≡ Algebra.ĉ A)
-  → (ka : Algebra.[_] A a ≡ Algebra.t̂ A)
-  → (ka₁ : Algebra.ty₁ A a ≡ x)
-  → Algebra.ty₁ A b ≡ Algebra.▷ A x a
-  → Algebra.ty₁ B (Hom.θ h b) ≡ Algebra.▷ B (Hom.θ h x) (Hom.θ h a)
-ext-tag {A = A} {B} h x a b kx ka ka₁ kb₁ =
-  ≡.trans (≡.trans (≡.sym (h.ty₁ b)) (≡.cong h.θ kb₁))
-    (h.▷ x a kx ka ka₁)
-  where
-  module A = Algebra A
-  module B = Algebra B
-  module h = Hom h
+observable-subst : ∀ {ℓA ℓB} {A : Algebra ℓA} {B : Algebra ℓB}
+  → (h : Hom A B) → ∀ x y
+  → Hom.θ h x ≡ y → Observable A x → Observable B y
+observable-subst {B = B} h x y p kx = substp (Observable B) p (observable-tag h x kx)
 
 _∘_ : ∀ {ℓA ℓB ℓC} {A : Algebra ℓA} {B : Algebra ℓB} {C : Algebra ℓC} → Hom B C → Hom A B → Hom A C
 _∘_ {A = A} {B} {C} g f = record
@@ -248,22 +227,21 @@ _∘_ {A = A} {B} {C} g f = record
   ; t̂ = ≡.trans (≡.cong g.θ f.t̂) g.t̂
   ; ty₁ = λ x → ≡.trans (≡.cong g.θ (f.ty₁ x)) (g.ty₁ (f.θ x))
   ; ∙ = ≡.trans (≡.cong g.θ f.∙) g.∙
-  ; ▷ = λ x a kx ka ka₁ →
-      ≡.trans (≡.cong g.θ (f.▷ x a kx ka ka₁))
-        (g.▷ (f.θ x) (f.θ a) (con-tag f x kx) (ty-tag f a ka)
-          (ty₁-tag f a x ka₁))
+  ; ▷ = λ x a kx →
+      ≡.trans (≡.cong g.θ (f.▷ x a kx))
+        (g.▷ (f.θ x) (f.θ a)
+          (observable-subst f (A.▷ x a) (B.▷ (f.θ x) (f.θ a)) (f.▷ x a kx) kx))
   ; u = λ x kx →
-      ≡.trans (≡.cong g.θ (f.u x kx)) (g.u (f.θ x) (con-tag f x kx))
-  ; π = λ x a b kx ka ka₁ kb kb₁ →
-      ≡.trans (≡.cong g.θ (f.π x a b kx ka ka₁ kb kb₁))
+      ≡.trans (≡.cong g.θ (f.u x kx))
+        (g.u (f.θ x) (observable-subst f (A.u x) (B.u (f.θ x)) (f.u x kx) kx))
+  ; π = λ x a b kx →
+      ≡.trans (≡.cong g.θ (f.π x a b kx))
         (g.π (f.θ x) (f.θ a) (f.θ b)
-          (con-tag f x kx) (ty-tag f a ka) (ty₁-tag f a x ka₁)
-          (ty-tag f b kb) (ext-tag f x a b kx ka ka₁ kb₁))
-  ; σ = λ x a b kx ka ka₁ kb kb₁ →
-      ≡.trans (≡.cong g.θ (f.σ x a b kx ka ka₁ kb kb₁))
+          (observable-subst f (A.π x a b) (B.π (f.θ x) (f.θ a) (f.θ b)) (f.π x a b kx) kx))
+  ; σ = λ x a b kx →
+      ≡.trans (≡.cong g.θ (f.σ x a b kx))
         (g.σ (f.θ x) (f.θ a) (f.θ b)
-          (con-tag f x kx) (ty-tag f a ka) (ty₁-tag f a x ka₁)
-          (ty-tag f b kb) (ext-tag f x a b kx ka ka₁ kb₁))
+          (observable-subst f (A.σ x a b) (B.σ (f.θ x) (f.θ a) (f.θ b)) (f.σ x a b kx) kx))
   }
   where
   module A = Algebra A
