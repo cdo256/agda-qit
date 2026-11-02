@@ -84,6 +84,14 @@ module _ {ℓP} where
   ≡→≈ : ∀ {ℓA} {X : Set ℓA} → {x* y* : PropLift ℓP X} → x* ≡ y* → x* ≈ y*
   ≡→≈ {x* = x*} {y*} p = substp (x* ≈_) p (≈refl x*)
 
+  ≡! : ∀ {ℓA} {X : Set ℓA}
+    → {x* y* : PropLift ℓP X}
+    → x* ≡ y*
+    → {x↓ : x* ↓}
+    → {y↓ : y* ↓}
+    → x* ! x↓ ≡ y* ! y↓
+  ≡! x = dcongsp _!_ x
+
   transp↓ : {X : Set ℓA} → {x* y* : PropLift ℓP X} → x* ≡ y*
     → (qx : x* ↓) → y* ↓
   transp↓ ≡.refl qx = qx

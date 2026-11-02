@@ -1061,8 +1061,8 @@ module G₁ {ℓA} {A B : M.Algebra ℓA} (f : M.Hom A B) where
   θ₀ : GA.Atom → GB.Atom
   θ₀ (GA.con γ) = GB.con (f.conᴿ γ)
   θ₀ (GA.ty a) = GB.ty (f.tyᴿ a)
-  θ₀ (GA.k̂) = GB.k̂
-  θ₀ (GA.ĉ) = GB.ĉ
+  θ₀ GA.k̂ = GB.k̂
+  θ₀ GA.ĉ = GB.ĉ
   θ₀ GA.t̂ = GB.t̂
 
   θ : GA.CT → GB.CT
@@ -1083,6 +1083,9 @@ module G₁ {ℓA} {A B : M.Algebra ℓA} (f : M.Hom A B) where
 
   θ-ka : (a : GA.Atom) → GA.[ a ]₀ ≡ GA.t̂ → GB.[ θ₀ a ]₀ ≡ GB.t̂
   θ-ka a ka = ≡.trans (≡.sym [ a ]₀) (≡.cong θ₀ ka)
+
+  θ⁻-kc : (γ : GA.Atom) → GB.[ θ₀ γ ]₀ ≡ GB.ĉ → GA.[ γ ]₀ ≡ GA.ĉ
+  θ⁻-kc (GA.con γ) kθγ = refl
 
   ty₁₀ : ∀ a → (ka : GA.[ a ]₀ ≡ GA.t̂) → θ₀ (GA.ty₁₀ a ka) ≡ GB.ty₁₀ (θ₀ a) (θ-ka a ka)
   ty₁₀ (GA.ty a) ≡.refl = ≡.cong GB.con (≡.sym (f.ty₁ᴿ a))
@@ -1185,41 +1188,101 @@ module G₁ {ℓA} {A B : M.Algebra ℓA} (f : M.Hom A B) where
   ∙ = mk≡↓ (∧i tt* , tt*) tt* (≡.cong GB.con f.∙ᴿ)
 
   ▷ : ∀ (γ : GA.CT) (a : GA.CT)
-    → GA.[ γ ] ≡ GA.cʰ
-    → GA.[ a ] ≡ GA.tʰ
-    → GA.ty₁ a ≡ γ
     → θ (GA.▷ γ a) ≡ GB.▷ (θ γ) (θ a)
-  ▷ γʰ aʰ kγ ka ka₁ = mk≡↓ pq qq val≡
+  ▷ γʰ aʰ = mk≡ p→q q→p r
     where
-    γ! : GA.Atom
-    γ! = γʰ ! (GA.con↓ γʰ kγ)
-    a! : GA.Atom
-    a! = aʰ ! (GA.ty↓ aʰ ka)
-    kγ! : GA.[ γ! ]₀ ≡ GA.ĉ
-    kγ! = GA.conKind γʰ kγ
-    ka! : GA.[ a! ]₀ ≡ GA.t̂
-    ka! = GA.tyKind aʰ ka
-    ka₁! : GA.ty₁₀ a! ka! ≡ γ!
-    ka₁! = GA.getTy₁-kind γʰ aʰ kγ ka ka₁
-    qq : (GB.▷ (θ γʰ) (θ aʰ)) ↓
-    qq = ∧i ∧i tt* , GA.con↓ γʰ kγ ,
-         ∧i ∧i tt* , GA.ty↓ aʰ ka ,
-         ∧i θ-kc γ! kγ! ,
-         ∧i θ-ka a! ka! ,
-         ∧i θ-ka₁ γ! a! kγ! ka! ka₁! ,
-         tt*
-    q : (GB.▷ (θ γʰ) (θ aʰ)) ↓ → (θ (GA.▷ γʰ aʰ)) ↓
-    q _ = ∧i tt* ,
-          ∧i GA.con↓ γʰ kγ ,
-          ∧i GA.ty↓ aʰ ka ,
-          ∧i kγ! ,
-          ∧i ka! ,
-          ∧i ka₁! ,
-          tt*
-    pq : (θ (GA.▷ γʰ aʰ)) ↓
-    pq = q qq
-    val≡ : θ (GA.▷ γʰ aʰ) ! pq ≡ GB.▷ (θ γʰ) (θ aʰ) ! qq
-    val≡ = θ-▷₀ γ! a! kγ! ka! ka₁!
+    r : (x↓ : θ (GA.▷ γʰ aʰ) ↓) (y↓ : GB.▷ (θ γʰ) (θ aʰ) ↓) →
+         θ (GA.▷ γʰ aʰ) ! x↓ ≡ GB.▷ (θ γʰ) (θ aʰ) ! y↓
+    r (∧i tt* , ▷↓) q =
+      θ-▷₀
+             (γʰ ! γ↓)
+             (aʰ ! a↓)
+             kγ₀ ka₀
+             (GA.▷⁻-ka₁ γʰ aʰ ▷↓)
+      where
+      γ↓ : γʰ ↓
+      γ↓ = GA.▷⁻-γ γʰ aʰ ▷↓
+      kγ₀ : GA.[ γʰ ! γ↓ ]₀ ≡ GA.ĉ
+      kγ₀ = GA.▷⁻-kγ γʰ aʰ ▷↓
+      θγ₀ : GB.Atom
+      θγ₀ = θ γʰ ! (∧i tt* , γ↓)
+      kθγ₀ : GB.[ θγ₀ ]₀ ≡ GB.ĉ
+      kθγ₀ = θ-kc (γʰ ! γ↓) kγ₀
+      a↓ : aʰ ↓
+      a↓ = GA.▷⁻-a γʰ aʰ ▷↓
+      ka₀ : GA.[ aʰ ! a↓ ]₀ ≡ GA.t̂
+      ka₀ = GA.▷⁻-ka γʰ aʰ ▷↓
+      θa₀ : GB.Atom
+      θa₀ = θ aʰ ! (∧i tt* , a↓)
+      kθa₀ : GB.[ θa₀ ]₀ ≡ GB.t̂
+      kθa₀ = θ-ka (aʰ ! a↓) ka₀
+    p→q : θ (GA.▷ γʰ aʰ) ↓ → GB.▷ (θ γʰ) (θ aʰ) ↓
+    p→q (∧i tt* , ▷↓) =
+        ∧i ∧i tt* , GA.▷⁻-γ γʰ aʰ ▷↓
+      , ∧i ∧i tt* , GA.▷⁻-a γʰ aʰ ▷↓
+      , ∧i kθγ₀
+      , ∧i kθa₀
+      , ∧i a₁₀
+      , tt*
+      where
+      γ↓ : γʰ ↓
+      γ↓ = GA.▷⁻-γ γʰ aʰ ▷↓
+      kγ₀ : GA.[ γʰ ! γ↓ ]₀ ≡ GA.ĉ
+      kγ₀ = GA.▷⁻-kγ γʰ aʰ ▷↓
+      θγ₀ : GB.Atom
+      θγ₀ = θ γʰ ! (∧i tt* , γ↓)
+      kθγ₀ : GB.[ θγ₀ ]₀ ≡ GB.ĉ
+      kθγ₀ = θ-kc (γʰ ! γ↓) kγ₀
+      a↓ : aʰ ↓
+      a↓ = GA.▷⁻-a γʰ aʰ ▷↓
+      ka₀ : GA.[ aʰ ! a↓ ]₀ ≡ GA.t̂
+      ka₀ = GA.▷⁻-ka γʰ aʰ ▷↓
+      θa₀ : GB.Atom
+      θa₀ = θ aʰ ! (∧i tt* , a↓)
+      kθa₀ : GB.[ θa₀ ]₀ ≡ GB.t̂
+      kθa₀ = θ-ka (aʰ ! a↓) ka₀
+      a₁₀ : GB.ty₁₀ θa₀ kθa₀ ≡ θγ₀
+      a₁₀ = θ-ka₁
+        (γʰ ! γ↓)
+        (aʰ ! a↓)
+        kγ₀ ka₀
+        (GA.▷⁻-ka₁ γʰ aʰ ▷↓)
+
+    q→p : GB.▷ (θ γʰ) (θ aʰ) ↓ → θ (GA.▷ γʰ aʰ) ↓
+    q→p q =
+        ∧i tt*
+      , ∧i γ↓
+      , ∧i a↓
+      , ∧i kγ₀
+      , ∧i ka₀
+      , ∧i a₁₀
+      , tt*
+      where
+      γ↓ : γʰ ↓
+      γ↓ = q .∧e₁ .∧e₂
+
+      a↓ : aʰ ↓
+      a↓ = q .∧e₂ .∧e₁ .∧e₂
+
+      kγ₀ : GA.[ γʰ ! γ↓ ]₀ ≡ GA.ĉ
+      kγ₀ = θ⁻-kc (γʰ ! γ↓) (q .∧e₂ .∧e₂ .∧e₁)
+
+      ka₀ : GA.[ aʰ ! a↓ ]₀ ≡ GA.t̂
+      ka₀ = θ⁻-ka (aʰ ! a↓) (q .∧e₂ .∧e₂ .∧e₂ .∧e₁)
+
+      θa₁₀ : GB.ty₁₀ (θ₀ (aʰ ! a↓)) (θ-ka (aʰ ! a↓) ka₀)
+        ≡ θ₀ (γʰ ! γ↓)
+      θa₁₀ = q .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁
+
+      a₁' : GA.ty₁ aʰ ≡ γʰ
+      a₁' = {!!}
+
+      -- a₁₀ : GB.ty₁₀ θa₀ kθa₀ ≡ θγ₀
+
+      a₁₀ : GA.ty₁₀ (aʰ ! a↓) ka₀ ≡ γʰ ! γ↓
+      a₁₀ = ≡! {!!}
+        where
+        u : {!!}
 
   u : ∀ (γ : GA.CT) → GA.[ γ ] ≡ GA.cʰ → θ (GA.u γ) ≡ GB.u (θ γ)
   u γʰ kγ = mk≡↓ pq qq val≡
@@ -1356,9 +1419,9 @@ G₁ f = record
   ; ty₁ = G₁.ty₁ f
   ; ∙ = G₁.∙ f
   ; ▷ = G₁.▷ f
-  ; u = G₁.u f
-  ; π = G₁.π f
-  ; σ = G₁.σ f
+  ; u = {!G₁.u f!}
+  ; π = {!G₁.π f!}
+  ; σ = {!G₁.σ f!}
   }
 
 G : ∀ {ℓA} → Functor (M.Cat ℓA) (W.Cat (lsuc ℓA))
