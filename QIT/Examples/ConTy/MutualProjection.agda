@@ -224,6 +224,8 @@ isEquiv≈ = record
       mk≈ (λ x → ≡.trans (c x) (c' x)) (λ x → ≡.trans (t x) (t' x))
   }
 
+module isEquiv≈ = IsEquivalence
+
 HomSetoid : ∀ {ℓA ℓB} → (A : Algebra ℓA) (B : Algebra ℓB) → Setoid (lsuc ℓA ⊔ lsuc ℓB) (ℓA ⊔ ℓB)
 HomSetoid A B = record
   { Carrier = Hom A B
