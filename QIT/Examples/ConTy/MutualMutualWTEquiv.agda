@@ -581,7 +581,18 @@ module _ {ℓA}
         (λ kx → ⊥e (¬t (θ-ty↓ kx) (θ-ty-kind kx)))
 
     ▷≢t : ∀ γ a → I.[ I.▷ γ a ] ≡ I.t̂ → ⊥
-    ▷≢t = {!!}
+    ▷≢t γ a p = {!!}
+      where
+      open ≡-Reasoning
+      q : G₀FI.[ G₀FI.▷ (ι.θ γ) (ι.θ a) ] ≡ G₀FI.tʰ
+      q =
+        G₀FI.[ G₀FI.▷ (ι.θ γ) (ι.θ a) ]
+          ≡⟨ cong G₀FI.[_] (sym (ι.▷ γ a {!!} {!!} {!!})) ⟩
+        G₀FI.[ ι.θ (I.▷ γ a) ]
+          ≡⟨ {!!} ⟩
+        ι.θ I.[ I.▷ γ a ]
+          ≡⟨ {!!} ⟩
+        G₀FI.tʰ ∎
 
     u≢c : ∀ γ → I.[ I.u γ ] ≡ I.ĉ → ⊥
     u≢c = {!!}
