@@ -192,6 +192,6 @@ F ℓA = record
     module g = W.Hom g
     module p = W._≈_ p
     q : (γ : F₀.Con A) → F₁.conᴿ f γ ≡ F₁.conᴿ g γ
-    q (γ , kγ) = ΣP≡ _ _ (p.θ≡ γ)
+    q (γ , kγ) = ΣP≡ _ _ (p.con≡ γ kγ)
     r : (a : F₀.Ty A) → F₁.tyᴿ f a ≡ F₁.tyᴿ g a
-    r (a , ka) = ΣP≡ _ _ (p.θ≡ a)
+    r (a , ka) = ΣP≡ _ _ (p.ty≡ a ka)

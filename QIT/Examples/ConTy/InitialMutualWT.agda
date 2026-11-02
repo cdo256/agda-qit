@@ -266,8 +266,10 @@ record DisplayedHom {ℓX} (D : DispAlgebra ℓX) : Set (lsuc (ℓI ⊔ ℓX)) w
     beta : (projHom D ∘ elimHom₀ D) ≈ id
   open Hom hom public
   open _≈_ beta
-  fst≡ : ∀ x → proj₁ (rec.θ (ΣAlg D) x) ≡ x
-  fst≡ = θ≡
+  fst-con≡ : ∀ x → I.[ x ] ≡ I.ĉ → proj₁ (rec.θ (ΣAlg D) x) ≡ x
+  fst-con≡ = con≡
+  fst-ty≡ : ∀ x → I.[ x ] ≡ I.t̂ → proj₁ (rec.θ (ΣAlg D) x) ≡ x
+  fst-ty≡ = ty≡
 
 elimHom : ∀ {ℓX} (D : DispAlgebra ℓX) → DisplayedHom D
 elimHom D = record
@@ -300,9 +302,9 @@ record DispAlgebraWithMotive {ℓX} (M : I.CT → Set ℓX) : Set (lsuc ℓI ⊔
   field
     motive : CT ≡ M
 
-runD : ∀ {ℓM} (M : I.CT → Set ℓM) → DispAlgebraWithMotive M
-  → (x : I.CT) → M x
-runD M DA x = subst (λ F → F x) DA.motive y
+runD-con : ∀ {ℓM} (M : I.CT → Set ℓM) → DispAlgebraWithMotive M
+  → (x : I.CT) → I.[ x ] ≡ I.ĉ → M x
+runD-con M DA x kx = subst (λ F → F x) DA.motive y
   where
   module DA = DispAlgebraWithMotive DA
   module DD = DispAlgebra DA.DA
@@ -314,21 +316,23 @@ runD M DA x = subst (λ F → F x) DA.motive y
   pair : Σ I.CT DD.CT
   pair = EH.θ x
   y : DD.CT x
-  y = subst DD.CT (EH.fst≡ x) (sndΣ pair)
+  y = subst DD.CT (EH.fst-con≡ x kx) (sndΣ pair)
 
-elim₂ : ∀ {ℓM}
-  → (M : I.CT → I.CT → Set (ℓM ⊔ ℓA))
-  → (A : DispAlgebraWithMotive
-      (λ x → DispAlgebraWithMotive (λ y → M x y)))
-  → ∀ x y → M x y
-elim₂ {ℓM} M A x y = m₂
+runD-ty : ∀ {ℓM} (M : I.CT → Set ℓM) → DispAlgebraWithMotive M
+  → (x : I.CT) → I.[ x ] ≡ I.t̂ → M x
+runD-ty M DA x kx = subst (λ F → F x) DA.motive y
   where
-  M' : (x : I.CT) → Set _
-  M' x = DispAlgebraWithMotive (λ y → M x y)
-  m₁ : M' x
-  m₁ = runD M' A x
-  m₂ : M x y
-  m₂ = runD (M x) m₁ y
+  module DA = DispAlgebraWithMotive DA
+  module DD = DispAlgebra DA.DA
+  module EH = DisplayedHom (elimHom DA.DA)
+  fstΣ : Σ I.CT DD.CT → I.CT
+  fstΣ (x , xᴰ) = x
+  sndΣ : (z : Σ I.CT DD.CT) → DD.CT (fstΣ z)
+  sndΣ (x , xᴰ) = xᴰ
+  pair : Σ I.CT DD.CT
+  pair = EH.θ x
+  y : DD.CT x
+  y = subst DD.CT (EH.fst-ty≡ x kx) (sndΣ pair)
 
 {-
 module Code where

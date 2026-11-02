@@ -1084,9 +1084,6 @@ module G₁ {ℓA} {A B : M.Algebra ℓA} (f : M.Hom A B) where
   θ-ka : (a : GA.Atom) → GA.[ a ]₀ ≡ GA.t̂ → GB.[ θ₀ a ]₀ ≡ GB.t̂
   θ-ka a ka = ≡.trans (≡.sym [ a ]₀) (≡.cong θ₀ ka)
 
-  θ⁻-kc : (γ : GA.Atom) → GB.[ θ₀ γ ]₀ ≡ GB.ĉ → GA.[ γ ]₀ ≡ GA.ĉ
-  θ⁻-kc (GA.con γ) kθγ = refl
-
   ty₁₀ : ∀ a → (ka : GA.[ a ]₀ ≡ GA.t̂) → θ₀ (GA.ty₁₀ a ka) ≡ GB.ty₁₀ (θ₀ a) (θ-ka a ka)
   ty₁₀ (GA.ty a) ≡.refl = ≡.cong GB.con (≡.sym (f.ty₁ᴿ a))
 
@@ -1188,101 +1185,41 @@ module G₁ {ℓA} {A B : M.Algebra ℓA} (f : M.Hom A B) where
   ∙ = mk≡↓ (∧i tt* , tt*) tt* (≡.cong GB.con f.∙ᴿ)
 
   ▷ : ∀ (γ : GA.CT) (a : GA.CT)
+    → GA.[ γ ] ≡ GA.cʰ
+    → GA.[ a ] ≡ GA.tʰ
+    → GA.ty₁ a ≡ γ
     → θ (GA.▷ γ a) ≡ GB.▷ (θ γ) (θ a)
-  ▷ γʰ aʰ = mk≡ p→q q→p r
+  ▷ γʰ aʰ kγ ka ka₁ = mk≡↓ pq qq val≡
     where
-    r : (x↓ : θ (GA.▷ γʰ aʰ) ↓) (y↓ : GB.▷ (θ γʰ) (θ aʰ) ↓) →
-         θ (GA.▷ γʰ aʰ) ! x↓ ≡ GB.▷ (θ γʰ) (θ aʰ) ! y↓
-    r (∧i tt* , ▷↓) q =
-      θ-▷₀
-             (γʰ ! γ↓)
-             (aʰ ! a↓)
-             kγ₀ ka₀
-             (GA.▷⁻-ka₁ γʰ aʰ ▷↓)
-      where
-      γ↓ : γʰ ↓
-      γ↓ = GA.▷⁻-γ γʰ aʰ ▷↓
-      kγ₀ : GA.[ γʰ ! γ↓ ]₀ ≡ GA.ĉ
-      kγ₀ = GA.▷⁻-kγ γʰ aʰ ▷↓
-      θγ₀ : GB.Atom
-      θγ₀ = θ γʰ ! (∧i tt* , γ↓)
-      kθγ₀ : GB.[ θγ₀ ]₀ ≡ GB.ĉ
-      kθγ₀ = θ-kc (γʰ ! γ↓) kγ₀
-      a↓ : aʰ ↓
-      a↓ = GA.▷⁻-a γʰ aʰ ▷↓
-      ka₀ : GA.[ aʰ ! a↓ ]₀ ≡ GA.t̂
-      ka₀ = GA.▷⁻-ka γʰ aʰ ▷↓
-      θa₀ : GB.Atom
-      θa₀ = θ aʰ ! (∧i tt* , a↓)
-      kθa₀ : GB.[ θa₀ ]₀ ≡ GB.t̂
-      kθa₀ = θ-ka (aʰ ! a↓) ka₀
-    p→q : θ (GA.▷ γʰ aʰ) ↓ → GB.▷ (θ γʰ) (θ aʰ) ↓
-    p→q (∧i tt* , ▷↓) =
-        ∧i ∧i tt* , GA.▷⁻-γ γʰ aʰ ▷↓
-      , ∧i ∧i tt* , GA.▷⁻-a γʰ aʰ ▷↓
-      , ∧i kθγ₀
-      , ∧i kθa₀
-      , ∧i a₁₀
-      , tt*
-      where
-      γ↓ : γʰ ↓
-      γ↓ = GA.▷⁻-γ γʰ aʰ ▷↓
-      kγ₀ : GA.[ γʰ ! γ↓ ]₀ ≡ GA.ĉ
-      kγ₀ = GA.▷⁻-kγ γʰ aʰ ▷↓
-      θγ₀ : GB.Atom
-      θγ₀ = θ γʰ ! (∧i tt* , γ↓)
-      kθγ₀ : GB.[ θγ₀ ]₀ ≡ GB.ĉ
-      kθγ₀ = θ-kc (γʰ ! γ↓) kγ₀
-      a↓ : aʰ ↓
-      a↓ = GA.▷⁻-a γʰ aʰ ▷↓
-      ka₀ : GA.[ aʰ ! a↓ ]₀ ≡ GA.t̂
-      ka₀ = GA.▷⁻-ka γʰ aʰ ▷↓
-      θa₀ : GB.Atom
-      θa₀ = θ aʰ ! (∧i tt* , a↓)
-      kθa₀ : GB.[ θa₀ ]₀ ≡ GB.t̂
-      kθa₀ = θ-ka (aʰ ! a↓) ka₀
-      a₁₀ : GB.ty₁₀ θa₀ kθa₀ ≡ θγ₀
-      a₁₀ = θ-ka₁
-        (γʰ ! γ↓)
-        (aʰ ! a↓)
-        kγ₀ ka₀
-        (GA.▷⁻-ka₁ γʰ aʰ ▷↓)
-
-    q→p : GB.▷ (θ γʰ) (θ aʰ) ↓ → θ (GA.▷ γʰ aʰ) ↓
-    q→p q =
-        ∧i tt*
-      , ∧i γ↓
-      , ∧i a↓
-      , ∧i kγ₀
-      , ∧i ka₀
-      , ∧i a₁₀
-      , tt*
-      where
-      γ↓ : γʰ ↓
-      γ↓ = q .∧e₁ .∧e₂
-
-      a↓ : aʰ ↓
-      a↓ = q .∧e₂ .∧e₁ .∧e₂
-
-      kγ₀ : GA.[ γʰ ! γ↓ ]₀ ≡ GA.ĉ
-      kγ₀ = θ⁻-kc (γʰ ! γ↓) (q .∧e₂ .∧e₂ .∧e₁)
-
-      ka₀ : GA.[ aʰ ! a↓ ]₀ ≡ GA.t̂
-      ka₀ = θ⁻-ka (aʰ ! a↓) (q .∧e₂ .∧e₂ .∧e₂ .∧e₁)
-
-      θa₁₀ : GB.ty₁₀ (θ₀ (aʰ ! a↓)) (θ-ka (aʰ ! a↓) ka₀)
-        ≡ θ₀ (γʰ ! γ↓)
-      θa₁₀ = q .∧e₂ .∧e₂ .∧e₂ .∧e₂ .∧e₁
-
-      a₁' : GA.ty₁ aʰ ≡ γʰ
-      a₁' = {!!}
-
-      -- a₁₀ : GB.ty₁₀ θa₀ kθa₀ ≡ θγ₀
-
-      a₁₀ : GA.ty₁₀ (aʰ ! a↓) ka₀ ≡ γʰ ! γ↓
-      a₁₀ = ≡! {!!}
-        where
-        u : {!!}
+    γ! : GA.Atom
+    γ! = γʰ ! (GA.con↓ γʰ kγ)
+    a! : GA.Atom
+    a! = aʰ ! (GA.ty↓ aʰ ka)
+    kγ! : GA.[ γ! ]₀ ≡ GA.ĉ
+    kγ! = GA.conKind γʰ kγ
+    ka! : GA.[ a! ]₀ ≡ GA.t̂
+    ka! = GA.tyKind aʰ ka
+    ka₁! : GA.ty₁₀ a! ka! ≡ γ!
+    ka₁! = GA.getTy₁-kind γʰ aʰ kγ ka ka₁
+    qq : GB.▷ (θ γʰ) (θ aʰ) ↓
+    qq = ∧i ∧i tt* , GA.con↓ γʰ kγ ,
+         ∧i ∧i tt* , GA.ty↓ aʰ ka ,
+         ∧i θ-kc γ! kγ! ,
+         ∧i θ-ka a! ka! ,
+         ∧i θ-ka₁ γ! a! kγ! ka! ka₁! ,
+         tt*
+    q : GB.▷ (θ γʰ) (θ aʰ) ↓ → θ (GA.▷ γʰ aʰ) ↓
+    q _ = ∧i tt* ,
+          ∧i GA.con↓ γʰ kγ ,
+          ∧i GA.ty↓ aʰ ka ,
+          ∧i kγ! ,
+          ∧i ka! ,
+          ∧i ka₁! ,
+          tt*
+    pq : θ (GA.▷ γʰ aʰ) ↓
+    pq = q qq
+    val≡ : θ (GA.▷ γʰ aʰ) ! pq ≡ GB.▷ (θ γʰ) (θ aʰ) ! qq
+    val≡ = θ-▷₀ γ! a! kγ! ka! ka₁!
 
   u : ∀ (γ : GA.CT) → GA.[ γ ] ≡ GA.cʰ → θ (GA.u γ) ≡ GB.u (θ γ)
   u γʰ kγ = mk≡↓ pq qq val≡
@@ -1419,9 +1356,9 @@ G₁ f = record
   ; ty₁ = G₁.ty₁ f
   ; ∙ = G₁.∙ f
   ; ▷ = G₁.▷ f
-  ; u = {!G₁.u f!}
-  ; π = {!G₁.π f!}
-  ; σ = {!G₁.σ f!}
+  ; u = G₁.u f
+  ; π = G₁.π f
+  ; σ = G₁.σ f
   }
 
 G : ∀ {ℓA} → Functor (M.Cat ℓA) (W.Cat (lsuc ℓA))
@@ -1440,9 +1377,14 @@ G = record
   id-θ₀ G₀.ĉ = ≡.refl
   id-θ₀ G₀.t̂ = ≡.refl
 
+  id-θ : ∀ {ℓA} {A : M.Algebra ℓA} (x : G₀.CT A)
+    → G₁.θ (M.id {A = A}) x ≡ x
+  id-θ {A = A} (P ⊢ x) =
+    G₀.mkCT≡ A (λ p → p .∧e₂) (λ p → ∧i tt* , p)
+      (λ p q → id-θ₀ (x q))
+
   id : ∀ {ℓA} {A : M.Algebra ℓA} → G₁ (M.id {A = A}) W.≈ W.id {A = G₀ A}
-  id {ℓA} {A} = W.mk≈ λ { (P ⊢ x) → G₀.mkCT≡ A (λ p → p .∧e₂) (λ p → ∧i tt* , p)
-    (λ p q → id-θ₀ (x q)) }
+  id = W.mk≈ (λ x _ → id-θ x) (λ x _ → id-θ x)
 
   comp-θ₀ : ∀ {ℓA} {A B C : M.Algebra ℓA} (f : M.Hom A B) (g : M.Hom B C) (x : G₀.Atom A)
     → G₁.θ₀ (g M.∘ f) x ≡ G₁.θ₀ g (G₁.θ₀ f x)
@@ -1452,9 +1394,16 @@ G = record
   comp-θ₀ f g G₀.ĉ = ≡.refl
   comp-θ₀ f g G₀.t̂ = ≡.refl
 
+  comp-θ : ∀ {ℓA} {A B C : M.Algebra ℓA}
+    → (f : M.Hom A B) (g : M.Hom B C) (x : G₀.CT A)
+    → G₁.θ (g M.∘ f) x ≡ G₁.θ g (G₁.θ f x)
+  comp-θ {C = C} f g (P ⊢ x) =
+    G₀.mkCT≡ C (λ p → ∧i tt* , p) (λ p → p .∧e₂)
+      (λ p q → comp-θ₀ f g (x (p .∧e₂)))
+
   comp : ∀ {ℓA} {A B C : M.Algebra ℓA} (f : M.Hom A B) (g : M.Hom B C)
     → G₁ (g M.∘ f) W.≈ (G₁ g W.∘ G₁ f)
-  comp {ℓA} {A} {B} {C} f g = W.mk≈ λ { (P ⊢ x) → G₀.mkCT≡ C (λ p → ∧i tt* , p) (λ p → p .∧e₂) λ p q → comp-θ₀ f g (x (p .∧e₂)) }
+  comp f g = W.mk≈ (λ x _ → comp-θ f g x) (λ x _ → comp-θ f g x)
 
   resp-θ₀ : ∀ {ℓA} {A B : M.Algebra ℓA} {f g : M.Hom A B} → f M.≈ g → (x : G₀.Atom A)
     → G₁.θ₀ f x ≡ G₁.θ₀ g x
@@ -1464,5 +1413,11 @@ G = record
   resp-θ₀ p G₀.ĉ = ≡.refl
   resp-θ₀ p G₀.t̂ = ≡.refl
 
+  resp-θ : ∀ {ℓA} {A B : M.Algebra ℓA} {f g : M.Hom A B}
+    → f M.≈ g → (x : G₀.CT A) → G₁.θ f x ≡ G₁.θ g x
+  resp-θ {B = B} p (P ⊢ x) =
+    G₀.mkCT≡ B (λ q → q) (λ q → q)
+      (λ q r → resp-θ₀ p (x (q .∧e₂)))
+
   resp : ∀ {ℓA} {A B : M.Algebra ℓA} {f g : M.Hom A B} → f M.≈ g → G₁ f W.≈ G₁ g
-  resp {ℓA} {A} {B} {f} {g} p = W.mk≈ λ { (P ⊢ x) → G₀.mkCT≡ B (λ q → q) (λ q → q) (λ q r → resp-θ₀ p (x (q .∧e₂))) }
+  resp p = W.mk≈ (λ x _ → resp-θ p x) (λ x _ → resp-θ p x)

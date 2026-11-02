@@ -154,12 +154,26 @@ record Hom (A : Algebra ℓA) (B : Algebra ℓB) : Set (ℓA ⊔ ℓB) where
     ty₁ : ∀ x → θ (A.ty₁ x) ≡ B.ty₁ (θ x)
     ∙ : θ A.∙ ≡ B.∙
     ▷ : ∀ (γ : A.CT) (a : A.CT)
+      → A.[ γ ] ≡ A.ĉ
+      → A.[ a ] ≡ A.t̂
+      → A.ty₁ a ≡ γ
       → θ (A.▷ γ a) ≡ B.▷ (θ γ) (θ a)
     u : ∀ (γ : A.CT)
+      → A.[ γ ] ≡ A.ĉ
       → θ (A.u γ) ≡ B.u (θ γ)
     π : ∀ (γ : A.CT) (a : A.CT) (b : A.CT)
+      → A.[ γ ] ≡ A.ĉ
+      → A.[ a ] ≡ A.t̂
+      → A.ty₁ a ≡ γ
+      → A.[ b ] ≡ A.t̂
+      → A.ty₁ b ≡ A.▷ γ a
       → θ (A.π γ a b) ≡ B.π (θ γ) (θ a) (θ b)
     σ : ∀ (γ : A.CT) (a : A.CT) (b : A.CT)
+      → A.[ γ ] ≡ A.ĉ
+      → A.[ a ] ≡ A.t̂
+      → A.ty₁ a ≡ γ
+      → A.[ b ] ≡ A.t̂
+      → A.ty₁ b ≡ A.▷ γ a
       → θ (A.σ γ a b) ≡ B.σ (θ γ) (θ a) (θ b)
 
 id : ∀ {ℓA} {A : Algebra ℓA} → Hom A A
@@ -171,11 +185,59 @@ id = record
   ; t̂ = ≡.refl
   ; ty₁ = λ _ → ≡.refl
   ; ∙ = ≡.refl
-  ; ▷ = λ _ _ → ≡.refl
-  ; u = λ _ → ≡.refl
-  ; π = λ _ _ _ → ≡.refl
-  ; σ = λ _ _ _ → ≡.refl
+  ; ▷ = λ _ _ _ _ _ → ≡.refl
+  ; u = λ _ _ → ≡.refl
+  ; π = λ _ _ _ _ _ _ _ _ → ≡.refl
+  ; σ = λ _ _ _ _ _ _ _ _ → ≡.refl
   }
+
+con-tag : ∀ {ℓA ℓB} {A : Algebra ℓA} {B : Algebra ℓB}
+  → (h : Hom A B) → ∀ x
+  → Algebra.[_] A x ≡ Algebra.ĉ A
+  → Algebra.[_] B (Hom.θ h x) ≡ Algebra.ĉ B
+con-tag {A = A} {B} h x kx =
+  ≡.trans (≡.sym (h.[ x ])) (≡.trans (≡.cong h.θ kx) h.ĉ)
+  where
+  module A = Algebra A
+  module B = Algebra B
+  module h = Hom h
+
+ty-tag : ∀ {ℓA ℓB} {A : Algebra ℓA} {B : Algebra ℓB}
+  → (h : Hom A B) → ∀ x
+  → Algebra.[_] A x ≡ Algebra.t̂ A
+  → Algebra.[_] B (Hom.θ h x) ≡ Algebra.t̂ B
+ty-tag {A = A} {B} h x kx =
+  ≡.trans (≡.sym (h.[ x ])) (≡.trans (≡.cong h.θ kx) h.t̂)
+  where
+  module A = Algebra A
+  module B = Algebra B
+  module h = Hom h
+
+ty₁-tag : ∀ {ℓA ℓB} {A : Algebra ℓA} {B : Algebra ℓB}
+  → (h : Hom A B) → ∀ a x
+  → Algebra.ty₁ A a ≡ x
+  → Algebra.ty₁ B (Hom.θ h a) ≡ Hom.θ h x
+ty₁-tag {A = A} {B} h a x ka₁ =
+  ≡.trans (≡.sym (h.ty₁ a)) (≡.cong h.θ ka₁)
+  where
+  module A = Algebra A
+  module B = Algebra B
+  module h = Hom h
+
+ext-tag : ∀ {ℓA ℓB} {A : Algebra ℓA} {B : Algebra ℓB}
+  → (h : Hom A B) → ∀ x a b
+  → (kx : Algebra.[_] A x ≡ Algebra.ĉ A)
+  → (ka : Algebra.[_] A a ≡ Algebra.t̂ A)
+  → (ka₁ : Algebra.ty₁ A a ≡ x)
+  → Algebra.ty₁ A b ≡ Algebra.▷ A x a
+  → Algebra.ty₁ B (Hom.θ h b) ≡ Algebra.▷ B (Hom.θ h x) (Hom.θ h a)
+ext-tag {A = A} {B} h x a b kx ka ka₁ kb₁ =
+  ≡.trans (≡.trans (≡.sym (h.ty₁ b)) (≡.cong h.θ kb₁))
+    (h.▷ x a kx ka ka₁)
+  where
+  module A = Algebra A
+  module B = Algebra B
+  module h = Hom h
 
 _∘_ : ∀ {ℓA ℓB ℓC} {A : Algebra ℓA} {B : Algebra ℓB} {C : Algebra ℓC} → Hom B C → Hom A B → Hom A C
 _∘_ {A = A} {B} {C} g f = record
@@ -186,10 +248,22 @@ _∘_ {A = A} {B} {C} g f = record
   ; t̂ = ≡.trans (≡.cong g.θ f.t̂) g.t̂
   ; ty₁ = λ x → ≡.trans (≡.cong g.θ (f.ty₁ x)) (g.ty₁ (f.θ x))
   ; ∙ = ≡.trans (≡.cong g.θ f.∙) g.∙
-  ; ▷ = λ x a → ≡.trans (≡.cong g.θ (f.▷ x a)) (g.▷ (f.θ x) (f.θ a))
-  ; u = λ x → ≡.trans (≡.cong g.θ (f.u x)) (g.u (f.θ x))
-  ; π = λ x a b → ≡.trans (≡.cong g.θ (f.π x a b)) (g.π (f.θ x) (f.θ a) (f.θ b))
-  ; σ = λ x a b → ≡.trans (≡.cong g.θ (f.σ x a b)) (g.σ (f.θ x) (f.θ a) (f.θ b))
+  ; ▷ = λ x a kx ka ka₁ →
+      ≡.trans (≡.cong g.θ (f.▷ x a kx ka ka₁))
+        (g.▷ (f.θ x) (f.θ a) (con-tag f x kx) (ty-tag f a ka)
+          (ty₁-tag f a x ka₁))
+  ; u = λ x kx →
+      ≡.trans (≡.cong g.θ (f.u x kx)) (g.u (f.θ x) (con-tag f x kx))
+  ; π = λ x a b kx ka ka₁ kb kb₁ →
+      ≡.trans (≡.cong g.θ (f.π x a b kx ka ka₁ kb kb₁))
+        (g.π (f.θ x) (f.θ a) (f.θ b)
+          (con-tag f x kx) (ty-tag f a ka) (ty₁-tag f a x ka₁)
+          (ty-tag f b kb) (ext-tag f x a b kx ka ka₁ kb₁))
+  ; σ = λ x a b kx ka ka₁ kb kb₁ →
+      ≡.trans (≡.cong g.θ (f.σ x a b kx ka ka₁ kb kb₁))
+        (g.σ (f.θ x) (f.θ a) (f.θ b)
+          (con-tag f x kx) (ty-tag f a ka) (ty₁-tag f a x ka₁)
+          (ty-tag f b kb) (ext-tag f x a b kx ka ka₁ kb₁))
   }
   where
   module A = Algebra A
@@ -200,16 +274,20 @@ _∘_ {A = A} {B} {C} g f = record
 
 record _≈_ {ℓA ℓB} {A : Algebra ℓA} {B : Algebra ℓB} (f g : Hom A B) : Prop (ℓA ⊔ ℓB) where
   constructor mk≈
+  private module A = Algebra A
   module f = Hom f
   module g = Hom g
   field
-    θ≡ : ∀ x → f.θ x ≡ g.θ x
+    con≡ : ∀ x → A.[ x ] ≡ A.ĉ → f.θ x ≡ g.θ x
+    ty≡ : ∀ x → A.[ x ] ≡ A.t̂ → f.θ x ≡ g.θ x
 
 isEquiv≈ : ∀ {ℓA ℓB} {A : Algebra ℓA} {B : Algebra ℓB} → IsEquivalence (_≈_ {A = A} {B})
 isEquiv≈ = record
-  { refl = mk≈ λ _ → ≡.refl
-  ; sym = λ (mk≈ p) → mk≈ λ x → ≡.sym (p x)
-  ; trans = λ (mk≈ p) (mk≈ q) → mk≈ λ x → ≡.trans (p x) (q x)
+  { refl = mk≈ (λ _ _ → ≡.refl) (λ _ _ → ≡.refl)
+  ; sym = λ (mk≈ pc pt) → mk≈ (λ x kx → ≡.sym (pc x kx)) (λ x kx → ≡.sym (pt x kx))
+  ; trans = λ (mk≈ pc pt) (mk≈ qc qt) →
+      mk≈ (λ x kx → ≡.trans (pc x kx) (qc x kx))
+          (λ x kx → ≡.trans (pt x kx) (qt x kx))
   }
 
 open import QIT.Setoid
@@ -222,8 +300,10 @@ HomSetoid A B = record
 
 ∘-resp-≈ : ∀ {ℓA ℓB ℓC} {A : Algebra ℓA} {B : Algebra ℓB} {C : Algebra ℓC} {f h : Hom B C} {g i : Hom A B}
   → f ≈ h → g ≈ i → (f ∘ g) ≈ (h ∘ i)
-∘-resp-≈ {f = f} {h} {g} {i} (mk≈ p) (mk≈ q) =
-  mk≈ λ x → ≡.trans (≡.cong (f.θ) (q x)) (p (i.θ x))
+∘-resp-≈ {A = A} {B} {f = f} {h} {g} {i} (mk≈ pc pt) (mk≈ qc qt) =
+  mk≈
+    (λ x kx → ≡.trans (≡.cong f.θ (qc x kx)) (pc (i.θ x) (con-tag i x kx)))
+    (λ x kx → ≡.trans (≡.cong f.θ (qt x kx)) (pt (i.θ x) (ty-tag i x kx)))
   where
   module f = Hom f
   module g = Hom g
@@ -237,11 +317,11 @@ Cat ℓX = record
   ; _≈_ = _≈_
   ; id = id
   ; _∘_ = _∘_
-  ; assoc = mk≈ λ _ → ≡.refl
-  ; sym-assoc = mk≈ λ _ → ≡.refl
-  ; identityˡ = mk≈ λ _ → ≡.refl
-  ; identityʳ = mk≈ λ _ → ≡.refl
-  ; identity² = mk≈ λ _ → ≡.refl
+  ; assoc = mk≈ (λ _ _ → ≡.refl) (λ _ _ → ≡.refl)
+  ; sym-assoc = mk≈ (λ _ _ → ≡.refl) (λ _ _ → ≡.refl)
+  ; identityˡ = mk≈ (λ _ _ → ≡.refl) (λ _ _ → ≡.refl)
+  ; identityʳ = mk≈ (λ _ _ → ≡.refl) (λ _ _ → ≡.refl)
+  ; identity² = mk≈ (λ _ _ → ≡.refl) (λ _ _ → ≡.refl)
   ; equiv = isEquiv≈
   ; ∘-resp-≈ = ∘-resp-≈
   }
