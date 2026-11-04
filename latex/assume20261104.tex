@@ -1,20 +1,36 @@
 \documentclass[11pt]{article}
 
 \usepackage[a4paper,margin=1in]{geometry}
-\usepackage{amsmath,amssymb}
-\usepackage{hyperref}
 \usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,array,tabularx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\setlist{nosep}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+\setlength{\emergencystretch}{2em}
 
 \newcommand{\Con}{\mathsf{Con}}
 \newcommand{\Ty}{\mathsf{Ty}}
+\newcommand{\Tm}{\mathsf{Tm}}
+\newcommand{\Sub}{\mathsf{Sub}}
 \newcommand{\CT}{\mathsf{CT}}
 \newcommand{\Obs}{\mathsf{Obs}}
 \newcommand{\Weak}{\mathcal{W}}
 \newcommand{\Mutual}{\mathcal{D}}
+\newcommand{\Dependent}{\mathcal{M}}
 \newcommand{\PropLift}{\mathsf{PropLift}}
+\newcommand{\Atom}{\mathsf{Atom}}
+\newcommand{\ret}{\mathsf{return}}
+\newcommand{\ToS}{\mathsf{ToS}}
+\newcommand{\ext}{\mathbin{\triangleright}}
+\newcommand{\ctag}{\widehat c}
+\newcommand{\ttag}{\widehat t}
+\newcommand{\kterm}{\widehat k}
+\newcommand{\tyone}{\mathsf{ty}_1}
 
-\title{Whiteboard Plan: Reducing Weakly Tagged Syntax to Mutual Syntax}
-\author{ASSUME Midlands Seminar on Homotopy Type Theory}
+\title{Whiteboard Plan: Reducing QIITs to CQW Types}
+\author{Christina O'Donnell\\ASSUME Midlands Seminar on Homotopy Type Theory}
 \date{}
 
 \begin{document}
@@ -22,213 +38,493 @@
 
 \section*{Aim and pacing}
 
-The talk should present the architecture of the reduction rather than every
-constructor calculation.  Plan for roughly 50 minutes of material and leave
-the remaining 10 minutes for questions.  The audience should leave with three
-ideas:
+Plan for 50 minutes of material and leave 10 minutes for questions. Present
+the architecture of the reduction rather than every constructor calculation.
+The background replaces the opening of the previous plan; it is not an
+additional introduction. Reach the main construction by minute 17.
+
+The narrative is:
+\begin{quote}
+Why construct the theory of signatures? Why reduce it to CQW types?
+How does the encoding work? Why does initiality survive?
+\end{quote}
+Use context extension as the single running constructor, from dependent
+syntax through flattening and tagging to the initiality proof. Mention the
+universe, substitution, and product cases without writing their complete
+definitions. The audience should leave with three ideas:
 \[
 \begin{gathered}
   \PropLift\text{ implements }G,
-  \qquad
-  \Obs\text{ gives the correct morphisms},\\
+  \qquad \Obs\text{ gives the required morphisms},\\
   \beta\text{ plus initiality proves the round trip}.
 \end{gathered}
 \]
-Use context extension as the single representative constructor.  State that
-the universe, substitution, product, and substitution-type cases have the
-same proof shape.
+Keep the distinctions between the reduction theorem, the existence of its
+source initial algebra, and the generalisation to further signatures explicit.
 
-\section*{Board 1: The problem (0--10 minutes)}
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}r X l@{}}
+\textbf{Minutes} & \textbf{Material} & \textbf{Notebook pages}\\\hline
+0--3 & Motivation and roadmap & 186--188\\
+3--7 & Theory of signatures & 189--191\\
+7--10 & QW and CQW targets & 192--198\\
+10--17 & Flattening and tagging & 199--203\\
+17--24 & Projection and reconstruction & 206--209\\
+24--33 & Morphisms and output observability & 204--206\\
+33--42 & The hard round trip & TeX proof plan\\
+42--48 & Transfer initiality & TeX proof plan\\
+48--50 & Conclusion and status & Overall roadmap
+\end{tabularx}
+\end{center}
+
+\section*{Board 1: Motivation and roadmap (0--3 minutes)}
+
+Introduce the project as work in progress on constructing quotient
+inductive-inductive types. State the question:
+\begin{quote}
+Which assumptions suffice to construct QIITs, rather than taking them as
+primitive type formers?
+\end{quote}
+Give the two relevant features verbally: sorts may depend on other sorts,
+and constructors may impose equations. Infinitary branching is also in scope.
+Mention term models of type theories as the principal application. Mobiles,
+ordinals, and multisets can be mentioned as further motivation, but do not
+develop a separate example here.
+
+Write the overall route, with arrows read as construction dependencies:
+\[
+\begin{gathered}
+ \text{QIITs described by signatures}\\[-1mm]
+ \Longleftarrow\ \text{initial syntax for a suitable }\ToS\\[-1mm]
+ \Longleftarrow\ \text{initial weakly tagged CQW presentation}\\[-1mm]
+ \Longleftarrow\ \text{inductive types, quotients, and WISC}\quad(*) .
+\end{gathered}
+\]
+Point to the middle arrow as the focus of the talk. Label the final arrow
+\((*)\): the published QW/QWI existence result motivates it, while its
+extension to the required CQW presentation remains to be verified.
+
+State the main theorem informally immediately:
+\begin{quote}
+An initial model of the weak presentation recovers an initial model of the
+intended mutual presentation.
+\end{quote}
+Do not claim that this already establishes every arrow in the roadmap.
+
+\section*{Board 2: Why the theory of signatures? (3--7 minutes)}
+
+Explain the strategy of Kaposi, Kov\'acs, and Altenkirch
+\cite{KKA19,KK20}: signatures can themselves be expressed in a small
+domain-specific dependent type theory. Its syntax then supports the
+construction of the QIITs it describes. Thus a suitable theory of signatures
+provides a common construction problem rather than a separate construction
+for every example.
+
+Distinguish the settings briefly. The 2019 result treats finitary QIITs; the
+2020 work treats large and infinitary signatures in an extensional
+metatheory. Our intended presentation uses external function constructors
+to handle infinitary branching in an intensional setting. State the working
+metatheory once, following the background notes: intensional MLTT with
+universes, judgemental UIP, a proposition universe, unique choice
+(\(\mathsf{A!C}\)), function extensionality, and propositional
+extensionality. Distinguish judgemental UIP from equality reflection.
+External function types do not by themselves prove the universal
+construction theorem for this variant.
+
+Write only the part of the syntax needed for the running example:
+\[
+ \Con:\mathcal U,\qquad
+ \Ty:\Con\to\mathcal U,\qquad
+ \bullet:\Con,\qquad
+ ({\ext}):(\Gamma:\Con)\to\Ty(\Gamma)\to\Con.
+\]
+Say that the full presentation also has terms, substitutions, a universe,
+function constructors, identity structure, and equations. The point here is
+the dependence of \(\Ty\) on \(\Con\), not the full syntax of a CwF.
+
+\textbf{Transition.} We want an initial model of this dependent syntax.
+The target construction machinery is designed for a simpler kind of algebra.
+
+\section*{Board 3: The QW and CQW targets (7--10 minutes)}
+
+Recall that a container \((S,P)\), with \(S:\mathcal U\) and
+\(P:S\to\mathcal U\), specifies operations
+\[
+ \alpha:(s:S)\to(P(s)\to X)\to X.
+\]
+A QW signature adds equations between terms in the free algebra; a QW type
+is an initial algebra satisfying those equations. A CQW signature allows
+equations conditional on a family of other equations. Display only the
+schematic form:
+\[
+ \bigl(\forall b:B,\ \ell_b[\rho]=r_b[\rho]\bigr)
+ \quad\Longrightarrow\quad \ell[\rho]=r[\rho].
+\]
+Here \(\rho\) assigns values to variables. The premise family can be
+infinitary. This is the form needed for typing and compatibility conditions.
+
+Explain the construction motivation in two sentences. Fiore, Pitts, and
+Steenkamp construct QW/QWI types from inductive types and quotients under
+WISC, using well-founded approximations and their colimit \cite{FPS22}.
+The present reduction is intended to bring dependent syntax into reach of
+that machinery, after extending the existence argument to the required
+conditional equations.
+
+\textbf{Status to say aloud.} The published QW/QWI theorem is established;
+the required CQW extension is a separate step still awaiting verification.
+Do not present WISC's definition, the size construction, stage relations,
+or the cocontinuity proof.
+
+\section*{Board 4: From dependent syntax to weak syntax (10--17 minutes)}
+
+This board supplies the bridge into the main construction. Use only context
+extension, in the following three stages.
+
+\subsection*{1. Flatten the dependent family}
+
+Replace the family of types by its total space:
+\[
+ \Ty_{\mathrm{tot}}:=\sum_{\Gamma:\Con}\Ty(\Gamma),
+ \qquad \tyone:\Ty_{\mathrm{tot}}\to\Con.
+\]
+The extension operation can then be written as
+\[
+ ({\ext}):(\Gamma:\Con)\to(a:\Ty_{\mathrm{tot}})
+          \to(\tyone(a)=\Gamma)\to\Con.
+\]
+The indices have become projections and compatibility equations.
+Explain the Cartmell-style total-space translation verbally
+\cite{Cartmell86}; do not prove its equivalence of model categories here.
+For infinitary signatures, identify the corresponding extension as part of
+the argument being used, rather than attributing it without qualification
+to the finitary result.
+
+Let \(\Dependent\) denote the intended dependent model category and
+\(\Mutual\) its flattened mutual presentation. From this point, abbreviate
+the independent sort \(\Ty_{\mathrm{tot}}\) in \(\Mutual\) by \(\Ty\).
+The original family is recovered by fibres:
+\[
+ \Ty_{\mathrm{dep}}(\Gamma)
+   :=\sum_{a:\Ty}(\tyone(a)=\Gamma).
+\]
+Thus \(\Mutual\) is an intermediate target, not an unexplained replacement
+for the original dependent syntax.
+
+\subsection*{2. Combine the sorts using tags}
+
+Introduce a single carrier and classifier:
+\[
+ \CT:\mathcal U,\qquad [-]:\CT\to\CT,\qquad
+ \ctag,\ttag:\CT.
+\]
+Contexts and types will be the classifier fibres over \(\ctag\) and
+\(\ttag\). At this stage the expected tags and the projection compatibility
+can still appear as proof arguments to constructors. This removes multiple
+carriers, but does not yet give the desired ordinary operation arities.
+
+\subsection*{3. Move premises out of operation arguments}
+
+Make the raw operations total:
+\[
+ \tyone:\CT\to\CT,\qquad
+ ({\ext}):\CT\to\CT\to\CT,
+\]
+and place the typing information in conditional equations, for example
+\[
+ \frac{[\gamma]=\ctag\qquad [a]=\ttag\qquad
+        \tyone(a)=\gamma}
+      {[\gamma\ext a]=\ctag}.
+\]
+This is now the shape of a CQW specification: the raw operation has an
+ordinary arity, and its formation law has equational premises.
+State that the full presentation also includes the corresponding projection
+and equation laws; do not enumerate them on the board.
+
+\textbf{The consequence to emphasise.} Raw extension now exists even when
+its inputs are malformed. The conditional law controls well-formed inputs;
+it does not eliminate all junk from arbitrary models. Recovering the right
+initial algebra therefore requires more than writing down the signature.
 
 Write the two presentations schematically:
 \[
 \begin{array}{rcl}
-  \text{Mutual} &:& \Con,\ \Ty,\ \mathsf{ty}_1,\ \bullet,\
-                    \mathbin{\triangleright},\ \mathsf{u},\ \pi,\ \sigma,\\[2mm]
-  \text{Weakly tagged} &:& \CT,\ [-],\ \widehat c,\ \widehat t,\
-                    \mathsf{ty}_1,\ \bullet,\ \mathbin{\triangleright},\
-                    \mathsf{u},\ \pi,\ \sigma.
+ \text{Mutual} &:& \Con,\Ty,\tyone,\bullet,{\ext},\mathsf u,\pi,\sigma,\\
+ \text{Weakly tagged} &:& \CT,[-],\ctag,\ttag,
+                         \tyone,\bullet,{\ext},\mathsf u,\pi,\sigma.
 \end{array}
 \]
-State the theorem immediately:
+Reserve a corner of the board for
 \[
-  I\text{ initial in }\Weak
-  \quad\Longrightarrow\quad
-  F(I)\text{ initial in }\Mutual.
+ \Weak\mathrel{\mathop{\rightleftarrows}^{F}_{G}}\Mutual,
+ \qquad
+ I\text{ initial in }\Weak
+ \Longrightarrow F(I)\text{ initial in }\Mutual.
 \]
-Draw the functors and leave this diagram visible throughout:
-\[
-  \Weak \mathrel{\mathop{\rightleftarrows}^{F}_{G}} \Mutual.
-\]
-Explain the strict-positivity motivation verbally.  Write only the formation
-rule for extension:
-\[
-  \frac{[\gamma]=\widehat c\qquad [a]=\widehat t\qquad
-        \mathsf{ty}_1(a)=\gamma}
-       {[\gamma\mathbin{\triangleright}a]=\widehat c}.
-\]
-Do not write the analogous rules for the other constructors.
+Here \(\Weak\) will carry the observational morphisms explained below.
+Leave the theorem and this diagram visible for the rest of the talk.
 
-\section*{Board 2: The functors and the easy round trip (10--20 minutes)}
+\section*{Board 5: Projection and reconstruction (17--24 minutes)}
 
-For the projection functor write:
+For the projection functor write
 \[
 \begin{aligned}
-  F(A).\Con &\;=\; \sum_{\gamma:A.\CT}[\gamma]=\widehat c,\\
-  F(A).\Ty  &\;=\; \sum_{a:A.\CT}[a]=\widehat t.
+ F(A).\Con&:=\sum_{\gamma:A.\CT}[\gamma]=\ctag,\\
+ F(A).\Ty&:=\sum_{a:A.\CT}[a]=\ttag.
 \end{aligned}
 \]
-For the reverse construction write only:
-\[
-\begin{aligned}
-  \mathsf{Atom}(A)
-    &\;=\; \mathsf{con}(A.\Con)+\mathsf{ty}(A.\Ty)
-          +\{\widehat k,\widehat c,\widehat t\},\\
-  G(A).\CT &\;=\; \PropLift(\mathsf{Atom}(A)).
-\end{aligned}
-\]
-Describe \(\PropLift\) as a partial element whose definedness is a
-proposition.  State, without proving its internal witness calculations, the
-natural isomorphism
-\[
-  \varepsilon_A:F(G(A))\cong A.
-\]
-Its context and type components simply extract the unique context or type atom.
+The typing and projection laws ensure that the operations restrict to these
+fibres, including the projection from types to contexts. Explain extension
+as the representative case. Do not write all the functor fields.
 
-\section*{Board 3: Why ordinary morphisms fail (20--30 minutes)}
+For the reverse construction, start with atoms for the valid data:
+\[
+ \Atom(A):=A.\Con+A.\Ty+\{\kterm,\ctag,\ttag\}.
+\]
+Name the first two injections \(\mathsf{con}\) and \(\mathsf{ty}\).
+Briefly explain why simply using \(\mathsf{Maybe}(\Atom(A))\) is insufficient:
+constructing extension requires a compatibility equation, and an arbitrary
+model need not have decidable equality. We must record conditional
+definedness without deciding whether the condition holds.
 
-This is the central motivation.  Write:
+Write
 \[
-  \mathsf{ty}_1(a)\neq\gamma,
-  \qquad
-  f(\mathsf{ty}_1(a))=f(\gamma).
+ \PropLift(X):=\sum_{P:\mathsf{Prop}}(P\to X),
+ \qquad G(A).\CT:=\PropLift(\Atom(A)).
 \]
-A non-injective semantic map can therefore make
-\[
-  \gamma\mathbin{\triangleright}a\text{ undefined},
-  \qquad
-  f(\gamma)\mathbin{\triangleright}f(a)\text{ defined}.
-\]
-Consequently, unconditional preservation of raw operations is false.  On the
-other hand, preservation conditional on the expected input witnesses is too
-weak: from a hypothetical wrong output tag
-\[
-  [\gamma\mathbin{\triangleright}a]=\widehat t
-\]
-one cannot obtain the expected input witnesses needed to invoke the
-homomorphism law.
+Describe this as a partial element whose definedness is a proposition.
+Under the stated extensionality assumptions, its operations can require
+tag and compatibility witnesses and return the corresponding semantic atom
+when those witnesses are available. Suppress universe lifting and internal
+witness calculations.
 
-\section*{Board 4: Observable morphisms (30--38 minutes)}
-
-Write prominently:
+State the easy round trip as a natural isomorphism:
 \[
-  \Obs_A(x)
-  \;:\!\!\equiv\;
-  ([x]=\widehat c)\;\lor\;([x]=\widehat t).
+ \varepsilon_A:F(G(A))\cong A.
 \]
-Then write the extension law:
+Its context and type components extract the unique corresponding atom.
+Do not claim \(GF(A)\cong A\) for arbitrary weak models: projection forgets
+junk, and reconstruction supplies its own partial raw elements.
+
+\section*{Board 6: Morphisms and output observability (24--33 minutes)}
+
+\subsection*{Why unconditional preservation fails}
+
+A semantic map need not be injective. In a possible instance, write
 \[
-  \Obs_A(\gamma\mathbin{\triangleright}a)
-  \quad\Longrightarrow\quad
-  \theta(\gamma\mathbin{\triangleright}a)
-  =\theta(\gamma)\mathbin{\triangleright}\theta(a).
+ \tyone(a)\ne\gamma,
+ \qquad f(\tyone(a))=f(\gamma).
+\]
+The corresponding partial extension in \(G(A)\) can be undefined while
+extension of the images in \(G(B)\) is defined. Hence \(G(f)\) cannot in
+general preserve every raw operation unconditionally.
+
+Preservation only under the expected input witnesses is also insufficient
+for the intended proof. Given a hypothetical wrong output tag
+\[
+ [\gamma\ext a]=\ttag,
+\]
+we cannot obtain the expected input witnesses merely from this hypothesis,
+so such a homomorphism law would not apply.
+
+\subsection*{Preserve operations when their outputs are observable}
+
+Write prominently
+\[
+ \Obs_A(x):\!\!\equiv([x]=\ctag)\lor([x]=\ttag),
+\]
+and the extension law
+\[
+ \Obs_A(\gamma\ext a)
+ \Longrightarrow
+ \theta(\gamma\ext a)=\theta(\gamma)\ext\theta(a).
 \]
 The slogan is:
 \begin{quote}
-  Preserve an operation exactly when its result is visible to the projected
-  context/type theory.
+Preserve an operation exactly when its result is visible to the projected
+context/type theory.
 \end{quote}
-Explain verbally that malformed junk is ignored, non-injective maps remain
-allowed, composition transports observability, and homomorphisms are compared
-only on context- and type-classified points.
+Explain verbally that the complete morphism definition also carries the
+classifier compatibility needed to transport observability. Composition
+transports observability; non-injective semantic maps remain allowed.
+Morphisms are compared on context- and type-classified elements, rather than
+on irrelevant raw junk. Do not write the setoid-category bookkeeping.
 
-\section*{Board 5: The hard round trip (38--47 minutes)}
+\textbf{Interface with CQW existence.} A CQW signature with ordinary
+homomorphisms and the category \(\Weak\) with observational morphisms are
+not automatically the same category. State which initiality result is being
+assumed: the theorem below requires initiality in \(\Weak\). To obtain a
+complete CQW-to-QIIT existence theorem, one must justify how the constructed
+CQW syntax supplies that initiality, including uniqueness for the chosen
+morphisms. Keep this interface separate from the pending extension of the
+WISC existence construction. Do not silently infer either step from the
+published QW result.
 
-Let
+\section*{Board 7: The hard round trip (33--42 minutes)}
+
+Let \(I\) be initial in \(\Weak\), and let
 \[
-  \iota:I\longrightarrow G(F(I))
+ \iota:I\longrightarrow G(F(I))
 \]
-be the unique weakly tagged morphism.  Write the two computational statements:
-\[
-\begin{aligned}
-  \beta_c(x)&:\ [x]=\widehat c
-      \longrightarrow \iota(x)=\mathsf{return}(\mathsf{con}(x)),\\
-  \beta_t(x)&:\ [x]=\widehat t
-      \longrightarrow \iota(x)=\mathsf{return}(\mathsf{ty}(x)).
-\end{aligned}
-\]
-Mention that these form a proposition-valued displayed algebra, so the path
-constructor coherence is automatic.
-
-Show only the wrong-sort extension case.  Given
-\[
-  p:[\gamma\mathbin{\triangleright}a]=\widehat t,
-\]
-we have \(\Obs_I(\gamma\mathbin{\triangleright}a)\), hence the operation law for
-\(\iota\) applies.  Transporting \(p\) says that the corresponding concrete
-extension in \(G(F(I))\) is type-tagged.  But direct analysis of the
-\(\PropLift\) operation says every observable extension is context-tagged.
-Thus \(\widehat c=\widehat t\), a contradiction.  State that the
-\(\mathsf{u}\), \(\pi\), and \(\sigma\) cases are identical in shape.
-
-Conclude:
-\[
-  F(\iota)=\varepsilon^{-1}_{F(I)},
-\]
-and therefore obtain both triangle identities.
-
-\section*{Board 6: Transfer initiality (47--53 minutes)}
-
-Define the chosen recursor:
-\[
-  \mathsf{rec}^{\Mutual}_A
-  \;:\!\!\equiv\;
-  \varepsilon_A\circ F(\mathsf{rec}^{\Weak}_{G(A)}).
-\]
-For an arbitrary \(f:F(I)\to A\), finish with the calculation
+be its unique morphism to the reconstructed model. State the two
+computational properties, keeping the fibre witnesses explicit:
 \[
 \begin{aligned}
-  f
-  &\simeq (f\circ\varepsilon_{F(I)})\circ F(\iota)
-      && \text{triangle identity}\\
-  &\simeq (\varepsilon_A\circ F(Gf))\circ F(\iota)
-      && \text{naturality of }\varepsilon\\
-  &\simeq \varepsilon_A\circ F(Gf\circ\iota)
-      && \text{functoriality of }F\\
-  &\simeq \varepsilon_A\circ F(\mathsf{rec}^{\Weak}_{G(A)})
-      && \text{initiality of }I\\
-  &=\mathsf{rec}^{\Mutual}_A.
+ \beta_c(x,p):\quad
+   \iota(x)&=\ret\bigl(\mathsf{con}(x,p)\bigr)
+       &&(p:[x]=\ctag),\\
+ \beta_t(x,p):\quad
+   \iota(x)&=\ret\bigl(\mathsf{ty}(x,p)\bigr)
+       &&(p:[x]=\ttag).
 \end{aligned}
 \]
-This is the payoff; stop the technical development here.
+Here \((x,p)\) is an element of the relevant sort of \(F(I)\).
+Explain that these are proved using a proposition-valued displayed algebra.
+Use the proposition-valued induction principle for the initial syntax;
+if the starting assumption is categorical initiality alone, state the
+initiality-to-induction lemma in the chosen algebra semantics. With the
+stated UIP assumptions, the required path coherence is automatic once the
+point-constructor cases have been supplied.
 
-\section*{Final three minutes}
+For extension, briefly describe the expected-sort case: the induction
+hypotheses return the context and type atoms, and compatibility permits
+the reconstructed extension to return the required context atom.
 
-End with three statements:
+Then show only the wrong-sort case in detail. Suppose
+\[
+ p:[\gamma\ext a]=\ttag.
+\]
+This gives \(\Obs_I(\gamma\ext a)\), so the operation law for \(\iota\)
+applies without first obtaining the expected input witnesses. Classifier
+compatibility and that operation law make the corresponding concrete
+extension in \(G(F(I))\) type-tagged. But the concrete partial operation
+can have an observable result only by returning a context atom. A context
+atom cannot be type-tagged, giving a contradiction between the distinct
+concrete tags. Emphasise that this is the purpose of the output condition.
+
+State that the other constructor cases follow the same proof pattern;
+omit their calculations. Conclude
+\[
+ F(\iota)=\varepsilon^{-1}_{F(I)},
+\]
+or equivalently the two inverse identities
+\[
+ \varepsilon_{F(I)}\circ F(\iota)=1_{F(I)},
+ \qquad F(\iota)\circ\varepsilon_{F(I)}=1_{FGF(I)}.
+\]
+These concern this initial object. They do not assert a global equivalence
+between all weak and mutual models.
+
+\section*{Board 8: Transfer initiality (42--48 minutes)}
+
+For a mutual model \(A\), define the chosen recursor
+\[
+ \mathsf{rec}^{\Mutual}_A
+ :=\varepsilon_A\circ F\bigl(\mathsf{rec}^{\Weak}_{G(A)}\bigr).
+\]
+Existence is now immediate: interpret the weak initial syntax in \(G(A)\),
+project, and use the easy round trip.
+
+For uniqueness, take an arbitrary \(f:F(I)\to A\) and calculate
+\[
+\begin{aligned}
+ f
+ &\simeq(f\circ\varepsilon_{F(I)})\circ F(\iota)
+       &&\text{inverse identity}\\
+ &\simeq(\varepsilon_A\circ F(Gf))\circ F(\iota)
+       &&\text{naturality of }\varepsilon\\
+ &\simeq\varepsilon_A\circ F(Gf\circ\iota)
+       &&\text{functoriality of }F\\
+ &\simeq\varepsilon_A\circ F\bigl(\mathsf{rec}^{\Weak}_{G(A)}\bigr)
+       &&\text{initiality of }I\\
+ &=\mathsf{rec}^{\Mutual}_A.
+\end{aligned}
+\]
+Say what makes the final use of initiality possible: both
+\(Gf\circ\iota\) and \(\mathsf{rec}^{\Weak}_{G(A)}\) are morphisms
+from \(I\) to \(G(A)\). Thus \(F(I)\) is initial in \(\Mutual\).
+The total-space/fibre correspondence then returns the intended dependent
+presentation, provided that correspondence has been established for the
+signature under discussion. Stop the technical development here.
+
+\section*{Board 9: Conclusion and status (48--50 minutes)}
+
+Return to the roadmap from Board 1. End with three statements:
 \begin{enumerate}
-  \item A strictly positive weak syntax can recover the intended mutual syntax.
-  \item Malformed raw terms force an observational notion of morphism.
-  \item Output observability is the precise boundary between semantic structure
-        and irrelevant junk.
+ \item Flattening and weak tagging turn dependent syntax into ordinary raw
+       operations governed by conditional equations.
+ \item Malformed raw terms require observational morphisms; output
+       observability supplies exactly the operation law used in the proof.
+ \item Propositional partial elements construct \(G\); the \(\beta\) argument
+       and initiality establish the required round trip and transfer
+       initiality.
 \end{enumerate}
+State the scope honestly: the displayed transfer theorem is the main
+construction being explained. The complete existence route additionally
+requires the CQW extension of the WISC construction, the interface to
+observational initiality, and the relevant generality of the flattening
+and theory-of-signatures steps. Report the current proof/formalisation
+status of those steps without presenting the entire route as finished.
 
-\section*{Material to omit from the board}
+\section*{Supporting material, not part of the timed talk}
 
-Do not present the following unless asked:
 \begin{itemize}
-  \item the full definitions of \(\pi\) and \(\sigma\);
-  \item witness-level calculations inside \(\PropLift\);
-  \item universe lifting;
-  \item proof-irrelevance and setoid-category boilerplate;
-  \item every field of the displayed algebra;
-  \item failed classifier constructions;
-  \item the possible adjunction \(G\dashv F\);
-  \item Agda terms longer than a single line.
+ \item Full signatures for \(\ToS\), the flattened mutual theory, and the
+       weakly tagged CQW presentation.
+ \item The four-sort CwF presentation, substitution equations, universe
+       rules, and the external function constructor.
+ \item Formal WISC definitions, size types, the stage relations, the
+       inflationary diagram, and the cocontinuity argument.
+ \item The full \(\pi\) and \(\sigma\) cases and all displayed-algebra fields.
+ \item Witness calculations inside \(\PropLift\), universe lifting,
+       extensionality details, and category/setoid bookkeeping.
+ \item Full proofs of the total-space/fibre correspondence and its
+       infinitary extension, and the link from CQW syntax to observational
+       initiality.
+ \item Failed classifier constructions and any possible adjunction.
+ \item Agda terms longer than one line.
 \end{itemize}
+If time runs short, shorten the literature discussion and the list of other
+constructors. Keep the three-stage encoding, the observability example,
+and the recursor uniqueness calculation. These explain what the reduction
+does and why it works.
 
-Reserve one corner of the board for the theorem and the diagram
-\(\Weak\rightleftarrows\Mutual\), and do not erase it.  If possible, provide a
-one-page handout or repository link containing the complete signatures and
-formal proof.
+\section*{Source map for preparation}
 
+Notebook pp.~186--188 provide the motivation and roadmap; pp.~189--191 the
+theory-of-signatures background; pp.~192--198 the QW/CQW target and the
+pending existence extension; pp.~199--203 the flattening and tagging bridge;
+pp.~204--206 the model categories, observability, and transfer statement;
+pp.~207--209 the need for propositional partial elements and the easy round
+trip. The hard round trip and final uniqueness calculation come from the
+original TeX plan. This source map and the references are preparation
+material, outside the 50-minute board schedule.
+
+\begin{thebibliography}{9}
+
+\bibitem{Cartmell86}
+John Cartmell.
+\emph{Generalised algebraic theories and contextual categories}.
+Annals of Pure and Applied Logic 32 (1986), 209--243.
+\href{https://doi.org/10.1016/0168-0072(86)90053-9}{doi:10.1016/0168-0072(86)90053-9}.
+
+\bibitem{KKA19}
+Ambrus Kaposi, Andr\'as Kov\'acs, and Thorsten Altenkirch.
+\emph{Constructing Quotient Inductive-Inductive Types}.
+Proceedings of the ACM on Programming Languages 3 (POPL), Article 2 (2019).
+\href{https://doi.org/10.1145/3290315}{doi:10.1145/3290315}.
+
+\bibitem{KK20}
+Andr\'as Kov\'acs and Ambrus Kaposi.
+\emph{Large and Infinitary Quotient Inductive-Inductive Types}.
+LICS 2020.
+\href{https://arxiv.org/abs/2006.11736}{arXiv:2006.11736}.
+
+\bibitem{FPS22}
+Marcelo P. Fiore, Andrew M. Pitts, and S. C. Steenkamp.
+\emph{Quotients, inductive types, and quotient inductive types}.
+Logical Methods in Computer Science 18(2), Article 15 (2022).
+\href{https://doi.org/10.46298/LMCS-18(2:15)2022}{doi:10.46298/LMCS-18(2:15)2022}.
+
+\end{thebibliography}
 \end{document}
