@@ -1,0 +1,234 @@
+\documentclass[11pt]{article}
+
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{hyperref}
+\usepackage[T1]{fontenc}
+
+\newcommand{\Con}{\mathsf{Con}}
+\newcommand{\Ty}{\mathsf{Ty}}
+\newcommand{\CT}{\mathsf{CT}}
+\newcommand{\Obs}{\mathsf{Obs}}
+\newcommand{\Weak}{\mathcal{W}}
+\newcommand{\Mutual}{\mathcal{D}}
+\newcommand{\PropLift}{\mathsf{PropLift}}
+
+\title{Whiteboard Plan: Reducing Weakly Tagged Syntax to Mutual Syntax}
+\author{ASSUME Midlands Seminar on Homotopy Type Theory}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Aim and pacing}
+
+The talk should present the architecture of the reduction rather than every
+constructor calculation.  Plan for roughly 50 minutes of material and leave
+the remaining 10 minutes for questions.  The audience should leave with three
+ideas:
+\[
+\begin{gathered}
+  \PropLift\text{ implements }G,
+  \qquad
+  \Obs\text{ gives the correct morphisms},\\
+  \beta\text{ plus initiality proves the round trip}.
+\end{gathered}
+\]
+Use context extension as the single representative constructor.  State that
+the universe, substitution, product, and substitution-type cases have the
+same proof shape.
+
+\section*{Board 1: The problem (0--10 minutes)}
+
+Write the two presentations schematically:
+\[
+\begin{array}{rcl}
+  \text{Mutual} &:& \Con,\ \Ty,\ \mathsf{ty}_1,\ \bullet,\
+                    \mathbin{\triangleright},\ \mathsf{u},\ \pi,\ \sigma,\\[2mm]
+  \text{Weakly tagged} &:& \CT,\ [-],\ \widehat c,\ \widehat t,\
+                    \mathsf{ty}_1,\ \bullet,\ \mathbin{\triangleright},\
+                    \mathsf{u},\ \pi,\ \sigma.
+\end{array}
+\]
+State the theorem immediately:
+\[
+  I\text{ initial in }\Weak
+  \quad\Longrightarrow\quad
+  F(I)\text{ initial in }\Mutual.
+\]
+Draw the functors and leave this diagram visible throughout:
+\[
+  \Weak \mathrel{\mathop{\rightleftarrows}^{F}_{G}} \Mutual.
+\]
+Explain the strict-positivity motivation verbally.  Write only the formation
+rule for extension:
+\[
+  \frac{[\gamma]=\widehat c\qquad [a]=\widehat t\qquad
+        \mathsf{ty}_1(a)=\gamma}
+       {[\gamma\mathbin{\triangleright}a]=\widehat c}.
+\]
+Do not write the analogous rules for the other constructors.
+
+\section*{Board 2: The functors and the easy round trip (10--20 minutes)}
+
+For the projection functor write:
+\[
+\begin{aligned}
+  F(A).\Con &\;=\; \sum_{\gamma:A.\CT}[\gamma]=\widehat c,\\
+  F(A).\Ty  &\;=\; \sum_{a:A.\CT}[a]=\widehat t.
+\end{aligned}
+\]
+For the reverse construction write only:
+\[
+\begin{aligned}
+  \mathsf{Atom}(A)
+    &\;=\; \mathsf{con}(A.\Con)+\mathsf{ty}(A.\Ty)
+          +\{\widehat k,\widehat c,\widehat t\},\\
+  G(A).\CT &\;=\; \PropLift(\mathsf{Atom}(A)).
+\end{aligned}
+\]
+Describe \(\PropLift\) as a partial element whose definedness is a
+proposition.  State, without proving its internal witness calculations, the
+natural isomorphism
+\[
+  \varepsilon_A:F(G(A))\cong A.
+\]
+Its context and type components simply extract the unique context or type atom.
+
+\section*{Board 3: Why ordinary morphisms fail (20--30 minutes)}
+
+This is the central motivation.  Write:
+\[
+  \mathsf{ty}_1(a)\neq\gamma,
+  \qquad
+  f(\mathsf{ty}_1(a))=f(\gamma).
+\]
+A non-injective semantic map can therefore make
+\[
+  \gamma\mathbin{\triangleright}a\text{ undefined},
+  \qquad
+  f(\gamma)\mathbin{\triangleright}f(a)\text{ defined}.
+\]
+Consequently, unconditional preservation of raw operations is false.  On the
+other hand, preservation conditional on the expected input witnesses is too
+weak: from a hypothetical wrong output tag
+\[
+  [\gamma\mathbin{\triangleright}a]=\widehat t
+\]
+one cannot obtain the expected input witnesses needed to invoke the
+homomorphism law.
+
+\section*{Board 4: Observable morphisms (30--38 minutes)}
+
+Write prominently:
+\[
+  \Obs_A(x)
+  \;:\!\!\equiv\;
+  ([x]=\widehat c)\;\lor\;([x]=\widehat t).
+\]
+Then write the extension law:
+\[
+  \Obs_A(\gamma\mathbin{\triangleright}a)
+  \quad\Longrightarrow\quad
+  \theta(\gamma\mathbin{\triangleright}a)
+  =\theta(\gamma)\mathbin{\triangleright}\theta(a).
+\]
+The slogan is:
+\begin{quote}
+  Preserve an operation exactly when its result is visible to the projected
+  context/type theory.
+\end{quote}
+Explain verbally that malformed junk is ignored, non-injective maps remain
+allowed, composition transports observability, and homomorphisms are compared
+only on context- and type-classified points.
+
+\section*{Board 5: The hard round trip (38--47 minutes)}
+
+Let
+\[
+  \iota:I\longrightarrow G(F(I))
+\]
+be the unique weakly tagged morphism.  Write the two computational statements:
+\[
+\begin{aligned}
+  \beta_c(x)&:\ [x]=\widehat c
+      \longrightarrow \iota(x)=\mathsf{return}(\mathsf{con}(x)),\\
+  \beta_t(x)&:\ [x]=\widehat t
+      \longrightarrow \iota(x)=\mathsf{return}(\mathsf{ty}(x)).
+\end{aligned}
+\]
+Mention that these form a proposition-valued displayed algebra, so the path
+constructor coherence is automatic.
+
+Show only the wrong-sort extension case.  Given
+\[
+  p:[\gamma\mathbin{\triangleright}a]=\widehat t,
+\]
+we have \(\Obs_I(\gamma\mathbin{\triangleright}a)\), hence the operation law for
+\(\iota\) applies.  Transporting \(p\) says that the corresponding concrete
+extension in \(G(F(I))\) is type-tagged.  But direct analysis of the
+\(\PropLift\) operation says every observable extension is context-tagged.
+Thus \(\widehat c=\widehat t\), a contradiction.  State that the
+\(\mathsf{u}\), \(\pi\), and \(\sigma\) cases are identical in shape.
+
+Conclude:
+\[
+  F(\iota)=\varepsilon^{-1}_{F(I)},
+\]
+and therefore obtain both triangle identities.
+
+\section*{Board 6: Transfer initiality (47--53 minutes)}
+
+Define the chosen recursor:
+\[
+  \mathsf{rec}^{\Mutual}_A
+  \;:\!\!\equiv\;
+  \varepsilon_A\circ F(\mathsf{rec}^{\Weak}_{G(A)}).
+\]
+For an arbitrary \(f:F(I)\to A\), finish with the calculation
+\[
+\begin{aligned}
+  f
+  &\simeq (f\circ\varepsilon_{F(I)})\circ F(\iota)
+      && \text{triangle identity}\\
+  &\simeq (\varepsilon_A\circ F(Gf))\circ F(\iota)
+      && \text{naturality of }\varepsilon\\
+  &\simeq \varepsilon_A\circ F(Gf\circ\iota)
+      && \text{functoriality of }F\\
+  &\simeq \varepsilon_A\circ F(\mathsf{rec}^{\Weak}_{G(A)})
+      && \text{initiality of }I\\
+  &=\mathsf{rec}^{\Mutual}_A.
+\end{aligned}
+\]
+This is the payoff; stop the technical development here.
+
+\section*{Final three minutes}
+
+End with three statements:
+\begin{enumerate}
+  \item A strictly positive weak syntax can recover the intended mutual syntax.
+  \item Malformed raw terms force an observational notion of morphism.
+  \item Output observability is the precise boundary between semantic structure
+        and irrelevant junk.
+\end{enumerate}
+
+\section*{Material to omit from the board}
+
+Do not present the following unless asked:
+\begin{itemize}
+  \item the full definitions of \(\pi\) and \(\sigma\);
+  \item witness-level calculations inside \(\PropLift\);
+  \item universe lifting;
+  \item proof-irrelevance and setoid-category boilerplate;
+  \item every field of the displayed algebra;
+  \item failed classifier constructions;
+  \item the possible adjunction \(G\dashv F\);
+  \item Agda terms longer than a single line.
+\end{itemize}
+
+Reserve one corner of the board for the theorem and the diagram
+\(\Weak\rightleftarrows\Mutual\), and do not erase it.  If possible, provide a
+one-page handout or repository link containing the complete signatures and
+formal proof.
+
+\end{document}
