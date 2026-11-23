@@ -266,6 +266,16 @@ isQuasiExtensionalZ .∧e₂ (∧i α⊆β , β⊆α) = ∧i ⊆→≤ α⊆β ,
 supᶻ : Σ S (λ s → P s → Z) → Z 
 supᶻ (s , f) = sup (ιₛ s , f)
 
+iswf : WellFounded _<_
+iswf x = acc λ y p → r x y (<→≤ p)
+  where
+  r : ∀ x y (p : y ≤ x) → Acc _<_ y
+  r (sup (a , f)) y p = acc s
+    where
+    s : ∀ z → z < y → Acc _<_ z
+    s z q with ≤< p q
+    ... | <sup i z≤fi = r (f i) z z≤fi
+
 Zᴬ : PlumpAlgebra S P
 Zᴬ = record
   { Z = Z
@@ -287,6 +297,7 @@ Zᴬ = record
   ; ∨ᶻ≤ = λ p q → sup≤ ⊎.[ (λ _ → p) , (λ _ → q) ]ᵖ
   ; ⊥ᶻ = ⊥ᶻ
   ; ⊥ᶻ≤ = sup≤ λ ()
+  ; iswf< = iswf
   }
 
 open import QIT.Plump.Size
