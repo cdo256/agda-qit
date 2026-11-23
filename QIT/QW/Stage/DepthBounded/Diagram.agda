@@ -5,11 +5,11 @@ open import QIT.Relation.SetQuotient
 open import QIT.Plump.Algebra
 open import QIT.Relation.Binary
 
--- Define staged construction of quotient W-types using plump ordinals.
+-- The diagram of depth-bounded stages.
 -- This builds the quotient in stages indexed by ordinals, ensuring that
 -- equations are satisfied at each stage. The construction uses diagrams
 -- indexed by the plump ordinal order to control the complexity of terms.
-module QIT.QW.Diagram
+module QIT.QW.Stage.DepthBounded.Diagram
   ⦃ a!c* : A!C ⦄ 
   ⦃ pathElim* : PathElim ⦄
   ⦃ funExt* : FunExt ⦄
@@ -29,7 +29,7 @@ open import QIT.Plump.Properties Zᴬ as Z
 open import QIT.Setoid
 open import QIT.Setoid.Quotient
 open import QIT.Set.Base using (_≡h_)
-open import QIT.QW.Stage sig Zᴬ
+open import QIT.QW.Stage.DepthBounded sig Zᴬ
 open import QIT.Category.Preorder
 open import QIT.Category.Setoid
 open import QIT.Category.Set

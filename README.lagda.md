@@ -172,12 +172,20 @@ open import QIT.QW.W
 
 Here's the key insight: equations might require arbitrarily deep unfolding
 of constructors to check, so we can't build the quotient all at once.
-Instead, we build it in stages indexed by plump ordinals, enforcing
-equations at each stage while controlling the complexity of terms we need
-to consider:
+This repository contains two distinct stage constructions. The
+depth-bounded stages restrict raw trees by ordinal rank:
 
 ```agda
-open import QIT.QW.Stage
+open import QIT.QW.Stage.DepthBounded
+```
+
+The Fiore--Pitts--Steenkamp construction instead iterates the free term
+monad over all earlier stages and quotients by equations and monad
+coherence. Its strict stage diagram is defined separately:
+
+```agda
+open import QIT.QW.Stage.IteratedMonad
+open import QIT.QW.Stage.IteratedMonad.Diagram
 ```
 
 What are we building toward? Algebras that satisfy all the equations in our

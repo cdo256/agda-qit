@@ -42,8 +42,8 @@ open DepthPreservingSig depthPreserving*
 open ExtensionalPlumpOrdinals epo*
 open ExtensionalPlumpAlgebra (Zᴬe S P) 
 
-open import QIT.QW.Stage sig Zᴬ
-open import QIT.QW.Diagram sig Zᴬ
+open import QIT.QW.Stage.DepthBounded sig Zᴬ
+open import QIT.QW.Stage.DepthBounded.Diagram sig Zᴬ
 import QIT.Plump.Extensional S P as Z
 open Z using (ιᶻ; ιᶻ≤≥ιᶻ; child≤)
 

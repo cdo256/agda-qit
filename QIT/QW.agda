@@ -2,11 +2,11 @@ open import QIT.Prelude
 
 -- Quotient W-types: The main construction for quotient inductive types (QITs).
 --
--- This module implements quotient W-types as colimits of staged approximations.
+-- This module implements quotient W-types using staged approximations.
 -- A quotient W-type is specified by a signature containing both constructors
 -- (via containers) and equations. The construction proceeds by:
 --
--- 1. Building staged approximations indexed by plump ordinals
+-- 1. Building depth-bounded or iterated-monad stages indexed by plump ordinals
 -- 2. Enforcing equations at each stage through a quotient relation
 -- 3. Taking the colimit to obtain the final quotient type
 -- 4. Proving this gives the initial algebra satisfying the equations

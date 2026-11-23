@@ -109,8 +109,10 @@ import QIT.QW.Equation
 import QIT.QW.Signature
 import QIT.QW.Subclasses
 import QIT.QW.Algebra
-import QIT.QW.Stage
-import QIT.QW.Diagram
+import QIT.QW.Stage.DepthBounded
+import QIT.QW.Stage.DepthBounded.Diagram
+import QIT.QW.Stage.IteratedMonad
+import QIT.QW.Stage.IteratedMonad.Diagram
 import QIT.QW.Locality
 import QIT.QW.Cocontinuity
 import QIT.QW.Cocontinuity.FromDepthPreservation
