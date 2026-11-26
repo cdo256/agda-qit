@@ -233,10 +233,25 @@ FixSizeStructᵇ-contractible = wf-rec Z._<_ Z.iswf< C hyp
     Di = mkIdxStructᵇ domi τi
 
     Di↓ᵇ : ∀ j {j<i} → (Di ↓ᵇ j) {j<i} ≡ (prev j {j<i}) .fst
-    Di↓ᵇ j {j<i} = {!!}
+    Di↓ᵇ j {j<i} =
+      IdxStructᵇ-ext domain-family-eq tau-family-eq
+      where
+      domain-family-eq :
+        Dᵇ ((Di ↓ᵇ j) {j<i}) ≡ Dᵇ ((prev j {j<i}) .fst)
+      domain-family-eq =
+        funExt λ k → funExtip λ p → domi< j {j<i} k {k<j = p}
+
+      tau-family-eq :
+        subst
+          (λ X → τᵇ-type j X)
+          domain-family-eq
+          (τᵇ ((Di ↓ᵇ j) {j<i}))
+          ≡ τᵇ ((prev j {j<i}) .fst)
+      tau-family-eq = {!!}
 
     δi : isFixSizeStructᵇ Di
-    δi j {j<i} = {!!}
+    δi j {j<i} =
+      ∃i box (≡.cong ◇ (≡.sym (Di↓ᵇ j {j<i}))) , {!!}
 
     -- Construct the quotient stage from the canonical fixed points below i.
     candidate : FixSizeStructᵇ i
