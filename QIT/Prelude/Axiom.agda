@@ -20,10 +20,15 @@ record FunExt : Propω where
     funExt : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB}
            → {f g : ∀ a → B a} → (∀ x → f x ≡ g x)
            → f ≡ g
-
+    funExti : ∀ {ℓA ℓB} {A : Set ℓA} {B : A → Set ℓB}
+           → {f g : ∀ {a} → B a} → (∀ x → f {x} ≡ g {x})
+           → _≡_ {A = ∀ {a} → B a} f g
     funExtp : ∀ {ℓA ℓB} {A : Prop ℓA} {B : A → Set ℓB}
            → {f g : ∀ a → B a} → (∀ x → f x ≡ g x)
            → f ≡ g
+    funExtip : ∀ {ℓA ℓB} {A : Prop ℓA} {B : A → Set ℓB}
+           → {f g : ∀ {a} → B a} → (∀ x → f {x} ≡ g {x})
+           → _≡_ {A = ∀ {a} → B a} f g
 
 -- P∧Q→P≡Q : ∀ {ℓP} {P Q : Prop ℓP} → P ∧ Q → P ≡ Q
 -- P∧Q→P≡Q (p , q) = propExt ((λ _ → q) , (λ _ → p))

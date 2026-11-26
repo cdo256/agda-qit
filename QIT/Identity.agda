@@ -239,9 +239,17 @@ funExt⁻ : ∀ {ℓA ℓB} → {A : Set ℓA} {B : A → Set ℓB} {f g : ∀ x
        → f ≡ g → (∀ x → f x ≡ g x)
 funExt⁻ refl _ = refl
 
+funExti⁻ : ∀ {ℓA ℓB} → {A : Set ℓA} {B : A → Set ℓB} {f g : ∀ {x} → B x}
+       → _≡_ {A = ∀ {x} → B x} f g → (∀ x → f {x} ≡ g {x})
+funExti⁻ refl _ = refl
+
 funExtp⁻ : ∀ {ℓA ℓB} → {A : Prop ℓA} {B : A → Set ℓB} {f g : ∀ x → B x}
        → f ≡ g → (∀ x → f x ≡ g x)
 funExtp⁻ refl _ = refl
+
+funExtip⁻ : ∀ {ℓA ℓB} → {A : Prop ℓA} {B : A → Set ℓB} {f g : ∀ {x} → B x}
+       → _≡_ {A = ∀ {x} → B x} f g → (∀ x → f {x} ≡ g {x})
+funExtip⁻ refl _ = refl
 
 -- Commutation of subst with function composition
 subst-∘ : ∀ {ℓA ℓB ℓC} {A : Set ℓA} {B : Set ℓB} {C : B → Set ℓC}

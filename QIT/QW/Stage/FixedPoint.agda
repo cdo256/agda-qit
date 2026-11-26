@@ -4,6 +4,7 @@ open import QIT.Prelude
 open import QIT.Prop
 open import QIT.Function.Base
 open import QIT.Plump.Algebra
+open import QIT.Relation.Binary using (wf-rec)
 open import QIT.QW.Signature
 open import QIT.Relation.SetQuotient
 
@@ -18,6 +19,8 @@ module QIT.QW.Stage.FixedPoint
   (sig : Sig ℓS ℓP ℓE ℓV)
   (Zᴬ : PlumpAlgebra (sig .Sig.S) (sig .Sig.P))
   where
+
+open FunExt funExt*
 
 open Sig sig
 module Z = PlumpAlgebra Zᴬ
@@ -133,3 +136,67 @@ FixSizeStructᵇ↓ᵇ (A , δ) j {j<i} = (A ↓ᵇ j) , δ↓
   δ↓ : isFixSizeStructᵇ ((A ↓ᵇ j) {j<i})
   δ↓ k {k<j} with δ k {<ᵇ<ᵇ j<i k<j}
   ... | ∃i p , q = ∃i p , λ l {l<k} t → q l {l<k} t
+
+-- Fixed bounded structures are unique at each size.  The proof proceeds by
+-- well-founded induction: compare all restrictions first, then use the two
+-- fixed-point witnesses to compare domains and transition maps.
+FixSizeStructᵇ-uniq :
+  (i : Size)
+  → (I I' : FixSizeStructᵇ i)
+  → I ≡ I'
+FixSizeStructᵇ-uniq = wf-rec Z._<_ Z.iswf< M hyp
+  where
+  M : Size → Prop _
+  M i = (I I' : FixSizeStructᵇ i) → I ≡ I'
+
+  hyp : ∀ i → (∀ j → j <ᵇ i → M j) → M i
+  hyp i ih (A , δ) (A' , δ') = ΣP≡ _ _ {!!}
+    where
+    -- Induction hypotheses identify the restrictions at every earlier size.
+    restriction-eq : ∀ j {j<i}
+      → (A ↓ᵇ j) {j<i} ≡ (A' ↓ᵇ j) {j<i}
+    restriction-eq j {j<i} =
+      ≡.cong fst
+        (ih j j<i
+          (FixSizeStructᵇ↓ᵇ (A , δ) j {j<i})
+          (FixSizeStructᵇ↓ᵇ (A' , δ') j {j<i}))
+
+    -- The first component of each fixed-point witness identifies domains.
+    domain-eq : ∀ j {j<i}
+      → Dᵇ A j {j<i} ≡ Dᵇ A' j {j<i}
+    domain-eq j {j<i} = let
+      u : Dᵇ (A ↓ᵇ j) ≡ Dᵇ (A' ↓ᵇ j)
+      u = ≡.cong (Dᵇ {j}) (restriction-eq j {j<i})
+      v : Dᵇ (A ↓ᵇ i) j {j<i} ≡ Dᵇ (A' ↓ᵇ i) j {j<i}
+      v = funExtip⁻ (funExt⁻ u j) {!!}
+      in {!!}
+
+    domain-family-eq : Dᵇ A ≡ Dᵇ A'
+    domain-family-eq = {!!}
+
+    -- The second component identifies transition maps after transporting
+    -- expressions and quotient representatives along domain-family-eq.
+    tau-eq :
+      subst (λ X → τᵇ-type i X) domain-family-eq (τᵇ A)
+        ≡ τᵇ A'
+    tau-eq = {!!}
+
+-- Contractibility packages existence and uniqueness so that the
+-- proposition-only well-founded recursor can define a Set-valued family.
+FixSizeStructᵇ-contractible : ∀ i → isContr (FixSizeStructᵇ i)
+FixSizeStructᵇ-contractible = wf-rec Z._<_ Z.iswf< C hyp
+  where
+  C : Size → Prop _
+  C i = isContr (FixSizeStructᵇ i)
+
+  hyp : ∀ i → (∀ j → j <ᵇ i → C j) → C i
+  hyp i ih = {!!}
+
+-- The bounded recursive family of fixed stages.
+initᵇ : ∀ i → FixSizeStructᵇ i
+initᵇ i = A!C.a!c a!c* (FixSizeStructᵇ i) (FixSizeStructᵇ-contractible i)
+
+-- The global fixed point is assembled from the bounded family.  The remaining
+-- holes are the coherent transport of domains and quotient representatives.
+init : FixSizeStruct
+init = {!!}

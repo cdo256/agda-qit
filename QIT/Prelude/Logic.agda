@@ -56,3 +56,4 @@ data ∃ {A : Set ℓA} (B : A → Prop ℓB) : Prop (ℓA ⊔ ℓB) where
 ∃e : {A : Set ℓA} {B : A → Prop ℓB} {C : Prop ℓC}
    → (∀ a → B a → C) → ∃ B → C
 ∃e f (∃i a , b) = f a b
+
