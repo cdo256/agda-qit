@@ -188,7 +188,9 @@ FixSizeStructᵇ-uniq = wf-rec Z._<_ Z.iswf< M hyp
     tau-eq :
       subst (λ X → τᵇ-type i X) domain-family-eq (τᵇ A)
         ≡ τᵇ A'
-    tau-eq = {!!}
+    tau-eq =
+      funExt λ j → funExtip λ p → funExt λ k → funExtip λ q →
+        funExt λ t → {!!}
 
 -- Contractibility packages existence and uniqueness so that the
 -- proposition-only well-founded recursor can define a Set-valued family.
@@ -213,7 +215,16 @@ FixSizeStructᵇ-contractible = wf-rec Z._<_ Z.iswf< C hyp
     domi< : ∀ j {j<i} k {k<j}
       → domi k {<ᵇ<ᵇ j<i k<j}
         ≡ Dᵇ ((prev j {j<i}) .fst) k {k<j}
-    domi< j {j<i} k {k<j} = {!!}
+    domi< j {j<i} k {k<j} with
+      (prev j {j<i}) .snd k {k<j}
+    ... | ∃i p , _ =
+      ≡.trans
+        (≡.cong ◇
+          (≡.cong fst
+            (FixSizeStructᵇ-uniq k
+              (prev k {<ᵇ<ᵇ j<i k<j})
+              (FixSizeStructᵇ↓ᵇ (prev j {j<i}) k {k<j}))))
+        (≡.sym (p .unbox))
 
     τi : τᵇ-type i domi
     τi j {j<i} k {k<j} t = {!!}
