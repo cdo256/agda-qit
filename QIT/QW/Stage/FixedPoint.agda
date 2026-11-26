@@ -99,6 +99,13 @@ data Rᵇ {i : Size} (A : IdxStructᵇ i) : Wᵇ A → Wᵇ A → Prop _ where
 ◇ : ∀ {i} → IdxStructᵇ i → Set _
 ◇ A = Wᵇ A / Rᵇ A
 
+-- Quotient classes transport coherently when the bounded structure changes.
+quotient-transport : ∀ {i} {A B : IdxStructᵇ i} (p : A ≡ B)
+  (x : Wᵇ A)
+  → subst (λ X → ◇ X) p Q.[ x ]
+    ≡ Q.[ subst Wᵇ p x ]
+quotient-transport ≡.refl x = ≡.refl
+
 -- A fixed structure identifies every stage with the quotient generated below it.
 record FixedPoint (A : IdxStruct) : Set _ where
   field
@@ -150,7 +157,8 @@ FixSizeStructᵇ-uniq = wf-rec Z._<_ Z.iswf< M hyp
   M i = (I I' : FixSizeStructᵇ i) → I ≡ I'
 
   hyp : ∀ i → (∀ j → j <ᵇ i → M j) → M i
-  hyp i ih (A , δ) (A' , δ') = ΣP≡ _ _ {!!}
+  hyp i ih (A , δ) (A' , δ') =
+    ΣP≡ _ _ (IdxStructᵇ-ext domain-family-eq tau-eq)
     where
     -- Induction hypotheses identify the restrictions at every earlier size.
     restriction-eq : ∀ j {j<i}
@@ -164,15 +172,16 @@ FixSizeStructᵇ-uniq = wf-rec Z._<_ Z.iswf< M hyp
     -- The first component of each fixed-point witness identifies domains.
     domain-eq : ∀ j {j<i}
       → Dᵇ A j {j<i} ≡ Dᵇ A' j {j<i}
-    domain-eq j {j<i} = let
-      u : Dᵇ (A ↓ᵇ j) ≡ Dᵇ (A' ↓ᵇ j)
-      u = ≡.cong (Dᵇ {j}) (restriction-eq j {j<i})
-      v : Dᵇ (A ↓ᵇ i) j {j<i} ≡ Dᵇ (A' ↓ᵇ i) j {j<i}
-      v = funExtip⁻ (funExt⁻ u j) {!!}
-      in {!!}
+    domain-eq j {j<i} with δ j {j<i} | δ' j {j<i}
+    ... | ∃i p , _ | ∃i p' , _ =
+      ≡.trans (p .unbox)
+        (≡.trans
+          (≡.cong ◇ (restriction-eq j {j<i}))
+          (≡.sym (p' .unbox)))
 
     domain-family-eq : Dᵇ A ≡ Dᵇ A'
-    domain-family-eq = {!!}
+    domain-family-eq =
+      funExt λ j → funExtip λ p → domain-eq j {j<i = p}
 
     -- The second component identifies transition maps after transporting
     -- expressions and quotient representatives along domain-family-eq.
@@ -190,7 +199,37 @@ FixSizeStructᵇ-contractible = wf-rec Z._<_ Z.iswf< C hyp
   C i = isContr (FixSizeStructᵇ i)
 
   hyp : ∀ i → (∀ j → j <ᵇ i → C j) → C i
-  hyp i ih = {!!}
+  hyp i ih = ∃i candidate , λ I → FixSizeStructᵇ-uniq i candidate I
+    where
+    -- Choose the recursively constructed fixed point at every predecessor.
+    prev : Πᵇ i λ j {j<i} → FixSizeStructᵇ j
+    prev j {j<i} = A!C.a!c a!c* (FixSizeStructᵇ j) (ih j j<i)
+
+    domi : Dᵇ-type i
+    domi j {j<i} = ◇ ((prev j {j<i}) .fst)
+
+    -- Every earlier domain can be identified with the corresponding domain
+    -- in the fixed point chosen at the current predecessor.
+    domi< : ∀ j {j<i} k {k<j}
+      → domi k {<ᵇ<ᵇ j<i k<j}
+        ≡ Dᵇ ((prev j {j<i}) .fst) k {k<j}
+    domi< j {j<i} k {k<j} = {!!}
+
+    τi : τᵇ-type i domi
+    τi j {j<i} k {k<j} t = {!!}
+
+    Di : IdxStructᵇ i
+    Di = mkIdxStructᵇ domi τi
+
+    Di↓ᵇ : ∀ j {j<i} → (Di ↓ᵇ j) {j<i} ≡ (prev j {j<i}) .fst
+    Di↓ᵇ j {j<i} = {!!}
+
+    δi : isFixSizeStructᵇ Di
+    δi j {j<i} = {!!}
+
+    -- Construct the quotient stage from the canonical fixed points below i.
+    candidate : FixSizeStructᵇ i
+    candidate = Di , δi
 
 -- The bounded recursive family of fixed stages.
 initᵇ : ∀ i → FixSizeStructᵇ i
