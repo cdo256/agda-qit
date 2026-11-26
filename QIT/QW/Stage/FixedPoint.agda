@@ -74,6 +74,11 @@ _↓ᵇ_ : {i : Size} → IdxStructᵇ i → ∀ j {j<i : j <ᵇ i} → IdxStruc
 ((A ↓ᵇ j) {j<i}) .Dᵇ k {k<j} = A .Dᵇ k {<ᵇ<ᵇ j<i k<j}
 ((A ↓ᵇ j) {j<i}) .τᵇ k {k<j} = A .τᵇ k {<ᵇ<ᵇ j<i k<j}
 
+restriction-restriction : ∀ {i} (A : IdxStructᵇ i) j {j<i} k {k<j}
+  → (((A ↓ᵇ j) {j<i}) ↓ᵇ k) {k<j}
+    ≡ (A ↓ᵇ k) {<ᵇ<ᵇ j<i k<j}
+restriction-restriction A j {j<i} k {k<j} = ≡.refl
+
 -- Raw inputs to stage i are terms over any strictly earlier stage.
 Wᵇ : ∀ {i} → IdxStructᵇ i → Set _
 Wᵇ {i} A = Σᵇ i λ j {j<i} → Expr (Dᵇ A j {j<i})
@@ -144,7 +149,11 @@ FixSizeStructᵇ↓ᵇ (A , δ) j {j<i} = (A ↓ᵇ j) , δ↓
   where
   δ↓ : isFixSizeStructᵇ ((A ↓ᵇ j) {j<i})
   δ↓ = record
-    { stage = λ k {k<j} → {!!}
+    { stage = λ k {k<j} → box
+        (≡.trans
+          ((δ .stage k {<ᵇ<ᵇ j<i k<j}) .unbox)
+          (≡.cong ◇
+            (≡.sym (restriction-restriction A j {j<i} k {k<j}))))
     ; beta = λ k {k<j} l {l<k} t → {!!} }
 
 -- Fixed bounded structures are unique at each size.  The proof proceeds by
