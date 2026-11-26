@@ -49,11 +49,18 @@ module _ {ℓA ℓR} {A : Set ℓA} (R : BinaryRel A ℓR) where
       refl  : Reflexive
       trans : Transitive
 
+  record IsWeakPreorder : Set (ℓR ⊔ ℓA) where
+    field
+      trans : Transitive
+
   record IsPartialOrder : Set (ℓR ⊔ ℓA) where
     field
       refl    : Reflexive
       antisym : AntiSymmetric
       trans   : Transitive
+
+WeakPreorder : ∀ {ℓA} (S : Set ℓA) → ∀ ℓR → Set (ℓA ⊔ lsuc ℓR)
+WeakPreorder S ℓR = Σ (BinaryRel S ℓR) IsWeakPreorder
 
 Preorder : ∀ {ℓA} (S : Set ℓA) → ∀ ℓR → Set (ℓA ⊔ lsuc ℓR)
 Preorder S ℓR = Σ (BinaryRel S ℓR) IsPreorder

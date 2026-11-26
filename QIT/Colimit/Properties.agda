@@ -4,12 +4,8 @@ open import QIT.Relation.Base
 open import QIT.Relation.Binary
 open import QIT.Relation.Subset
 open import QIT.Set.Base
-open import QIT.Functor.Base
-open import QIT.Functor.Properties using (restrict-domain)
-open import QIT.Category.Base hiding (_[_≈_]; _[_,_]; _[_∘_])
-open import QIT.Category.Preorder
-open import QIT.Category.Set
 open import QIT.Relation.SetQuotient
+import QIT.SimpleDiagram
 
 module QIT.Colimit.Properties
   ⦃ pathElim* : PathElim ⦄
@@ -17,11 +13,11 @@ module QIT.Colimit.Properties
   ⦃ funExt* : FunExt ⦄
   ⦃ propExt* : PropExt ⦄
   ⦃ sq : SetQuotients ⦄
-  {ℓI} {ℓ≤}
+  {ℓI} {ℓ<}
   {I : Set ℓI}
-  (≤p : Preorder I ℓ≤)
-  (ℓD ℓD' : Level)
-  (P : Functor (PreorderCat I ≤p) (SetCat (ℓD ⊔ ℓD')))
+  (<p : WeakPreorder I ℓ<)
+  (ℓD : Level)
+  (P : QIT.SimpleDiagram.Diagram {ℓA = ℓI} {ℓ< = ℓ<} {A = I} <p ℓD)
   where
 
 open FunExt funExt*
@@ -30,20 +26,33 @@ open import QIT.Setoid
 open import QIT.Setoid.Quotient
 
 private
-  module ≤ = IsPreorder (≤p .proj₂)
-  _≤_ : BinaryRel I ℓ≤
-  _≤_ = ≤p .proj₁
+  module < = IsWeakPreorder (<p .proj₂)
+  _<_ : BinaryRel I ℓ<
+  _<_ = <p .proj₁
 
-open import QIT.Colimit.Base ≤p ℓD ℓD' P public
+open import QIT.SimpleDiagram <p
+open import QIT.Colimit.Base <p ℓD P public
 
-open Functor P using () renaming (ob to P̂)
-module ≤p = QIT.Category.Preorder I ≤p
+P̂ : I → Set ℓD
+P̂ = Diagram.ob P
 
-RestrictDiagram : (α : I) → Functor (≤p.PreorderCat↓ α) (SetCat (ℓD ⊔ ℓD'))
-RestrictDiagram α = restrict-domain (≤p.include≤ α) P
+Below : I → Set (ℓI ⊔ ℓ<)
+Below α = ΣP I (_< α)
+
+_<↓_ : ∀ {α} → BinaryRel (Below α) ℓ<
+(i , _) <↓ (j , _) = i < j
+
+Restrict< : (α : I) → WeakPreorder (Below α) ℓ<
+Restrict< α = _<↓_ , record { trans = <.trans }
+
+RestrictDiagram : (α : I) → QIT.SimpleDiagram.Diagram (Restrict< α) ℓD
+RestrictDiagram α = record
+  { ob = λ i → P.ob (i .fst)
+  ; edge = P.edge
+  ; nat = P.nat }
 
 module Bounded (α : I) where
-  open import QIT.Colimit.Base (≤p.Restrict≤ α) ℓD ℓD' (RestrictDiagram α) public
+  open import QIT.Colimit.Base (Restrict< α) ℓD (RestrictDiagram α) public
     using ()
     renaming
       ( Colim₀ to Colim≤₀
@@ -70,8 +79,8 @@ module Bounded (α : I) where
   recˡ≤' : ∀ {ℓ ℓ'}
         → (C≤ : ∀ {s t} → s ≈ˡ≤ t → Prop ℓ)
         → (C  : ∀ {s t} → s ≈ˡ t → Prop ℓ')
-        → (c-stage : ∀ (i : ≤p.Below α) {x x'} (e : x ≡ x') → C≤ (≈l≤stage i e))
-        → (c-step  : ∀ {i j : ≤p.Below α} (p : i .fst ≤ j .fst) (x : Functor.ob (RestrictDiagram α) i) → C≤ (≈l≤step p x))
+        → (c-stage : ∀ (i : Below α) {x x'} (e : x ≡ x') → C≤ (≈l≤stage i e))
+        → (c-step  : ∀ {i j : Below α} (p : i .fst < j .fst) (x : P̂ (i .fst)) → C≤ (≈l≤step p x))
         → (c-sym   : ∀ {s t} (r : s ≈ˡ≤ t) → C≤ r → C≤ (≈l≤sym r))
         → (c-trans : ∀ {s t u} (r₁ : s ≈ˡ≤ t) (r₂ : t ≈ˡ≤ u) → C≤ r₁ → C≤ r₂ → C≤ (≈l≤trans r₁ r₂))
         → (forgetC : ∀ {s t} (r : s ≈ˡ≤ t) → C≤ r → C (forget≈≤ r))
@@ -84,19 +93,19 @@ module Bounded (α : I) where
     go (≈lsym r) = c-sym r (go r)
     go (≈ltrans r₁ r₂) = c-trans r₁ r₂ (go r₁) (go r₂)
 
-record BoundedFactor (s t : Colim₀) : Set (ℓI ⊔ ℓ≤ ⊔ ℓD ⊔ ℓD') where
+record BoundedFactor (s t : Colim₀) : Set (ℓI ⊔ ℓ< ⊔ ℓD) where
   field
     α : I
-    s≤α : s .proj₁ ≤ α
-    t≤α : t .proj₁ ≤ α
+    s≤α : s .proj₁ < α
+    t≤α : t .proj₁ < α
     r≤ : let module B = Bounded α in B._≈ˡ≤_ ((s .proj₁ , s≤α) , s .proj₂) ((t .proj₁ , t≤α) , t .proj₂)
 
 recˡ↑ : ∀ {ℓ≤' ℓ}
       → (C : ∀ {s t} → s ≈ˡ t → Prop ℓ)
       → (factor : ∀ {s t} (r : s ≈ˡ t) → BoundedFactor s t)
       → (C≤ : ∀ α {s t} → let module B = Bounded α in B._≈ˡ≤_ s t → Prop ℓ≤')
-      → (c-stage : ∀ α (i : ≤p.Below α) {x x'} (e : x ≡ x') → C≤ α (Bounded.≈l≤stage {α = α} i e))
-      → (c-step  : ∀ α {i j : ≤p.Below α} (p : i .fst ≤ j .fst) (x : Functor.ob (RestrictDiagram α) i)
+      → (c-stage : ∀ α (i : Below α) {x x'} (e : x ≡ x') → C≤ α (Bounded.≈l≤stage {α = α} i e))
+      → (c-step  : ∀ α {i j : Below α} (p : i .fst < j .fst) (x : P̂ (i .fst))
                 → C≤ α (Bounded.≈l≤step {α = α} {i = i} {j = j} p x))
       → (c-sym   : ∀ α {s t} (r : let module B = Bounded α in B._≈ˡ≤_ s t)
                 → C≤ α r → C≤ α (Bounded.≈l≤sym {α = α} r))
@@ -117,26 +126,12 @@ recˡ↑ C factor C≤ c-stage c-step c-sym c-trans forgetC stable r =
   pr : C (B.forget≈≤ (F.r≤))
   pr = B.recˡ≤' (C≤ (F.α)) C (c-stage (F.α)) (c-step (F.α)) (c-sym (F.α)) (c-trans (F.α)) (forgetC (F.α)) (F.r≤)
 
-module _ where
-  open Bounded renaming (_≈ˡ≤_ to _⊢_≈ˡ≤_)
-  -- recˡ↑ : 
-  -- recˡ↑ : ∀ {ℓ ℓ'}
-  --      → (C≤ : ∀ α {s t} → α ⊢ s ≈ˡ≤ t → Prop ℓ)
-  --      → (C  : ∀ {s t} → s ≈ˡ t → Prop ℓ')
-  --      → (c-stage : ∀ α (i : ≤p.Below α) {x x' : ?} (e : x ≡ x') → C≤ α (≈l≤stage i e))
-  --      → (c-step  : ∀ α {i j : ≤p.Below α} (p : i .fst ≤ j .fst) (x : Functor.ob (RestrictDiagram α) i) → C≤ α (≈l≤step p x))
-  --      → (c-sym   : ∀ α {s t} (r : α ⊢ s ≈ˡ≤ t) → C≤ r → C≤ (≈l≤sym r))
-  --      → (c-trans : ∀ α {s t u} (r₁ : α ⊢ s ≈ˡ≤ t) (r₂ : α ⊢ t ≈ˡ≤ u) → C≤ r₁ → C≤ r₂ → C≤ (≈l≤trans r₁ r₂))
-  --      → (forgetC : ∀ α {s t} (r : α ⊢ s ≈ˡ≤ t) → C≤ r → C (forget≈≤ r))
-  --      → ∀ {s t} (r : s ≈ˡ t) → C r
-  -- recˡ↑ C≤ C c-stage c-step c-sym c-trans forgetC r = ?
-
-record Cocone : Set (lsuc (ℓ≤ ⊔ ℓD' ⊔ ℓD ⊔ ℓI)) where
+record Cocone : Set (lsuc (ℓ< ⊔ ℓD ⊔ ℓI)) where
   field
-    Apex     : Set (ℓI ⊔ ℓ≤ ⊔ ℓD ⊔ ℓD')
+    Apex     : Set (ℓI ⊔ ℓ< ⊔ ℓD)
     inj      : ∀ i → P̂ i → Apex
-    commutes : ∀ {i j} (p : i ≤ j)
-              → inj i ≡ (inj j ∘ Functor.hom P (box p))
+    commutes : ∀ {i j} (p : i < j)
+              → inj i ≡ (inj j ∘ P.edge p)
 
 open Cocone
 
@@ -147,14 +142,14 @@ LimitCocone = record
   ; commutes = λ p → funExt λ x → Colim ⊢≈[ ≈lstep p x ]
   }
 
-record ColimMorphism (C C' : Cocone) : Set (ℓI ⊔ ℓ≤ ⊔ ℓD ⊔ ℓD') where
+record ColimMorphism (C C' : Cocone) : Set (ℓI ⊔ ℓ< ⊔ ℓD) where
   field
     apexHom  : (C .Apex) → (C' .Apex)
     commutes : ∀ i → (apexHom ∘ C .inj i) ≡ (C' .inj i)
 
 open ColimMorphism
 
-record isLimitingCocone (C : Cocone) : Set (lsuc ℓI ⊔ lsuc ℓ≤ ⊔ lsuc ℓD ⊔ lsuc ℓD') where
+record isLimitingCocone (C : Cocone) : Set (lsuc ℓI ⊔ lsuc ℓ< ⊔ lsuc ℓD) where
   field
     hom    : ∀ C' → ColimMorphism C C'
     unique : ∀ C' → (F : ColimMorphism C C')

@@ -48,12 +48,12 @@ import QIT.Plump.Extensional S P as Z
 open Z using (ιᶻ; ιᶻ≤≥ιᶻ; child≤)
 
 open import QIT.Container.StrictFunctor S P (ℓS ⊔ ℓP ⊔ ℓE ⊔ ℓV)
-open import QIT.Colimit Z.≤p ℓD ℓD'
+open import QIT.Colimit ≤wp (ℓD ⊔ ℓD')
 
 module F = Functor F
-module D̃ = Functor D̃
-module D̃/ = Functor D̃/
-module FD̃/ = Functor FD̃/
+module D̃ = Diagram≈ D̃
+module D̃/ = Diagram D̃/
+module FD̃/ = Diagram FD̃/
 module D* = Setoid D*
 module FD* = Setoid FD*
   
@@ -102,7 +102,7 @@ module Rank where
   rankC₀ (_ , t̂) = rank t̂
 
   rank-step₀ : ∀ {α β} (p : α ≤ β) (t̂ : S₀ α)
-            → rank (S̃ α ⊢[ t̂ ]) ≡ rank (D̃/.hom (box p) (S̃ α ⊢[ t̂ ]))
+            → rank (S̃ α ⊢[ t̂ ]) ≡ rank (D̃/.edge p (S̃ α ⊢[ t̂ ]))
   rank-step₀ p t̂ rewrite
       rank-beta t̂
     | ≡.sym (rank-beta (dweaken₀ p t̂))
@@ -110,10 +110,10 @@ module Rank where
       ≡.refl
 
   rank-step : ∀ {α β} (p : α ≤ β) (t̂ : S̃/ α)
-            → rank t̂ ≡ rank (D̃/.hom (box p) t̂)
+            → rank t̂ ≡ rank (D̃/.edge p t̂)
   rank-step {α} p =
     SQ.elimp (S̃ α)
-      (λ q → rank q ≡ rank (D̃/.hom (box p) q))
+      (λ q → rank q ≡ rank (D̃/.edge p q))
       (rank-step₀ p)
 
   rankC-cong : ∀ {x y} → D* [ x ≈ y ]
@@ -213,15 +213,15 @@ module LiftElement where
     SQ.elim-beta (S̃ α) (λ t̂ → S̃/ (rank t̂)) lift≈₀ lift≈-cong ŝ
 
   lift≈-step : ∀ {α β} (p : α ≤ β) (s̃ : S̃/ α)
-    → (q : rank s̃ ≡ rank (D̃/.hom (box p) s̃))
-    → subst S̃/ q (lift≈ s̃) ≡ lift≈ (D̃/.hom (box p) s̃)
+    → (q : rank s̃ ≡ rank (D̃/.edge p s̃))
+    → subst S̃/ q (lift≈ s̃) ≡ lift≈ (D̃/.edge p s̃)
   lift≈-step {α} {β} p =
     SQ.elimp (S̃ α) _ r
     where
     r : (a : S₀ α)
-      → (q : rank (S̃ α ⊢[ a ]) ≡ rank (D̃/.hom (box p) (S̃ α ⊢[ a ])))
+      → (q : rank (S̃ α ⊢[ a ]) ≡ rank (D̃/.edge p (S̃ α ⊢[ a ])))
       → subst S̃/ q (lift≈ (S̃ α ⊢[ a ]))
-      ≡ lift≈ (D̃/.hom (box p) (S̃ α ⊢[ a ]))
+      ≡ lift≈ (D̃/.edge p (S̃ α ⊢[ a ]))
     r a q =
       subst S̃/ q (lift≈ (S̃ α ⊢[ a ]))
         ≡⟨ ≡.cong (subst S̃/ q) (lift≈-beta a) ⟩
@@ -248,7 +248,7 @@ module LiftElement where
       subst S̃/ (≡.cong rank (≡.sym (dweaken-beta p a)))
         (lift≈ (S̃ β ⊢[ dweaken₀ p a ]))
         ≡⟨ dcong-lift≈ (≡.sym (dweaken-beta p a)) ⟩
-      lift≈ (D̃/.hom (box p) (S̃ α ⊢[ a ])) ∎
+      lift≈ (D̃/.edge p (S̃ α ⊢[ a ])) ∎
       where
       open ≡.≡-Reasoning
 
@@ -293,19 +293,19 @@ module LiftElement where
            (≡.trans (≡.sym (rankC-beta (α , s̃)))
                     (rankC-dp (≈lstep p s̃)))
            (≡.trans (rankC-cong (≈lstep p s̃))
-                    (≡.sym (rankC-beta (β , D̃/.hom (box p) s̃))))
+                     (≡.sym (rankC-beta (β , D̃/.edge p s̃))))
            (lift≈ s̃) ⟩
     subst S̃/ (≡.trans (rankC-cong (≈lstep p s̃))
-                       (≡.sym (rankC-beta (β , D̃/.hom (box p) s̃))))
+                        (≡.sym (rankC-beta (β , D̃/.edge p s̃))))
           (lift≈ s̃)
       ≡⟨ ≡.sym (≡.subst-subst S̃/ (rankC-cong (≈lstep p s̃))
-                           (≡.sym (rankC-beta (β , D̃/.hom (box p) s̃)))
+                            (≡.sym (rankC-beta (β , D̃/.edge p s̃)))
                            (lift≈ s̃)) ⟩
-    subst S̃/ (≡.sym (rankC-beta (β , D̃/.hom (box p) s̃)))
+    subst S̃/ (≡.sym (rankC-beta (β , D̃/.edge p s̃)))
           (subst S̃/ (rankC-cong (≈lstep p s̃)) (lift≈ s̃))
-      ≡⟨ ≡.cong (subst S̃/ (≡.sym (rankC-beta (β , D̃/.hom (box p) s̃))))
+      ≡⟨ ≡.cong (subst S̃/ (≡.sym (rankC-beta (β , D̃/.edge p s̃))))
                (lift≈-step p s̃ (rankC-cong (≈lstep p s̃))) ⟩
-    liftC₀ (β , D̃/.hom (box p) s̃) ∎
+    liftC₀ (β , D̃/.edge p s̃) ∎
     where
     open ≡.≡-Reasoning
   liftC-cong {x} {y} (≈lsym p) =
@@ -399,7 +399,7 @@ module LiftElement where
     dweaken/ (≤≤ p (rank≤ ŝ)) (subst S̃/ (rankC-beta (α , ŝ)) (liftC₀ (α , ŝ)))
       ≡⟨ ≡.cong (dweaken/ (≤≤ p (rank≤ ŝ))) (subst-inv S̃/ (≡.sym (rankC-beta (α , ŝ)))) ⟩
     dweaken/ (≤≤ p (rank≤ ŝ)) (lift≈ ŝ)
-      ≡⟨ comp (box (rank≤ ŝ)) (box p) {x = lift≈ ŝ} ⟩
+      ≡⟨ comp (rank≤ ŝ) p {t̃ = lift≈ ŝ} ⟩
     dweaken/ p (dweaken/ (rank≤ ŝ) (lift≈ ŝ))
       ≡⟨ ≡.cong (dweaken/ p) (weakenLift ŝ) ⟩
     dweaken/ p ŝ ∎
@@ -517,7 +517,7 @@ module Cocontinuity where
               ≡ dweaken/ (Z.<→≤ (Z.∨ᶻ-l< {α} {β})) (f̂ i)
       h i =
         ≡.trans
-          (≡.sym (comp (box (child≤ s μ i)) (box (Z.<→≤ (Z.∨ᶻ-r< {α} {β}))) {x = ĝ i}))
+          (≡.sym (comp (child≤ s μ i) (Z.<→≤ (Z.∨ᶻ-r< {α} {β})) {t̃ = ĝ i}))
           (≡.trans
             (dweaken-cast r₁ p₁ q₁ (ĝ i))
             (≡.trans

@@ -3,11 +3,8 @@ open import QIT.Prop
 open import QIT.Relation.Base
 open import QIT.Relation.Binary
 open import QIT.Set.Base
-open import QIT.Functor.Base
-open import QIT.Category.Base hiding (_[_≈_]; _[_,_]; _[_∘_])
-open import QIT.Category.Preorder
-open import QIT.Category.Set
 open import QIT.Relation.SetQuotient
+import QIT.SimpleDiagram
 
 module QIT.Colimit
   ⦃ pathElim* : PathElim ⦄
@@ -15,11 +12,11 @@ module QIT.Colimit
   ⦃ fe* : FunExt ⦄
   ⦃ propExt* : PropExt ⦄
   ⦃ sq* : SetQuotients ⦄
-  {ℓI} {ℓ≤}
+  {ℓI} {ℓ<}
   {I : Set ℓI}
-  (≤p : Preorder I ℓ≤)
-  (ℓD ℓD' : Level)
-  (P : Functor (PreorderCat I ≤p) (SetCat (ℓD ⊔ ℓD')))
+  (<p : WeakPreorder I ℓ<)
+  (ℓD : Level)
+  (P : QIT.SimpleDiagram.Diagram {ℓA = ℓI} {ℓ< = ℓ<} {A = I} <p ℓD)
   where
 
-open import QIT.Colimit.Properties ≤p ℓD ℓD' P public
+open import QIT.Colimit.Properties <p ℓD P public

@@ -2,6 +2,7 @@ open import QIT.Prelude
 open import QIT.Identity as ≡ hiding (refl; sym; trans; cong)
 open import QIT.Logic
 open import QIT.Setoid.Base
+open import QIT.Setoid.Hom
 open import QIT.Relation.Binary using (IsEquivalence)
 open import QIT.Relation.SetQuotient
 
@@ -208,6 +209,13 @@ map Ã B̃ f₀ f-cong =
   where
   module B = Setoid B̃
 
+mapHom : ∀ {ℓA ℓR ℓB ℓS}
+    → (Ã : Setoid ℓA ℓR)
+    → (B̃ : Setoid ℓB ℓS)
+    → (f : Hom Ã B̃)
+    → Ã /≈ → B̃ /≈
+mapHom Ã B̃ f x = map Ã B̃ (Hom.to f) (Hom.cong f) x
+
 map-beta
   : ∀ {ℓA ℓR ℓB ℓS}
   → (Ã : Setoid ℓA ℓR)
@@ -221,6 +229,15 @@ map-beta Ã B̃ f₀ f-cong a =
                     (λ p → B̃ ⊢≈[ f-cong p ]) a
   where
   module B = Setoid B̃
+
+mapHom-beta
+  : ∀ {ℓA ℓR ℓB ℓS}
+  → (Ã : Setoid ℓA ℓR)
+  → (B̃ : Setoid ℓB ℓS)
+  → (f : Hom Ã B̃)
+  → (a : ⟨ Ã ⟩)
+  → mapHom Ã B̃ f (Ã ⊢[ a ]) ≡ B̃ ⊢[ f .Hom.to a ]
+mapHom-beta Ã B̃ f a = map-beta Ã B̃ (Hom.to f) (Hom.cong f) a
 
 
 record QuotRelWitness {ℓA ℓA≈ ℓB ℓB≈ ℓR} (A : Setoid ℓA ℓA≈) (B : Setoid ℓB ℓB≈)

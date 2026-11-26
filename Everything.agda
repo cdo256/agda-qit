@@ -88,8 +88,8 @@ import QIT.Category.FamilyOfSetoids
 import QIT.Functor.Base
 import QIT.Functor.Properties
 import QIT.Functor.NatTrans
-import QIT.Functor.Diagram
 import QIT.Functor.Quotient
+import QIT.SimpleDiagram
 
 -- Container
 import QIT.Container.Base
