@@ -122,18 +122,20 @@ FixSizeStruct : Set _
 FixSizeStruct = Σ IdxStruct FixedPoint
 
 -- A bounded structure is fixed at every stage strictly below its bound.
-isFixSizeStructᵇ : {i : Size} → IdxStructᵇ i → Prop _
-isFixSizeStructᵇ A =
-  ∀ j {j<i} →
-    ∃ λ (p : Box (Dᵇ A j {j<i} ≡ ◇ ((A ↓ᵇ j) {j<i}))) →
-      ∀ k {k<j} →
-        ∀ t →
-          subst (λ X → X) (p .unbox)
-            (τᵇ A j {j<i} k {k<j} t)
-            ≡ Q.[ pairᵇ k {k<j} t ]
+-- The domain equality is boxed so it can be eliminated into Set-valued
+-- recursive definitions.
+record isFixSizeStructᵇ {i : Size} (A : IdxStructᵇ i) : Set _ where
+  field
+    stage : ∀ j {j<i}
+      → Box (Dᵇ A j {j<i} ≡ ◇ ((A ↓ᵇ j) {j<i}))
+    beta : ∀ j {j<i} k {k<j} (t : Expr (Dᵇ A k {<ᵇ<ᵇ j<i k<j}))
+      → subst (λ X → X) (stage j {j<i} .unbox)
+          (τᵇ A j {j<i} k {k<j} t)
+          ≡ Q.[ pairᵇ k {k<j} t ]
+open isFixSizeStructᵇ public
 
 FixSizeStructᵇ : (i : Size) → Set _
-FixSizeStructᵇ i = ΣP (IdxStructᵇ i) isFixSizeStructᵇ
+FixSizeStructᵇ i = Σ (IdxStructᵇ i) isFixSizeStructᵇ
 
 -- Restricting a bounded fixed structure yields bounded fixed structures.
 FixSizeStructᵇ↓ᵇ : ∀ {i} (A : FixSizeStructᵇ i)
@@ -141,8 +143,9 @@ FixSizeStructᵇ↓ᵇ : ∀ {i} (A : FixSizeStructᵇ i)
 FixSizeStructᵇ↓ᵇ (A , δ) j {j<i} = (A ↓ᵇ j) , δ↓
   where
   δ↓ : isFixSizeStructᵇ ((A ↓ᵇ j) {j<i})
-  δ↓ k {k<j} with δ k {<ᵇ<ᵇ j<i k<j}
-  ... | ∃i p , q = ∃i p , λ l {l<k} t → q l {l<k} t
+  δ↓ = record
+    { stage = λ k {k<j} → {!!}
+    ; beta = λ k {k<j} l {l<k} t → {!!} }
 
 -- Fixed bounded structures are unique at each size.  The proof proceeds by
 -- well-founded induction: compare all restrictions first, then use the two
@@ -158,13 +161,13 @@ FixSizeStructᵇ-uniq = wf-rec Z._<_ Z.iswf< M hyp
 
   hyp : ∀ i → (∀ j → j <ᵇ i → M j) → M i
   hyp i ih (A , δ) (A' , δ') =
-    ΣP≡ _ _ (IdxStructᵇ-ext domain-family-eq tau-eq)
+    Σ≡ (IdxStructᵇ-ext domain-family-eq tau-eq) {!!}
     where
     -- Induction hypotheses identify the restrictions at every earlier size.
     restriction-eq : ∀ j {j<i}
       → (A ↓ᵇ j) {j<i} ≡ (A' ↓ᵇ j) {j<i}
     restriction-eq j {j<i} =
-      ≡.cong fst
+      ≡.cong proj₁
         (ih j j<i
           (FixSizeStructᵇ↓ᵇ (A , δ) j {j<i})
           (FixSizeStructᵇ↓ᵇ (A' , δ') j {j<i}))
@@ -172,12 +175,14 @@ FixSizeStructᵇ-uniq = wf-rec Z._<_ Z.iswf< M hyp
     -- The first component of each fixed-point witness identifies domains.
     domain-eq : ∀ j {j<i}
       → Dᵇ A j {j<i} ≡ Dᵇ A' j {j<i}
-    domain-eq j {j<i} with δ j {j<i} | δ' j {j<i}
-    ... | ∃i p , _ | ∃i p' , _ =
+    domain-eq j {j<i} =
       ≡.trans (p .unbox)
         (≡.trans
           (≡.cong ◇ (restriction-eq j {j<i}))
           (≡.sym (p' .unbox)))
+      where
+      p = δ .stage j {j<i}
+      p' = δ' .stage j {j<i}
 
     domain-family-eq : Dᵇ A ≡ Dᵇ A'
     domain-family-eq =
@@ -208,23 +213,23 @@ FixSizeStructᵇ-contractible = wf-rec Z._<_ Z.iswf< C hyp
     prev j {j<i} = A!C.a!c a!c* (FixSizeStructᵇ j) (ih j j<i)
 
     domi : Dᵇ-type i
-    domi j {j<i} = ◇ ((prev j {j<i}) .fst)
+    domi j {j<i} = ◇ ((prev j {j<i}) .proj₁)
 
     -- Every earlier domain can be identified with the corresponding domain
     -- in the fixed point chosen at the current predecessor.
     domi< : ∀ j {j<i} k {k<j}
       → domi k {<ᵇ<ᵇ j<i k<j}
-        ≡ Dᵇ ((prev j {j<i}) .fst) k {k<j}
-    domi< j {j<i} k {k<j} with
-      (prev j {j<i}) .snd k {k<j}
-    ... | ∃i p , _ =
+        ≡ Dᵇ ((prev j {j<i}) .proj₁) k {k<j}
+    domi< j {j<i} k {k<j} =
       ≡.trans
         (≡.cong ◇
-          (≡.cong fst
+          (≡.cong proj₁
             (FixSizeStructᵇ-uniq k
               (prev k {<ᵇ<ᵇ j<i k<j})
               (FixSizeStructᵇ↓ᵇ (prev j {j<i}) k {k<j}))))
         (≡.sym (p .unbox))
+      where
+      p = (prev j {j<i}) .proj₂ .stage k {k<j}
 
     τi : τᵇ-type i domi
     τi j {j<i} k {k<j} t =
@@ -235,12 +240,12 @@ FixSizeStructᵇ-contractible = wf-rec Z._<_ Z.iswf< C hyp
     Di : IdxStructᵇ i
     Di = mkIdxStructᵇ domi τi
 
-    Di↓ᵇ : ∀ j {j<i} → (Di ↓ᵇ j) {j<i} ≡ (prev j {j<i}) .fst
+    Di↓ᵇ : ∀ j {j<i} → (Di ↓ᵇ j) {j<i} ≡ (prev j {j<i}) .proj₁
     Di↓ᵇ j {j<i} =
       IdxStructᵇ-ext domain-family-eq tau-family-eq
       where
       domain-family-eq :
-        Dᵇ ((Di ↓ᵇ j) {j<i}) ≡ Dᵇ ((prev j {j<i}) .fst)
+        Dᵇ ((Di ↓ᵇ j) {j<i}) ≡ Dᵇ ((prev j {j<i}) .proj₁)
       domain-family-eq =
         funExt λ k → funExtip λ p → domi< j {j<i} k {k<j = p}
 
@@ -249,12 +254,14 @@ FixSizeStructᵇ-contractible = wf-rec Z._<_ Z.iswf< C hyp
           (λ X → τᵇ-type j X)
           domain-family-eq
           (τᵇ ((Di ↓ᵇ j) {j<i}))
-          ≡ τᵇ ((prev j {j<i}) .fst)
+          ≡ τᵇ ((prev j {j<i}) .proj₁)
       tau-family-eq = {!!}
 
     δi : isFixSizeStructᵇ Di
-    δi j {j<i} =
-      ∃i box (≡.cong ◇ (≡.sym (Di↓ᵇ j {j<i}))) , {!!}
+    δi = record
+      { stage = λ j {j<i} →
+          box (≡.cong ◇ (≡.sym (Di↓ᵇ j {j<i})))
+      ; beta = λ j {j<i} k {k<j} t → {!!} }
 
     -- Construct the quotient stage from the canonical fixed points below i.
     candidate : FixSizeStructᵇ i
@@ -271,10 +278,10 @@ eqIso {X} p = ≡.J (λ Y _ → X ≅ˢ Y) p ≅ˢ.refl
 -- the canonical quotient at a lower size with the corresponding domain in
 -- the larger bounded fixed point.
 Q : Size → Set _
-Q i = ◇ ((initᵇ i) .fst)
+Q i = ◇ ((initᵇ i) .proj₁)
 
 Q< : ∀ i → Πᵇ i λ j {j<i} →
-  Box (Q j ≡ Dᵇ ((initᵇ i) .fst) j {j<i})
+  Box (Q j ≡ Dᵇ ((initᵇ i) .proj₁) j {j<i})
 Q< i j {j<i} = {!!}
 
 initD : IdxStruct
@@ -282,7 +289,7 @@ initD = record
   { D = Q
   ; τ = λ i j {j<i} t → {!!} }
 
-D↓ : ∀ i → (initD ↓ i) ≡ (initᵇ i) .fst
+D↓ : ∀ i → (initD ↓ i) ≡ (initᵇ i) .proj₁
 D↓ i = {!!}
 
 δ : FixedPoint initD
