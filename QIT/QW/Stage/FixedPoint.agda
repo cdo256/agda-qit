@@ -227,7 +227,10 @@ FixSizeStructᵇ-contractible = wf-rec Z._<_ Z.iswf< C hyp
         (≡.sym (p .unbox))
 
     τi : τᵇ-type i domi
-    τi j {j<i} k {k<j} t = {!!}
+    τi j {j<i} k {k<j} t =
+      Q.[ pairᵇ k {k<j}
+        (subst (λ X → Expr X)
+          (domi< j {j<i} k {k<j}) t) ]
 
     Di : IdxStructᵇ i
     Di = mkIdxStructᵇ domi τi
