@@ -261,7 +261,32 @@ FixSizeStructᵇ-contractible = wf-rec Z._<_ Z.iswf< C hyp
 initᵇ : ∀ i → FixSizeStructᵇ i
 initᵇ i = A!C.a!c a!c* (FixSizeStructᵇ i) (FixSizeStructᵇ-contractible i)
 
--- The global fixed point is assembled from the bounded family.  The remaining
--- holes are the coherent transport of domains and quotient representatives.
+eqIso : ∀ {X Y : Set _} → X ≡ Y → X ≅ˢ Y
+eqIso {X} p = ≡.J (λ Y _ → X ≅ˢ Y) p ≅ˢ.refl
+
+-- The global fixed point is assembled from the bounded family.  Q< aligns
+-- the canonical quotient at a lower size with the corresponding domain in
+-- the larger bounded fixed point.
+Q : Size → Set _
+Q i = ◇ ((initᵇ i) .fst)
+
+Q< : ∀ i → Πᵇ i λ j {j<i} →
+  Box (Q j ≡ Dᵇ ((initᵇ i) .fst) j {j<i})
+Q< i j {j<i} = {!!}
+
+initD : IdxStruct
+initD = record
+  { D = Q
+  ; τ = λ i j {j<i} t → {!!} }
+
+D↓ : ∀ i → (initD ↓ i) ≡ (initᵇ i) .fst
+D↓ i = {!!}
+
+δ : FixedPoint initD
+δ = record
+  { stage = λ i →
+      eqIso (≡.cong ◇ (≡.sym (D↓ i)))
+  ; τ-β = λ i j {j<i} t → {!!} }
+
 init : FixSizeStruct
-init = {!!}
+init = initD , δ
