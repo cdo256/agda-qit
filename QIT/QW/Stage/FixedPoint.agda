@@ -55,6 +55,12 @@ record IdxStructᵇ (i : Size) : Set _ where
     τᵇ : τᵇ-type i Dᵇ
 open IdxStructᵇ public
 
+IdxStructᵇ-ext : ∀ {i} {A B : IdxStructᵇ i}
+  → (p : Dᵇ A ≡ Dᵇ B)
+  → subst (λ X → τᵇ-type i X) p (τᵇ A) ≡ τᵇ B
+  → A ≡ B
+IdxStructᵇ-ext {A = A} ≡.refl q = ≡.cong (mkIdxStructᵇ (Dᵇ A)) q
+
 infixl 6 _↓_ _↓ᵇ_
 
 _↓_ : IdxStruct → ∀ i → IdxStructᵇ i
@@ -104,3 +110,26 @@ open FixedPoint public
 
 FixSizeStruct : Set _
 FixSizeStruct = Σ IdxStruct FixedPoint
+
+-- A bounded structure is fixed at every stage strictly below its bound.
+isFixSizeStructᵇ : {i : Size} → IdxStructᵇ i → Prop _
+isFixSizeStructᵇ A =
+  ∀ j {j<i} →
+    ∃ λ (p : Box (Dᵇ A j {j<i} ≡ ◇ ((A ↓ᵇ j) {j<i}))) →
+      ∀ k {k<j} →
+        ∀ t →
+          subst (λ X → X) (p .unbox)
+            (τᵇ A j {j<i} k {k<j} t)
+            ≡ Q.[ pairᵇ k {k<j} t ]
+
+FixSizeStructᵇ : (i : Size) → Set _
+FixSizeStructᵇ i = ΣP (IdxStructᵇ i) isFixSizeStructᵇ
+
+-- Restricting a bounded fixed structure yields bounded fixed structures.
+FixSizeStructᵇ↓ᵇ : ∀ {i} (A : FixSizeStructᵇ i)
+  → Πᵇ i λ j {j<i} → FixSizeStructᵇ j
+FixSizeStructᵇ↓ᵇ (A , δ) j {j<i} = (A ↓ᵇ j) , δ↓
+  where
+  δ↓ : isFixSizeStructᵇ ((A ↓ᵇ j) {j<i})
+  δ↓ k {k<j} with δ k {<ᵇ<ᵇ j<i k<j}
+  ... | ∃i p , q = ∃i p , λ l {l<k} t → q l {l<k} t
