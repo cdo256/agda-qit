@@ -1,7 +1,7 @@
 open import QIT.Prelude
 open import QIT.Prop hiding (⊥; _∨_)
 open import QIT.Container.Base as W using (⟦_◁_⟧)
-open import QIT.Relation.Binary using (WellFounded)
+open import QIT.Relation.Binary
 open import QIT.Relation.Subset
 
 module QIT.Plump.Algebra
@@ -51,6 +51,9 @@ record PlumpAlgebra
 
     iswf< : WellFounded _<_
 
+  <wp : WeakPreorder Z _
+  <wp = _<_ , record { trans = λ p q → << q p }
+
 record ExtensionalPlumpAlgebra
   : Set (lsuc ℓS ⊔ lsuc ℓP) where
   field
@@ -74,6 +77,7 @@ record PlumpHom
       → Z (A.sup (s , f)) ≡ B.sup (s , λ i → Z (f i))
     _<_ : ∀ {α β} → α A.< β → Z α B.< Z β
     _≤_ : ∀ {α β} → α A.≤ β → Z α B.≤ Z β
+
 
 record _≈ᵖ_
   {A B : PlumpAlgebra}
@@ -168,6 +172,7 @@ record InitialExtensionalPlumpOrdinals
   ext p =
     antisym (qext (λ γ → p γ .∧e₁))
             (qext (λ γ → p γ .∧e₂))
+
 
 {-
 record ExtensionalPlumpOrdinals : Setω where

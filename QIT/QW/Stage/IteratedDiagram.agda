@@ -9,7 +9,7 @@ open import QIT.Relation.Binary
 open import QIT.Relation.SetQuotient
 
 -- The strict size-indexed diagram associated to an iterated-monad fixed point.
-module QIT.QW.Stage.IteratedMonad.Diagram
+module QIT.QW.Stage.IteratedDiagram
   ⦃ pathElim* : PathElim ⦄
   ⦃ a!c* : A!C ⦄
   ⦃ funExt* : FunExt ⦄
@@ -21,14 +21,13 @@ module QIT.QW.Stage.IteratedMonad.Diagram
   where
 
 open Sig sig
-module Ord = PlumpAlgebra Zᴬ
+open PlumpAlgebra Zᴬ
+open import QIT.Plump.Size
 open import QIT.QW.Equation S P ℓV
-open import QIT.QW.Stage.IteratedMonad sig Zᴬ hiding (D)
+open import QIT.QW.Stage.FixedPoint sig Zᴬ hiding (D)
+module Sz = SizeStr sizeStr
 
-<wp : WeakPreorder Size _
-<wp = Ord._<_ , record { trans = λ p q → Ord.<< q p }
-
-open import QIT.SimpleDiagram <wp
+open import QIT.SimpleDiagram Sz.<wp
 
 private
   iso-injective : ∀ {A : Set ℓV} {B : Set _} (e : A ≅ˢ B) {x y}
@@ -38,27 +37,28 @@ private
       (≡.trans (≡.cong (_≅ˢ_.from e) p) (_≅ˢ_.rinv e _))
 
 module FromFixedPoint (A : IdxStruct) (fixed : FixedPoint A) where
-  D′ : ∀ i j → j Ord.< i → IdxStruct.D A j → IdxStruct.D A i
-  D′ i j j<i x = τ A i j j<i (varᴱ x)
+  D' : ∀ i j → j < i → IdxStruct.D A j → IdxStruct.D A i
+  D' i j j<i x = τ A i j {j<i} (varᴱ x)
 
-  Dact : ∀ i j (j<i : j Ord.< i) k (k<j : k Ord.< j) x
-    → D′ i k (Ord.<< j<i k<j) x ≡ D′ i j j<i (D′ j k k<j x)
-  Dact i j j<i k k<j x = iso-injective (FixedPoint.stage fixed i) proof
+  Dact : ∀ i j (j<i : j < i) k (k<j : k < j) x
+    → D' i k (<< j<i k<j) x ≡ D' i j j<i (D' j k k<j x)
+  Dact i j j<i k k<j x = iso-injective (FP.stage i) proof
     where
-    proof : _≅ˢ_.to (FixedPoint.stage fixed i) (D′ i k (Ord.<< j<i k<j) x)
-          ≡ _≅ˢ_.to (FixedPoint.stage fixed i) (D′ i j j<i (D′ j k k<j x))
-    proof = ≡.trans (FixedPoint.τ-β fixed i k (Ord.<< j<i k<j) (varᴱ x))
+    module FP = FixedPoint fixed
+    proof : ≅ˢ.to (FP.stage i) (D' i k (<< j<i k<j) x)
+          ≡ ≅ˢ.to (FP.stage i) (D' i j j<i (D' j k k<j x))
+    proof = ≡.trans (FP.τ-β i k {<< j<i k<j} (varᴱ x))
       (≡.trans
-        (≡.sym (Q.quot-rel _ _ (τηᵇ j j<i k k<j (varᴱ x))))
-        (≡.sym (FixedPoint.τ-β fixed i j j<i (varᴱ (D′ j k k<j x)))))
+        (≡.sym (Q.quot-rel _ _ (τηᵇ j {j<i} k {k<j} (varᴱ x))))
+        (≡.sym (FP.τ-β i j {j<i} (varᴱ (D' j k k<j x)))))
 
   D : Diagram ℓV
   D = record
     { ob = IdxStruct.D A
-    ; edge = λ {i} {j} i<j → D′ j i i<j
+    ; edge = λ {i} {j} i<j → D' j i i<j
     ; nat = λ {i} {j} {k} i<j j<k → Dact k j j<k i i<j }
 
-  open import QIT.Colimit <wp ℓV D
+  open import QIT.Colimit Sz.<wp ℓV D
 
   D* = Colim
   D*/ = Colim/

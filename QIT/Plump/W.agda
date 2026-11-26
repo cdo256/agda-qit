@@ -302,12 +302,4 @@ Zᴬ = record
 
 open import QIT.Plump.Size
 Sz : SizeStr Z
-Sz = record
-  { _<_ = _<_
-  ; << = <<
-  ; iswf< = iswf<
-  ; ⊥ᶻ = ⊥ᶻ
-  ; _∨ᶻ_ = _∨ᶻ_
-  ; ∨ᶻ-l = ∨ᶻ-l<
-  ; ∨ᶻ-r = ∨ᶻ-r<
-  }
+Sz = plumpSizeStr Zᴬ
