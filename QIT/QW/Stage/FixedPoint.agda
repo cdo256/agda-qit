@@ -282,15 +282,37 @@ Q i = ◇ ((initᵇ i) .proj₁)
 
 Q< : ∀ i → Πᵇ i λ j {j<i} →
   Box (Q j ≡ Dᵇ ((initᵇ i) .proj₁) j {j<i})
-Q< i j {j<i} = {!!}
+Q< i j {j<i} = box
+  (≡.trans
+    (≡.cong ◇
+      (≡.cong proj₁
+        (FixSizeStructᵇ-uniq j
+          (initᵇ j)
+          (FixSizeStructᵇ↓ᵇ (initᵇ i) j {j<i}))))
+    (≡.sym ((initᵇ i) .proj₂ .stage j {j<i} .unbox)))
 
 initD : IdxStruct
 initD = record
   { D = Q
-  ; τ = λ i j {j<i} t → {!!} }
+  ; τ = λ i j {j<i} t →
+      Q.[ pairᵇ j {j<i}
+        (subst (λ X → Expr X) (Q< i j {j<i} .unbox) t) ] }
 
 D↓ : ∀ i → (initD ↓ i) ≡ (initᵇ i) .proj₁
-D↓ i = {!!}
+D↓ i = IdxStructᵇ-ext domain-family-eq tau-family-eq
+  where
+  domain-family-eq :
+    Dᵇ (initD ↓ i) ≡ Dᵇ ((initᵇ i) .proj₁)
+  domain-family-eq =
+    funExt λ j → funExtip λ p → Q< i j {β<α = p} .unbox
+
+  tau-family-eq :
+    subst
+      (λ X → τᵇ-type i X)
+      domain-family-eq
+      (τᵇ (initD ↓ i))
+      ≡ τᵇ ((initᵇ i) .proj₁)
+  tau-family-eq = {!!}
 
 δ : FixedPoint initD
 δ = record
